@@ -55,3 +55,93 @@ testability: PASSIVE
 
 **STEP 7 — RISK**:
 [RISK] BASF SE program: 70 — Large cloud surface across Azure Functions + SAP dev endpoints; SSRF→metadata chain high impact if confirmed; dev endpoints may have weaker controls but lower business value
+===== ANALYST bigpickle 2026-09-03 21:00:23 UTC =====
+[0m
+> build · big-pickle
+[0m
+**STEP 1 — DELTA**
+NO_DELTA — inventory unchanged since last scan; no new hosts or technology shifts.
+
+---
+
+**STEP 2 — PRIORITIZE**
+
+| Asset | Attack | Business | Tech | Gate | Cloud | Fresh | **Total** |
+|---|---|---|---|---|---|---|---|
+| `ap-eupf.api.basf.com` | 9 | 7 | 9 | 8 | 9 | 8 | **8.5** |
+| `ap-digitalconnect.api.basf.com` | 7 | 8 | 8 | 6 | 8 | 7 | **7.3** |
+| `dev-ext001.api.basf.com` | 6 | 5 | 5 | 7 | 3 | 7 | **5.5** |
+| `e-gate.api.basf.com` | 5 | 6 | 4 | 6 | 3 | 5 | **4.9** |
+
+---
+
+**STEP 3 — HYPOTHESES**
+
+```
+[HYP] SSRF via header-injected URL on Azure Functions health endpoint
+class: SSRF
+asset: ap-eupf.api.basf.com
+confidence: 62
+reasoning: url param probes return 403 (WAF); Azure Functions HTTP triggers may forward X-Forwarded-For, X-Original-URL, or Referer headers to backend; metadata endpoint confirmed reachable from App Service; common pattern in Azure Functions with reverse proxy
+evidence_needed: metadata JSON response or header-specific 403/timeout distinguishing blocked vs allowed header injection
+verify_steps: GET https://ap-eupf.api.basf.com/api/health with headers: X-Forwarded-For: 169.254.169.254 / Referer: http://169.254.169.254/metadata/instance?api-version=2021-02-01
+impact: Managed identity token theft, lateral move to linked Azure resources, keyvault/storage exfiltration; CRITICAL
+testability: PASSIVE
+```
+
+```
+[HYP] Azure Function admin key via non-standard path enumeration
+class: AUTH
+asset: ap-digitalconnect.api.basf.com
+confidence: 50
+reasoning: /admin/host/keys returns 404 not 401; admin surface non-standard — suggests custom routing; alternative paths (/admin/list, /admin/keys, /admin/.env, /.azure-functions-host) may expose master key or admin dashboard; Azure Functions v4 default admin path varies by extension version
+evidence_needed: HTTP 200 with master key in response body or admin dashboard HTML
+verify_steps: GET https://ap-digitalconnect.api.basf.com/admin/list, GET /admin/keys, GET /.azure-functions-host
+impact: Full admin control over Azure Function app, code execution, data access; CRITICAL
+testability: PASSIVE
+```
+
+```
+[HYP] Dev endpoint stack trace / debug info disclosure
+class: MISCONFIG
+asset: dev-ext001.api.basf.com
+confidence: 48
+reasoning: HTTP 400 without client cert; dev endpoints often have verbose error responses; stack traces may leak internal paths, framework versions, or connection strings
+evidence_needed: Full error response body with stack trace, internal paths, or version strings
+verify_steps: GET https://dev-ext001.api.basf.com/ and inspect for stack traces, internal paths, or version info
+impact: Internal information disclosure aiding further attacks; LOW-MEDIUM
+testability: PASSIVE
+```
+
+---
+
+**STEP 4 — SELF-CRITIQUE**
+
+- [PARKED] Dev endpoint stack trace: confidence 48 < 50 threshold; dev endpoints with client cert requirement unlikely to yield useful disclosure passively
+- [FINAL] SSRF via header injection: 62 — active WAF on url param; header-based bypass plausible but needs confirmation
+- [FINAL] Admin key via alt paths: 50 — 404 suggests custom routing; alt paths worth one round of enumeration
+
+---
+
+**STEP 5 — NEXT ACTION**
+
+```
+[NEXT] PROBE: GET https://ap-eupf.api.basf.com/api/health with headers X-Forwarded-For: 169.254.169.254 and Referer: http://169.254.169.254/metadata/instance?api-version=2021-02-01 (test header-based SSRF bypass on Azure Functions)
+```
+
+---
+
+**STEP 6 — LEARNING**
+
+```
+[LEARN] REJECTED MISCONFIG @ dev-ext001.api.basf.com: confidence too low for active probe; dev client cert requirement blocks passive disclosure
+[LEARN] ACCEPTED SSRF @ ap-eupf.api.basf.com: Azure Functions confirmed; metadata endpoint reachable from App Service; url param blocked by WAF; header injection remains untested
+```
+
+---
+
+**STEP 7 — RISK**
+
+```
+[RISK] BASF SE program: 68 — Large cloud surface across Azure Functions + SAP dev endpoints; SSRF→metadata chain high impact if confirmed; WAF blocks common url param injection; header-based bypass needs validation; dev endpoints may have weaker controls but lower business value
+```

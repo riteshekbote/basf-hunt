@@ -34,3 +34,11 @@ www.basf.com
 ## 2026-09-03 17:55:27 UTC
 - CHANGED `ap-digitalconnect.api.basf.com/admin/host/keys` → HTTP 404 (was expected 401 Bearer); admin surface differs from standard Azure Function App defaults
 - CHANGED `ap-eupf.api.basf.com` SSRF probes (`/api/health?url=...`, `/api/<function>?url=...`) → HTTP 403 (blocked by WAF/gateway); SSRF vector appears mitigated at edge
+
+## 2026-09-03 21:00:23 UTC
+- CHANGED `ap-digitalconnect.api.basf.com/admin/host/keys` → HTTP 401 (was 404 in KB); standard admin path exists and requires auth
+- CHANGED `ap-eupf.api.basf.com/admin/host/keys` → HTTP 401; both Function Apps have standard admin surface gated by auth
+- CHANGED `ap-eupf.api.basf.com/runtime/webhooks/host/keys` → HTTP 401; internal runtime endpoint also auth-gated
+- CHANGED `ap-eupf.api.basf.com/api/HttpTrigger1|health|HttpTrigger|function|run` → all HTTP 404; no common function names exposed at `/api/`
+- CHANGED Header-based SSRF probes (`X-Forwarded-Url`, `X-Callback-Url` to metadata endpoint) on both roots → HTTP 200 (headers ignored, no callback evidence)
+- NEW `dev-m.api.basf.com` and `dev-sap.api.basf.com` → HTTP 404 (not in prior deep enum tail)
