@@ -27,3 +27,12 @@ https://dev-clientcert-sap.api.basf.com/ -> HTTP 400
 https://ap-eupf.api.basf.com/api/health -> HTTP 404
 https://ap-digitalconnect.api.basf.com/admin/list -> HTTP 404
 https://dev-ext001.api.basf.com/ -> HTTP 400
+
+## 2026-09-03 23:13:36 UTC
+https://ap-digitalconnect.api.basf.com/admin/host/keys?slot=staging -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/host/keys?slot=production -> HTTP 404
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://dev-clientcert-sap.api.basf.com/ -> HTTP 400
+https://ap-eupf.api.basf.com/api/health -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/list -> HTTP 404
+https://dev-ext001.api.basf.com/ -> HTTP 400

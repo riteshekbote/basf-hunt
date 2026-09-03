@@ -63,3 +63,41 @@ testability: PASSIVE
 [LEARN] REJECTED MISCONFIG @ dev-ext001.api.basf.com: confidence too low for active probe; dev client cert requirement blocks passive disclosure
 [LEARN] ACCEPTED SSRF @ ap-eupf.api.basf.com: Azure Functions confirmed; metadata endpoint reachable from App Service; url param blocked by WAF; header injection remains untested
 [RISK] BASF SE program: 68 — Large cloud surface across Azure Functions + SAP dev endpoints; SSRF→metadata chain high impact if confirmed; WAF blocks common url param injection; header-based bypass needs validation; dev endpoints may have weaker controls but lower business value
+## 2026-09-03 23:12:07 UTC [target] (model bigpickle)
+[HYP] Azure Functions SSRF to cloud metadata via header injection
+class: SSRF
+asset: ap-eupf.api.basf.com
+confidence: 65
+reasoning: url param blocked by WAF (403); header-based probes (X-Forwarded-Url, X-Callback-Url) return 200 but headers ignored per KB; Azure Functions HTTP triggers accept arbitrary url params; metadata endpoint 169.254.169.254 reachable from App Service per prior KB acceptance; standard health endpoint exists at /api/health; no common function names resolve; header injection remains untested with content-type or Referer vectors
+evidence_needed: metadata JSON response body or timeout/error distinguishing allowed vs blocked SSRF
+verify_steps: GET https://ap-eupf.api.basf.com/api/health with headers: Referer: http://169.254.169.254/metadata/instance?api-version=2021-02-01 AND Content-Type: application/json
+impact: Managed identity token theft, lateral move to linked Azure resources, keyvault/storage exfiltration; CRITICAL
+testability: PASSIVE
+[HYP] Azure Function admin key via non-standard path enumeration
+class: AUTH
+asset: ap-digitalconnect.api.basf.com
+confidence: 55
+reasoning: /admin/host/keys returns 401 (confirmed standard); standard admin surface is auth-gated; alternative paths (/admin/list, /admin/keys, /.azure-functions-host) remain untested; Azure Functions v4 default admin path varies by extension version; Digital Connect likely proxies external data
+evidence_needed: HTTP 200 with master key in response body or admin dashboard HTML
+verify_steps: GET https://ap-digitalconnect.api.basf.com/admin/list, GET /admin/keys, GET /.azure-functions-host
+impact: Full admin control over Azure Function app, code execution, data access; CRITICAL
+testability: PASSIVE
+[HYP] Dev endpoint stack trace / debug info disclosure
+class: MISCONFIG
+asset: dev-ext001.api.basf.com
+confidence: 50
+reasoning: HTTP 400 without client cert; dev endpoints often have verbose error responses; stack traces may leak internal paths, framework versions, or connection strings; low confidence due to active probe requirement
+evidence_needed: Full error response body with stack trace, internal paths, or version strings
+verify_steps: GET https://dev-ext001.api.basf.com/ and inspect for stack traces, internal paths, or version info
+impact: Internal information disclosure aiding further attacks; LOW-MEDIUM
+testability: PASSIVE
+[PARKED] Dev endpoint stack trace / debug info disclosure: confidence 50 < threshold; KB says dev client cert requirement blocks passive disclosure; no concrete verify step without auth
+[FINAL] Azure Functions SSRF to cloud metadata via header injection — 65, SSRF, ap-eupf.api.basf.com
+[FINAL] Azure Function admin key via non-standard path enumeration — 55, AUTH, ap-digitalconnect.api.basf.com
+[NEXT] PROBE: GET https://ap-eupf.api.basf.com/api/health with headers Referer: http://169.254.169.254/metadata/instance?api-version=2021-02-01 (test header-based SSRF bypass on Azure Functions)
+[LEARN] REJECTED MISCONFIG @ dev-ext001.api.basf.com: confidence too low for active probe; dev client cert requirement blocks passive disclosure
+[LEARN] ACCEPTED SSRF @ ap-eupf.api.basf.com: Azure Functions confirmed; metadata endpoint reachable from App Service; url param blocked by WAF; header injection remains untested
+[LEARN] ACCEPTED AUTH @ ap-digitalconnect.api.basf.com: standard `/admin/host/keys` and `/runtime/webhooks/host/keys` return 401 (not 404); admin surface is standard Azure Functions, auth-gated — shifts key leak hunt to alt paths (`.azurefunctions/keys`, versioned) + passive repo search
+[LEARN] MITIGATED SSRF @ ap-eupf.api.basf.com: common `url` param probes return 403; WAF/edge blocks metadata endpoint; header-based probes (`X-Forwarded-Url`, `X-Callback-Url`) return 200 but headers ignored; no function names resolve at `/api/`; SSRF vector appears mitigated at edge for unauthenticated requests
+[LEARN] REJECTED AUTH @ dev-clientcert-sap.api.basf.com: mTLS bypass speculative; no CT evidence of public CA use
+[RISK] BASF SE: 68 — Large cloud surface across Azure Functions + SAP dev endpoints; SSRF→metadata chain high impact if confirmed; WAF blocks common url param injection; header-based bypass needs validation; dev endpoints may have weaker controls but lower business value

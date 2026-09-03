@@ -11,3 +11,9 @@
 - 2026-09-03 MITIGATED SSRF @ ap-eupf.api.basf.com: common `url` param probes return 403; WAF/edge blocks metadata endpoint; header-based probes (`X-Forwarded-Url`, `X-Callback-Url`) return 200 but headers ignored; no function names resolve at `/api/`; SSRF vector appears mitigated at edge for unauthenticated requests
 - 2026-09-03 REJECTED MISCONFIG @ dev-ext001.api.basf.com: confidence too low for active probe; dev client cert requirement blocks passive disclosure
 - 2026-09-03 ACCEPTED SSRF @ ap-eupf.api.basf.com: Azure Functions confirmed; metadata endpoint reachable from App Service; url param blocked by WAF; header injection remains untested
+- 2026-09-03 REJECTED AUTH @ ap-digitalconnect.api.basf.com/.azurefunctions/keys: returns 404; Azure internal alternate keys path not exposed
+- 2026-09-03 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/v2/keys: returns 404; versioned admin keys path not exposed
+- 2026-09-03 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/list: returns 404; admin list endpoint not exposed
+- 2026-09-03 ACCEPTED RECON @ ap-eupf.api.basf.com/: root returns 200 with 150KB content; indicates active function handler or custom landing page at root
+- 2026-09-03 REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404; common health endpoint not exposed
+- 2026-09-03 MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403; param-based SSRF blocked at edge/WAF for enumerated function names

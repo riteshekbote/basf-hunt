@@ -42,3 +42,11 @@ www.basf.com
 - CHANGED `ap-eupf.api.basf.com/api/HttpTrigger1|health|HttpTrigger|function|run` → all HTTP 404; no common function names exposed at `/api/`
 - CHANGED Header-based SSRF probes (`X-Forwarded-Url`, `X-Callback-Url` to metadata endpoint) on both roots → HTTP 200 (headers ignored, no callback evidence)
 - NEW `dev-m.api.basf.com` and `dev-sap.api.basf.com` → HTTP 404 (not in prior deep enum tail)
+
+## 2026-09-03 23:13:28 UTC
+- NEW `ap-digitalconnect.api.basf.com/.azurefunctions/keys` → HTTP 404 (Azure internal alt path tested, not found)
+- NEW `ap-digitalconnect.api.basf.com/admin/v2/keys` → HTTP 404 (versioned admin path tested, not found)
+- NEW `ap-digitalconnect.api.basf.com/admin/list` → HTTP 404 (admin list endpoint tested, not found)
+- NEW `ap-eupf.api.basf.com/` → HTTP 200 len=150093 (root returns substantial content, not empty placeholder)
+- NEW `ap-eupf.api.basf.com/api/health` → HTTP 404 (common health endpoint not exposed)
+- NEW `ap-eupf.api.basf.com/api/<enum>?url=http://attacker.com` → HTTP 403 (param-based SSRF blocked by WAF/edge)
