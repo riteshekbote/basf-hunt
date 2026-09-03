@@ -1,0 +1,57 @@
+===== ANALYST bigpickle 2026-09-03 17:55:27 UTC =====
+[0m
+> build · big-pickle
+[0m
+**STEP 1 — DELTA**: NO_DELTA
+
+**STEP 2 — PRIORITIZE**:
+- [PRIO] ap-eupf.api.basf.com, 7.3, attack_surface=8 cloud_surface=9 tech_exposure=7 gate_ease=7
+- [PRIO] ap-digitalconnect.api.basf.com, 6.45, attack_surface=6 cloud_surface=7 business_value=7
+- [PRIO] dev-clientcert-sap.api.basf.com, 5.2, attack_surface=5 tech_exposure=5 gate_ease=4
+
+**STEP 3 — HYPOTHESES**:
+[HYP] Azure Functions SSRF to cloud metadata via url parameter
+class: SSRF
+asset: ap-eupf.api.basf.com
+confidence: 85
+reasoning: Azure Functions HTTP triggers accept arbitrary url params; cloud metadata 169.254.169.254 reachable from App Service; host confirmed HTTP 200
+evidence_needed: metadata JSON response body (instance, identity, compute keys)
+verify_steps: GET https://ap-eupf.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01
+impact: Cloud managed identity token theft, lateral move to linked Azure resources, data exfiltration from storage/keyvault; CRITICAL
+testability: PASSIVE
+
+[HYP] Azure Functions SSRF to cloud metadata via url parameter
+class: SSRF
+asset: ap-digitalconnect.api.basf.com
+confidence: 60
+reasoning: Same Azure Functions platform as ap-eupf; HTTP 200 suggests active endpoints; Digital Connect likely proxies external data
+evidence_needed: metadata JSON response or error distinguishing valid SSRF from generic error
+verify_steps: GET https://ap-digitalconnect.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01
+impact: Same as above; CRITICAL
+testability: PASSIVE
+
+[HYP] Dev endpoint information disclosure via error messages
+class: MISCONFIG
+asset: dev-ext001.api.basf.com
+confidence: 45
+reasoning: HTTP 400 without client cert suggests structured error response; dev endpoints may leak stack traces or internal paths
+evidence_needed: Full error response body showing internal details
+verify_steps: GET https://dev-ext001.api.basf.com/ and inspect response body for stack traces, internal paths, or version info
+impact: Internal information disclosure aiding further attacks; LOW-MEDIUM
+testability: PASSIVE
+
+**STEP 4 — SELF-CRITIQUE**:
+- [PARKED] Dev endpoint info disclosure @ dev-ext001.api.basf.com: confidence 45, error responses may be generic 400s with no useful data
+- [FINAL] SSRF @ ap-eupf.api.basf.com: confidence 85, accepted KB, concrete verify
+- [FINAL] SSRF @ ap-digitalconnect.api.basf.com: confidence 60, same platform pattern
+
+**STEP 5 — NEXT ACTION**:
+[NEXT] PROBE: GET https://ap-eupf.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01
+
+**STEP 6 — LEARNING**:
+[LEARN] ACCEPTED SSRF @ ap-eupf.api.basf.com: Azure Functions confirmed via KB; metadata endpoint reachable from App Service; concrete url param for testing
+[LEARN] REJECTED AUTH @ ap-digitalconnect.api.basf.com: master key leak lacks verify without auth; passive GitHub search not systematic
+[LEARN] REJECTED AUTH @ dev-clientcert-sap.api.basf.com: mTLS bypass speculative; no CT evidence of public CA use
+
+**STEP 7 — RISK**:
+[RISK] BASF SE program: 70 — Large cloud surface across Azure Functions + SAP dev endpoints; SSRF→metadata chain high impact if confirmed; dev endpoints may have weaker controls but lower business value

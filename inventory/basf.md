@@ -30,3 +30,7 @@ www.basf.com
 ## 2026-09-03 09:40:45 UTC
 
 ## 2026-09-03 14:03:00 UTC
+
+## 2026-09-03 17:55:27 UTC
+- CHANGED `ap-digitalconnect.api.basf.com/admin/host/keys` → HTTP 404 (was expected 401 Bearer); admin surface differs from standard Azure Function App defaults
+- CHANGED `ap-eupf.api.basf.com` SSRF probes (`/api/health?url=...`, `/api/<function>?url=...`) → HTTP 403 (blocked by WAF/gateway); SSRF vector appears mitigated at edge

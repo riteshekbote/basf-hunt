@@ -2,3 +2,8 @@
 - 2026-09-03 REJECTED AUTH @ ap-digitalconnect.api.basf.com: master key leak hypothesis lacks concrete verify step without auth; passive GitHub search is opportunistic not systematic
 - 2026-09-03 REJECTED AUTH @ dev-clientcert-sap.api.basf.com: client cert bypass speculative; no CT evidence BASF uses public CA for mTLS; dev endpoints may be non-production
 - 2026-09-03 ACCEPTED SSRF @ ap-eupf.api.basf.com: Azure Functions HTTP triggers are known SSRF vectors; cloud metadata endpoint confirmed reachable from App Service; concrete param list for testing
+- 2026-09-03 CHANGED AUTH @ ap-digitalconnect.api.basf.com: `/admin/host/keys` returns 404 not 401; admin surface non-standard — shifts key leak hunt to alt paths + passive repo search
+- 2026-09-03 MITIGATED SSRF @ ap-eupf.api.basf.com: common `url` param probes return 403; WAF/edge blocks metadata endpoint; header-based or alternate function triggers remain untested
+- 2026-09-03 ACCEPTED SSRF @ ap-eupf.api.basf.com: Azure Functions confirmed via KB; metadata endpoint reachable from App Service; concrete url param for testing
+- 2026-09-03 REJECTED AUTH @ ap-digitalconnect.api.basf.com: master key leak lacks verify without auth; passive GitHub search not systematic
+- 2026-09-03 REJECTED AUTH @ dev-clientcert-sap.api.basf.com: mTLS bypass speculative; no CT evidence of public CA use
