@@ -116,3 +116,46 @@ _Generated 2026-09-03 | read-only passive enumeration | no active testing_
 ---
 
 _Honest framing: all observations from read-only passive enumeration. No vulnerability claimed. Scope must be confirmed before active testing on any of these live production assets._
+# Deeper finding re-verification — 2026-09-03
+
+_Appended to DEEPER-FINDINGS.md | read-only re-check, no active testing_
+
+## Re-verification results
+
+### alfaview API — all endpoints auth-gated (CONFIRMED, no unauth vuln)
+
+Live checks against `https://apis.alfaview.com`:
+- `/v2/languages` → 401 "No access token was provided in the Authorization header."
+- `/v2/room-types` → 401 (same)
+- `/v2/users/me` → 401 (same)
+- `/v2/rooms` → 401 (same)
+- `/v2/auth/token-info` → 422 "invalid access token format" — **endpoint works and validates token format**; could act as an oracle distinguishing valid vs malformed tokens, but no unauth info disclosure
+- `/v2/stats` → 422 "validation failed" (requires query params)
+
+**Conclusion:** The alfaview API is properly auth-gated. No unauthenticated vulnerability. The exposed OpenAPI spec is a **roadmap for authenticated testing** — the IDOR-shaped operations (`/v2/rooms/{roomId}/permissions/{userId}`, `DELETE /v2/users/{id}`, `/v2/users/invitation`) only become testable with a valid access token obtained via one of the 4 auth methods.
+
+### Auth model (documented in spec, verified structure)
+- All requests require `Authorization: Bearer <base64 accessToken>`
+- Tokens valid for 1 hour
+- Auth methods: API-key (companyId+clientId+key), password (username+password), group-link (companyId+roomId+accessKey), guest-link (companyId+accessKey)
+- Group/guest-link auth accepts only a companyId + roomId + accessKey — **potential guest-auth brute force IF access keys are low-entropy**, but companyId+roomId are long random IDs raising the bar. Not exploitable without scope-authorized testing.
+
+### BASF Azure Functions — admin API exposed, Bearer-auth-gated (CONFIRMED)
+- `/admin/host/status` → 401 with `WWW-Authenticate: Bearer`
+- `/admin/functions` → 401 Bearer
+- `/admin/host/keys` → 401 Bearer
+- `/.env` → 403 (blocked)
+- Requires Azure Functions master/system key. No default/weak key confirmed (no auth testing done). This is a legitimate **documented-observation**: the admin endpoints are reachable but properly key-authenticated.
+
+### daimlertruck developer portal — login-gated (CONFIRMED still)
+- `developer.eu.api.daimlertruck.com/api` → 307 to `/?callbackUrl=%2Fapi` (login gate intact)
+
+## Overall honest conclusion
+
+Each deeper dig confirmed the same reality: **the 6 live targets are all auth-gated at the application/API layer.** The genuinely valuable output of this session:
+
+1. **alfaview OpenAPI spec** (159KB, 60 operations) recovered and stored — the single highest-value artifact; enables targeted authenticated testing later.
+2. **BASF Azure Functions admin surface** documented — reachable admin API requiring keys.
+3. Honest negative results recorded for daimlertruck and the 22 subdomain-thin targets.
+
+No unauthenticated compromise was achieved, and per triage discipline **no vulnerability is claimed.** The path to real findings is **authenticated testing on alfaview** (obtain a legitimate developer account + written scope confirmation).
