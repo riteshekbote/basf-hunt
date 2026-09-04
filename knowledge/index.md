@@ -31,3 +31,7 @@
 - 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/status: returns 404; admin host status not exposed
 - 2026-09-04 ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 6 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface fully mapped — no unauthenticated path exists
 - 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; zero probes run; API gateway naming convention warrants documentation path enumeration
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/functionkeys: returns 404; v4 function-level key endpoint not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/system: returns 404; admin system info endpoint not exposed
+- 2026-09-04 ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 8 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface fully mapped — no unauthenticated path exists
+- 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; zero probes run against any sub-paths; API gateway naming convention warrants documentation path enumeration

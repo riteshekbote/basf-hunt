@@ -65,3 +65,5 @@ www.basf.com
 - NEW `e-gate.api.basf.com` → HTTP 404 at root, ZERO probes run against any sub-paths (untested surface)
 - NEW `ap-digitalconnect.api.basf.com/admin/host/functionkeys` → UNTESTED (v4 function-level key endpoint)
 - NEW `ap-digitalconnect.api.basf.com/admin/system` → UNTESTED (admin system info endpoint)
+
+## 2026-09-04 11:37:35 UTC
