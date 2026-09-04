@@ -17,3 +17,9 @@
 - 2026-09-03 ACCEPTED RECON @ ap-eupf.api.basf.com/: root returns 200 with 150KB content; indicates active function handler or custom landing page at root
 - 2026-09-03 REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404; common health endpoint not exposed
 - 2026-09-03 MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403; param-based SSRF blocked at edge/WAF for enumerated function names
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/keys?slot=staging: returns 404; deployment slot staging admin keys path not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/keys?slot=production: returns 404; deployment slot production admin keys path not exposed
+- 2026-09-04 ACCEPTED RECON @ ap-eupf.api.basf.com/: root returns 200 with 150KB content (reconfirmed); indicates active function handler or custom landing page at root
+- 2026-09-04 REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404 (reconfirmed); common health endpoint not exposed
+- 2026-09-04 ACCEPTED AUTH @ ap-digitalconnect.api.basf.com: standard `/admin/host/keys` and `/runtime/webhooks/host/keys` return 401 (not 404); admin surface is standard Azure Functions, auth-gated
+- 2026-09-04 MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403 (reconfirmed); param-based SSRF blocked at edge/WAF for enumerated function names

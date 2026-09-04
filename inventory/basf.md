@@ -50,3 +50,10 @@ www.basf.com
 - NEW `ap-eupf.api.basf.com/` → HTTP 200 len=150093 (root returns substantial content, not empty placeholder)
 - NEW `ap-eupf.api.basf.com/api/health` → HTTP 404 (common health endpoint not exposed)
 - NEW `ap-eupf.api.basf.com/api/<enum>?url=http://attacker.com` → HTTP 403 (param-based SSRF blocked by WAF/edge)
+
+## 2026-09-04 01:13:42 UTC
+- NEW `ap-digitalconnect.api.basf.com/admin/host/keys?slot=staging` → HTTP 404 (deployment slot admin keys endpoint tested)
+- NEW `ap-digitalconnect.api.basf.com/admin/host/keys?slot=production` → HTTP 404 (deployment slot admin keys endpoint tested)
+- CHANGED `ap-eupf.api.basf.com/` → HTTP 200 len=150093 (reconfirmed, substantial content persists)
+- CHANGED `dev-clientcert-sap.api.basf.com/` → HTTP 400 (reconfirmed, mTLS required)
+- CHANGED `dev-ext001.api.basf.com/` → HTTP 400 (reconfirmed, mTLS required)

@@ -205,3 +205,475 @@ testability: PASSIVE
 
 ## STEP 7 — RISK
 [RISK] BASF SE: 68 — Large cloud surface across Azure Functions + SAP dev endpoints; SSRF→metadata chain high impact if confirmed; WAF blocks common url param injection; header-based bypass needs validation; dev endpoints may have weaker controls but lower business value
+===== ANALYST bigpickle 2026-09-04 01:13:42 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/ 2>/dev/null; echo "---"; ls -la /home/runner/work/basf-hunt/basf-hunt/art/ 2>/dev/null
+total 132
+drwxr-xr-x 12 runner runner  4096 Sep  4 01:04 .
+drwxr-xr-x  3 runner runner  4096 Sep  4 01:04 ..
+drwxr-xr-x  7 runner runner  4096 Sep  4 01:04 .git
+drwxr-xr-x  3 runner runner  4096 Sep  4 01:04 .github
+-rw-r--r--  1 runner runner  1801 Sep  4 01:04 README.md
+-rw-r--r--  1 runner runner    32 Sep  4 01:04 analyst-out.txt
+-rw-r--r--  1 runner runner 22355 Sep  4 01:04 analyst-prompt.txt
+-rw-r--r--  1 runner runner 18483 Sep  4 01:04 ctx.txt
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 inventory
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 knowledge
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 leads
+-rw-r--r--  1 runner runner  1985 Sep  4 01:04 probe-results.md
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 recon-notes
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 reports
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 reposcan-raw
+-rw-r--r--  1 runner runner  3285 Sep  4 01:04 scope.yml
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 scripts
+-rw-r--r--  1 runner runner    33 Sep  4 01:04 state_bigpickle.json
+-rw-r--r--  1 runner runner    33 Sep  4 01:04 state_laguna.json
+-rw-r--r--  1 runner runner    33 Sep  4 01:04 state_ling3.json
+-rw-r--r--  1 runner runner    33 Sep  4 01:04 state_longcat.json
+-rw-r--r--  1 runner runner    33 Sep  4 01:04 state_mimo.json
+-rw-r--r--  1 runner runner    33 Sep  4 01:04 state_nemotron3.json
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 triage
+---
+[0m
+Let me examine the environment, state files, and recent probe results to understand what's current.
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt/; echo "=== state files ==="; for f in state_*.json; do echo "--- $f ---"; cat "$f"; echo; done; echo "=== analyst-out ==="; cat analyst-out.txt; echo; echo "=== probe-results ==="; cat probe-results.md
+=== state files ===
+--- state_bigpickle.json ---
+{"phase": "POC", "target": "api"}
+--- state_laguna.json ---
+{"phase": "POC", "target": "api"}
+--- state_ling3.json ---
+{"phase": "POC", "target": "api"}
+--- state_longcat.json ---
+{"phase": "POC", "target": "api"}
+--- state_mimo.json ---
+{"phase": "POC", "target": "api"}
+--- state_nemotron3.json ---
+{"phase": "POC", "target": "api"}
+=== analyst-out ===
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/ 2>/dev/null; echo "---"; ls -la /home/runner/work/basf-hunt/basf-hunt/art/ 2>/dev/null
+total 132
+drwxr-xr-x 12 runner runner  4096 Sep  4 01:04 .
+drwxr-xr-x  3 runner runner  4096 Sep  4 01:04 ..
+drwxr-xr-x  7 runner runner  4096 Sep  4 01:04 .git
+drwxr-xr-x  3 runner runner  4096 Sep  4 01:04 .github
+-rw-r--r--  1 runner runner  1801 Sep  4 01:04 README.md
+-rw-r--r--  1 runner runner    32 Sep  4 01:04 analyst-out.txt
+-rw-r--r--  1 runner runner 22355 Sep  4 01:04 analyst-prompt.txt
+-rw-r--r--  1 runner runner 18483 Sep  4 01:04 ctx.txt
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 inventory
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 knowledge
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 leads
+-rw-r--r--  1 runner runner  1985 Sep  4 01:04 probe-results.md
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 recon-notes
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 reports
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 reposcan-raw
+-rw-r--r--  1 runner runner  3285 Sep  4 01:04 scope.yml
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 scripts
+-rw-r--r--  1 runner runner    33 Sep  4 01:04 state_bigpickle.json
+-rw-r--r--  1 runner runner    33 Sep  4 01:04 state_laguna.json
+-rw-r--r--  1 runner runner    33 Sep  4 01:04 state_ling3.json
+-rw-r--r--  1 runner runner    33 Sep  4 01:04 state_longcat.json
+-rw-r--r--  1 runner runner    33 Sep  4 01:04 state_mimo.json
+-rw-r--r--  1 runner runner    33 Sep  4 01:04 state_nemotron3.json
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 triage
+---
+[0m
+
+=== probe-results ===
+
+## 2026-09-03 09:40:45 UTC
+
+
+## 2026-09-03 14:03:05 UTC
+https://ap-digitalconnect.api.basf.com/admin/host/keys -> HTTP 404
+https://dev-clientcert-sap.api.basf.com/ -> HTTP 400
+https://ap-eupf.api.basf.com/api/<function>?url=http://attacker.com -> HTTP 403
+https://ap-eupf.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+
+## 2026-09-03 17:55:37 UTC
+https://ap-digitalconnect.api.basf.com/admin/keys -> HTTP 404
+https://ap-digitalconnect.api.basf.com/runtime/webhooks/host/keys -> HTTP 404
+https://ap-eupf.api.basf.com/api/HttpTrigger1?url=http://attacker.com -> HTTP 403
+https://ap-eupf.api.basf.com/api/HttpTrigger1 -> HTTP 404
+https://dev-clientcert-sap.api.basf.com/ -> HTTP 400
+https://ap-eupf.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+https://ap-digitalconnect.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+https://dev-ext001.api.basf.com/ -> HTTP 400
+
+## 2026-09-03 21:00:34 UTC
+https://ap-digitalconnect.api.basf.com/.azurefunctions/keys -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/v2/keys -> HTTP 404
+https://ap-eupf.api.basf.com/api/<enum>?url=http://attacker.com -> HTTP 403
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://dev-clientcert-sap.api.basf.com/ -> HTTP 400
+https://ap-eupf.api.basf.com/api/health -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/list -> HTTP 404
+https://dev-ext001.api.basf.com/ -> HTTP 400
+
+## 2026-09-03 23:13:36 UTC
+https://ap-digitalconnect.api.basf.com/admin/host/keys?slot=staging -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/host/keys?slot=production -> HTTP 404
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://dev-clientcert-sap.api.basf.com/ -> HTTP 400
+https://ap-eupf.api.basf.com/api/health -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/list -> HTTP 404
+https://dev-ext001.api.basf.com/ -> HTTP 400
+[0m
+Let me look at the leads files, knowledge directory, and inventory to understand the complete state.
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt/; echo "=== leads ==="; ls -la leads/; for f in leads/*.txt; do echo "--- $f ---"; cat "$f"; echo; done
+=== leads ===
+total 68
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 .
+drwxr-xr-x 12 runner runner  4096 Sep  4 01:04 ..
+-rw-r--r--  1 runner runner  9881 Sep  4 01:04 lead-bigpickle.md
+-rw-r--r--  1 runner runner   153 Sep  4 01:04 lead-laguna.md
+-rw-r--r--  1 runner runner   150 Sep  4 01:04 lead-ling3.md
+-rw-r--r--  1 runner runner   156 Sep  4 01:04 lead-longcat.md
+-rw-r--r--  1 runner runner    18 Sep  4 01:04 lead-mimo.md
+-rw-r--r--  1 runner runner 24826 Sep  4 01:04 lead-nemotron3.md
+-rw-r--r--  1 runner runner   412 Sep  4 01:04 reposcan-basf.md
+--- leads/*.txt ---
+
+cat: 'leads/*.txt': No such file or directory
+[0m
+[0m→ [0mRead leads/lead-bigpickle.md
+[0m→ [0mRead leads/reposcan-basf.md
+Let me look at the other lead files and the reposcan note to understand what other agents found.
+Let me look at the nemotron3 lead (the other primary agent) and the knowledge directory to get a full picture.
+[0m→ [0mRead leads/lead-nemotron3.md
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt/; for f in leads/lead-laguna.md leads/lead-ling3.md leads/lead-longcat.md leads/lead-mimo.md; do echo "=== $f ==="; cat "$f"; echo; done; echo "=== knowledge dir ==="; ls -la knowledge/; echo "=== inventory dir ==="; ls -la inventory/; echo "=== recon-notes ==="; ls -la recon-notes/
+=== leads/lead-laguna.md ===
+## 2026-09-03 17:46:53 UTC [target] (model laguna)
+## 2026-09-03 20:54:21 UTC [target] (model laguna)
+## 2026-09-03 23:11:42 UTC [target] (model laguna)
+
+=== leads/lead-ling3.md ===
+## 2026-09-03 17:46:52 UTC [target] (model ling3)
+## 2026-09-03 20:54:19 UTC [target] (model ling3)
+## 2026-09-03 23:11:42 UTC [target] (model ling3)
+
+=== leads/lead-longcat.md ===
+## 2026-09-03 17:46:54 UTC [target] (model longcat)
+## 2026-09-03 20:54:26 UTC [target] (model longcat)
+## 2026-09-03 23:11:42 UTC [target] (model longcat)
+
+=== leads/lead-mimo.md ===
+# Lead log (seed)
+
+=== knowledge dir ===
+total 12
+drwxr-xr-x  2 runner runner 4096 Sep  4 01:04 .
+drwxr-xr-x 12 runner runner 4096 Sep  4 01:04 ..
+-rw-r--r--  1 runner runner 3122 Sep  4 01:04 index.md
+=== inventory dir ===
+total 12
+drwxr-xr-x  2 runner runner 4096 Sep  4 01:04 .
+drwxr-xr-x 12 runner runner 4096 Sep  4 01:04 ..
+-rw-r--r--  1 runner runner 3513 Sep  4 01:04 basf.md
+=== recon-notes ===
+total 20
+drwxr-xr-x  2 runner runner 4096 Sep  4 01:04 .
+drwxr-xr-x 12 runner runner 4096 Sep  4 01:04 ..
+-rw-r--r--  1 runner runner 1005 Sep  4 01:04 DEDICATED-DEEP.md
+-rw-r--r--  1 runner runner 7833 Sep  4 01:04 DEEPER-FINDINGS.md
+[0m
+Let me check the other small lead files and the knowledge/inventory directories to complete my picture, plus check probe-results for anything new since the last run.
+[0m→ [0mRead recon-notes/DEEPER-FINDINGS.md
+[0m→ [0mRead knowledge/index.md
+Now let me look at the knowledge index and inventory to confirm the full scope picture.
+[0m→ [0mRead inventory/basf.md
+I now have a complete picture. Let me check the git log to see if there have been any probe activities since the last recorded run (my role is analyst—I should consider what new exploration is warranted).
+
+Let me check the scope.yml to confirm the target framing, and the scripts directory for any probing utilities.
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt/; git log --oneline -15; echo "=== scripts ==="; ls -la scripts/; echo "=== triage ==="; ls -la triage/; echo "=== reports ==="; ls -la reports/
+2a8b802 reposcan 2026-09-04-00-28
+=== scripts ===
+total 28
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 .
+drwxr-xr-x 12 runner runner  4096 Sep  4 01:04 ..
+-rw-r--r--  1 runner runner 16987 Sep  4 01:04 sync-issues.py
+=== triage ===
+total 32
+drwxr-xr-x  2 runner runner 4096 Sep  4 01:04 .
+drwxr-xr-x 12 runner runner 4096 Sep  4 01:04 ..
+-rw-r--r--  1 runner runner    0 Sep  4 01:04 .gitkeep
+-rw-r--r--  1 runner runner  171 Sep  4 01:04 run-2026-09-03-11-40.md
+-rw-r--r--  1 runner runner  170 Sep  4 01:04 run-2026-09-03-15-10.md
+-rw-r--r--  1 runner runner 5769 Sep  4 01:04 run-2026-09-03-18-42.md
+-rw-r--r--  1 runner runner  189 Sep  4 01:04 run-2026-09-03-21-29.md
+-rw-r--r--  1 runner runner  186 Sep  4 01:04 run-2026-09-03-23-30.md
+=== reports ===
+total 112
+drwxr-xr-x  2 runner runner  4096 Sep  4 01:04 .
+drwxr-xr-x 12 runner runner  4096 Sep  4 01:04 ..
+-rw-r--r--  1 runner runner 12438 Sep  4 01:04 analyst-bigpickle.log
+-rw-r--r--  1 runner runner   651 Sep  4 01:04 analyst-laguna.log
+-rw-r--r--  1 runner runner   648 Sep  4 01:04 analyst-ling3.log
+-rw-r--r--  1 runner runner   654 Sep  4 01:04 analyst-longcat.log
+-rw-r--r--  1 runner runner 35773 Sep  4 01:04 analyst-nemotron3.log
+-rw-r--r--  1 runner runner  4320 Sep  4 01:04 hypotheses-bigpickle.txt
+-rw-r--r--  1 runner runner    51 Sep  4 01:04 hypotheses-laguna.txt
+-rw-r--r--  1 runner runner    50 Sep  4 01:04 hypotheses-ling3.txt
+-rw-r--r--  1 runner runner    52 Sep  4 01:04 hypotheses-longcat.txt
+-rw-r--r--  1 runner runner  7414 Sep  4 01:04 hypotheses-nemotron3.txt
+-rw-r--r--  1 runner runner  6161 Sep  4 01:04 hypotheses.md
+-rw-r--r--  1 runner runner    39 Sep  4 01:04 valid-bugs.md
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt/; for f in triage/run-2026-09-03-23-30.md triage/run-2026-09-03-21-29.md triage/run-2026-09-03-18-42.md; do echo "=== $f ==="; cat "$f"; echo; done
+=== triage/run-2026-09-03-23-30.md ===
+
+===== TRIAGE 2026-09-03 23:30:17 UTC =====
+[0m
+> build · mimo-v2.5-free
+[0m
+No leads provided — the LEADS section is empty. Please paste the probe results you'd like me to triage.
+
+=== triage/run-2026-09-03-21-29.md ===
+
+===== TRIAGE 2026-09-03 21:29:08 UTC =====
+[0m
+> build · mimo-v2.5-free
+[0m
+No leads provided. Please paste the probe results/leads you want me to evaluate against the 7-Question Gate.
+
+=== triage/run-2026-09-03-18-42.md ===
+
+===== TRIAGE 2026-09-03 18:42:27 UTC =====
+[0m
+> build · mimo-v2.5-free
+[0m
+[0m• [0mFind scope files[90m Explore Agent[0m
+[0m✓ [0mFind scope files[90m Explore Agent[0m
+[0m✱ [0mGlob "leads/*.md"[90m 7 matches[0m
+[0m→ [0mRead probe-results.md
+[0m→ [0mRead leads/lead-nemotron3.md
+[0m→ [0mRead leads/lead-bigpickle.md
+[0m→ [0mRead leads/lead-laguna.md
+[0m→ [0mRead leads/lead-longcat.md
+[0m→ [0mRead leads/lead-mimo.md
+[0m→ [0mRead leads/lead-ling3.md
+The "LEADS:" section in your message is empty — no leads to triage. I found active leads in the repo. Here are the **7-Question Gate** verdicts for the unvalidated candidates from `lead-nemotron3.md` and `lead-bigpickle.md`:
+
+---
+
+## Lead 1: Azure Function master key leak via non-standard admin path (ap-digitalconnect.api.basf.com)
+
+| Q | Answer |
+|---|--------|
+| Q1 Scope | **YES** — `ap-digitalconnect.api.basf.com` is in-scope (Azure Function App on owned infra) |
+| Q2 Reachable | **YES** — HTTP 200 on public DNS; admin path returns 404 (not 401), unclear if gated |
+| Q3 Impact | **YES** — master key = full Function App takeover, env var disclosure, lateral movement |
+| Q4 Provable | **NO** — verify_steps require brute-forcing paths or passive GitHub dork; no concrete key found |
+| Q5 Novel | **MAYBE** — non-standard 404 on `/admin/host/keys` is interesting but no proof of exposure |
+| Q6 Not rejected | **YES** — not on always-rejected list |
+| Q7 Reasonable triager | **NO** — too speculative; no evidence key is exposed |
+
+**Verdict: INVALID** — No passive proof of key exposure. Path returning 404 ≠ vulnerability. Requires auth or brute-force to validate; speculative.
+
+---
+
+## Lead 2: SSRF via Azure Function HTTP trigger with WAF bypass (ap-eupf.api.basf.com)
+
+| Q | Answer |
+|---|--------|
+| Q1 Scope | **YES** — `ap-eupf.api.basf.com` is in-scope |
+| Q2 Reachable | **YES** — HTTP 200 confirmed |
+| Q3 Impact | **YES** — SSRF → cloud metadata → managed identity tokens = critical |
+| Q4 Provable | **NO** — all probes return 403 (WAF blocked); no callback confirmed |
+| Q5 Novel | **NO** — WAF actively mitigating; common params all blocked |
+| Q6 Not rejected | **YES** — not on always-rejected list |
+| Q7 Reasonable triager | **NO** — 403 on every probe = blocked; no evidence bypass works |
+
+**Verdict: INVALID** — WAF blocks all SSRF probes (403). No evidence of bypass. Rejected by probe results.
+
+---
+
+## Lead 3: SSRF to cloud metadata via url parameter (ap-eupf.api.basf.com) — bigpickle
+
+| Q | Answer |
+|---|--------|
+| Q1 Scope | **YES** |
+| Q2 Reachable | **YES** |
+| Q3 Impact | **YES** — critical if confirmed |
+| Q4 Provable | **NO** — probe returned 403; no metadata response |
+| Q5 Novel | **NO** — same endpoint already blocked |
+| Q6 Not rejected | **YES** |
+| Q7 Reasonable triager | **NO** — duplicate of Lead 2, already blocked |
+
+**Verdict: INVALID** — Duplicate. WAF returns 403. No proof.
+
+---
+
+## Lead 4: SSRF to cloud metadata via url parameter (ap-digitalconnect.api.basf.com) — bigpickle
+
+| Q | Answer |
+|---|--------|
+| Q1 Scope | **YES** |
+| Q2 Reachable | **YES** — HTTP 200 |
+| Q3 Impact | **YES** — critical if confirmed |
+| Q4 Provable | **NO** — no probe result confirming metadata access |
+| Q5 Novel | **MAYBE** — untested SSRF on digitalconnect (only admin paths tested) |
+| Q6 Not rejected | **YES** |
+| Q7 Reasonable triager | **HOLD** — worth probing but no evidence yet |
+
+**Verdict: HOLD** — Untested. Needs a single passive probe: `GET /api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01`
+
+---
+
+## Lead 5: Dev endpoint information disclosure (dev-ext001.api.basf.com)
+
+| Q | Answer |
+|---|--------|
+| Q1 Scope | **YES** — dev endpoints on owned infra |
+| Q2 Reachable | **YES** — HTTP 400 (client cert required) |
+| Q3 Impact | **NO** — error messages alone = informational; no data exposure |
+| Q4 Provable | **PARTIAL** — response body may show stack trace but HTTP 400 is generic |
+| Q5 Novel | **NO** — error disclosure is always-rejected per scope.yml |
+| Q6 Not rejected | **NO** — "descriptive error messages" is explicitly out-of-scope |
+| Q7 Reasonable triager | **NO** — always-rejected finding |
+
+**Verdict: INVALID** — Descriptive error messages are explicitly out-of-scope per program rules.
+
+---
+
+## Lead 6: Client certificate auth bypass (dev-clientcert-sap.api.basf.com)
+
+| Q | Answer |
+|---|--------|
+| Q1 Scope | **YES** |
+| Q2 Reachable | **YES** — HTTP 400 (cert required) |
+| Q3 Impact | **YES** — if bypass works, SAP backend access |
+| Q4 Provable | **NO** — no CT evidence of public CA client certs; no bypass demonstrated |
+| Q5 Novel | **MAYBE** — speculative |
+| Q6 Not rejected | **YES** |
+| Q7 Reasonable triager | **NO** — too speculative; no proof of cert availability |
+
+**Verdict: INVALID** — Speculative. No evidence BASF uses public CA for mTLS. Dev endpoints likely non-production.
+
+---
+
+## Summary
+
+| # | Lead | Verdict | Reason |
+|---|------|---------|--------|
+| 1 | Master key leak (digitalconnect) | **INVALID** | 404 ≠ exposed; no key found |
+| 2 | SSRF WAF bypass (eupf) | **INVALID** | All probes 403; WAF blocks |
+| 3 | SSRF metadata (eupf) | **INVALID** | Duplicate; 403 blocked |
+| 4 | SSRF metadata (digitalconnect) | **HOLD** | Untested; worth one probe |
+| 5 | Dev error disclosure | **INVALID** | Out-of-scope (error messages) |
+| 6 | Client cert bypass | **INVALID** | Speculative; no evidence |
+
+**Actionable:** Lead 4 (digitalconnect SSRF) — run the single probe `GET https://ap-digitalconnect.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01` and check for 200 + metadata JSON.
+[0m
+Let me check the triage run notes and the hypotheses file to see the latest rankings of the collective.
+The picture is now clear. My role is analyst big-pickle. All the prior exploration has repeatedly hit WAF blocks (403) on SSRF params, 404s on alternate admin paths, and auth-gated surfaces. The triage marked the SSRF/keys leads as INVALID, but flagged digitalconnect SSRF as HOLD.
+
+Let me verify the current surface state once more since I want to emit a delta — checking whether there's anything I haven't confirmed with my own probe. Given the extensive prior probes, I've no new information to add beyond what's already in the KB. Let me perform the single most valuable pending read-only probe myself (the HOLD one: digitalconnect SSRF), which is the one thing triage explicitly recommended that hasn't obviously been run against digitalconnect specifically.
+
+Per probe-results, `ap-digitalconnect.api.basf.com/api/health?url=...` was already run at 17:55 and returned 403. So that's done too. Everything has been exhaustively probed and blocked.
+
+Let me do a quick live sanity check on the most anomalous surface point — the ap-eupf root returning 200 with 150KB content (the largest unchecked surface), since that's the one thing repeatedly flagged as "active handler." Let me look at what that root actually serves, read-only.
+[0m$ [0mcd /tmp/opencode; curl -s -o eupf-root.html -w "HTTP %{http_code} len=%{size_download}\n" --max-time 20 "https://ap-eupf.api.basf.com/" 2>&1; echo "--- first 80 lines ---"; head -c 3000 eupf-root.html
+HTTP 200 len=150093
+--- first 80 lines ---
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Azure Function App is up and running.</title>
+    <style type="text/css">
+        @font-face {
+            font-family: 'SegoeLight';
+            src: url(//:) format('no404'), url(data:font/woff;charset=utf-8;base64,d09GRgABAAAAAFbcABAAAAAAjewAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABGRlRNAAABbAAAABsAAAAcWqtaPUdERUYAAAGIAAAAHQAAACABGAADT1MvMgAAAagAAABYAAAAYGrqcLZjbWFwAAACAAAAAaIAAAIKczqUA2N2dCAAAAOkAAAATAAAAEwOEAwRZnBnbQAAA/AAAAGxAAACZQ+0L6dnYXNwAAAFpAAAAAwAAAAMAAMAB2dseWYAAAWwAABJAAAAe3CDYeDNaGVhZAAATrAAAAAxAAAANvjlJxhoaGVhAABO5AAAACAAAAAkDm4GkWhtdHgAAE8EAAACNgAAA6yU7F4gbG9jYQAAUTwAAAHOAAAB2DtSXCptYXhwAABTDAAAACAAAAAgAg8B1G5hbWUAAFMsAAAA5wAAAZ4hIT5EcG9zdAAAVBQAAAH4AAAC+Je8aS1wcmVwAABWDAAAAM8AAAFulHbF13jaY2BgYGQAguP/NtwH0SfDQtZA6Y0AWbsHmQB42mNgZGBg4ANiCQYQYGIA8V8BSRYwjwEADksBHAAAAHjaY2BmfsOow8DKwMI6i9WYgYFhBYRmkmZIY0rjYGLiZmZiYWVhYmJewMC03oFBIZoBCnyDFRSAlMJvFra0f2kMDOzpTJxAgfkgORYG1lkgOQZGAGSzDHF42mNgYGBmgGAZBkYgycDIAuQxgvksDC+AtBmDApAlxlDH8J/RkDGYsYLpGNMtpjssbCwcLGEsEQpcCiIKUgpyCkoKagr6ClYK8QprFJUeMPxm+s3y/z9QvwLDAqC+IAx9DAoCChIKMlB9lnB9jCB9/x//P/R/4v/C/77/GP6+/fvmj9of1d/ffn99cPLBkQcHHxx4sPfBrgebHqx80PrA8v4Rheesz1mfQdxPDmBkY4BrZmQCEkzoCoBBxMLKxs7BycXNw8vHLyAoJCwiKiYuISklLSMrJ6+gqKSsoqqmrqGppa2jq6dvYGhkbGJqZm5haWVtY2tn7+Do5Ozi6ubu4enl7ePr5x8QGBQcEhoWHhEZFR0TGxefkMjQ1t7ZPXnGvMWLlixbunzl6lVr1q5ft2Hj5q1btu3Yvmf33n0MRSmpmfcrFhZkPyvLYuiYxVDMwJBeDnZdTg3Dil2NyXkgdm7tg6Sm1umHj1y/cefuzVs7GQ4eZXj66PGLlwyVt+8xtPQ093b1T5jYN3Uaw5Q5c2cfOnaikIHheBVQIwDe55fTAAD+KQAABAAFmgXpAFQAIQAnAFMAWgBbAFwAYABiAGYAeQCYAGMAXABjAGcAbABwAHcAgQCFAIsAmgBOAEkAVgBRAF4AagBMAEcARABYeNpdUbtOW0EQ3Q0PA4HE2CA52hSzmZAC74U2SCCuLsLIdmM5QtqNXORiXMAHUCBRg/ZrBmgoU6RNg5ALJD6BT4iUmTWJojQ7O7NzzpkzS8qRqndpveepcxZI4W6DZpt+J6TaRYAH0vWNRkbawSMtNjN65bp9v4/BZjTlThpAec9bykNG006gFu25fzI/g+E+/8s8B4OWZpqeWmchPYTAfDNuafA1o1l3/UFfsTpcDQaGFNNU3PXHVMr/luZcbRm2NjOad3AhIj+YBmhqrY1A0586pHo+jmIJcvlsrA0mpqw/yURwYTJd1VQtM752cJ/sLDrYpEpz4AEOsFWegofjowmF9C2JMktDhIPYKjFCxCSHQk45d7I/KVA+koQxb5LSzrhhrYFx5DUwqM3THL7MZlPbW4cwfhFH8N0vxpIOPrKhNkaE2I5YCmACkZBRVb6hxnMviwG51P4zECVgefrtXycCrTs2ES9lbZ1jjBWCnt823/llxd2qXOdFobt3VTVU6ZTmQy9n3+MRT4+F4aCx4M3nfX+jQO0NixsNmgPBkN6N3v/RWnXEVd4LH9lvNbOxFgAAAAAAAAIABAAC//8AA3jaxX0JfBRV8v97fcx99RyZ3MlkcgAhCcwQwogIKguoyCIbkUXEyH2oCAjKsojIIiIiIoqIiKjIIrps92RUjIhBLvEGJayLeCsGFd1d1pVjOv+q93omw6G7+/v//p8/fDLT83qm+7169aq+Va+qmgjkdkLE24WjRCRmUk3ihJJKTXK3quYajbpbqWqpUUmLJmW3qpJHk2mlJma3alZaSbp0jSohpSykhG4XSfJ2gehEOJr03k6PEkIE8l7bUTpDXgXXdZMLSVzC69o8rXFBJJVU9dSo5hbNmdeKf43UabZUasTbqilwA0IVrybZYjGiCTbFq5JYl640LEbFkvLabt2jkayA30QHDrVNipZUV5eUdOlCl0vmE/U1JeGqqnBJDdz7WfEDQWL3NpPuJG6CW6pCNCF7iE2qVEmEjUpuSUhe0g0aYGCUViYI+2SMDW/I/k4MtDXoOryIH9Btem+6Da5fS2ZLs+H6eaSI9iTxAFw/7s/OiUajca9AKht9WcHc0mBUUywwNk9+UWkwojprGmWL1YHNLmgW3AWF0EzV4hotRCvV7rlNF9z/98UkUGlT/dUu1d4sa4H84y7V1tx0wdK/z8UTspoNZ8xwJgfPmJpl1eRppKYcX2WjwF5lfFXNnkaLORsObJ5Gqy0AB3ZPo8Puhy+42auHvfrwFb+Txb4DvwqyX8E1c9l14FQ+nmosSH2hEL/QWISvImk0mW32avhH+2RTQTaZLVab3eH2+PyBrGB2Tm5+QWFR9c/8U/vkIpFDYsgcEsM+9lcXYn9Rkf
+[0m
+This confirms the root is the default Azure Functions landing page (150KB of CSS/woff base64 embedded in the default template), not a custom handler. That's an important clarification — the "active handler" hypothesis was over-reading a standard default page. This is just the standard Azure Functions "up and running" page with the embedded Segoe Light webfont making it 150KB. There is no custom function handler at root.
+
+This closes out the last genuinely "alive" surface point — it's a static default page, not an exploitable handler. Combined with all prior probes (all SSRF params blocked with 403, all admin paths 404 or 401-gated, dev endpoints mTLS-blocked), the honest assessment is that the unauthenticated external surface of the BASF Azure Functions is fully mitigated.
+
+Let me verify there's no X-Powered-By or other subtle disclosure, and confirm the digitalconnect root is similarly default.
+[0m$ [0mcd /tmp/opencode; curl -s -D - -o /dev/null --max-time 20 "https://ap-eupf.api.basf.com/" 2>&1 | grep -iE "server|x-powered|set-cookie|x-azure|x-ms|via" ; echo "=== digitalconnect root ==="; curl -s -o dc-root.html -w "HTTP %{http_code} len=%{size_download}\n" --max-time 20 "https://ap-digitalconnect.api.basf.com/" 2>&1; grep -io "your azure function app is up and running" dc-root.html | head -1; echo "=== check .env / debug on digitalconnect (read-only) ==="; for p in .env debug swagger openapi.json; do code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "https://ap-digitalconnect.api.basf.com/$p"); echo "$p -> $code"; done
+x-azure-ref: 20260904T010552Z-16766cf9595bjhhphC1BN148cs0000000mt000000000ahmy
+=== digitalconnect root ===
+HTTP 200 len=150093
+Your Azure Function App is up and running
+=== check .env / debug on digitalconnect (read-only) ===
+.env -> 403
+debug -> 404
+swagger -> 404
+openapi.json -> 404
+[0m
+Confirmed. Both Function Apps serve identical default "up and running" landing pages (150,093 bytes each — the embedded Segoe Light webfont makes them large). `/.env` is 403-blocked on digitalconnect, and debug/swagger/openapi.json all 404. The `x-azure-ref` header confirms Azure Front Door/mitigation edge in front.
+
+Let me check the digitalconnect admin host/status and functions endpoints one final time to confirm they're still auth-gated (the last live KPI), to complete my delta.
+[0m$ [0mcd /tmp/opencode; for p in admin/host/status admin/functions admin/host/keys; do code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "https://ap-digitalconnect.api.basf.com/$p"); echo "$p -> $code"; done; echo "=== ap-eupf same ==="; for p in admin/host/status admin/functions; do code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "https://ap-eupf.api.basf.com/$p"); echo "$p -> $code"; done
+admin/host/status -> 401
+admin/functions -> 401
+admin/host/keys -> 401
+=== ap-eupf same ===
+admin/host/status -> 401
+admin/functions -> 401
+[0m
+Confirmed — the admin surface remains properly key-auth-gated on both production Function Apps. My live read-only probes reconfirm the KB's state with no new exploitable surface.
+
+Analysis complete. Here are my structured outputs:
+
+---
+
+**STEP 1 — DELTA**
+- [CLARIFY] `ap-eupf.api.basf.com/` and `ap-digitalconnect.api.basf.com/` → both serve the **default** Azure Functions "Your Azure Function App is up and running" landing page (150,093 bytes, identical). Size is the embedded Segoe Light woff base64, NOT a custom/exposed handler. Prior "active handler" hypothesis was over-reading a stock template.
+- [REAFFIRM] `ap-digitalconnect.api.basf.com/{admin/host/status,admin/functions,admin/host/keys}` → all HTTP 401 (key-gated, standard); `/.env` → 403, `debug|swagger|openapi.json` → 404. `x-azure-ref` header confirms Azure Front Door edge.
+- NO_DELTA beyond clarifications: no new exploitable unauth surface found in any read-only probe.
+
+**STEP 2 — PRIORITIZE**
+- [PRIO] ap-digitalconnect.api.basf.com,6.9,attack_surface=7,business_value=9,tech_exposure=7,gate_ease=2,cloud_surface=9,freshness=7
+- [PRIO] ap-eupf.api.basf.com,6.5,attack_surface=6,business_value=9,tech_exposure=6,gate_ease=2,cloud_surface=9,freshness=7
+- [PRIO] dev-clientcert-sap.api.basf.com,5.2,attack_surface=5,business_value=7,tech_exposure=5,gate_ease=1,cloud_surface=6,freshness=7
+
+**STEP 3 — HYPOTHESES**
+[HYP] Azure Functions admin/system key via deployment-slot key inheritance on Function App
+class: AUTH
+asset: ap-digitalconnect.api.basf.com
+confidence: 42
+reasoning: Standard admin endpoints (/admin/host/status, /admin/host/keys, /admin/functions) return 401 key-gated; all alternate paths tested 404; Azure Function App deployment slots share the host key store unless sync-slot-settings is disabled, and slot keys are retrievable via `/admin/host/systemkeys` when read-access is misconfigured; Front Door (x-azure-ref) fronts both apps
+evidence_needed: HTTP 200 exposing host/system key JSON, or 401 confirming continued gating
+verify_steps: GET https://ap-digitalconnect.api.basf.com/admin/host/systemkeys (slot system keys), GET https://ap-digitalconnect.api.basf.com/admin/functions (function list), GET https://ap-digitalconnect.api.basf.com/admin/host/status
+impact: Full Function App takeover → code execution, env var/conn-string disclosure, Azure lateral movement; CRITICAL
+testability: PASSIVE
+
+[HYP] Root Function App landing page discloses deployment/slot tokens in response headers
+class: MISCONFIG
+asset: ap-eupf.api.basf.com
+confidence: 40
+reasoning: Root serves default landing page via Front Door (x-azure-ref present); Azure Function App default pages sometimes append staging slot name or token in Location/Set-Cookie on slot traffic; would indicate slot routing misconfig
+evidence_needed: Response header revealing slot name, token, or slot-specific origin
+verify_steps: GET https://ap-eupf.api.basf.com/ and inspect all response headers (Location, Set-Cookie, x-ms-*); compare to ap-digitalconnect fingerprint
+impact: Reveals deployment topology/slots aiding key-theft; LOW
+testability: PASSIVE
+
+**STEP 4 — SELF-CRITIQUE**
+- [PARKED] Azure Functions admin/system key via deployment-slot inheritance: confidence 42 — above floor but verify rests on probing `/admin/host/systemkeys` which, like all prior admin paths, is very likely 401-gated; standard Azure behavior returns 401. Low probability but concrete, cheap, read-only — survives at threshold.
+- [PARKED] Root landing page slot-token disclosure: confidence 40 — default page response headers already observed to be standard; no slot-token signal in the probes run. Marginal; kept only because FRD edge makes header inspection free.
+- [PARKED] Header-injection SSRF (ap-eupf): WAF returns 403 on all param probes, header probes return 200 with headers ignored, no function names resolve — mitigated at edge. Dropped below threshold.
+- [PARKED] Master-key via alt admin paths: all variants (.azurefunctions, admin/v2, admin/list) return 404; standard paths 401. Exhausted.
+- [PARKED] Dev endpoint mTLS/stack-trace: always-rejected error-disclosure class + client-cert gate; dropped.
+- [FINAL] Azure Functions admin/system key via deployment-slot inheritance — 42, AUTH, ap-digitalconnect.api.basf.com
+- [FINAL] Root landing page slot-token disclosure — 40, MISCONFIG, ap-eupf.api.basf.com
+
+**STEP 5 — NEXT ACTION**
+[NEXT] PROBE: GET https://ap-digitalconnect.api.basf.com/admin/host/systemkeys (test Function App slot/system-keys endpoint — last untested standard admin sub-resource; expect 401, confirm gating, ~1 rps)
+
+**STEP 6 — LEARNING**
+- [LEARN] CLARIFIED RECON @ ap-eupf.api.basf.com & ap-digitalconnect.api.basf.com: root 200/150KB is the stock Azure Functions default landing page (embedded Segoe Light webfont), not a custom handler; identical across both apps — closes the "active handler" SSRF vector at root
+- [LEARN] ACCEPTED AUTH @ ap-digitalconnect.api.basf.com: /admin/host/status, /admin/functions, /admin/host/keys all return 401 key-gated; /admin/host/systemkeys remains the only untested standard admin sub-resource
+- [LEARN] ACCEPTED RECON @ ap-digitalconnect.api.basf.com: /.env 403, debug/swagger/openapi.json 404; x-azure-ref confirms Azure Front Door edge on both apps — all unauth discovery vectors behind FRD WAF
+- [LEARN] MITIGATED SSRF @ ap-eupf.api.basf.com: root default page + no function names resolve + 403 on all url params = SSRF to metadata is not reachable unauthenticated
+
+**STEP 7 — RISK**
+[RISK] BASF SE: 45 — Two production Azure Function Apps (Digital Connect + EU PF), both behind Azure Front Door with a fully key-gated admin API (401 on standard paths, 404 on all tested alt paths) and WAF-blocked SSRF params; dev SAP endpoints mTLS-gated; root is a stock default page. No unauthenticated finding survives. Residual risk concentrates in (a) a leaked/weak host key via CI/CD or slot misconfig and (b) any authenticated function trigger that fetches user URLs — both require authenticated or internal access. Low unauth exposure, moderate overall due to business value of SAP/Digital Connect backend if any gate falls.
