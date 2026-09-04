@@ -294,3 +294,15 @@ testability: REJECTED
 [LEARN] ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; SSL errors on all sub-paths; mTLS or self-signed cert required; surface inaccessible without client cert
 [RISK] BASF SE: 38 — Program near-exhausted for unauthenticated testing. ap-digitalconnect fully mapped (401/404 on all 8 admin paths). e-gate appears mTLS-gated (SSL errors on all probes). Only actionable lead is ap-eupf 150KB root analysis — if function names are discoverable, attack surface jumps. If not, residual risk requires authenticated access (leaked Function App keys via CI/CD artifacts, client certs, or passive GitHub/secret scanning). Low overall unauth exposure.
 ## 2026-09-04 21:03:10 UTC [target] (model bigpickle)
+## 2026-09-04 23:08:18 UTC [target] (model bigpickle)
+[HYP] ap-eupf unlisted function names recoverable via passive artifact/code search
+class: OTHER
+asset: ap-eupf.api.basf.com
+confidence: 45
+reasoning: Fact — all /api/<common-name> probes 404, root+placeholder bodies contain zero function names, runtime status 401 (key-gated), SSRF params edge-blocked. The only unknown on this live Function App is the real function-name set; Microsoft-HTTP-triggered write/IDOR surfaces are unreachable without it. Name enumeration is verifiable, unlike secret leak hunting previously rejected as un-verifiable.
+evidence_needed: any GitHub code/commit, CT log, or public Azure artifact mentioning ap-eupf function names or Azure resource/consumer-group names
+verify_steps: passive — GitHub code search + secret-scanning for "ap-eupf.api.basf.com", "ap-digitalconnect.api.basf.com", correlate resource-name patterns; if a name is recovered, single read-only GET /api/<name> — 403/200 = exists, 404 = dead
+impact: MEDIUM only if a function is recovered (targeted SSRF/IDOR/business-logic on the single live unauth-reachable app)
+testability: PASSIVE
+[NEXT] RAG: passive GitHub-code/commit + secret-scanning + CT-log search for "ap-eupf.api.basf.com", "ap-digitalconnect.api.basf.com", "basf digitalconnect" to recover ap-eupf Azure function names/resource names; on any hit, single read-only GET /api/<name> to confirm
+[RISK] BASF SE: 30 — Unauthenticated surface effectively exhausted: both Function Apps are stock-placeholder + fully auth-gated with no reachable functions, e-gate is a Windows HTTPAPI host 404 on everything (plus revoked/expired-trust cert — operational, out-of-scope), dev hosts require client certs. Only residual path = passive artifact search for ap-eupf function names (low probability) or obtaining authenticated access (host/function keys, client cert, CI/CD leak). Overall unauth exposure low.
