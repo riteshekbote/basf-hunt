@@ -1630,3 +1630,139 @@ testability: PASSIVE
 
 [STEP 7 — RISK]
 [RISK] basf: 45 — Two production Azure Function Apps with fully mapped auth-gated admin surface (401/404), WAF-blocked SSRF, mTLS-gated dev endpoints. e-gate.api.basf.com is the critical unexplored surface: SSL cert failures on all 6 documentation paths strongly indicate exposed API gateway docs (OpenAPI/Swagger). If confirmed, attack surface jumps significantly with full API contract disclosure. Residual risk requires authenticated access (Function App keys, client certs) or passive CI/CD artifact leaks for findings. Medium overall unauth exposure with one high-potential vector pending verification.
+===== ANALYST nemotron3 2026-09-04 21:06:19 UTC =====
+[0m
+> build · nemotron-3-ultra-free
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/
+total 152
+drwxr-xr-x 12 runner runner  4096 Sep  4 21:02 .
+drwxr-xr-x  3 runner runner  4096 Sep  4 21:02 ..
+drwxr-xr-x  7 runner runner  4096 Sep  4 21:02 .git
+drwxr-xr-x  3 runner runner  4096 Sep  4 21:02 .github
+-rw-r--r--  1 runner runner  1801 Sep  4 21:02 README.md
+-rw-r--r--  1 runner runner    43 Sep  4 21:02 analyst-out.txt
+-rw-r--r--  1 runner runner 30119 Sep  4 21:02 analyst-prompt.txt
+-rw-r--r--  1 runner runner 26247 Sep  4 21:02 ctx.txt
+drwxr-xr-x  2 runner runner  4096 Sep  4 21:02 inventory
+drwxr-xr-x  2 runner runner  4096 Sep  4 21:02 knowledge
+drwxr-xr-x  2 runner runner  4096 Sep  4 21:02 leads
+-rw-r--r--  1 runner runner  4464 Sep  4 21:02 probe-results.md
+drwxr-xr-x  2 runner runner  4096 Sep  4 21:02 recon-notes
+drwxr-xr-x  2 runner runner  4096 Sep  4 21:02 reports
+drwxr-xr-x  2 runner runner  4096 Sep  4 21:02 reposcan-raw
+-rw-r--r--  1 runner runner  3285 Sep  4 21:02 scope.yml
+drwxr-xr-x  2 runner runner  4096 Sep  4 21:02 scripts
+-rw-r--r--  1 runner runner    33 Sep  4 21:02 state_bigpickle.json
+-rw-r--r--  1 runner runner    33 Sep  4 21:02 state_laguna.json
+-rw-r--r--  1 runner runner    33 Sep  4 21:02 state_ling3.json
+-rw-r--r--  1 runner runner    33 Sep  4 21:02 state_longcat.json
+-rw-r--r--  1 runner runner    33 Sep  4 21:02 state_mimo.json
+-rw-r--r--  1 runner runner    33 Sep  4 21:02 state_nemotron3.json
+drwxr-xr-x  2 runner runner  4096 Sep  4 21:02 triage
+[0m
+[0m→ [0mRead inventory/basf.md
+[0m→ [0mRead probe-results.md
+[0m→ [0mRead scope.yml
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/knowledge/
+total 16
+drwxr-xr-x  2 runner runner 4096 Sep  4 21:02 .
+drwxr-xr-x 12 runner runner 4096 Sep  4 21:02 ..
+-rw-r--r--  1 runner runner 6475 Sep  4 21:02 index.md
+[0m
+[0m→ [0mRead knowledge/index.md
+Now I have the full picture. Let me execute the 8-step analysis.
+
+---
+
+## STEP 1 — DELTA
+
+**[CHANGED]** `e-gate.api.basf.com/` → HTTP 404 → **SSL CERTIFICATE_VERIFY_FAILED** (root now responds with TLS handshake but cert validation fails; previously 404)  
+**[CONFIRMED]** `e-gate.api.basf.com` 6/6 documentation paths → **SSL CERTIFICATE_VERIFY_FAILED** (not 404) — endpoints exist but TLS misconfigured (mTLS/self-signed)  
+**[STABLE]** `ap-eupf.api.basf.com/` → HTTP 200, 150,093 bytes (reconfirmed 5×) — substantial custom content at root  
+**[STABLE]** `ap-digitalconnect.api.basf.com` → 8/8 Azure Functions admin endpoints mapped (401 auth-gated, 404 non-existent) — no unauth path  
+**[STABLE]** `dev-*` endpoints → HTTP 400 (mTLS) or 404 — no change
+
+---
+
+## STEP 2 — PRIORITIZE
+
+| Asset | Score | attack_surface | business_value | tech_exposure | gate_ease | cloud_surface | freshness |
+|---|---|---|---|---|---|---|---|
+| **e-gate.api.basf.com** | **7.8** | 8 | 9 | 8 | 7 | 6 | 10 |
+| **ap-eupf.api.basf.com** | **5.9** | 6 | 8 | 5 | 3 | 8 | 8 |
+| **ap-digitalconnect.api.basf.com** | **4.5** | 4 | 9 | 4 | 2 | 8 | 8 |
+
+**[PRIO] e-gate.api.basf.com,7.8,attack_surface=8,business_value=9,tech_exposure=8,gate_ease=7,cloud_surface=6,freshness=10**  
+**[PRIO] ap-eupf.api.basf.com,5.9,attack_surface=6,business_value=8,tech_exposure=5,gate_ease=3,cloud_surface=8,freshness=8**  
+**[PRIO] ap-digitalconnect.api.basf.com,4.5,attack_surface=4,business_value=9,tech_exposure=4,gate_ease=2,cloud_surface=8,freshness=8**
+
+---
+
+## STEP 3 — HYPOTHESES
+
+**[HYP] API gateway OpenAPI/Swagger documentation exposure on e-gate via TLS bypass**  
+class: MISCONFIG  
+asset: e-gate.api.basf.com  
+confidence: 75  
+reasoning: Host named "e-gate" indicates API gateway for business transactions (procurement/supplier/logistics). Root + all 6 documentation paths return SSL CERTIFICATE_VERIFY_FAILED (not 404/connection refused) — server completes TLS handshake but cert validation fails (wrong CN, self-signed, or chain issue). This confirms endpoints exist. Azure APIM/Kong/AWS API GW commonly expose these paths.  
+evidence_needed: HTTP 200 with JSON/YAML OpenAPI spec, Swagger UI HTML, or any non-404 response body on documented sub-paths when TLS verify skipped  
+verify_steps: GET https://e-gate.api.basf.com/openapi.json -k (skip TLS verify); GET https://e-gate.api.basf.com/swagger.json -k; GET https://e-gate.api.basf.com/api-docs -k; GET https://e-gate.api.basf.com/docs -k; GET https://e-gate.api.basf.com/swagger/ui -k; GET https://e-gate.api.basf.com/.well-known/openapi-schema -k  
+impact: Full API surface disclosure enabling targeted auth/logic/IDOR testing on high-value business flows; MEDIUM-HIGH  
+testability: PASSIVE  
+
+**[HYP] Root 150KB page on ap-eupf contains API route map or function discovery endpoints**  
+class: MISCONFIG  
+asset: ap-eupf.api.basf.com  
+confidence: 50  
+reasoning: Root returns 200 with 150,093 bytes — far exceeding default Azure Functions placeholder (<5KB). Indicates custom SPA, API documentation page, or function dashboard. All /api/<function> brute-force probes returned 404; function names may be embedded in JS bundle or HTML rather than discoverable via path enumeration.  
+evidence_needed: Response Content-Type header; <script src> tags, fetch() URLs, or /api/ path references in response body  
+verify_steps: GET https://ap-eupf.api.basf.com/ with Accept: text/html — extract Content-Type and inspect response body for route references, JS bundles, fetch() calls, or /api/ path patterns  
+impact: Function name disclosure enabling targeted SSRF or logic testing; MEDIUM  
+testability: PASSIVE  
+
+**[HYP] Azure Function master key leak via CI/CD artifact or storage misconfiguration exposure**  
+class: AUTH  
+asset: ap-digitalconnect.api.basf.com  
+confidence: 55  
+reasoning: Standard /admin/host/keys and /runtime/webhooks/host/keys return 401 (auth-gated); all alt paths (.azurefunctions/keys, admin/v2/keys, admin/list), deployment slots (?slot=staging|production), and standard admin sub-resources (admin/host/systemkeys, admin/functions, admin/host/status, admin/host/functionkeys, admin/system) return 404. Master key may still leak via GitHub Actions/GitLab CI logs, Azure DevOps pipeline artifacts, misconfigured Azure Blob Storage deployment packages, or Function App zip deploy credentials.  
+evidence_needed: Valid master/system key accepted by any admin endpoint, or key found in public repo/artifact/storage blob  
+verify_steps: Passive GitHub/GitLab dork search for basf.com + function + master + key + WEBSITE_AUTH_ + ap-digitalconnect + ap-eupf; passive search for ap-digitalconnect in public CI/CD logs (GitHub Actions, Azure DevOps); check Azure Blob Storage for deployment packages via passive enum (storage account naming patterns)  
+impact: Full Function App takeover — code execution, env var disclosure (DB conn strings, service principal secrets, storage keys), lateral movement to Azure subscription; CRITICAL  
+testability: PASSIVE  
+
+---
+
+## STEP 4 — SELF-CRITIQUE
+
+**[PARKED] Azure Function master key leak via CI/CD artifact or storage misconfiguration exposure**: confidence 55 but verify steps are passive search only — no live confirmation possible without auth; kept as FINAL due to CRITICAL impact if confirmed  
+
+**[FINAL] 1. API gateway OpenAPI/Swagger documentation exposure on e-gate via TLS bypass (75)**  
+**[FINAL] 2. Root 150KB page on ap-eupf contains API route map or function discovery endpoints (50)**  
+**[FINAL] 3. Azure Function master key leak via CI/CD artifact or storage misconfiguration exposure (55)**
+
+---
+
+## STEP 5 — NEXT ACTION
+
+**[NEXT] PROBE: GET https://e-gate.api.basf.com/openapi.json -k && GET https://e-gate.api.basf.com/swagger.json -k && GET https://e-gate.api.basf.com/api-docs -k && GET https://e-gate.api.basf.com/docs -k && GET https://e-gate.api.basf.com/swagger/ui -k && GET https://e-gate.api.basf.com/.well-known/openapi-schema -k** (test 6 API gateway documentation paths with TLS verify skipped — SSL cert failure confirms endpoints exist; ~1 rps, GET only)
+
+---
+
+## STEP 6 — LEARNING
+
+[LEARN] ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 8 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface fully mapped — no unauthenticated path exists  
+[LEARN] REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/functionkeys: returns 404; v4 function-level key endpoint not exposed  
+[LEARN] REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/system: returns 404; admin system info endpoint not exposed  
+[LEARN] ACCEPTED RECON @ e-gate.api.basf.com: host returns SSL CERTIFICATE_VERIFY_FAILED at root; 6/6 documentation paths return SSL cert verify failure (not 404) — endpoints exist but TLS misconfigured  
+[LEARN] ACCEPTED RECON @ ap-eupf.api.basf.com/: root returns 200 with 150KB content (reconfirmed); indicates active function handler or custom landing page at root  
+[LEARN] REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404 (reconfirmed); common health endpoint not exposed  
+[LEARN] MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403 (reconfirmed); param-based SSRF blocked at edge/WAF for enumerated function names  
+[LEARN] CHANGED RECON @ e-gate.api.basf.com/: root changed from HTTP 404 to SSL CERTIFICATE_VERIFY_FAILED — host is live with TLS misconfiguration (mTLS/self-signed)
+
+---
+
+## STEP 7 — RISK
+
+[RISK] basf: 45 — Two production Azure Function Apps with fully mapped auth-gated admin surface (401/404), WAF-blocked SSRF, mTLS-gated dev endpoints. e-gate.api.basf.com is the critical unexplored surface: SSL cert failures on root + all 6 documentation paths strongly indicate exposed API gateway docs (OpenAPI/Swagger) behind TLS misconfiguration. If confirmed via -k bypass, attack surface jumps significantly with full API contract disclosure. Residual risk requires authenticated access (Function App keys, client certs) or passive CI/CD artifact leaks for findings. Medium overall unauth exposure with one high-potential vector pending verification.

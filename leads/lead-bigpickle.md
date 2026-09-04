@@ -293,3 +293,4 @@ testability: REJECTED
 [LEARN] MITIGATED SSRF @ e-gate.api.basf.com: all 6 API doc probes return SSL CERTIFICATE_VERIFY_FAILED; host likely mTLS-gated like dev endpoints; SSL error blocks all unauthenticated HTTP probing
 [LEARN] ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; SSL errors on all sub-paths; mTLS or self-signed cert required; surface inaccessible without client cert
 [RISK] BASF SE: 38 — Program near-exhausted for unauthenticated testing. ap-digitalconnect fully mapped (401/404 on all 8 admin paths). e-gate appears mTLS-gated (SSL errors on all probes). Only actionable lead is ap-eupf 150KB root analysis — if function names are discoverable, attack surface jumps. If not, residual risk requires authenticated access (leaked Function App keys via CI/CD artifacts, client certs, or passive GitHub/secret scanning). Low overall unauth exposure.
+## 2026-09-04 21:03:10 UTC [target] (model bigpickle)
