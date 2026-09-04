@@ -836,3 +836,74 @@ STEP 6 — LEARNING:
 
 STEP 7 — RISK:
 [RISK] BASF SE: 42 — Two production Azure Function Apps (Digital Connect + EU PF) with fully mapped admin surface (401/404 on all 6 standard paths), WAF-blocked SSRF params, mTLS-gated dev endpoints. e-gate.api.basf.com is the last untested production surface — if API docs are exposed, attack surface jumps significantly. If not, program is near-exhausted for unauthenticated testing. Residual risk requires authenticated access (Function App keys, client certs, or CI/CD artifact leaks via passive repo search) for any finding. Low overall unauth exposure.
+===== ANALYST bigpickle 2026-09-04 15:26:08 UTC =====
+[0m
+> build · big-pickle
+[0m
+## STEP 1 — DELTA
+
+NO_DELTA — No new hosts, no changed statuses, no new inventory entries since last run.
+
+## STEP 2 — PRIORITIZE
+
+[PRIO] e-gate.api.basf.com,7.4,attack_surface=7,business_value=8,tech_exposure=7,gate_ease=6,cloud_surface=3,freshness=10
+[PRIO] ap-eupf.api.basf.com,5.9,attack_surface=5,business_value=8,tech_exposure=5,gate_ease=3,cloud_surface=8,freshness=8
+[PRIO] ap-digitalconnect.api.basf.com,5.5,attack_surface=5,business_value=9,tech_exposure=5,gate_ease=2,cloud_surface=8,freshness=8
+
+## STEP 3 — HYPOTHESES
+
+[HYP] API gateway OpenAPI/Swagger documentation exposure on e-gate
+class: MISCONFIG
+asset: e-gate.api.basf.com
+confidence: 68
+reasoning: Host named "e-gate" suggests API gateway for business transactions (procurement, supplier, logistics). Standard root returns 404 — zero probes have touched sub-paths. Common API gateway platforms (Azure APIM, Kong, AWS API GW) expose `/swagger`, `/openapi.json`, `/api-docs`, `/_swagger`, `/docs`, `/.well-known/openapi` at root. If exposed, full endpoint map including IDOR/BOLA-prone business-logic routes becomes visible.
+evidence_needed: HTTP 200 with JSON/YAML OpenAPI spec, or Swagger UI HTML, or any non-404 response on documented sub-paths
+verify_steps: GET https://e-gate.api.basf.com/openapi.json, GET /swagger.json, GET /api-docs, GET /swagger/ui, GET /_swagger, GET /docs, GET /.well-known/openapi-schema
+impact: Full API surface disclosure enabling targeted auth/logic/IDOR testing; MEDIUM-HIGH (roadmap to HIGH-VALUE finding)
+testability: PASSIVE
+
+[HYP] Root 150KB page on ap-eupf contains API route map or function discovery endpoint
+class: MISCONFIG
+asset: ap-eupf.api.basf.com
+confidence: 48
+reasoning: Root returns 200 with 150093 bytes — far too large for default Azure Functions placeholder (typically <5KB). Likely a custom SPA, API documentation page, or function dashboard. Response body may contain JavaScript bundle with route definitions, fetch() calls to `/api/<function>` paths, or Azure Functions runtime config. All `/api/<function>` probes returned 404 — function names may be in the JS bundle rather than discoverable via path brute.
+evidence_needed: Response Content-Type header; any `<script src>` tags, fetch() URLs, or `/api/` path references in the 150KB body
+verify_steps: GET https://ap-eupf.api.basf.com/ with Accept: text/html — extract Content-Type and inspect response body for route references
+impact: Function name disclosure enabling targeted SSRF or logic testing; MEDIUM
+testability: PASSIVE
+
+[HYP] Admin function-level keys endpoint on ap-digitalconnect via v4 system key path
+class: AUTH
+asset: ap-digitalconnect.api.basf.com
+confidence: 32
+reasoning: 8 standard admin paths tested (401/404), but Azure Functions v4 introduced `/admin/host/functionkeys` and `/admin/system` endpoints that may not be gated by the same middleware as `/admin/host/keys`. Very low probability because Front Door + WAF likely apply uniform routing rules across all admin paths.
+evidence_needed: HTTP 200 with function key JSON
+verify_steps: GET https://ap-digitalconnect.api.basf.com/admin/host/functionkeys, GET https://ap-digitalconnect.api.basf.com/admin/system
+impact: Function-level key disclosure; MEDIUM
+testability: PASSIVE
+
+## STEP 4 — SELF-CRITIQUE
+
+[PARKED] Admin function-level keys endpoint on ap-digitalconnect via v4 system key path: confidence 32 — below 40 threshold. 8 admin paths already tested uniformly return 401/404; Azure Front Door + WAF applies consistent routing; functionkeys/system endpoints are unlikely to bypass existing auth gate. Low ROI.
+
+[FINAL] API gateway OpenAPI/Swagger docs or hidden API routes on e-gate — 68, MISCONFIG, e-gate.api.basf.com
+[FINAL] Root 150KB page on ap-eupf contains API route map or function discovery endpoint — 48, MISCONFIG, ap-eupf.api.basf.com
+
+## STEP 5 — NEXT ACTION
+
+[NEXT] PROBE: GET https://e-gate.api.basf.com/openapi.json && GET /swagger.json && GET /api-docs && GET /swagger/ui && GET /docs && GET /.well-known/openapi-schema (test 6 common API gateway documentation paths on untested host — ~1 rps, GET only)
+
+## STEP 6 — LEARNING
+
+[LEARN] ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 8 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface fully mapped — no unauthenticated path exists
+[LEARN] ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; zero probes run against any sub-paths; API gateway naming convention warrants documentation path enumeration
+[LEARN] REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/systemkeys: returns 404; system keys endpoint not exposed
+[LEARN] REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/functions: returns 404; admin function list not exposed
+[LEARN] REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/status: returns 404; host status endpoint not exposed
+[LEARN] ACCEPTED RECON @ ap-eupf.api.basf.com/: root returns 200 with 150KB content (reconfirmed); indicates active function handler or custom landing page at root
+[LEARN] REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404 (reconfirmed); common health endpoint not exposed
+[LEARN] MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403 (reconfirmed); param-based SSRF blocked at edge/WAF for enumerated function names
+
+## STEP 7 — RISK
+
+[RISK] BASF SE: 42 — Three production surfaces: ap-digitalconnect admin fully mapped (401/404 on all 8 standard paths), ap-eupf WAF-blocked SSRF + unanalyzed 150KB root, e-gate.api.basf.com completely untested. If API docs are exposed on e-gate, attack surface jumps significantly. If not, program is near-exhausted for unauthenticated testing. Residual risk requires authenticated access (Function App keys, client certs, or CI/CD artifact leaks via passive repo search) for any finding. Low overall unauth exposure.

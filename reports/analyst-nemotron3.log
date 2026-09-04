@@ -933,3 +933,594 @@ testability: PASSIVE
 ### STEP 7 — RISK
 
 [RISK] basf: 42 — Two production Azure Function Apps (Digital Connect + EU PF) with fully mapped admin surface (401/404 on all 8 standard paths), WAF-blocked SSRF params, mTLS-gated dev endpoints. e-gate.api.basf.com is the last untested production surface — if API docs are exposed, attack surface jumps significantly. If not, program is near-exhausted for unauthenticated testing. Residual risk requires authenticated access (Function App keys, client certs, or CI/CD artifact leaks via passive repo search) for any finding. Low overall unauth exposure.
+===== ANALYST nemotron3 2026-09-04 15:26:08 UTC =====
+[0m
+> build · nemotron-3-ultra-free
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/
+total 148
+drwxr-xr-x 12 runner runner  4096 Sep  4 15:05 .
+drwxr-xr-x  3 runner runner  4096 Sep  4 15:05 ..
+drwxr-xr-x  7 runner runner  4096 Sep  4 15:06 .git
+drwxr-xr-x  3 runner runner  4096 Sep  4 15:05 .github
+-rw-r--r--  1 runner runner  1801 Sep  4 15:05 README.md
+-rw-r--r--  1 runner runner    43 Sep  4 15:06 analyst-out.txt
+-rw-r--r--  1 runner runner 29676 Sep  4 15:05 analyst-prompt.txt
+-rw-r--r--  1 runner runner 25804 Sep  4 15:05 ctx.txt
+drwxr-xr-x  2 runner runner  4096 Sep  4 15:05 inventory
+drwxr-xr-x  2 runner runner  4096 Sep  4 15:05 knowledge
+drwxr-xr-x  2 runner runner  4096 Sep  4 15:05 leads
+-rw-r--r--  1 runner runner  3393 Sep  4 15:05 probe-results.md
+drwxr-xr-x  2 runner runner  4096 Sep  4 15:05 recon-notes
+drwxr-xr-x  2 runner runner  4096 Sep  4 15:05 reports
+drwxr-xr-x  2 runner runner  4096 Sep  4 15:05 reposcan-raw
+-rw-r--r--  1 runner runner  3285 Sep  4 15:05 scope.yml
+drwxr-xr-x  2 runner runner  4096 Sep  4 15:05 scripts
+-rw-r--r--  1 runner runner    33 Sep  4 15:05 state_bigpickle.json
+-rw-r--r--  1 runner runner    33 Sep  4 15:05 state_laguna.json
+-rw-r--r--  1 runner runner    33 Sep  4 15:05 state_ling3.json
+-rw-r--r--  1 runner runner    33 Sep  4 15:05 state_longcat.json
+-rw-r--r--  1 runner runner    33 Sep  4 15:05 state_mimo.json
+-rw-r--r--  1 runner runner    33 Sep  4 15:05 state_nemotron3.json
+drwxr-xr-x  2 runner runner  4096 Sep  4 15:05 triage
+[0m
+[0m→ [0mRead analyst-out.txt
+[0m→ [0mRead probe-results.md
+[0m→ [0mRead scope.yml
+[0m✱ [0mGlob "/home/runner/work/basf-hunt/basf-hunt/inventory/*"[90m 0 matches[0m
+[0m✱ [0mGlob "/home/runner/work/basf-hunt/basf-hunt/knowledge/*"[90m 0 matches[0m
+[0m✱ [0mGlob "/home/runner/work/basf-hunt/basf-hunt/leads/*"[90m 0 matches[0m
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/inventory/ && ls -la /home/runner/work/basf-hunt/basf-hunt/knowledge/ && ls -la /home/runner/work/basf-hunt/basf-hunt/leads/
+total 16
+drwxr-xr-x  2 runner runner 4096 Sep  4 15:05 .
+drwxr-xr-x 12 runner runner 4096 Sep  4 15:05 ..
+-rw-r--r--  1 runner runner 4759 Sep  4 15:05 basf.md
+total 16
+drwxr-xr-x  2 runner runner 4096 Sep  4 15:05 .
+drwxr-xr-x 12 runner runner 4096 Sep  4 15:05 ..
+-rw-r--r--  1 runner runner 5906 Sep  4 15:05 index.md
+total 100
+drwxr-xr-x  2 runner runner  4096 Sep  4 15:05 .
+drwxr-xr-x 12 runner runner  4096 Sep  4 15:05 ..
+-rw-r--r--  1 runner runner 23207 Sep  4 15:05 lead-bigpickle.md
+-rw-r--r--  1 runner runner   306 Sep  4 15:05 lead-laguna.md
+-rw-r--r--  1 runner runner   300 Sep  4 15:05 lead-ling3.md
+-rw-r--r--  1 runner runner   312 Sep  4 15:05 lead-longcat.md
+-rw-r--r--  1 runner runner    18 Sep  4 15:05 lead-mimo.md
+-rw-r--r--  1 runner runner 46982 Sep  4 15:05 lead-nemotron3.md
+-rw-r--r--  1 runner runner   721 Sep  4 15:05 reposcan-basf.md
+[0m
+[0m→ [0mRead inventory/basf.md
+[0m→ [0mRead knowledge/index.md
+[0m→ [0mRead leads/lead-nemotron3.md
+[0m→ [0mRead leads/lead-bigpickle.md
+Now I have full context. Let me execute the 8-step analysis.
+[0m
+[0m$ [0mcurl -s -I --max-time 10 "https://e-gate.api.basf.com/" 2>&1 | head -20
+(no output)
+[0m
+[0m$ [0mcurl -s -I --max-time 10 "https://e-gate.api.basf.com/openapi.json" 2>&1 | head -20
+(no output)
+[0m
+[0m$ [0mcurl -v --max-time 15 "https://e-gate.api.basf.com/" 2>&1 | head -30
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host e-gate.api.basf.com:443 was resolved.
+* IPv6: (none)
+* IPv4: 159.27.122.90
+*   Trying 159.27.122.90:443...
+* Connected to e-gate.api.basf.com (159.27.122.90) port 443
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/ssl/certs/ca-certificates.crt
+*  CApath: /etc/ssl/certs
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [98 bytes data]
+* TLSv1.2 (IN), TLS handshake, Certificate (11):
+{ [3265 bytes data]
+* TLSv1.2 (OUT), TLS alert, certificate expired (557):
+} [2 bytes data]
+* SSL certificate problem: certificate has expired
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+* Closing connection
+curl: (60) SSL certificate problem: certificate has expired
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the web page mentioned above.
+[0m
+[0m$ [0mcurl -v --max-time 15 "https://ap-digitalconnect.api.basf.com/" 2>&1 | head -30
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host ap-digitalconnect.api.basf.com:443 was resolved.
+* IPv6: 2603:1061:14:47::1
+* IPv4: 150.171.109.73
+*   Trying 150.171.109.73:443...
+* Connected to ap-digitalconnect.api.basf.com (150.171.109.73) port 443
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/ssl/certs/ca-certificates.crt
+*  CApath: /etc/ssl/certs
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [88 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [155 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [19 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [3029 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [264 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [52 bytes data]
+[0m
+[0m$ [0mcurl -v --max-time 15 "https://ap-eupf.api.basf.com/" 2>&1 | head -30
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host ap-eupf.api.basf.com:443 was resolved.
+* IPv6: 2603:1061:14:49::1
+* IPv4: 150.171.109.73
+*   Trying 150.171.109.73:443...
+* Connected to ap-eupf.api.basf.com (150.171.109.73) port 443
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/ssl/certs/ca-certificates.crt
+*  CApath: /etc/ssl/certs
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [88 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [155 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [19 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [3008 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [264 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [52 bytes data]
+[0m
+[0m$ [0mcurl -k -v --max-time 15 "https://e-gate.api.basf.com/" 2>&1 | head -50
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host e-gate.api.basf.com:443 was resolved.
+* IPv6: (none)
+* IPv4: 159.27.122.90
+*   Trying 159.27.122.90:443...
+* Connected to e-gate.api.basf.com (159.27.122.90) port 443
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [98 bytes data]
+* TLSv1.2 (IN), TLS handshake, Certificate (11):
+{ [3265 bytes data]
+* TLSv1.2 (IN), TLS handshake, Server key exchange (12):
+{ [556 bytes data]
+* TLSv1.2 (IN), TLS handshake, Server finished (14):
+{ [4 bytes data]
+* TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
+} [37 bytes data]
+* TLSv1.2 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.2 (OUT), TLS handshake, Finished (20):
+} [16 bytes data]
+* TLSv1.2 (IN), TLS handshake, Finished (20):
+{ [16 bytes data]
+* SSL connection using TLSv1.2 / ECDHE-RSA-AES256-GCM-SHA384 / X25519 / rsaEncryption
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: C=DE; L=Ludwigshafen am Rhein; O=BASF Digital Solutions GmbH; CN=e-gate.api.basf.com
+*  start date: Feb 16 00:00:00 2024 GMT
+*  expire date: Mar 18 23:59:59 2025 GMT
+*  issuer: C=US; O=DigiCert Inc; CN=DigiCert Global G2 TLS RSA SHA256 2020 CA1
+*  SSL certificate verify result: unable to get local issuer certificate (20), continuing anyway.
+*   Certificate level 0: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 1: Public key type RSA (2048/112 Bits/secBits), signed using sha256WithRSAEncryption
+{ [5 bytes data]
+* using HTTP/2
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0* [HTTP/2] [1] OPENED stream for https://e-gate.api.basf.com/
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: e-gate.api.basf.com]
+* [HTTP/2] [1] [:path: /]
+* [HTTP/2] [1] [user-agent: curl/8.5.0]
+* [HTTP/2] [1] [accept: */*]
+} [5 bytes data]
+> GET / HTTP/2
+> Host: e-gate.api.basf.com
+> User-Agent: curl/8.5.0
+[0m
+[0m$ [0mcurl -k -v --max-time 15 "https://e-gate.api.basf.com/openapi.json" 2>&1 | head -50
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host e-gate.api.basf.com:443 was resolved.
+* IPv6: (none)
+* IPv4: 159.27.122.90
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying 159.27.122.90:443...
+* Connected to e-gate.api.basf.com (159.27.122.90) port 443
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [98 bytes data]
+* TLSv1.2 (IN), TLS handshake, Certificate (11):
+{ [3265 bytes data]
+* TLSv1.2 (IN), TLS handshake, Server key exchange (12):
+{ [556 bytes data]
+* TLSv1.2 (IN), TLS handshake, Server finished (14):
+{ [4 bytes data]
+* TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
+} [37 bytes data]
+* TLSv1.2 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.2 (OUT), TLS handshake, Finished (20):
+} [16 bytes data]
+* TLSv1.2 (IN), TLS handshake, Finished (20):
+{ [16 bytes data]
+* SSL connection using TLSv1.2 / ECDHE-RSA-AES256-GCM-SHA384 / X25519 / rsaEncryption
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: C=DE; L=Ludwigshafen am Rhein; O=BASF Digital Solutions GmbH; CN=e-gate.api.basf.com
+*  start date: Feb 16 00:00:00 2024 GMT
+*  expire date: Mar 18 23:59:59 2025 GMT
+*  issuer: C=US; O=DigiCert Inc; CN=DigiCert Global G2 TLS RSA SHA256 2020 CA1
+*  SSL certificate verify result: unable to get local issuer certificate (20), continuing anyway.
+*   Certificate level 0: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 1: Public key type RSA (2048/112 Bits/secBits), signed using sha256WithRSAEncryption
+{ [5 bytes data]
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://e-gate.api.basf.com/openapi.json
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: e-gate.api.basf.com]
+* [HTTP/2] [1] [:path: /openapi.json]
+* [HTTP/2] [1] [user-agent: curl/8.5.0]
+* [HTTP/2] [1] [accept: */*]
+} [5 bytes data]
+> GET /openapi.json HTTP/2
+> Host: e-gate.api.basf.com
+> User-Agent: curl/8.5.0
+[0m
+[0m$ [0mcurl -k --max-time 10 "https://e-gate.api.basf.com/openapi.json" 2>&1
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+100   315  100   315    0     0    212      0  0:00:01  0:00:01 --:--:--   212
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<HTML><HEAD><TITLE>Not Found</TITLE>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=us-ascii"></HEAD>
+<BODY><h2>Not Found</h2>
+<hr><p>HTTP Error 404. The requested resource is not found.</p>
+</BODY></HTML>
+[0m
+[0m$ [0mcurl -k --max-time 10 "https://e-gate.api.basf.com/" 2>&1
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+100   315  100   315    0     0    173      0  0:00:01  0:00:01 --:--:--   173
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<HTML><HEAD><TITLE>Not Found</TITLE>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=us-ascii"></HEAD>
+<BODY><h2>Not Found</h2>
+<hr><p>HTTP Error 404. The requested resource is not found.</p>
+</BODY></HTML>
+[0m
+[0m$ [0mfor path in swagger.json api-docs swagger/ui docs .well-known/openapi-schema _swagger; do echo "=== $path ==="; curl -k --max-time 10 "https://e-gate.api.basf.com/$path" 2>&1; done
+=== swagger.json ===
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+100   315  100   315    0     0    170      0  0:00:01  0:00:01 --:--:--   170
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<HTML><HEAD><TITLE>Not Found</TITLE>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=us-ascii"></HEAD>
+<BODY><h2>Not Found</h2>
+<hr><p>HTTP Error 404. The requested resource is not found.</p>
+</BODY></HTML>
+=== api-docs ===
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+100   315  100   315    0     0    172      0  0:00:01  0:00:01 --:--:--   171
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<HTML><HEAD><TITLE>Not Found</TITLE>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=us-ascii"></HEAD>
+<BODY><h2>Not Found</h2>
+<hr><p>HTTP Error 404. The requested resource is not found.</p>
+</BODY></HTML>
+=== swagger/ui ===
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+100   315  100   315    0     0    176      0  0:00:01  0:00:01 --:--:--   176
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<HTML><HEAD><TITLE>Not Found</TITLE>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=us-ascii"></HEAD>
+<BODY><h2>Not Found</h2>
+<hr><p>HTTP Error 404. The requested resource is not found.</p>
+</BODY></HTML>
+=== docs ===
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0
+100   315  100   315    0     0    118      0  0:00:02  0:00:02 --:--:--   118
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<HTML><HEAD><TITLE>Not Found</TITLE>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=us-ascii"></HEAD>
+<BODY><h2>Not Found</h2>
+<hr><p>HTTP Error 404. The requested resource is not found.</p>
+</BODY></HTML>
+=== .well-known/openapi-schema ===
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+100   315  100   315    0     0    174      0  0:00:01  0:00:01 --:--:--   174
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<HTML><HEAD><TITLE>Not Found</TITLE>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=us-ascii"></HEAD>
+<BODY><h2>Not Found</h2>
+<hr><p>HTTP Error 404. The requested resource is not found.</p>
+</BODY></HTML>
+=== _swagger ===
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+100   315  100   315    0     0    190      0  0:00:01  0:00:01 --:--:--   190
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<HTML><HEAD><TITLE>Not Found</TITLE>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=us-ascii"></HEAD>
+<BODY><h2>Not Found</h2>
+<hr><p>HTTP Error 404. The requested resource is not found.</p>
+</BODY></HTML>
+[0m
+[0m$ [0mcurl -k --max-time 15 "https://ap-eupf.api.basf.com/" 2>&1 | head -200
+...output truncated...
+
+Full output saved to: /home/runner/.local/share/opencode/tool-output/tool_06d06d45d001Sb7DDRK1PL2aZX
+
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            background-color: #002050;
+            color: #fff;
+            font-family: 'SegoeLight', helvetica, sans-serif;
+            font-size: 18px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content {
+            position: absolute;
+            left: 50px;
+            top: 38px;
+            width: 400px;
+        }
+
+            .content .azureLogo {
+                margin: 0 0 65px 0;
+            }
+
+            .content .bodyHeadline {
+                margin: 0 0 10px 0;
+                font-size: 40px;
+                line-height: 43px;
+            }
+
+            .content .bodyContent {
+                margin: 20px 0 20px 0;
+                line-height: 22px;
+            }
+
+                .content .bodyContent a {
+                    color: #fff;
+                    text-decoration: none;
+                }
+
+                    .content .bodyContent a:hover {
+                        opacity: .7;
+                    }
+
+            .content .bodyCTA {
+                color: #fff;
+                display: block;
+                line-height: 25px;
+                height: 29px;
+                width: 125px;
+                cursor: pointer;
+                text-decoration: none;
+            }
+
+                .content .bodyCTA div {
+                    position: relative;
+                    overflow: hidden;
+                    width: 29px;
+                    height: 29px;
+                    float: right;
+                }
+
+                    .content .bodyCTA div img {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        border: 0;
+                    }
+
+                .content .bodyCTA:hover {
+                    opacity: .7;
+                }
+
+            .content .bodyLink {
+                font-size: 14px;
+                font-weight: bold;
+                color: #fff;
+                display: block;
+                line-height: 21px;
+                height: 29px;
+                margin-bottom: 11px;
+                width: 150px;
+                cursor: pointer;
+                text-decoration: none;
+            }
+
+                .content .bodyLink:hover {
+                    opacity: .7;
+                }
+
+        .wrapper {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            min-width: 1200px;
+        }
+
+        .innerwrapper {
+            width: 384px;
+            height: 100%;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        .browser {
+            position: absolute;
+            display: block;
+            top: 400px;
+            width: 384px;
+            height: 305px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+            .browser div {
+                width: 384px;
+                height: 305px;
+                position: absolute;
+                top: 40px;
+                left: 100px;
+                font-size: 200px;
+                text-align: left;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+
+        .bulb {
+            position: fixed;
+            margin-left: 20px;
+            top: 0;
+        }
+
+        .light {
+            position: fixed;
+            margin-left: 53px;
+            top: 0;
+            opacity: 0;
+        }
+
+        .bottom {
+            position: fixed;
+            bottom: 0;
+            margin-right: auto;
+            margin-left: -303px;
+            z-index: -1;
+            height: 202px;
+        }
+    </style>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.6.0.min.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery.ui/1.13.2/jquery-ui.min.js"></script>
+    <script>
+    $(function () {
+        var browser = $(".browser"),
+            body = $("body"),
+            browserimg = $(".browser img"),
+            firstlight = $(".light.first"),
+            secondlight = $(".light.second"),
+            bulb = $(".bulb"),
+            bulbimg = $(".bulb img"),
+            emote = $(".browser div"),
+            bulbimages = [
+              'data:image/png;base64,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',
+              'data:image/png;base64,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hRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBMkVUhRYgU0RVaAEyRVSFFiBTRFVoATJFVIUWIFNEVWgBgJW84Q3/H2hYAMaicpiPAAAAAElFTkSuQmCC',
+            ],
+            emoticons = [":-o", ":-)", ";-)", ":-\\"],
+            browserimages = [
+                'data:image/png;base64,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',
+                'data:image/png;base64,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' ],
+            first = true,
+            act = false,
+            clickreset = '',
+            blinking = '',
+            ani = false;
+
+        browser
+            .on('mousedown', function () {
+                if (!act && !ani) {
+                    clearTimeout(clickreset);
+                    clearInterval(blinking);
+                    ani = true;
+                    if (!first) { emote.html(emoticons[0]); }
+
+                    first = false;
+
+                    browser
+                        .animate({
+[0m

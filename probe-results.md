@@ -59,3 +59,9 @@ https://e-gate.api.basf.com/.well-known/openapi-schema -> ERR <urlopen error [SS
 https://ap-eupf.api.basf.com/ -> 200 len=150093
 https://ap-digitalconnect.api.basf.com/admin/host/functionkeys -> HTTP 404
 https://ap-digitalconnect.api.basf.com/admin/system -> HTTP 404
+
+## 2026-09-04 15:26:14 UTC
+https://e-gate.api.basf.com/openapi.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://ap-digitalconnect.api.basf.com/admin/host/functionkeys -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/system -> HTTP 404

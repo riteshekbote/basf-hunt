@@ -328,3 +328,4 @@ testability: PASSIVE
 [LEARN] MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403 (reconfirmed); param-based SSRF blocked at edge/WAF for enumerated function names  
 [LEARN] ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; zero probes run against any sub-paths; API gateway naming convention warrants documentation path enumeration  
 [RISK] basf: 42 — Two production Azure Function Apps (Digital Connect + EU PF) with fully mapped admin surface (401/404 on all 8 standard paths), WAF-blocked SSRF params, mTLS-gated dev endpoints. e-gate.api.basf.com is the last untested production surface — if API docs are exposed, attack surface jumps significantly. If not, program is near-exhausted for unauthenticated testing. Residual risk requires authenticated access (Function App keys, client certs, or CI/CD artifact leaks via passive repo search) for any finding. Low overall unauth exposure.
+## 2026-09-04 15:25:59 UTC [target] (model nemotron3)
