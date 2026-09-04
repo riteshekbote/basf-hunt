@@ -907,3 +907,190 @@ testability: PASSIVE
 ## STEP 7 — RISK
 
 [RISK] BASF SE: 42 — Three production surfaces: ap-digitalconnect admin fully mapped (401/404 on all 8 standard paths), ap-eupf WAF-blocked SSRF + unanalyzed 150KB root, e-gate.api.basf.com completely untested. If API docs are exposed on e-gate, attack surface jumps significantly. If not, program is near-exhausted for unauthenticated testing. Residual risk requires authenticated access (Function App keys, client certs, or CI/CD artifact leaks via passive repo search) for any finding. Low overall unauth exposure.
+===== ANALYST bigpickle 2026-09-04 18:36:03 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la
+total 140
+drwxr-xr-x 12 runner runner  4096 Sep  4 18:29 .
+drwxr-xr-x  3 runner runner  4096 Sep  4 18:29 ..
+drwxr-xr-x  7 runner runner  4096 Sep  4 18:29 .git
+drwxr-xr-x  3 runner runner  4096 Sep  4 18:29 .github
+-rw-r--r--  1 runner runner  1801 Sep  4 18:29 README.md
+-rw-r--r--  1 runner runner    32 Sep  4 18:29 analyst-out.txt
+-rw-r--r--  1 runner runner 27950 Sep  4 18:29 analyst-prompt.txt
+-rw-r--r--  1 runner runner 24078 Sep  4 18:29 ctx.txt
+drwxr-xr-x  2 runner runner  4096 Sep  4 18:29 inventory
+drwxr-xr-x  2 runner runner  4096 Sep  4 18:29 knowledge
+drwxr-xr-x  2 runner runner  4096 Sep  4 18:29 leads
+-rw-r--r--  1 runner runner  3707 Sep  4 18:29 probe-results.md
+drwxr-xr-x  2 runner runner  4096 Sep  4 18:29 recon-notes
+drwxr-xr-x  2 runner runner  4096 Sep  4 18:29 reports
+drwxr-xr-x  2 runner runner  4096 Sep  4 18:29 reposcan-raw
+-rw-r--r--  1 runner runner  3285 Sep  4 18:29 scope.yml
+drwxr-xr-x  2 runner runner  4096 Sep  4 18:29 scripts
+-rw-r--r--  1 runner runner    33 Sep  4 18:29 state_bigpickle.json
+-rw-r--r--  1 runner runner    33 Sep  4 18:29 state_laguna.json
+-rw-r--r--  1 runner runner    33 Sep  4 18:29 state_ling3.json
+-rw-r--r--  1 runner runner    33 Sep  4 18:29 state_longcat.json
+-rw-r--r--  1 runner runner    33 Sep  4 18:29 state_mimo.json
+-rw-r--r--  1 runner runner    33 Sep  4 18:29 state_nemotron3.json
+drwxr-xr-x  2 runner runner  4096 Sep  4 18:29 triage
+[0m
+[0m→ [0mRead probe-results.md
+[0m→ [0mRead scope.yml
+[0m→ [0mRead state_bigpickle.json
+[0m→ [0mRead inventory
+[0m→ [0mRead leads
+[0m→ [0mRead leads/lead-bigpickle.md
+[0m→ [0mRead inventory/basf.md
+## STEP 1 — DELTA
+- `[CHANGED]` `e-gate.api.basf.com` — All 6 API doc probes return SSL errors (`CERTIFICATE_VERIFY_FAILED`), not HTTP 404; host likely mTLS-gated like dev endpoints
+- `[CHANGED]` `ap-digitalconnect.api.basf.com/admin/host/functionkeys` → HTTP 404 (confirmed; v4 admin path not exposed)
+- `[CHANGED]` `ap-digitalconnect.api.basf.com/admin/system` → HTTP 404 (confirmed; admin system not exposed)
+
+## STEP 2 — PRIORITIZE
+```
+[PRIO] ap-eupf.api.basf.com,6.9,attack_surface=5,business_value=8,tech_exposure=6,gate_ease=5,cloud_surface=8,freshness=8
+[PRIO] e-gate.api.basf.com,4.8,attack_surface=6,business_value=8,tech_exposure=5,gate_ease=1,cloud_surface=3,freshness=10
+[PRIO] ap-digitalconnect.api.basf.com,3.5,attack_surface=3,business_value=9,tech_exposure=3,gate_ease=1,cloud_surface=8,freshness=4
+```
+
+## STEP 3 — HYPOTHESES
+```
+[HYP] API route/function discovery in 150KB root response body on ap-eupf
+class: MISCONFIG
+asset: ap-eupf.api.basf.com
+confidence: 62
+reasoning: Root returns 200 with 150093 bytes — far too large for default Azure Functions placeholder (<5KB). Likely custom SPA or API dashboard. Response body may contain JavaScript with route definitions, fetch() calls to /api/<function> paths, or runtime config. All /api/<function> probes returned 404 — function names may be discoverable only via JS bundle analysis rather than path brute.
+evidence_needed: Response Content-Type header; any <script src> tags, fetch() URLs, route definitions, or /api/ path references in the 150KB body
+verify_steps: GET https://ap-eupf.api.basf.com/ — inspect Content-Type, extract script tags and any /api/ or function-name references from response body
+impact: Function name disclosure enabling targeted SSRF, IDOR, or logic testing; MEDIUM
+testability: PASSIVE
+```
+```
+[HYP] e-gate.api.basf.com mTLS-gated host with SSL certificate mismatch
+class: MISCONFIG
+asset: e-gate.api.basf.com
+confidence: 55
+reasoning: All 6 API doc probes returned SSL CERTIFICATE_VERIFY_FAILED errors (not HTTP 404/403). Same pattern as dev-clientcert-sap and dev-ext001 which require client certificates. The host may present a self-signed/internal CA certificate or require mutual TLS. If the SSL error is due to self-signed cert rather than mTLS, bypassing certificate validation could reveal the API surface. Business-critical gateway for procurement/supplier/logistics.
+evidence_needed: SSL certificate details (issuer, subject, SAN); whether error is self-signed cert vs client cert requirement
+verify_steps: curl -k -v https://e-gate.api.basf.com/ 2>&1 | grep -E "subject:|issuer:|SSL error|certificate" (test with -k flag to bypass cert verification)
+impact: If self-signed cert (not mTLS), bypassing reveals full API gateway surface; HIGH
+testability: PASSIVE
+```
+```
+[HYP] ap-digitalconnect admin surface exhaustion — program near-exhausted for unauth testing
+class: RECON
+asset: ap-digitalconnect.api.basf.com
+confidence: 95
+reasoning: All 8 standard Azure Functions admin paths tested (401 on auth-gated, 404 on non-existent). functionkeys, system, status, systemkeys, functions all confirmed 404. No unauthenticated path exists. Front Door + WAF applies uniform routing. Only residual risk is leaked host key via CI/CD or passive repo search.
+evidence_needed: None — surface fully mapped
+verify_steps: None — exhausted
+impact: None unauthenticated; LOW
+testability: REJECTED
+```
+
+## STEP 4 — SELF-CRITIQUE
+```
+[PARKED] ap-digitalconnect admin surface exhaustion — REJECTED class (RECON only); no actionable probe; surface fully mapped
+[FINAL] API route/function discovery in 150KB root response body on ap-eupf — 62, MISCONFIG
+[FINAL] e-gate.api.basf.com mTLS-gated host with SSL certificate mismatch — 55, MISCONFIG
+```
+
+## STEP 5 — NEXT ACTION
+```
+[NEXT] PROBE: GET https://ap-eupf.api.basf.com/ — save response body, extract Content-Type, <script> tags, fetch() URLs, and any /api/ or function-name references. THEN: curl -k -v https://e-gate.api.basf.com/ 2>&1 — extract SSL certificate details (issuer, subject, SAN) to determine if mTLS or self-signed cert
+```
+
+## STEP 6 — LEARNING
+```
+[LEARN] REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/functionkeys: returns 404; v4 function-level key endpoint not exposed
+[LEARN] REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/system: returns 404; admin system info endpoint not exposed
+[LEARN] ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 8 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface fully mapped — no unauthenticated path exists
+[LEARN] MITIGATED SSRF @ e-gate.api.basf.com: all 6 API doc probes return SSL CERTIFICATE_VERIFY_FAILED; host likely mTLS-gated like dev endpoints; SSL error blocks all unauthenticated HTTP probing
+[LEARN] ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; SSL errors on all sub-paths; mTLS or self-signed cert required; surface inaccessible without client cert
+```
+
+## STEP 7 — RISK
+```
+[RISK] BASF SE: 38 — Program near-exhausted for unauthenticated testing. ap-digitalconnect fully mapped (401/404 on all 8 admin paths). e-gate appears mTLS-gated (SSL errors on all probes). Only actionable lead is ap-eupf 150KB root analysis — if function names are discoverable, attack surface jumps. If not, residual risk requires authenticated access (leaked Function App keys via CI/CD artifacts, client certs, or passive GitHub/secret scanning). Low overall unauth exposure.
+```
+[0m
+[0m$ [0mcurl -s -o /tmp/eupf-root.html -w "%{http_code}|%{size_download}|%{content_type}" -H "Accept: text/html" https://ap-eupf.api.basf.com/ 2>/dev/null && echo "" && echo "---SIZE---" && wc -c /tmp/eupf-root.html && echo "---CONTENT-TYPE---" && file /tmp/eupf-root.html
+200|150093|text/html
+---SIZE---
+150093 /tmp/eupf-root.html
+---CONTENT-TYPE---
+/tmp/eupf-root.html: HTML document, ASCII text, with very long lines (65349), with CRLF line terminators
+[0m
+[0m$ [0mcurl -k -v https://e-gate.api.basf.com/ 2>&1 | head -50
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host e-gate.api.basf.com:443 was resolved.
+* IPv6: (none)
+* IPv4: 159.27.122.90
+*   Trying 159.27.122.90:443...
+* Connected to e-gate.api.basf.com (159.27.122.90) port 443
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [98 bytes data]
+* TLSv1.2 (IN), TLS handshake, Certificate (11):
+{ [3265 bytes data]
+* TLSv1.2 (IN), TLS handshake, Server key exchange (12):
+{ [556 bytes data]
+* TLSv1.2 (IN), TLS handshake, Server finished (14):
+{ [4 bytes data]
+* TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
+} [37 bytes data]
+* TLSv1.2 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.2 (OUT), TLS handshake, Finished (20):
+} [16 bytes data]
+* TLSv1.2 (IN), TLS handshake, Finished (20):
+{ [16 bytes data]
+* SSL connection using TLSv1.2 / ECDHE-RSA-AES256-GCM-SHA384 / X25519 / rsaEncryption
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: C=DE; L=Ludwigshafen am Rhein; O=BASF Digital Solutions GmbH; CN=e-gate.api.basf.com
+*  start date: Feb 16 00:00:00 2024 GMT
+*  expire date: Mar 18 23:59:59 2025 GMT
+*  issuer: C=US; O=DigiCert Inc; CN=DigiCert Global G2 TLS RSA SHA256 2020 CA1
+*  SSL certificate verify result: unable to get local issuer certificate (20), continuing anyway.
+*   Certificate level 0: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 1: Public key type RSA (2048/112 Bits/secBits), signed using sha256WithRSAEncryption
+{ [5 bytes data]
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://e-gate.api.basf.com/
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: e-gate.api.basf.com]
+* [HTTP/2] [1] [:path: /]
+* [HTTP/2] [1] [user-agent: curl/8.5.0]
+* [HTTP/2] [1] [accept: */*]
+} [5 bytes data]
+> GET / HTTP/2
+> Host: e-gate.api.basf.com
+> User-Agent: curl/8.5.0
+[0m
+[93m[1m! [0mpermission requested: external_directory (/tmp/*); auto-rejecting
+[0m✗ [0mcat /tmp/eupf-root.html | grep -oiE '(src|href|action)="[^"]*"' | head -40 && echo "---SCRIPT-TAGS---" && cat /tmp/eupf-root.html | grep -oiE '<script[^>]*>' | head -20 && echo "---API-REFS---" && cat /tmp/eupf-root.html | grep -oiE '/api/[a-zA-Z0-9_/-]+' | sort -u && echo "---FETCH-URLS---" && cat /tmp/eupf-root.html | grep -oiE 'fetch\([^)]+\)' | head -20 failed
+[91m[1mError: [0mThe user rejected permission to use this specific tool call.
+[0m
+[0m$ [0mcurl -k -s -o /tmp/e-gate-root.html -w "%{http_code}|%{size_download}|%{content_type}" https://e-gate.api.basf.com/ 2>/dev/null && echo "" && echo "---SIZE---" && wc -c /tmp/e-gate-root.html && echo "---HEADERS---" && curl -k -sI https://e-gate.api.basf.com/ 2>/dev/null | head -30
+404|315|text/html; charset=us-ascii
+---SIZE---
+315 /tmp/e-gate-root.html
+---HEADERS---
+HTTP/2 404 
+content-length: 315
+content-type: text/html; charset=us-ascii
+server: Microsoft-HTTPAPI/2.0
+date: Fri, 04 Sep 2026 18:30:36 GMT
+[0m

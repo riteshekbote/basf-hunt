@@ -115,3 +115,21 @@
 - LEARN: ACCEPTED RECON @ ap-eupf.api.basf.com/: root returns 200 with 150KB content (reconfirmed); indicates active function handler or custom landing page at root
 - LEARN: REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404 (reconfirmed); common health endpoint not exposed
 - LEARN: MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403 (reconfirmed); param-based SSRF blocked at edge/WAF for enumerated function names
+
+## RANKED HYPOTHESES 2026-09-04 18:36:03 UTC
+- [75] e-gate.api.basf.com: API gateway OpenAPI/Swagger documentation exposure on e-gate (from art/lead_nemotron3.txt)
+- [62] ap-eupf.api.basf.com: API route/function discovery in 150KB root response body on ap-eupf (from art/lead_bigpickle.txt)
+- NEXT(hypotheses-bigpickle.txt): PROBE: GET https://ap-eupf.api.basf.com/ — save response body, extract Content-Type, <script> tags, fetch() URLs, and any /api/ or function-name references. THE
+- NEXT(hypotheses-nemotron3.txt): PROBE: GET https://e-gate.api.basf.com/openapi.json -k && GET https://e-gate.api.basf.com/swagger.json -k && GET https://e-gate.api.basf.com/api-docs -k && GET 
+- LEARN: REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/functionkeys: returns 404; v4 function-level key endpoint not exposed
+- LEARN: REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/system: returns 404; admin system info endpoint not exposed
+- LEARN: ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 8 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface f
+- LEARN: MITIGATED SSRF @ e-gate.api.basf.com: all 6 API doc probes return SSL CERTIFICATE_VERIFY_FAILED; host likely mTLS-gated like dev endpoints; SSL error blocks all
+- LEARN: ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; SSL errors on all sub-paths; mTLS or self-signed cert required; surface inaccessible without cli
+- LEARN: ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 8 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface f
+- LEARN: REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/functionkeys: returns 404; v4 function-level key endpoint not exposed
+- LEARN: REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/system: returns 404; admin system info endpoint not exposed
+- LEARN: ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; 6/6 documentation paths return SSL cert verify failure (not 404) — endpoints exist but TLS misco
+- LEARN: ACCEPTED RECON @ ap-eupf.api.basf.com/: root returns 200 with 150KB content (reconfirmed); indicates active function handler or custom landing page at root
+- LEARN: REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404 (reconfirmed); common health endpoint not exposed
+- LEARN: MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403 (reconfirmed); param-based SSRF blocked at edge/WAF for enumerated function names

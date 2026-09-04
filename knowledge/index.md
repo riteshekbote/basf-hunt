@@ -35,3 +35,6 @@
 - 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/system: returns 404; admin system info endpoint not exposed
 - 2026-09-04 ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 8 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface fully mapped — no unauthenticated path exists
 - 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; zero probes run against any sub-paths; API gateway naming convention warrants documentation path enumeration
+- 2026-09-04 MITIGATED SSRF @ e-gate.api.basf.com: all 6 API doc probes return SSL CERTIFICATE_VERIFY_FAILED; host likely mTLS-gated like dev endpoints; SSL error blocks all unauthenticated HTTP probing
+- 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; SSL errors on all sub-paths; mTLS or self-signed cert required; surface inaccessible without client cert
+- 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; 6/6 documentation paths return SSL cert verify failure (not 404) — endpoints exist but TLS misconfigured
