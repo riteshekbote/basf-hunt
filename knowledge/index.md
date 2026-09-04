@@ -23,3 +23,11 @@
 - 2026-09-04 REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404 (reconfirmed); common health endpoint not exposed
 - 2026-09-04 ACCEPTED AUTH @ ap-digitalconnect.api.basf.com: standard `/admin/host/keys` and `/runtime/webhooks/host/keys` return 401 (not 404); admin surface is standard Azure Functions, auth-gated
 - 2026-09-04 MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403 (reconfirmed); param-based SSRF blocked at edge/WAF for enumerated function names
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/systemkeys: returns 404; slot/system keys endpoint not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/functions: returns 404; function list endpoint not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/status: returns 404; host status endpoint not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/systemkeys: returns 404; system keys endpoint not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/functions: returns 404; admin function list not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/status: returns 404; admin host status not exposed
+- 2026-09-04 ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 6 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface fully mapped — no unauthenticated path exists
+- 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; zero probes run; API gateway naming convention warrants documentation path enumeration

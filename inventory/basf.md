@@ -57,3 +57,11 @@ www.basf.com
 - CHANGED `ap-eupf.api.basf.com/` → HTTP 200 len=150093 (reconfirmed, substantial content persists)
 - CHANGED `dev-clientcert-sap.api.basf.com/` → HTTP 400 (reconfirmed, mTLS required)
 - CHANGED `dev-ext001.api.basf.com/` → HTTP 400 (reconfirmed, mTLS required)
+
+## 2026-09-04 06:05:58 UTC
+- CHANGED `ap-digitalconnect.api.basf.com/admin/host/systemkeys` → HTTP 404 (was planned probe; now confirmed in probe-results.md)
+- CHANGED `ap-digitalconnect.api.basf.com/admin/functions` → HTTP 404 (was planned; confirmed)
+- CHANGED `ap-digitalconnect.api.basf.com/admin/host/status` → HTTP 404 (was planned; confirmed)
+- NEW `e-gate.api.basf.com` → HTTP 404 at root, ZERO probes run against any sub-paths (untested surface)
+- NEW `ap-digitalconnect.api.basf.com/admin/host/functionkeys` → UNTESTED (v4 function-level key endpoint)
+- NEW `ap-digitalconnect.api.basf.com/admin/system` → UNTESTED (admin system info endpoint)

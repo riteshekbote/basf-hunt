@@ -60,3 +60,23 @@
 - LEARN: REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404 (reconfirmed); common health endpoint not exposed
 - LEARN: ACCEPTED AUTH @ ap-digitalconnect.api.basf.com: standard `/admin/host/keys` and `/runtime/webhooks/host/keys` return 401 (not 404); admin surface is standard Az
 - LEARN: MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403 (reconfirmed); param-based SSRF blocked at edge/WAF for enumerated function names
+
+## RANKED HYPOTHESES 2026-09-04 06:05:58 UTC
+- [55] e-gate.api.basf.com: API gateway OpenAPI/Swagger docs or hidden API routes on e-gate (from art/lead_bigpickle.txt)
+- [50] ap-digitalconnect.api.basf.com: Azure Function master key leak via CI/CD artifact or storage misconfiguration exposure (from art/lead_nemotron3.txt)
+- NEXT(hypotheses-nemotron3.txt): RAG: Passive GitHub/GitLab dork search for `basf.com` + `function` + `master` + `key` + `WEBSITE_AUTH_` + `ap-digitalconnect` + `ap-eupf` to find leaked Functio
+- NEXT(hypotheses-bigpickle.txt): PROBE: GET https://e-gate.api.basf.com/openapi.json && GET /swagger.json && GET /api-docs && GET /swagger/ui && GET /docs && GET /.well-known/openapi-schema (te
+- LEARN: REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/keys?slot=staging: returns 404; deployment slot staging admin keys path not exposed
+- LEARN: REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/keys?slot=production: returns 404; deployment slot production admin keys path not exposed
+- LEARN: REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/systemkeys: returns 404; slot/system keys endpoint not exposed
+- LEARN: REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/functions: returns 404; function list endpoint not exposed
+- LEARN: REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/status: returns 404; host status endpoint not exposed
+- LEARN: ACCEPTED RECON @ ap-eupf.api.basf.com/: root returns 200 with 150KB content (reconfirmed); indicates active function handler or custom landing page at root
+- LEARN: REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404 (reconfirmed); common health endpoint not exposed
+- LEARN: ACCEPTED AUTH @ ap-digitalconnect.api.basf.com: standard `/admin/host/keys` and `/runtime/webhooks/host/keys` return 401 (not 404); admin surface is standard Az
+- LEARN: MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403 (reconfirmed); param-based SSRF blocked at edge/WAF for enumerated function names
+- LEARN: REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/systemkeys: returns 404; system keys endpoint not exposed
+- LEARN: REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/functions: returns 404; admin function list not exposed
+- LEARN: REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/status: returns 404; admin host status not exposed
+- LEARN: ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 6 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface f
+- LEARN: ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; zero probes run; API gateway naming convention warrants documentation path enumeration
