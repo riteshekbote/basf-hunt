@@ -186,3 +186,13 @@
 - LEARN: REJECTED MISCONFIG @ e-gate.api.basf.com: all 7 documentation paths + root return HTTP 404 (not SSL error) — server=Microsoft-HTTPAPI/2.0, no API gateway docs e
 - LEARN: ACCEPTED RECON @ *.api.basf.com: full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
 - LEARN: REJECTED MISCONFIG @ ap-eupf.api.basf.com: 150KB root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — zero function r
+
+## RANKED HYPOTHESES 2026-09-05 10:30:27 UTC
+- [70] api.basf.com: API gateway OpenAPI/Swagger documentation exposure on api.basf.com (from art/lead_nemotron3.txt)
+- NEXT(hypotheses-nemotron3.txt): PROBE: GET https://api.basf.com/ -I && GET https://api.basf.com/openapi.json -k && GET https://api.basf.com/swagger.json -k && GET https://api.basf.com/docs -k 
+- LEARN: REJECTED MISCONFIG @ e-gate.api.basf.com: all 7 documentation paths + root return HTTP 404 (not SSL error) — server=Microsoft-HTTPAPI/2.0, no API gateway docs e
+- LEARN: ACCEPTED RECON @ *.api.basf.com: full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+- LEARN: REJECTED MISCONFIG @ ap-eupf.api.basf.com: 150KB root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — zero function r
+- LEARN: REJECTED MISCONFIG @ ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: /.auth/config and /.auth/me return 404 — App Service EasyAuth not exposed on either 
+- LEARN: REJECTED OTHER @ ap-eupf.api.basf.com: passive artifact/code search for function names and keys returned zero public hits — unverifiable, exhausted
+- LEARN: ACCEPTED RECON @ dev.api.basf.com + dev-m.api.basf.com + dev-sap.api.basf.com: openapi.json/swagger.json/api-docs all 404 — catch-all hosts, no gateway/docs sur

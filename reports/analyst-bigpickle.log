@@ -2258,3 +2258,75 @@ STEP 6 — LEARNING
 
 STEP 7 — RISK
 [RISK] BASF SE: 45 — The prior `*.api.basf.com` "estate exhausted" conclusion was incomplete: the portal boot config exposed 7 production backend hosts the estate map never covered, including a production Apigee gateway with a live x-api-key proxy and an AWS API Gateway commerce tier, plus the corporate NetIQ identity provider. Defenses observed are solid (strict redirect_uri, key-gated gateway, mTLS-capable backends) and no unauth data access is demonstrated yet, but the proxy/stage enumeration surface is large and key-scoping of browser-shipped API keys is the single most probable real finding; any key-only proxy with a mis-scoped browser key yields HIGH impact data access on BASF's customer/supplier commerce platform.
+===== ANALYST bigpickle 2026-09-05 10:30:27 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m✱ [0mGlob "art/**/*.txt"[90m 0 matches[0m
+[0m✱ [0mGlob "**/*.md"[90m 30 matches[0m
+[0m→ [0mRead .
+[0m→ [0mRead leads/lead-bigpickle.md
+[0m→ [0mRead probe-results.md[90m [limit=100][0m
+[0m→ [0mRead reports/hypotheses.md
+[0m→ [0mRead scope.yml
+[0m→ [0mRead probe-results.md[90m [offset=101][0m
+[0m→ [0mRead leads/lead-nemotron3.md
+[0m→ [0mRead triage/run-2026-09-05-08-33.md
+[0m→ [0mRead triage/run-2026-09-05-00-07.md
+[0m→ [0mRead leads/lead-longcat.md[90m [limit=100][0m
+[0m→ [0mRead reports/valid-bugs.md
+[0m→ [0mRead triage/run-2026-09-05-04-31.md
+[0m→ [0mRead recon-notes/DEEPER-FINDINGS.md
+[0m→ [0mRead leads/lead-laguna.md
+[0m→ [0mRead leads/lead-mimo.md[90m [limit=100][0m
+[0m→ [0mRead leads/reposcan-basf.md
+[0m→ [0mRead recon-notes/DEDICATED-DEEP.md[90m [limit=100][0m
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://prod.api.basf.com/products" 2>/dev/null; echo " /products"
+404 /products
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://prod.api.basf.com/catalog" 2>/dev/null; echo " /catalog"
+404 /catalog
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://prod.api.basf.com/search" 2>/dev/null; echo " /search"
+404 /search
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://prod.api.basf.com/user" 2>/dev/null; echo " /user"
+404 /user
+[0m
+Now I have full context. The highest-value action is executing the `prod.api.basf.com` proxy path sweep from the last NEXT. Let me run the probes.
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://prod.api.basf.com/order" 2>/dev/null; echo " /order"
+404 /order
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://prod.api.basf.com/productinformation" 2>/dev/null; echo " /productinformation"
+500 /productinformation
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://prod.api.basf.com/cart" 2>/dev/null; echo " /cart"
+404 /cart
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://prod.api.basf.com/price" 2>/dev/null; echo " /price"
+404 /price
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://prod.api.basf.com/availability" 2>/dev/null; echo " /availability"
+404 /availability
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://prod.api.basf.com/documents" 2>/dev/null; echo " /documents"
+404 /documents
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://prod.api.basf.com/copilot" 2>/dev/null; echo " /copilot"
+404 /copilot
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://prod.api.basf.com/mss" 2>/dev/null; echo " /mss"
+404 /mss
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://prod.api.basf.com/dus" 2>/dev/null; echo " /dus"
+404 /dus
+[0m
+/productinformation now returns **500**, not the 401 recorded in the lead (which said it returns 401 VerifyAPIKey). Let me continue the sweep and check the /productinformation more carefully.
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://prod.api.basf.com/transaction" 2>/dev/null; echo " /transaction"
+404 /transaction
+[0m
+[93m[1m! [0mpermission requested: external_directory (/tmp/*); auto-rejecting
+[0m✗ [0mcurl -sv -o /tmp/pi_body.txt --max-time 10 "https://prod.api.basf.com/productinformation" 2>&1 | grep -iE "< HTTP|content-type|server|x-api|apigee|location"; echo "---BODY---"; cat /tmp/pi_body.txt failed
+[91m[1mError: [0mThe user rejected permission to use this specific tool call.
+Only `/productinformation` is a live proxy (500 now vs 401 in the lead — status changed). Let me investigate it and test more variants, plus check the 500 body/response headers.
