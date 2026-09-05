@@ -691,3 +691,4 @@ testability: PASSIVE
 [LEARN] ACCEPTED RECON @ api.commerce.basf.com: AWS REST API Gateway (x-amz-apigw-id); `/copilot` returns 403 MissingAuthenticationToken; root returns 400; staged routes likely exist
 [LEARN] ACCEPTED RECON @ federation.basf.com: NetIQ/Access Manager login page at `.well-known/openid-configuration`; standard OIDC discovery not exposed; HTML error page returned instead of JSON
 [RISK] basf: 45 — *.api.basf.com estate fully exhausted (9 hosts, zero unauth findings). Web estate partially mapped: api.basf.com dead (127.0.0.1), my.basf.com high-value portal with non-standard auth stack (NetIQ/Access Manager), prod.api.basf.com Apigee with single known proxy, api.commerce.basf.com AWS API Gateway with staged auth, www/basf.com CloudFront frontends. Residual risk concentrated on my.basf.com auth logic and prod.api.basf.com/api.commerce.basf.com undiscovered proxies.
+## 2026-09-05 18:45:52 UTC [target] (model nemotron3)

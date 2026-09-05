@@ -70,3 +70,14 @@
 - 2026-09-05 ACCEPTED RECON @ prod.api.basf.com: CNAME basf-prod-prod.apigee.net (Apigee); `/productinformation` returns 401 VerifyAPIKey; 25 common proxy paths return 404; 401-vs-404 oracle operational
 - 2026-09-05 ACCEPTED RECON @ api.commerce.basf.com: AWS REST API Gateway (x-amz-apigw-id); `/copilot` returns 403 MissingAuthenticationToken; root returns 400; staged routes likely exist
 - 2026-09-05 ACCEPTED RECON @ federation.basf.com: NetIQ/Access Manager login page at `.well-known/openid-configuration`; standard OIDC discovery not exposed; HTML error page returned instead of JSON
+- 2026-09-05 REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy-path probes all 404 except `/productinformation` (401); 4 browser keys (core/pi/csp/navigator) rejected Invalid ApiKey — no additional proxy, key-scope exhausted
+- 2026-09-05 REJECTED AUTH @ api.commerce.basf.com: `/copilot` + 8 stage prefixes all 403 MissingAuthenticationTokenException with navigator key — route IAM/SigV4-gated, x-api-key not credential class, stage-switching irrelevant
+- 2026-09-05 REJECTED MISCONFIG @ api.productinformation.basf.com + api-imp.productinformation.basf.com: 403 ForbiddenException with pi+core keys — Lambda-authorizer/API-GW-policy deny regardless of key
+- 2026-09-05 ACCEPTED RECON @ api-imp.commerce.basf.com: HTTP 400 empty root gate (CloudFront→API GW ingest); no auth oracle; imp-* = import/processing tier
+- 2026-09-05 REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except /productinformation (401); 4 browser keys Invalid ApiKey — no extra proxy, key scope exhausted
+- 2026-09-05 REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+- 2026-09-05 REJECTED MISCONFIG @ api.productinformation.basf.com + api-imp.productinformation.basf.com: 403 ForbiddenException / 400 empty with pi+core keys — authorizer denies
+- 2026-09-05 REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — @ userinfo, %2f%2f, CRLF, port, suffix, dot-segment all rejected; no bypass
+- 2026-09-05 ACCEPTED RECON @ my.basf.com: SSR boot config discloses full OAuth client (86cc4bf9-…, redirect /.auth, refresh_token scope, acr 3IAM/Login/External, code flow, no PKCE)
+- 2026-09-05 ACCEPTED RECON @ federation.basf.com: authorize endpoint live; legit full flow → 302 /nidp/app/login; error pages styled as BASF Authentication Service
+- 2026-09-05 ACCEPTED RECON @ products.basf.com: CloudFront Magnolia SPA (252KB), same WCMS stack, zero auth entry in HTML

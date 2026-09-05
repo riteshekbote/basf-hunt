@@ -109,3 +109,5 @@ www.basf.com
 - CHANGED prod.api.basf.com confirmed as Apigee gateway (CNAME basf-prod-prod.apigee.net); only `/productinformation` returns 401 VerifyAPIKey; ~25 common proxy paths (/products, /catalog, /search, /user, /orde
 - CHANGED api.commerce.basf.com confirmed as AWS REST API Gateway (x-amz-apigw-id header); `/copilot` returns 403 MissingAuthenticationToken; root returns 400; staged routes exist but require auth
 - CHANGED federation.basf.com OIDC discovery returns HTML error page (NetIQ/Access Manager), not JSON — standard `.well-known/openid-configuration` not exposed
+
+## 2026-09-05 18:46:05 UTC

@@ -2672,3 +2672,291 @@ testability: PASSIVE
 **STEP 7 — RISK**
 
 [RISK] basf: 45 — *.api.basf.com estate fully exhausted (9 hosts, zero unauth findings). Web estate partially mapped: api.basf.com dead (127.0.0.1), my.basf.com high-value portal with non-standard auth stack (NetIQ/Access Manager), prod.api.basf.com Apigee with single known proxy, api.commerce.basf.com AWS API Gateway with staged auth, www/basf.com CloudFront frontends. Residual risk concentrated on my.basf.com auth logic and prod.api.basf.com/api.commerce.basf.com undiscovered proxies.
+===== ANALYST nemotron3 2026-09-05 18:46:05 UTC =====
+[0m
+> build · nemotron-3-ultra-free
+[0m
+[0m$ [0mcurl -ks -o /dev/null -w "%{http_code} %{content_length}" "https://my.basf.com/" && echo
+curl: unknown --write-out variable: 'content_length'
+200
+[0m
+[0m$ [0mcurl -ks -o /dev/null -w "%{http_code} %{size_download}" "https://my.basf.com/" && echo
+200 204926
+[0m
+[0m$ [0mcurl -ks -o /dev/null -w "%{http_code} %{size_download}" "https://my.basf.com/.well-known/openid-configuration" && echo
+404 136
+[0m
+[0m$ [0mcurl -ks -o /dev/null -w "%{http_code} %{size_download}" "https://federation.basf.com/.well-known/openid-configuration" && echo
+200 14920
+[0m
+[0m$ [0mcurl -ks "https://federation.basf.com/.well-known/openid-configuration" | head -100
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication Service - Error</title>
+  
+  <link rel="icon" type="image/png" href="/nidp/images/basf/redesign/favicon.ico"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" />
+
+  <style>
+    a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,html,i,iframe,img,ins,kbd,label,legend,li,mark,menu,nav,object,ol,output,p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:after,blockquote:before,q:after,q:before{content:'';content:none}table{border-collapse:collapse;border-spacing:0}
+  </style>
+  <style>
+    :root{--corporate-dark-blue:#004a96;--corporate-light-blue:#21a0d2;--corporate-dark-green:#00793a;--corporate-light-green:#65ac1e;--corporate-orange:#f39500;--corporate-red:#c50022;--black:#000000;--dark-grey:#7c7c7c;--middle-grey:#adadad;--light-grey:#dcdcdc;--box-grey:#f0f0f0;--copytext-grey:#333333;--white:#ffffff}html{background: url(/nidp/images/basf/redesign/background.jpg) no-repeat top center fixed;-webkit-background-size:100% auto;-moz-background-size:100% auto;-o-background-size:100% auto;background-size:100% auto;height:100%}body{display:flex;flex-direction:column;height:100%}.message-container{display:flex;align-items:center;justify-content:center;flex:1}.error-message{width:90.6%;background:rgba(255,255,255,.75);border:1px solid var(--corporate-red);border-radius:4px;backdrop-filter:blur(5px)}.error-message__header{background-color:var(--corporate-red);color:var(--white);padding:16px}.error-message__body{padding:16px}@media only screen and (min-width:768px){.error-message{width:78.48%}}@media only screen and (min-width:992px){.error-message{width:55%}}@media only screen and (min-width:1200px){.error-message{width:45%}}.login-container{flex:1;height:400px}.login-content{margin-left:auto;margin-right:auto;width:90.6%;max-width:1246px;max-height:380px;height:100%;display:flex;flex-direction:column;border-radius:8px;box-shadow:0 4px 6px 2px rgba(124,124,124,.5)}@media only screen and (min-width:992px){.login-content{flex-direction:row}}@media only screen and (min-width:1200px){.login-content{width:78.48%}}.login-content__login-info-panel{background:var(--corporate-red);color:var(--white);padding:16px;border-top-left-radius:8px;border-top-right-radius:8px;display:flex;flex-direction:column}@media only screen and (min-width:992px){.login-content__login-info-panel{border-top-left-radius:8px;border-bottom-left-radius:8px;border-top-right-radius:0;border-bottom-right-radius:0;max-width:40%;justify-content:center;align-items:center}.login-content__login-info-panel h2{margin-bottom:32px}.login-content__login-info-panel p{max-width:66.66%;margin-bottom:16px;text-align:center}}.login-content__login-action-panel{display:flex;background:var(--white);padding:16px;border-bottom-left-radius:8px;border-bottom-right-radius:8px;flex:1}@media only screen and (min-width:992px){.login-content__login-action-panel{border-top-right-radius:8px;border-bottom-right-radius:8px;border-bottom-left-radius:0;border-top-left-radius:0;padding:32px}}.login-content__login-action-panel__action-list{flex:1}.login-content__login-action-panel__action-list li{display:flex;margin-bottom:16px}.login-content__login-action-panel__action-list a{border:1px solid var(--corporate-red);color:var(--corporate-red);border-radius:4px;padding:16px;flex:1;text-align:center}.login-content__login-action-panel__action-list a:hover{background-color:var(--corporate-red);color:var(--white)}.footer-container{background-color:var(--dark-grey);min-height:25em;flex-shrink:0}.footer-content{margin-left:auto;margin-right:auto;width:90.6%;max-width:1246px;margin:0 auto;padding-top:3%;padding-bottom:3%;min-height:11.5625em}@media only screen and (min-width:1200px){.footer-content{width:78.48%}}.footer-content__footer-company-bar{display:flex;margin:45px -15px 25px}.footer-content__footer-company-bar__linklist{height:100%;padding:0 15px;flex-basis:50%}.footer-content__footer-company-bar__linklist ul{padding-bottom:25px}@media only screen and (min-width:992px){.footer-content__footer-company-bar__linklist{flex-basis:23%}}.footer-content__footer-legal{display:flex;flex-wrap:wrap;margin-top:20px}.footer-content__footer-legal__header{min-width:240px;width:25%}.footer-content__footer-legal__itemlist{display:flex}.footer-content__footer-legal__itemlist ul{display:flex;flex-wrap:wrap;margin-top:10px}@media only screen and (min-width:947px){.footer-content__footer-legal__itemlist ul{margin:0}}.footer-content__footer-legal__itemlist ul li:not(:last-child):after{content:'|';color:var(--middle-grey);margin-left:.85em;margin-right:.85em;font-size:12px;line-height:25px}.footer-container.only-copyright{min-height:0}.footer-container.only-copyright .footer-content{min-height:0}@media only screen and (min-width:992px){.footer-container.only-copyright .footer-content{padding-top:1%;padding-bottom:1%}}.footer-container.only-copyright .footer-content__footer-legal{margin:0}.error-text{color:var(--corporate-red)}.warning-text{color:var(--corporate-orange)}a{text-decoration:none}a:hover{cursor:pointer}footer h1,footer h2,footer h3,footer h4{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:20px;line-height:32px;margin-bottom:20px;color:var(--white)}footer a,footer p,footer span{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:15px;line-height:32px;margin-bottom:20px;color:var(--white)}footer small,footer small>a{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:12px;line-height:25px;margin-bottom:20px;color:var(--middle-grey)}@media only screen and (max-width:767px){h1{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:35px;line-height:45px}h2{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:22px;line-height:30px}h3{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:22px;line-height:30px}h4{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:15px;line-height:26px}body{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:15px;line-height:26px;color:var(--copytext-grey)}a{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:15px;line-height:26px;color:var(--corporate-dark-blue)}}@media only screen and (min-width:768px){h1{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:40px;line-height:50px}h2{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:24px;line-height:32px}h3{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:24px;line-height:32px}h4{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;line-height:28px}body{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:16px;line-height:28px;color:var(--copytext-grey)}a{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:16px;line-height:28px;color:var(--corporate-dark-blue)}}@media only screen and (min-width:992px){h1{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:45px;line-height:55px}h2{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:28px;line-height:38px}h3{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:28px;line-height:38px}h4{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:18px;line-height:32px}body{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:18px;line-height:32px;color:var(--copytext-grey)}a{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:18px;line-height:32px;color:var(--corporate-dark-blue)}}@media only screen and (min-width:1200px){h1{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:50px;line-height:60px}h2{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:30px;line-height:40px}h3{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:30px;line-height:40px}h4{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:20px;line-height:34px}body{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:20px;line-height:34px;color:var(--copytext-grey)}a{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:20px;line-height:34px;color:var(--corporate-dark-blue)}}
+  </style>
+  <style>
+    .header-container{display:flex;height:64px;margin-top:25px;width:100%;color:var(--white);flex:0 0 auto}.header-container::before{content:'';display:block;flex:1;background-color:rgba(0,0,0,.4)}.header-container::after{content:'';display:block;flex:1;background-color:var(--corporate-dark-blue)}.header-container--error::after{background-color:var(--corporate-red)}.header-container--error .header-content__header-logo{background-color:var(--corporate-red)}@media only screen and (min-width:768px){.header-container{margin-top:40px;height:80px}}.header-content{margin-left:auto;margin-right:auto;width:90.6%;max-width:1246px;height:100%;display:flex}@media only screen and (min-width:1200px){.header-content{width:78.48%}}.header-content__header-menu{display:flex;flex:1;align-items:center;width:100%;background-color:rgba(0,0,0,.4);backdrop-filter:blur(5px)}.header-content__header-logo{height:100%;margin-left:20px;background-color:var(--corporate-dark-blue)}.header-content__header-logo__image{display:flex;height:100%;margin:0}.main-container{display:flex;width:100%;flex:1 0 auto;flex-direction:column;background:var(--white);margin-top:200px;padding-top:1em;box-shadow:0 8px 24px 24px rgba(0,0,0,.4)}.main-content{margin-left:auto;margin-right:auto;width:90.6%;max-width:1246px}.actions__list{margin:1em 0}.actions__list-item{border:1px solid var(--corporate-dark-blue);margin:1em 0}.actions__list-item__link{padding:.5em;display:block}.actions__list-item.disabled,.actions__list-item.disabled .actions__list-item__link{cursor:not-allowed;color:var(--dark-grey);border-color:var(--dark-grey)}.actions__list-item:not(.disabled) .actions__list-item__link:hover{color:var(--white);background-color:var(--corporate-dark-blue)}.breadcrumbs{width:calc(100% + 32px);left:-32px;height:48px;top:-68px;margin-bottom:-48px;position:relative;background-color:var(--white);display:flex;box-shadow:0 -8px 8px -8px #000,8px 0 8px -8px #000,-8px 0 8px -8px #000}.breadcrumbs__item{display:flex;align-items:center}.breadcrumbs__item a:hover{text-decoration:underline}.breadcrumbs .breadcrumbs__item+.breadcrumbs__item:before{padding:1em;color:var(--copytext-grey);content:'/\00a0'}.breadcrumbs__item:first-child{margin-left:32px}.breadcrumbs__item--active a{pointer-events:none;color:var(--copytext-grey)}.file-upload{border:1px solid var(--dark-grey);border-style:dashed;border-radius:4px;width:400px;height:400px;display:flex;align-items:center;justify-content:center}.file-upload form{pointer-events:none}.file-upload.highlighted{border-color:var(--corporate-dark-blue);border-style:solid;box-shadow:2px 2px 4px 8px var(--dark-grey)}#harFileElement{display:none}.alert{position:relative;border:1px solid #e0cc8e;border-radius:8px;color:#856404;background-color:#fff3cd;padding:16px;margin-bottom:16px}.alert__heading{font-size:1.5rem}.alert__close{position:absolute;top:0;right:.5rem}.alert__close:hover{color:#3f2f01;cursor:pointer}.alert__close--hidden{display:none}
+  </style>
+  <style>
+    table {
+      margin: 1rem;
+    }
+    td {
+      border: 1px solid grey;
+      padding: .5rem 1rem;
+    }
+    tr td:first-child {
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <script type="text/javascript">
+    var utag_data = {
+      page_name: "BASF Authentication Service",
+    };
+  </script>
+
+  <script type="text/javascript">
+    (function (a, b, c, d) {
+      a = "//tags.tiqcdn.com/utag/basf/basf/prod/utag.js";
+      b = document;
+      c = "script";
+      d = b.createElement(c);
+      d.src = a;
+      d.type = "text/java" + c;
+      d.async = true;
+      a = b.getElementsByTagName(c)[0];
+      a.parentNode.insertBefore(d, a);
+    })();
+  </script>
+
+  <header class="header-container header-container--error">
+    <div class="header-content">
+      <div class="header-content__header-menu">
+        <h1>Authentication Service</h1>
+      </div>
+      <div class="header-content__header-logo">
+        <img class="header-content__header-logo__image" src="/nidp/images/basf/redesign/BASF_Logo.svg" alt="BASF Logo">
+      </div>
+    </div>
+  </header>
+  <div class="main-container">
+    <div class="main-content">
+      <h2>Your content was blocked by the BASF firewall</h2>
+      <p>If you believe that this content should be unblocked, please open a ServiceNow incident:</p>
+      <table>
+        <tr>
+          <td>Service Offering</td>
+          <td>SECURITY WAF</td>
+        </tr>
+        <tr>
+          <td>Assignee Group</td>
+          <td>gw.security.waf</td>
+        </tr>
+        <tr>
+          <td>Support ID</td>
+          <td>5137637049338484259</td>
+        </tr>
+      </table>
+      <p>Thank you for your understanding.</p>
+    </div>
+  </div>
+  <footer class="footer-container only-copyright">
+      <div class="footer-content">
+        <div class="footer-content__footer-legal">
+          <div class="footer-content__footer-legal__header">
+            <small>Copyright © BASF SE 2023</small>
+          </div>
+          <div class="footer-content__footer-legal__itemlist">
+            <ul>
+              <li>
+                <small
+                  ><a
+                    href="https://www.basf.com/global/en/legal/disclaimer.html"
+                    >Disclaimer</a
+[0m
+[0m$ [0mfor path in "/auth/.well-known/openid-configuration" "/basf/.well-known/openid-configuration" "/nidp/.well-known/openid-configuration" "/.well-known/oauth-authorization-server"; do echo "=== $path ==="; curl -ks -o /dev/null -w "%{http_code} %{size_download}" "https://my.basf.com$path" && echo; done
+=== /auth/.well-known/openid-configuration ===
+200 204936
+=== /basf/.well-known/openid-configuration ===
+200 204926
+=== /nidp/.well-known/openid-configuration ===
+200 204926
+=== /.well-known/oauth-authorization-server ===
+404 136
+[0m
+[0m$ [0mcurl -ks "https://my.basf.com/auth/.well-known/openid-configuration" | head -50
+...output truncated...
+
+Full output saved to: /home/runner/.local/share/opencode/tool-output/tool_072d7194c001G2Z2qwRKfVVd9b
+
+  <body><!--nghm-->
+    <app-root ng-version="21.2.16" _nghost-ng-c4111945955 ngh="3" ng-server-context="ssr"><!----><div _ngcontent-ng-c4111945955 appconsentmanagement wxptrackscroll><!----><router-outlet _ngcontent-ng-c4111945955></router-outlet><!----><basf-mbw-terms-of-use _ngcontent-ng-c4111945955 _nghost-ng-c3772757706 ngh="1"><p-dialog _ngcontent-ng-c3772757706 maskstyleclass="always-on-top" pc38224 data-pc-section="host" ngh="0"><!----></p-dialog></basf-mbw-terms-of-use></div><p-toast _ngcontent-ng-c4111945955 data-p="top-right" style="bottom: false; position: fixed; right: 20px; top: 20px;" class="p-component p-toast p-toast-top-right" pc38223 data-pc-section="root" data-pc-name="toast" ngh="2"><!----></p-toast><!----><!----><!----><!----><!----><!----><!----><!----></app-root>
+  <link rel="modulepreload" href="chunk-WRCFWZJL.js"><link rel="modulepreload" href="chunk-WLFO2ZN6.js"><link rel="modulepreload" href="chunk-OBGUN2H2.js"><link rel="modulepreload" href="chunk-QKAQFF34.js"><link rel="modulepreload" href="chunk-EMC5L54J.js"><link rel="modulepreload" href="chunk-7MX2DL4R.js"><link rel="modulepreload" href="chunk-NFSZNZ7R.js"><link rel="modulepreload" href="chunk-R2CCNDS2.js"><link rel="modulepreload" href="chunk-EDPKM5BN.js"><link rel="modulepreload" href="chunk-AF3RL6FK.js"><script src="polyfills-5CFQRCPP.js" type="module"></script><script src="main-CURZYBQE.js" type="module"></script>
+  
+
+<script id="ng-state" type="application/json">{"configKey":{"attributeClusterOrder":["8a8081089d48c10e019d4cfb72880006","8a8081089d48c10e019d4cfc5aa00008","8a8081089d48c10e019d4cfcded7000a","8a8081089d48c10e019d4cfdae5b000c","8a8081089d48c10e019d4cfe339b000e","8a8082139d48c0e1019d4d00e4be00f5","8a8082139d48c0e1019d4d016b4300f7","8a8082139d48c0e1019d4d02f2ec00f9","8a8082139d48c0e1019d4d03731900fb","8a8082139d48c0e1019d4d03ce4800fd","8a8082139d48c0e1019d4d04d4bc00ff","8a8082139d48c0e1019d4d0914260101"],"commerce":{"core":{"baseApiUrl":"https:\u002F\u002Fapi.commerce.basf.com","cspBaseUrl":"https:\u002F\u002Fprod.api.basf.com","dssBaseUrl":"https:\u002F\u002Fapi.productinformation.basf.com\u002Fproductliterature","dusBaseUrl":"https:\u002F\u002Fdus.basf.com","envName":"prod","impersonateBaseApiUrl":"https:\u002F\u002Fapi-imp.commerce.basf.com","impersonateDssBaseApiUrl":"https:\u002F\u002Fapi-imp.productinformation.basf.com\u002Fproductliterature","impersonatePiBaseUrl":"https:\u002F\u002Fapi-imp.productinformation.basf.com","mssBaseUrl":"https:\u002F\u002Fmss.basf.com","piBaseUrl":"https:\u002F\u002Fapi.productinformation.basf.com"}},"dssEndpoint":"\u002Fapi\u002Fdss","logoLinkTarget":"_self","logoPath":"\u002Fassets\u002Flogo.v1.svg","mssAttributeIds":{"benefitsId":"8a8081e5804534050180477358da5539","casNamesId":"8a8082fc9daa6417019daf7676c00109","casNumbersId":"8a80814f9daa63a4019daf778f53013e","coManufacturerId":"8a8082e59517c0a301953765e45c00bb","descriptionId":"000000007076229d017076b81d992631","descriptionTeaserId":"8a80811387558e68018755f596e90855","manufacturerId":"8a8082e59517c0a301953764dd3f00b2","relatedCasCategoryId":"8a80816a6ed073ca016ed0fde3fc0011"},"mssEndpoint":"\u002Fapi\u002Fmss","productInformationEndpoint":"\u002Fapi\u002Fproduct-information"},"hostKey":{"cartConfig":{"cartUrl":"my-cart"},"commerce":{"afterSales":{"featureFlags":{"enableDownloadResultList":true,"enableNCM":true,"enableNCMFileUpload":true,"enableNewInvoiceDownloadEndpoint":true,"enableNewShipmentSearch":false,"enableOrderAgain":true,"enableOrderChange":true,"isVmiEnabled":true,"showExpandableDocumentDownload":true,"showOrderStatusTooltip":true,"showTotalPriceOnOrderDetail":true},"gmapsApiKey":"AIzaSyCScwLKKBg329AbrlGenjN7ox6TFQCFHLY","routingConfig":{"basePath":"orders","complaints":"complaints","deliveries":"shipments","documentSearch":"documents","download":"download","financialDocuments":"financial-overview","orderChange":"change","success":"success"}},"cart":{"catalogPageUrl":"\u002Fmy-catalog","customerSupportEmail":"NEEDSTOBECHANGED@basf.com","featureFlags":{"enableAddToCartWithoutPrice":true,"isCustomLineItemNoEnabled":true,"isDuplicateLineItemEnabled":true,"isEditAllItemsEnabled":true,"isExpandAllCartEnabled":true,"isGrossWeightShown":true,"isTotalQuantityShown":false,"isUploadCartEnabled":true,"showBPSOnSavedCart":true},"orderHistoryPageLink":"\u002Faccount\u002Forders","savedCartsToastRoute":"\u002Fcarts\u002Ftemplates"},"common":{"dataDog":{"allowedTracingUrls":[{"match":"https:\u002F\u002Fapi.commerce.basf.com","propagatorTypes":["tracecontext"]}],"applicationId":"503ad525-51ff-43b1-8fbf-ad9c0b7f4e89","clientToken":"pub799f64b6a253e7d0f6301cf8aa8f1953","defaultPrivacyLevel":"mask-user-input","env":"prd","filterBotsAndCrawlers":true,"service":"my-basf-world","sessionReplaySampleRate":0,"sessionSampleRate":100,"site":"datadoghq.eu","trackLongTasks":true,"trackResources":true,"trackUserInteractions":false,"version":"0.0.0"},"friendlyCaptcha":{"puzzleEndpoint":"https:\u002F\u002Feu-api.friendlycaptcha.eu\u002Fapi\u002Fv1\u002Fpuzzle,https:\u002F\u002Fapi.friendlycaptcha.com\u002Fapi\u002Fv1\u002Fpuzzle","siteKey":"FCMTO350BLLQLRAS"},"isContactUsCaptchaEnabled":true,"isDatadogRumEnabled":true,"isMarketingConsentEnabled":true,"qualtrics":{"enableJSSanitization":true,"enableSecureVariables":true},"tealium":{"account":"basf","environment":"prod","profile":"dcp"},"userLocations":{"defaultLocationEnabled":true,"oneTimeShipmentEnabled":true}},"core":{"apiKey":"1bGxwPYji82wTvIFjLgEG1T4x2WAxFO07XTiVhWw","cspApi":{"apiKey":"4a788782-6321-42f5-a99f-7dffc5506a75","apiUrl":"\u002Fapi\u002Fcsp"},"cspApiKey":"4a788782-6321-42f5-a99f-7dffc5506a75","flags":{"arePricesMandatoryForCheckout":false,"cartRecalculateTimeout":300000,"isAiProductFinderEnabled":false,"isExpandAllPreCartEnabled":true,"isFavouritesEnabled":true,"isFinancialDocumentsEnabled":true,"isQuantitySelectFreeText":true,"isSavedCartsEnabled":true,"isTrackingEnabled":true},"hideFormulationFinderPage":true,"langToLocaleMap":{"en":"en-US","es":"es-ES","zh":"zh-CN"},"piApiKey":"3OvViVDQyl1M0QlXIxxdN2xIjMYEp8fM8KKvpWyN","pimData":{"catalogId":"\u002F8a80818a9c4619ee019c47e1a13b013b","documentTypeTabIds":["8a8082d37dbd2df3017de5fbf2eb309e","8a8082d37dbd2df3017de5fc0bc130a0","8a8082d37dbd2df3017de5fc24a530a2","8a8082d37dbd2df3017de5fb8bdf309a","8a8082d37dbd2df3017de5fc3c3f30a4","8a8082d37dbd2df3017de5fbb7b2309c","8a8082459c91a635019cd74603ec032b","8a8082459c91a635019cd7469e44032e","8a8082459c91a635019cd7478c480331","8a8081219c91a5eb019cd749c19704c6","8a8081219c91a5eb019cd74a499a04c9","8a8081219c91a5eb019cadefd1860083"],"filterAttributes":[],"pcfProductTypeId":"\u002F8a8082c97eaf959c017eb4fc61fe6211","productSafetyTabId":"8a8082d37dbd2df3017de5fc3c3f30a4"},"routes":{"cart":{"basePath":"my-cart","checkoutPath":"checkout","errorPath":"error","orderSuccessPath":"order-success","pendingPath":"pending","uploadHelpPath":"upload-help"}},"storeKey":"my-basf-world","storeLocales":{"default":"en-US","list":["en-US","en-GB","bg-BG","pt-BR","pt-PT","zh-CN","zh-TW","cs-CZ","nl-NL","fi-FI","el-GR","hu-HU","ja-JP","ko-KR","ro-RO","ru-RU","sk-SK","sl-SI","es-MX","es-ES","sv-SE","tr-TR","vi-VN","de-DE","it-IT","pl-PL","fr-FR","hr-HR","en-CA","fr-CA","es-AR"]}},"myAccount":{"businessDetailsControls":["COMPANY","IS_EXISTING_CUSTOMER","CUSTOMER_ACCOUNT_NUMBER","SELECT_COUNTRY_LOCATION","ESTATE_PROVINCE","CITY","ADDRESS_STREET_NUMBER","ZIPCODE_ALPHANUMERIC","MBW_INDUSTRY","PORTAL_USAGE","MESSAGE"],"flags":{"cspUserInformationComponent":{"use":true,"useGroupEmailAddress":true},"defaultLocationEnabled":true,"emailSettings":{"showNotificationSettings":true,"showOpenOrderReport":true,"showStatusNotifications":true},"isRequestHistoryEnabled":true,"registration":{"fileUpload":{"isEnabled":false},"isCaptchaEnabled":true,"isCountryDropdownEnabled":true,"isCspEnabled":false,"isStateDropdownEnabled":true,"isTrackEmailEnabled":false,"isTwoCnpjEnabled":false,"useDcpRegistrationApi":true},"showDefaultCsrDetails":true,"useUserDefaultLang":true},"personalDetailsControls":["FIRST_NAME","LAST_NAME","EMAIL","OCCUPATION_MBW","MOBILE_PHONE","PRODUCT_LIST_MBW","PREFERRED_LANGUAGE","CHECK_TERMS"],"threeiamProfileUrl":"https:\u002F\u002Fexternal-profile-management.basf.com\u002Fmydata\u002Findexui5.html"},"myBasfNavigator":{"apiKey":"ahWVpas7g72agBIjAtUqr3v6Q7hjxGTl4BzngjYR","baseUrl":"https:\u002F\u002Fapi.commerce.basf.com\u002Fcopilot","showSessionId":false},"portfolio":{"featureFlags":{"isBookletDownloadEnabled":true,"isConsignmentsEnabled":true,"isContractsEnabled":true,"isMyDownloadsEnabled":true,"isSampleRequestEnabled":true}},"productFinder":{"facets":[{"facet":"region","hideChildren":true,"index":0,"isExpanded":false,"label":"pim.regionalAvailability"},{"facet":"industry","index":1,"isExpanded":false,"label":"productFinder.sideFilter.industries"},{"facet":"application","index":2,"isExpanded":false,"label":"pim.applications","treeDepthLimit":1},{"facet":"product_group","index":3,"isExpanded":false,"label":"pim.productGroups"},{"facet":"process","index":4,"isExpanded":false,"label":"pim.processes"},{"facet":"topic","index":5,"isExpanded":false,"label":"pim.sustainability","rootFilterId":"\u002F8a8081cd9be68ca9019bfe91812f0059","showFilterDefinitions":true},{"facet":"topic","index":6,"isExpanded":false,"label":"pim.regulatory","rootFilterId":"\u002F8a80828b9a372e6a019a5fc7609f0507"}],"ranges":[]}},"formulationConfig":{"benefitsId":"000000007076229d0170772a1ffc6f0e","descriptionId":"000000007076229d017076b81d992631","formulationPath":"\u002Fformulations","instructionId":"8a80821e7650c7780176dd6cf0767f63","pdpPath":"..\u002Fpdp\u002F${id}","technologyId":"8a8082738050164501806608d16f5593"},"isInternalLoginAllowed":false,"marketingConsent":{"collectionPointId":"588d9610-5c79-448f-b127-b3d7c4dae7a8","consents":{"email-communication":"e7b685a8-891c-4a3b-b710-7ec5af388740"}},"myBasfWorldUserGroup":"SG_DCP_MYBASFWORLD","oidc":{"authority":"https:\u002F\u002Ffederation.basf.com\u002Fnidp\u002Foauth\u002Fnam","autoCleanStateAfterAuthentication":false,"autoUserInfo":false,"clientId":"86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4","configId":"0-basfFederationService","customParamsAuthRequest":{"acr_values":"3IAM\u002FLogin\u002FExternal"},"customParamsCodeRequest":{"resourceServer":"Unencrypted","scope":"openid DigitalCommercePlatform profile1"},"historyCleanupOff":true,"logLevel":3,"maxIdTokenIatOffsetAllowedInSeconds":600,"postLogoutRedirectUri":"https:\u002F\u002Fmy.basf.com\u002F","redirectUrl":"https:\u002F\u002Fmy.basf.com\u002F.auth","renewTimeBeforeTokenExpiresInSeconds":60,"responseType":"code","scope":"openid DigitalCommercePlatform profile1 refresh_token","secureRoutes":["\u002Fapi","\u002Fdam","https:\u002F\u002Fmy.basf.com\u002Fdam","https:\u002F\u002Fmy.basf.com\u002Fapi","https:\u002F\u002Fapi.commerce.basf.com","https:\u002F\u002Fapi-imp.commerce.basf.com","https:\u002F\u002Fapi-imp.productinformation.basf.com","https:\u002F\u002Fmss.basf.com","https:\u002F\u002Fapi.productinformation.basf.com","https:\u002F\u002Fdus.basf.com","https:\u002F\u002Fprod.api.basf.com","https:\u002F\u002Fvideos.prod.wcms.basf.com"],"silentRenew":true,"triggerRefreshWhenIdTokenExpired":false,"useRefreshToken":true,"authWellknownEndpointUrl":"https:\u002F\u002Ffederation.basf.com\u002Fnidp\u002Foauth\u002Fnam"},"pdpConfig":{"useNewPdpRoutes":true,"withProductComparison":true},"profileConfig":{"businessPartnerSelection":true,"enableViewSelection":true,"filterChannel":"my-basf-world"},"publishServer":"https:\u002F\u002Fmy.basf.com","redirectApiKey":"EZKKbo6Ni4Sn","rootPath":"\u002Fmbw\u002Fmy","tracking":{"environment":"prod","host":"https:\u002F\u002Fblackberry.basf.com","profile":"wxp"}},"imageConfigKey":{"formats":{"avatar":[{"variation":"1x1","ratio":1,"renditions":[75,150]}],"pressphoto_thumbnail":[{"variation":"4x3","ratio":1.333,"renditions":[210,286,414,438,572,768,1024]}],"overview_teaser-16x9":[{"variation":"16x9","ratio":1.777,"renditions":[200,300,600]}],"overview_teaser-original":[{"variation":"original","renditions":[200,300,600]}],"stage_large":[{"media":"(min-aspect-ratio: 23\u002F9)","sizes":"100vw","variation":"23x9","ratio":2.5,"renditions":[1366,1920,2560]},{"media":"(min-aspect-ratio: 5\u002F3)","sizes":"100vw","variation":"5x3","ratio":1.67,"renditions":[1366,1920]},{"media":"(min-aspect-ratio: 1\u002F1)","sizes":"100vw","variation":"1x1","ratio":1,"renditions":[1080,1366]},{"media":"(min-aspect-ratio: 3\u002F4)","sizes":"100vw","variation":"3x4","ratio":0.75,"renditions":[720,1080]},{"sizes":"100vw","variation":"9x16","ratio":0.56,"renditions":[480,720]}],"stage_medium":[{"media":"(min-width: 1600px)","sizes":"100vw","variation":"23x9","ratio":2.56,"renditions":[1366,1920,2560]},{"media":"(min-width: 1200px)","sizes":"100vw","variation":"23x9","ratio":2.56,"renditions":[1366,1920]},{"media":"(min-width: 976px)","sizes":"100vw","variation":"23x9","ratio":2.56,"renditions":[1080,1366]},{"media":"(min-width: 768px)","sizes":"100vw","variation":"6x3","ratio":2,"renditions":[720,1080]},{"sizes":"100vw","variation":"9x16","ratio":0.56,"renditions":[480,720]}],"stage_medium-lite":[{"media":"(min-width: 1600px)","sizes":"100vw","variation":"23x9","ratio":2.56,"renditions":[1366,1920,2560]},{"media":"(min-width: 1200px)","sizes":"100vw","variation":"23x9","ratio":2.56,"renditions":[1366,1920]},{"media":"(min-width: 976px)","sizes":"100vw","variation":"23x9","ratio":2.56,"renditions":[1080,1366]},{"media":"(min-width: 768px)","sizes":"100vw","variation":"21x9","ratio":2.33,"renditions":[720,1080]},{"sizes":"100vw","variation":"4x3","ratio":1.33,"renditions":[480,720]}],"stage_small":[{"media":"(min-width: 1600px)","sizes":"100vw","variation":"4x1","ratio":4,"renditions":[1366,1920,2560]},{"media":"(min-width: 1200px)","sizes":"100vw","variation":"32x9","ratio":3.55,"renditions":[1366,1920]},{"media":"(min-width: 976px)","sizes":"100vw","variation":"23x9","ratio":2.56,"renditions":[1080,1366]},{"media":"(min-width: 768px)","sizes":"100vw","variation":"21x9","ratio":2.33,"renditions":[720,1080]},{"sizes":"100vw","variation":"21x9","ratio":2.33,"renditions":[480,720]}],"stage_extra_small":[{"media":"(min-width: 1600px)","sizes":"100vw","variation":"1584x155","ratio":10.22,"renditions":[1366,1920,2560]},{"media":"(min-width: 1200px)","sizes":"100vw","variation":"4x1","ratio":4,"renditions":[1366,1920]},{"media":"(min-width: 976px)","sizes":"100vw","variation":"4x1","ratio":4,"renditions":[1080,1366]},{"media":"(min-width: 768px)","sizes":"100vw","variation":"33x10","ratio":3.3,"renditions":[720,1080]},{"sizes":"100vw","variation":"21x9","ratio":2.33,"renditions":[480,720]}],"media-16x9":[{"variation":"16x9","ratio":1.777,"renditions":[210,414,768,930,1280,1920,2560]}],"media-23x9":[{"variation":"23x9","ratio":2.555,"renditions":[210,414,768,930,1280,1920,2560]}],"media-33x10":[{"variation":"33x10","ratio":3.3,"renditions":[210,414,768,930,1280,1920,2560]}],"media-1x1":[{"variation":"1x1","ratio":1,"renditions":[210,414,768,930,1280,1920,2560]}],"media-original":[{"variation":"original","renditions":[210,414,768,930,1280,1920,2560]}],"og:image":[{"variation":"16x9","ratio":1.777,"renditions":[1200]}],"twitter:image":[{"variation":"16x9","ratio":1.777,"renditions":[4096]},{"variation":"1x1","ratio":1,"renditions":[4096]}],"menuteaser-16x9":[{"variation":"16x9","ratio":1.777,"renditions":[210,414,768]}],"location-overview":[{"variation":"16x9","ratio":1.777,"renditions":[200,250,300,375,400,500,600,750,800,1000]}],"teaser-16x9":[{"variation":"16x9","ratio":1.777,"renditions":[210,414,768,930,1280,1366,1920,2560]}],"contact-overview":[{"variation":"1x1","ratio":1,"renditions":[128,160,192,200,240,256,300,320,384,400,480,512,600,640,800]}],"contact-DIN-Portrait":[{"variation":"DIN-Portrait","ratio":0.7071,"renditions":[210,414,768,930,1024,1280,1366,1920,2560]}],"downloadteaser-16x9":[{"variation":"16x9","ratio":1.777,"renditions":[210,414,768,930,1280,1366,1920,2560]}],"downloadteaser-DIN-Cover":[{"variation":"DIN-Portrait","ratio":0.7071,"renditions":[210,414,768,930,1280,1366,1920,2560]}],"downloadteaser-DIN-Landscape":[{"variation":"DIN-Landscape","ratio":1.4142,"renditions":[210,414,768,930,1280,1366,1920,2560]}],"downloadteaser-Original":[{"variation":"original","renditions":[210,414,768,930,1280,1366,1920,2560]}],"herofigure":[{"variation":"16x9","ratio":1.777,"renditions":[768,930,1280,1366,1920,2560]}],"quiz-slide":[{"media":"(min-width: 61em)","variation":"16x9","ratio":1.777,"renditions":[942,1413,1884,2826,3768]},{"media":"(min-width: 48em)","variation":"4x3","ratio":1.333,"renditions":[435,700,900,1200,1400,1800,2100,2800,3600]},{"variation":"3x4","ratio":0.75,"renditions":[435,695,870,1043,1390,1740,2085,2780]},{"variation":"9x16","ratio":0.5625,"renditions":[435,695,870,1043,1390,1740,2085,2780]}],"storyteaser":[{"media":"(min-width: 61em)","variation":"4x3","ratio":1.333,"renditions":[768,930,1280,1366,1920,2560]},{"variation":"3x2","ratio":1.5,"renditions":[210,414,768,1024]}]}},"__nghData__":[{"t":{"0":"t116"},"c":{"0":[]}},{"d":[1,2,3],"t":{"3":"t117"}},{"t":{"0":"t118"},"c":{"0":[]}},{"t":{"0":"t0","2":"t1","6":"t119","7":"t120","8":"t121","10":"t23","12":"t122","14":"t123","16":"t124","18":"t125"},"c":{"0":[],"2":[],"3":[],"6":[],"7":[],"8":[],"10":[],"12":[],"14":[],"16":[],"18":[]}}]}</script></body><!-- 20260826.4-locations-fix-20260903.5 --></html>
+[0m
+[0m$ [0mcurl -ks "https://federation.basf.com/nidp/oauth/nam" | head -100
+<!DOCTYPE html>
+<html>
+<head>
+<title>Response</title>
+</head>
+<body>
+<h2>Error: HTTP 404 Not Found</h2>
+</body>
+</html>
+[0m
+[0m$ [0mfor path in "/nidp/oauth/nam/" "/nidp/oauth/nam/.well-known/openid-configuration" "/nidp/.well-known/openid-configuration" "/.well-known/openid-configuration"; do echo "=== $path ==="; curl -ks -o /dev/null -w "%{http_code} %{size_download}" "https://federation.basf.com$path" && echo; done
+=== /nidp/oauth/nam/ ===
+404 120
+=== /nidp/oauth/nam/.well-known/openid-configuration ===
+200 2029
+=== /nidp/.well-known/openid-configuration ===
+200 14920
+=== /.well-known/openid-configuration ===
+200 14920
+[0m
+[0m$ [0mcurl -ks "https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration"
+{"issuer":"https://federation.basf.com/nidp/oauth/nam","authorization_endpoint":"https://federation.basf.com/nidp/oauth/nam/authz","token_endpoint":"https://federation.basf.com/nidp/oauth/nam/token","userinfo_endpoint":"https://federation.basf.com/nidp/oauth/nam/userinfo","end_session_endpoint":"https://federation.basf.com/nidp/oauth/v1/nam/end_session","revocation_endpoint":"https://federation.basf.com/nidp/oauth/nam/revoke","introspection_endpoint":"https://federation.basf.com/nidp/oauth/v1/nam/introspect","jwks_uri":"https://federation.basf.com/nidp/oauth/nam/keys","registration_endpoint":"https://federation.basf.com/nidp/oauth/nam/clients","scopes_supported":["address","urn:netiq.com:nam:scope:oauth:registration:full","email","phone","urn:netiq.com:nam:scope:oauth:registration:read","maglis","profile","openid"],"response_types_supported":["token","id_token","token id_token","none","code","code token","code id_token","code id_token token"],"frontchannel_logout_supported":true,"frontchannel_logout_session_supported":true,"response_modes_supported":["query","fragment","form_post"],"grant_types_supported":["authorization_code","implicit","password","client_credentials","hybrid","refresh_token"],"id_token_signing_alg_values_supported":["RS256"],"claims_supported":["address","add","modify","delete","read","email_verified","email","phone_number_verified","phone_number","Language","guid","cn","co","basfOTPUsed","website","birthdate","gender","profile","preferred_username","given_name","middle_name","locale","picture","UPN","zone_info","updated_at","/UserAttribute[@ldap:targetAttribute=\"groupMembership\"]","nickname","name","family_name"],"code_challenge_methods_supported":["plain","S256"],"subject_types_supported":["public"],"token_endpoint_auth_methods_supported":["client_secret_post","client_secret_basic"],"revocation_endpoint_auth_methods_supported":["client_secret_post","client_secret_basic"],"introspection_endpoint_auth_methods_supported":["client_secret_post","client_secret_basic","bearer"]}
+[0m
+[0m$ [0mcurl -ks "https://federation.basf.com/nidp/oauth/nam/keys"
+{"keys":[{"kty":"RSA","use":"sig","alg":"RS256","kid":"1111010011111111","x5c":["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"],"x5t":"z_h0rZ-0hLMtZyY-XSjoV7Y3RqY","x5tS256":"NP7TBmmw8HBjblxN2peGzj10AgIX8EQO7TWpa0wbw_0","n":"1jTrzZqAqflmQnTVMDhKHzJb1E5Mjw0Cuwoogktjc3gCx2znAnNzrFZkiI8ApTTOtq2ftxTlbhvh-HyAR4O5oc3DlpAwp92PCRZDR26C7ocyjg-bjOZ4t3Zx58P-4NcNCv2SNFm8v9ZCux5xX8NZjQ7YO9jBMCDzN0OSne09KaaA4FA3U85HrtYZ7pnI3M8-1sDgwDZMOTgWf4Xf8BzT0tdBOAf1pGFzt_q5imt3Xxzwd_0ODEl7m3cqgqhgr-EvOcrwlyaO6lPITVHddjrLnvVbI0xJnFpRiLxxueaj16gle4T1xV19TZX_6-2n1ku4lkU43qzMZ6DDl7yfbkb3l7QyoKjOKT5Q-D-bjIgJljwLTyAWBK7ViqMkq2yBBV1fotsRbvcYeCNkFimtjoE81twdu-U0TVlaunsp-m3IMOaLWosr9I9xXv6qMRmQn7c_5-IYCtrzdezfc0V9mqfyhvTFd09djhffkIcFUzjmd7QRaSpZ86TnwupDpPWmrBTgx2ezNLlKTMJt_xmOoE1xgfnUcLytw4SfVelvjU8iQhj9FgjRQMw4tLHj8b_mFhuKVnl0q2UC4arguuEQPCXnKqzuO6t6AkUUP8XnXjaFjDZ-RuqvA_wX25Oj_G6mtl_oO9qubUIXkEEAKrugqi8rGJcpoCiiDXkTjv_QYVPgYq0","e":"AQAB"}]}
+[0m
+[0m$ [0mcurl -ks -o /dev/null -w "%{http_code} %{size_download}" "https://federation.basf.com/nidp/oauth/nam/clients" && echo
+401 37
+[0m
+[0m$ [0mcurl -ks -X POST "https://federation.basf.com/nidp/oauth/nam/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&scope=openid" \
+  -o /dev/null -w "%{http_code} %{size_download}" && echo
+400 110
+[0m
+[0m$ [0mcurl -ks "https://federation.basf.com/nidp/oauth/nam/authz?client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&response_type=code&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth&scope=openid%20DigitalCommercePlatform%20profile1%20refresh_token&state=test" -o /dev/null -w "%{http_code} %{size_download}" && echo
+302 0
+[0m
+[0m$ [0mcurl -ks -L "https://federation.basf.com/nidp/oauth/nam/authz?client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&response_type=code&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth&scope=openid%20DigitalCommercePlatform%20profile1%20refresh_token&state=test" -o /dev/null -w "%{http_code} %{url_effective}" && echo
+200 https://federation.basf.com/nidp//app/login?target=https%3A%2F%2Ffederation.basf.com%2Fnidp%2Foauth%2Fnam%2Fauthz%3Fclient_id%3D86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4%26response_type%3Dcode%26redirect_uri%3Dhttps%3A%2F%2Fmy.basf.com%2F.auth%26scope%3Dopenid+DigitalCommercePlatform+profile1+refresh_token%26state%3Dtest
+[0m
+[0m$ [0mfor path in "/products" "/catalog" "/search" "/user" "/order" "/cart" "/price" "/availability" "/inventory" "/pricing" "/docs" "/swagger" "/openapi.json" "/api-docs" "/developer" "/v1" "/v2" "/beta" "/internal" "/admin" "/health" "/status" "/info" "/metrics" "/actuator"; do echo "=== $path ==="; curl -ks -o /dev/null -w "%{http_code} %{size_download}" "https://prod.api.basf.com$path" && echo; done
+=== /products ===
+404 168
+=== /catalog ===
+404 167
+=== /search ===
+404 166
+=== /user ===
+404 164
+=== /order ===
+404 165
+=== /cart ===
+404 164
+=== /price ===
+404 165
+=== /availability ===
+404 172
+=== /inventory ===
+404 169
+=== /pricing ===
+404 167
+=== /docs ===
+404 164
+=== /swagger ===
+404 167
+=== /openapi.json ===
+404 172
+=== /api-docs ===
+404 168
+=== /developer ===
+404 169
+=== /v1 ===
+404 162
+=== /v2 ===
+404 162
+=== /beta ===
+404 164
+=== /internal ===
+404 168
+=== /admin ===
+404 165
+=== /health ===
+404 166
+=== /status ===
+404 166
+=== /info ===
+404 164
+=== /metrics ===
+404 167
+=== /actuator ===
+404 168
+[0m
+[0m$ [0mfor stage in "prod" "dev" "test" "staging" "v1" "v2" "api"; do for path in "/copilot" "/swagger.json" "/openapi.json"; do echo "=== /$stage$path ==="; curl -ks -o /dev/null -w "%{http_code} %{size_download}" "https://api.commerce.basf.com/$stage$path" && echo; done; done
+=== /prod/copilot ===
+403 42
+=== /prod/swagger.json ===
+403 42
+=== /prod/openapi.json ===
+403 42
+=== /dev/copilot ===
+403 42
+=== /dev/swagger.json ===
+403 42
+=== /dev/openapi.json ===
+403 42
+=== /test/copilot ===
+403 42
+=== /test/swagger.json ===
+403 42
+=== /test/openapi.json ===
+403 42
+=== /staging/copilot ===
+403 42
+=== /staging/swagger.json ===
+403 42
+=== /staging/openapi.json ===
+403 42
+=== /v1/copilot ===
+403 42
+=== /v1/swagger.json ===
+403 42
+=== /v1/openapi.json ===
+403 42
+=== /v2/copilot ===
+403 42
+=== /v2/swagger.json ===
+403 42
+=== /v2/openapi.json ===
+403 42
+=== /api/copilot ===
+403 42
+=== /api/swagger.json ===
+403 42
+=== /api/openapi.json ===
+403 42
+[0m
+[0m$ [0mcurl -ks "https://my.basf.com/.auth" -o /dev/null -w "%{http_code} %{size_download} %{redirect_url}" && echo
+200 205023
+[0m
+[0m$ [0mcurl -ks "https://federation.basf.com/nidp/oauth/nam/authz?client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&response_type=code&redirect_uri=https%3A%2F%2Fevil.com&scope=openid&state=test" -o /dev/null -w "%{http_code} %{size_download} %{redirect_url}" && echo
+400 0
+[0m
+[0m$ [0mcurl -ks "https://federation.basf.com/nidp/oauth/nam/authz?client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&response_type=code&redirect_uri=https%3A%2F%2Fapi.commerce.basf.com%2F.auth&scope=openid&state=test" -o /dev/null -w "%{http_code} %{size_download} %{redirect_url}" && echo
+400 0
+[0m
