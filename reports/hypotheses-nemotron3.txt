@@ -1,46 +1,57 @@
-## 2026-09-05 13:34:21 UTC [target] (model nemotron3)
-[NEW] api.basf.com, my.basf.com, www.basf.com, basf.com: completely unprobed web estate (4 hosts) while *.api.basf.com estate (9 hosts) fully exhausted with zero unauth findings
-[CHANGED] e-gate.api.basf.com: confirmed HTTP 404 at root + all 7 doc paths (not SSL error); server=Microsoft-HTTPAPI/2.0; no API gateway surface
-[CHANGED] ap-eupf.api.basf.com: 150KB root confirmed as stock Azure Functions 3.0 placeholder (azureLogo, jQuery, go.microsoft.com); zero function refs or `/api/` routes
+## 2026-09-05 16:26:04 UTC [target] (model nemotron3)
+[NEW] api.basf.com resolves to 127.0.0.1 (loopback) — not publicly reachable; all documentation probes fail with connection refused
+[NEW] my.basf.com returns HTTP 200 (204KB) via CloudFront; `.well-known/openid-configuration` returns 404 (HTML error page from BASF Auth Service); auth stack not at standard OIDC path
+[NEW] www.basf.com returns HTTP 308 redirect to /us/en via CloudFront; 640KB content; no dangling CNAME (A records to CloudFront IPs)
+[NEW] basf.com resolves to CloudFront IP (13.248.131.227); no CNAME
+[CHANGED] prod.api.basf.com confirmed as Apigee gateway (CNAME basf-prod-prod.apigee.net); only `/productinformation` returns 401 VerifyAPIKey; ~25 common proxy paths (/products, /catalog, /search, /user, /order, /cart, /price, /availability, /docs, /swagger, /openapi.json) all return 404
+[CHANGED] api.commerce.basf.com confirmed as AWS REST API Gateway (x-amz-apigw-id header); `/copilot` returns 403 MissingAuthenticationToken; root returns 400; staged routes exist but require auth
+[CHANGED] federation.basf.com OIDC discovery returns HTML error page (NetIQ/Access Manager), not JSON — standard `.well-known/openid-configuration` not exposed
 [PRIO] my.basf.com,8.8,attack_surface=9,business_value=10,tech_exposure=9,gate_ease=8,cloud_surface=7,freshness=10
-[PRIO] www.basf.com,8.5,attack_surface=8,business_value=10,tech_exposure=8,gate_ease=8,cloud_surface=7,freshness=10
-[PRIO] api.basf.com,8.2,attack_surface=8,business_value=9,tech_exposure=8,gate_ease=7,cloud_surface=8,freshness=10
-[PRIO] basf.com,7.9,attack_surface=7,business_value=10,tech_exposure=7,gate_ease=7,cloud_surface=8,freshness=10
-[HYP] API gateway OpenAPI/Swagger documentation exposure on api.basf.com
-class: MISCONFIG
-asset: api.basf.com
-confidence: 70
-reasoning: api.basf.com is canonical API gateway hostname; Azure APIM/Kong/Apigee commonly expose /docs, /swagger, /openapi.json, /api-docs at root or /developer; completely unprobed in current dataset
-evidence_needed: HTTP 200 with OpenAPI/Swagger JSON/YAML or Swagger UI HTML on any documentation path
-verify_steps: GET https://api.basf.com/ -I; GET https://api.basf.com/openapi.json -k; GET https://api.basf.com/swagger.json -k; GET https://api.basf.com/docs -k; GET https://api.basf.com/api-docs -k; GET https://api.basf.com/developer -k
-impact: Full API contract disclosure enabling targeted auth/logic/IDOR testing on business flows; HIGH
-testability: PASSIVE
-[HYP] Corporate portal authentication bypass via subdomain takeover or misconfigured Azure AD B2C
+[PRIO] prod.api.basf.com,7.6,attack_surface=7,business_value=9,tech_exposure=8,gate_ease=6,cloud_surface=8,freshness=10
+[PRIO] api.commerce.basf.com,7.3,attack_surface=7,business_value=8,tech_exposure=8,gate_ease=6,cloud_surface=9,freshness=10
+[PRIO] www.basf.com,7.1,attack_surface=6,business_value=10,tech_exposure=6,gate_ease=8,cloud_surface=7,freshness=10
+[PRIO] federation.basf.com,6.9,attack_surface=6,business_value=9,tech_exposure=7,gate_ease=7,cloud_surface=6,freshness=10
+[PRIO] basf.com,6.5,attack_surface=5,business_value=10,tech_exposure=5,gate_ease=7,cloud_surface=7,freshness=10
+[PRIO] api.basf.com,2.0,attack_surface=1,business_value=9,tech_exposure=1,gate_ease=1,cloud_surface=1,freshness=10
+[HYP] my.basf.com authentication stack enumeration for OAuth/OIDC misconfiguration
 class: AUTH
 asset: my.basf.com
-confidence: 65
-reasoning: my.basf.com is customer/supplier portal subdomain; BASF uses Azure AD B2C for identity (evident from dev-clientcert-sap mTLS pattern); subdomain takeover or misconfigured custom domain in B2C tenant could allow auth bypass
-evidence_needed: HTTP 200 with login page, Azure AD B2C tenant name in redirect, or dangling CNAME to unclaimed storage/blob
-verify_steps: GET https://my.basf.com/ -I; GET https://my.basf.com/.well-known/openid-configuration -k; dig my.basf.com CNAME
-impact: Full portal account takeover, PII access, supplier/procurement fraud; CRITICAL
+confidence: 70
+reasoning: Portal returns 200 with 204KB SPA; `.well-known/openid-configuration` returns 404 (HTML error from BASF Auth Service/NetIQ); auth stack uses non-standard discovery path; CloudFront + custom auth service suggests Azure AD B2C or NetIQ Access Manager with custom domain — misconfigured redirect_uri, PKCE downgrade, or token endpoint exposure possible
+evidence_needed: Discovery of actual OIDC config endpoint (e.g., /basf/.well-known/openid-configuration, /auth/.well-known/openid-configuration, /nidp/.well-known/openid-configuration); login flow redirect to identity provider with observable parameters
+verify_steps: GET https://my.basf.com/ -k (body for login links/redirects); GET https://my.basf.com/auth/.well-known/openid-configuration -k; GET https://my.basf.com/basf/.well-known/openid-configuration -k; GET https://my.basf.com/nidp/.well-known/openid-configuration -k; GET https://federation.basf.com/.well-known/openid-configuration -k (JSON parse)
+impact: Full portal account takeover, PII access, supplier/procurement fraud via auth bypass or token theft; CRITICAL
 testability: PASSIVE
-[HYP] Main website subdomain takeover via dangling Azure/AWS/GCP DNS records
-class: OTHER
-asset: www.basf.com
+[HYP] prod.api.basf.com additional unauthenticated Apigee proxies beyond /productinformation
+class: MISCONFIG
+asset: prod.api.basf.com
 confidence: 55
-reasoning: Large enterprise with cloud migrations often leaves dangling CNAMEs to decommissioned App Services, Storage static sites, CloudFront, or Firebase; www.basf.com is highest-visibility asset
-evidence_needed: CNAME resolving to unclaimed cloud resource (azurewebsites.net, cloudfront.net, storage.googleapis.com, etc.) returning 404 or "No such app"
-verify_steps: dig www.basf.com CNAME; dig basf.com CNAME; curl -skI https://www.basf.com/; check all CNAME targets for "404 Web App not found" or equivalent
-impact: Full content control on primary domain, phishing, brand damage, cookie theft via subdomain; CRITICAL
+reasoning: Apigee gateway confirmed (CNAME basf-prod-prod.apigee.net); `/productinformation` returns 401 VerifyAPIKey (key-gated proxy); 25+ common base paths (/products, /catalog, /search, /user, /order, /cart, /price, /availability, /inventory, /pricing, /docs, /swagger, /openapi.json, /api-docs, /developer, /v1, /v2, /beta, /internal, /admin, /health, /status, /info, /metrics, /actuator) all return 404; Apigee commonly hosts multiple proxies on same virtual host — unverified paths may exist without API key requirement
+evidence_needed: HTTP 200 or 401 (not 404) on any untested proxy base path indicating deployed proxy; OpenAPI/Swagger spec exposure on any path
+verify_steps: GET https://prod.api.basf.com/products -k; GET https://prod.api.basf.com/catalog -k; GET https://prod.api.basf.com/search -k; GET https://prod.api.basf.com/user -k; GET https://prod.api.basf.com/order -k; GET https://prod.api.basf.com/cart -k; GET https://prod.api.basf.com/price -k; GET https://prod.api.basf.com/availability -k; GET https://prod.api.basf.com/inventory -k; GET https://prod.api.basf.com/pricing -k; GET https://prod.api.basf.com/docs -k; GET https://prod.api.basf.com/swagger -k; GET https://prod.api.basf.com/openapi.json -k; GET https://prod.api.basf.com/api-docs -k; GET https://prod.api.basf.com/developer -k; GET https://prod.api.basf.com/v1 -k; GET https://prod.api.basf.com/v2 -k; GET https://prod.api.basf.com/beta -k; GET https://prod.api.basf.com/internal -k; GET https://prod.api.basf.com/admin -k; GET https://prod.api.basf.com/health -k; GET https://prod.api.basf.com/status -k; GET https://prod.api.basf.com/info -k; GET https://prod.api.basf.com/metrics -k; GET https://prod.api.basf.com/actuator -k
+impact: Unauthenticated access to business APIs (product catalog, pricing, inventory) enabling competitive intel, pricing abuse, or chained IDOR; HIGH
 testability: PASSIVE
-[FINAL] 1. API gateway OpenAPI/Swagger documentation exposure on api.basf.com (70)
-[FINAL] 2. Corporate portal authentication bypass via subdomain takeover or misconfigured Azure AD B2C (65)
-[FINAL] 3. Main website subdomain takeover via dangling Azure/AWS/GCP DNS records (55)
-[NEXT] PROBE: GET https://api.basf.com/ -I && GET https://api.basf.com/openapi.json -k && GET https://api.basf.com/swagger.json -k && GET https://api.basf.com/docs -k && GET https://api.basf.com/api-docs -k && GET https://api.basf.com/developer -k
-[LEARN] REJECTED MISCONFIG @ e-gate.api.basf.com: all 7 documentation paths + root return HTTP 404 (not SSL error) — server=Microsoft-HTTPAPI/2.0, no API gateway docs exposed
-[LEARN] ACCEPTED RECON @ *.api.basf.com: full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
-[LEARN] REJECTED MISCONFIG @ ap-eupf.api.basf.com: 150KB root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — zero function refs
-[LEARN] REJECTED MISCONFIG @ ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: /.auth/config and /.auth/me return 404 — App Service EasyAuth not exposed on either Function App
-[LEARN] REJECTED OTHER @ ap-eupf.api.basf.com: passive artifact/code search for function names and keys returned zero public hits — unverifiable, exhausted
-[LEARN] ACCEPTED RECON @ dev.api.basf.com + dev-m.api.basf.com + dev-sap.api.basf.com: openapi.json/swagger.json/api-docs all 404 — catch-all hosts, no gateway/docs surface
-[RISK] basf: 35 — *.api.basf.com estate fully exhausted (9 hosts, zero unauth findings). Residual risk shifted to unprobed web estate (my.basf.com, www.basf.com, api.basf.com, basf.com) where attack surface is unknown but business value is maximum. Next probe batch targets api.basf.com (gateway docs) and my.basf.com (portal auth surface).
+[HYP] api.commerce.basf.com AWS API Gateway stage enumeration for unauthenticated routes
+class: MISCONFIG
+asset: api.commerce.basf.com
+confidence: 50
+reasoning: AWS REST API Gateway confirmed (x-amz-apigw-id, MissingAuthenticationToken error); `/copilot` returns 403 (requires auth); root returns 400; API Gateway stages (prod, dev, test, staging, v1, v2, api) may expose additional routes; stage prefix not enumerated; 3 browser keys in SPA bundle per prior art suggest client-side integration
+evidence_needed: HTTP 200 or 401 (not 403/404) on any stage-prefixed path (e.g., /prod/copilot, /dev/copilot, /v1/copilot); Swagger/OpenAPI export at /prod/swagger.json or similar
+verify_steps: GET https://api.commerce.basf.com/prod/copilot -k; GET https://api.commerce.basf.com/dev/copilot -k; GET https://api.commerce.basf.com/test/copilot -k; GET https://api.commerce.basf.com/staging/copilot -k; GET https://api.commerce.basf.com/v1/copilot -k; GET https://api.commerce.basf.com/v2/copilot -k; GET https://api.commerce.basf.com/api/copilot -k; GET https://api.commerce.basf.com/prod/swagger.json -k; GET https://api.commerce.basf.com/dev/swagger.json -k; GET https://api.commerce.basf.com/prod/openapi.json -k
+impact: Unauthenticated access to commerce APIs (orders, cart, pricing, copilot AI) enabling business logic abuse; HIGH
+testability: PASSIVE
+[PARKED] api.basf.com documentation exposure: confidence 10 — host resolves to 127.0.0.1, not publicly reachable; zero attack surface
+[PARKED] www.basf.com subdomain takeover: confidence 15 — no CNAME, direct A to CloudFront IPs; no dangling cloud resource evidence
+[PARKED] basf.com subdomain takeover: confidence 10 — apex domain, CloudFront IP; no CNAME to test
+[FINAL] 1. my.basf.com authentication stack enumeration for OAuth/OIDC misconfiguration (70)
+[FINAL] 2. prod.api.basf.com additional unauthenticated Apigee proxies beyond /productinformation (55)
+[FINAL] 3. api.commerce.basf.com AWS API Gateway stage enumeration for unauthenticated routes (50)
+[NEXT] PROBE: GET https://my.basf.com/ -k && GET https://my.basf.com/auth/.well-known/openid-configuration -k && GET https://my.basf.com/basf/.well-known/openid-configuration -k && GET https://my.basf.com/nidp/.well-known/openid-configuration -k && GET https://federation.basf.com/.well-known/openid-configuration -k (parse JSON)
+[LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused on all probes; dead/internal-only DNS entry — zero external attack surface
+[LEARN] ACCEPTED RECON @ my.basf.com: HTTP 200, 204KB SPA via CloudFront; `.well-known/openid-configuration` returns 404 (HTML error from BASF Auth Service/NetIQ); auth stack not at standard OIDC path; deep enumeration required
+[LEARN] ACCEPTED RECON @ www.basf.com: HTTP 308 to /us/en via CloudFront; 640KB; A records to CloudFront IPs (18.172.x.x); no CNAME, no dangling resource
+[LEARN] ACCEPTED RECON @ basf.com: A record to CloudFront IP (13.248.131.227); no CNAME
+[LEARN] ACCEPTED RECON @ prod.api.basf.com: CNAME basf-prod-prod.apigee.net (Apigee); `/productinformation` returns 401 VerifyAPIKey; 25 common proxy paths return 404; 401-vs-404 oracle operational
+[LEARN] ACCEPTED RECON @ api.commerce.basf.com: AWS REST API Gateway (x-amz-apigw-id); `/copilot` returns 403 MissingAuthenticationToken; root returns 400; staged routes likely exist
+[LEARN] ACCEPTED RECON @ federation.basf.com: NetIQ/Access Manager login page at `.well-known/openid-configuration`; standard OIDC discovery not exposed; HTML error page returned instead of JSON
+[RISK] basf: 45 — *.api.basf.com estate fully exhausted (9 hosts, zero unauth findings). Web estate partially mapped: api.basf.com dead (127.0.0.1), my.basf.com high-value portal with non-standard auth stack (NetIQ/Access Manager), prod.api.basf.com Apigee with single known proxy, api.commerce.basf.com AWS API Gateway with staged auth, www/basf.com CloudFront frontends. Residual risk concentrated on my.basf.com auth logic and prod.api.basf.com/api.commerce.basf.com undiscovered proxies.

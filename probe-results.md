@@ -143,3 +143,17 @@ https://www.basf.com/ -> 200 len=639993
 https://my.basf.com/saml/metadata -> 200 len=204926
 https://my.basf.com/adfs/.well-known/openid-configuration -> 200 len=204926
 https://my.basf.com/oauth2/authorize?response_type=code&client_id=test&redirect_uri=https://evil.com -> 200 len=204926
+
+## 2026-09-05 16:26:31 UTC
+https://my.basf.com/ -> 200 len=204926
+https://my.basf.com/auth/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/basf/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/nidp/.well-known/openid-configuration -> 200 len=204926
+https://federation.basf.com/.well-known/openid-configuration -> 200 len=14920
+https://prod.api.basf.com/products -> HTTP 404
+https://prod.api.basf.com/catalog -> HTTP 404
+https://prod.api.basf.com/search -> HTTP 404
+https://prod.api.basf.com/user -> HTTP 404
+https://prod.api.basf.com/order -> HTTP 404
+https://prod.api.basf.com/cart -> HTTP 404
+https://prod.api.basf.com/price -> HTTP 404

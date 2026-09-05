@@ -63,3 +63,10 @@
 - 2026-09-05 ACCEPTED RECON @ my.basf.com: HTTP 200, 204KB; `.well-known/openid-configuration` 404; portal auth stack not at standard OIDC discovery path; deep enum required
 - 2026-09-05 ACCEPTED RECON @ api.basf.com: Connection refused on all probes; not publicly reachable; dead or internal-only DNS entry
 - 2026-09-05 CHANGED RECON @ my.basf.com: `.well-known/openid-configuration` → HTTP 404 (was previously unprobed); auth stack not at standard OIDC discovery path
+- 2026-09-05 REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused on all probes; dead/internal-only DNS entry — zero external attack surface
+- 2026-09-05 ACCEPTED RECON @ my.basf.com: HTTP 200, 204KB SPA via CloudFront; `.well-known/openid-configuration` returns 404 (HTML error from BASF Auth Service/NetIQ); auth stack not at standard OIDC path; deep enumeration required
+- 2026-09-05 ACCEPTED RECON @ www.basf.com: HTTP 308 to /us/en via CloudFront; 640KB; A records to CloudFront IPs (18.172.x.x); no CNAME, no dangling resource
+- 2026-09-05 ACCEPTED RECON @ basf.com: A record to CloudFront IP (13.248.131.227); no CNAME
+- 2026-09-05 ACCEPTED RECON @ prod.api.basf.com: CNAME basf-prod-prod.apigee.net (Apigee); `/productinformation` returns 401 VerifyAPIKey; 25 common proxy paths return 404; 401-vs-404 oracle operational
+- 2026-09-05 ACCEPTED RECON @ api.commerce.basf.com: AWS REST API Gateway (x-amz-apigw-id); `/copilot` returns 403 MissingAuthenticationToken; root returns 400; staged routes likely exist
+- 2026-09-05 ACCEPTED RECON @ federation.basf.com: NetIQ/Access Manager login page at `.well-known/openid-configuration`; standard OIDC discovery not exposed; HTML error page returned instead of JSON

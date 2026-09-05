@@ -214,3 +214,14 @@
 - LEARN: REJECTED MISCONFIG @ ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: /.auth/config and /.auth/me return 404 — App Service EasyAuth not exposed on either 
 - LEARN: REJECTED OTHER @ ap-eupf.api.basf.com: passive artifact/code search for function names and keys returned zero public hits — unverifiable, exhausted
 - LEARN: ACCEPTED RECON @ dev.api.basf.com + dev-m.api.basf.com + dev-sap.api.basf.com: openapi.json/swagger.json/api-docs all 404 — catch-all hosts, no gateway/docs sur
+
+## RANKED HYPOTHESES 2026-09-05 16:26:13 UTC
+- [70] my.basf.com: my.basf.com authentication stack enumeration for OAuth/OIDC misconfiguration (from art/lead_nemotron3.txt)
+- NEXT(hypotheses-nemotron3.txt): PROBE: GET https://my.basf.com/ -k && GET https://my.basf.com/auth/.well-known/openid-configuration -k && GET https://my.basf.com/basf/.well-known/openid-config
+- LEARN: REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused on all probes; dead/internal-only DNS entry — zero external attack surfa
+- LEARN: ACCEPTED RECON @ my.basf.com: HTTP 200, 204KB SPA via CloudFront; `.well-known/openid-configuration` returns 404 (HTML error from BASF Auth Service/NetIQ); auth
+- LEARN: ACCEPTED RECON @ www.basf.com: HTTP 308 to /us/en via CloudFront; 640KB; A records to CloudFront IPs (18.172.x.x); no CNAME, no dangling resource
+- LEARN: ACCEPTED RECON @ basf.com: A record to CloudFront IP (13.248.131.227); no CNAME
+- LEARN: ACCEPTED RECON @ prod.api.basf.com: CNAME basf-prod-prod.apigee.net (Apigee); `/productinformation` returns 401 VerifyAPIKey; 25 common proxy paths return 404; 
+- LEARN: ACCEPTED RECON @ api.commerce.basf.com: AWS REST API Gateway (x-amz-apigw-id); `/copilot` returns 403 MissingAuthenticationToken; root returns 400; staged route
+- LEARN: ACCEPTED RECON @ federation.basf.com: NetIQ/Access Manager login page at `.well-known/openid-configuration`; standard OIDC discovery not exposed; HTML error pag

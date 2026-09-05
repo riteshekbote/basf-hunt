@@ -100,3 +100,12 @@ www.basf.com
 - NEW api.basf.com, my.basf.com, www.basf.com, basf.com: completely unprobed web estate (4 hosts) while *.api.basf.com estate (9 hosts) fully exhausted with zero unauth findings
 - CHANGED e-gate.api.basf.com: confirmed HTTP 404 at root + all 7 doc paths (not SSL error); server=Microsoft-HTTPAPI/2.0; no API gateway surface
 - CHANGED ap-eupf.api.basf.com: 150KB root confirmed as stock Azure Functions 3.0 placeholder (azureLogo, jQuery, go.microsoft.com); zero function refs or `/api/` routes
+
+## 2026-09-05 16:26:13 UTC
+- NEW api.basf.com resolves to 127.0.0.1 (loopback) — not publicly reachable; all documentation probes fail with connection refused
+- NEW my.basf.com returns HTTP 200 (204KB) via CloudFront; `.well-known/openid-configuration` returns 404 (HTML error page from BASF Auth Service); auth stack not at standard OIDC path
+- NEW www.basf.com returns HTTP 308 redirect to /us/en via CloudFront; 640KB content; no dangling CNAME (A records to CloudFront IPs)
+- NEW basf.com resolves to CloudFront IP (13.248.131.227); no CNAME
+- CHANGED prod.api.basf.com confirmed as Apigee gateway (CNAME basf-prod-prod.apigee.net); only `/productinformation` returns 401 VerifyAPIKey; ~25 common proxy paths (/products, /catalog, /search, /user, /orde
+- CHANGED api.commerce.basf.com confirmed as AWS REST API Gateway (x-amz-apigw-id header); `/copilot` returns 403 MissingAuthenticationToken; root returns 400; staged routes exist but require auth
+- CHANGED federation.basf.com OIDC discovery returns HTML error page (NetIQ/Access Manager), not JSON — standard `.well-known/openid-configuration` not exposed

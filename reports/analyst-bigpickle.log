@@ -2417,3 +2417,11 @@ testability: PASSIVE_GET
 ## STEP 7 — RISK
 
 [RISK] BASF SE: 45 — The prior `*.api.basf.com` "estate exhausted" conclusion was incomplete: the portal boot config exposed 7 production backend hosts the estate map never covered, including a production Apigee gateway with a live x-api-key proxy and an AWS API Gateway commerce tier, plus the corporate NetIQ identity provider. Defenses observed are solid (strict redirect_uri, key-gated gateway, mTLS-capable backends) and no unauth data access is demonstrated yet, but the proxy/stage enumeration surface is large and key-scoping of browser-shipped API keys is the single most probable real finding; any key-only proxy with a mis-scoped browser key yields HIGH impact data access on BASF's customer/supplier commerce platform.
+===== ANALYST bigpickle 2026-09-05 16:26:13 UTC =====
+[0m
+> build · big-pickle
+[0m
+```
+STEP 1 — DELTA
+[NO_DELTA] No new data; current state = last leads tail
+```
