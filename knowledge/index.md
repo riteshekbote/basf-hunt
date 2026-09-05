@@ -57,3 +57,9 @@
 - 2026-09-05 REJECTED MISCONFIG @ e-gate.api.basf.com: all 7 documentation paths + root return HTTP 404 (not SSL error) — server=Microsoft-HTTPAPI/2.0, no API gateway docs exposed
 - 2026-09-05 ACCEPTED RECON @ *.api.basf.com: full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
 - 2026-09-05 REJECTED MISCONFIG @ ap-eupf.api.basf.com: 150KB root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — zero function refs
+- 2026-09-05 ACCEPTED RECON @ prod.api.basf.com: `/productinformation` returns 401 VerifyAPIKey; path-routed Apigee proxy confirmed; 401-vs-404 oracle operational
+- 2026-09-05 ACCEPTED RECON @ api.commerce.basf.com: `/copilot` returns 403 MissingAuthenticationToken; AWS REST API Gateway confirmed; staged routes exist
+- 2026-09-05 ACCEPTED RECON @ federation.basf.com: OIDC discovery at `.well-known/openid-configuration` lists plain+S256 PKCE; SPA uses code+refresh tokens with zero PKCE references; public client with refresh_token = long-lived bearer
+- 2026-09-05 ACCEPTED RECON @ my.basf.com: HTTP 200, 204KB; `.well-known/openid-configuration` 404; portal auth stack not at standard OIDC discovery path; deep enum required
+- 2026-09-05 ACCEPTED RECON @ api.basf.com: Connection refused on all probes; not publicly reachable; dead or internal-only DNS entry
+- 2026-09-05 CHANGED RECON @ my.basf.com: `.well-known/openid-configuration` → HTTP 404 (was previously unprobed); auth stack not at standard OIDC discovery path

@@ -371,3 +371,55 @@ testability: AUTH_HELPED
 [NEXT] PROBE: read-only GET sweep of ~25 probable proxy base-paths on https://prod.api.basf.com (products, catalog, search, user, order, cart, price, availability, documents, copilot, mss, dus, v2/*) at 1 rps logging only status code; on first non-404 (401/200), apply the 3 discovered browser keys via `x-api-key` and record result — a 200 key-only hit is the finding
 [RISK] BASF SE: 45 — The prior `*.api.basf.com` "estate exhausted" conclusion was incomplete: the portal boot config exposed 7 production backend hosts the estate map never covered, including a production Apigee gateway with a live x-api-key proxy and an AWS API Gateway commerce tier, plus the corporate NetIQ identity provider. Defenses observed are solid (strict redirect_uri, key-gated gateway, mTLS-capable backends) and no unauth data access is demonstrated yet, but the proxy/stage enumeration surface is large and key-scoping of browser-shipped API keys is the single most probable real finding; any key-only proxy with a mis-scoped browser key yields HIGH impact data access on BASF's customer/supplier commerce platform.
 ## 2026-09-05 10:30:19 UTC [target] (model bigpickle)
+## 2026-09-05 13:33:24 UTC [target] (model bigpickle)
+[NEW] `prod.api.basf.com` — HTTP 404 at root; `/productinformation` returns 401 VerifyAPIKey (key-gated Apigee proxy confirmed on one virtual host); 3 browser keys shipped in SPA bundle; zero proxy path enumeration performed
+[NEW] `api.commerce.basf.com` — 403 `MissingAuthenticationToken` (x-amzn-errortype) = AWS REST API Gateway with staged routes; navigator key paired with `/copilot` baseUrl; zero stage-prefix enumeration performed
+[NEW] `federation.basf.com` — NAM OIDC provider; discovery lists `code_challenge_methods_supported: plain, S256`, `client_secret_post/basic`; SPA uses responseType=code + useRefreshToken=true + zero PKCE references; zero auth-flow probes
+[NEW] `my.basf.com` — HTTP 200, 204KB content; `.well-known/openid-configuration` returns 404; zero deep auth-stack enumeration beyond root
+[NEW] `www.basf.com` — HTTP 200, 640KB content; zero probes beyond root reachability
+[CHANGED] `api.basf.com` — all probes return `Connection refused` (Errno 111); not publicly reachable; dead or internal-only DNS entry
+[PRIO] my.basf.com,7.0,attack_surface=6,business_value=9,tech_exposure=7,gate_ease=6,cloud_surface=3,freshness=10
+[PRIO] www.basf.com,6.9,attack_surface=7,business_value=9,tech_exposure=6,gate_ease=5,cloud_surface=2,freshness=10
+[PRIO] prod.api.basf.com,6.4,attack_surface=7,business_value=9,tech_exposure=7,gate_ease=5,cloud_surface=4,freshness=10
+[PRIO] federation.basf.com,5.8,attack_surface=5,business_value=8,tech_exposure=8,gate_ease=3,cloud_surface=5,freshness=10
+[PRIO] api.commerce.basf.com,5.2,attack_surface=5,business_value=8,tech_exposure=6,gate_ease=2,cloud_surface=6,freshness=10
+[HYP] prod.api.basf.com additional unauthenticated/public-key Apigee proxies beyond /productinformation
+class: MISCONFIG
+asset: prod.api.basf.com
+confidence: 55
+reasoning: Gateway 404s (ApplicationNotFound) on 8/9 probes but `/productinformation` returns 401 VerifyAPIKey, proving path-routed proxy deployment on one virtual host (`BASF_secure`); the SPA ships 3 static browser keys (core/csp/navigator prefixes) implying key-only VerifyAPIKey proxies exist somewhere in estate; 401-vs-404 status split is a reliable live-vs-dead proxy oracle
+evidence_needed: any probe path returning unique non-404 (401/200) indicating a deployed proxy; then whether a shipped browser key is accepted and what resource class it gates
+verify_steps: passive→read-only GET sweep of ~25 probable proxy base paths (`/products,/catalog,/search,/user,/order,/cart,/price,/availability,/documents,/mss,/dus,/copilot,/v1/productinformation,/v2/*…`) at 1 rps, noting status split; on any 401/200, retry with each of the 3 discovered x-api-keys; any 200 w/o user token = key-only read access finding
+impact: if a browser-published key opens a key-only proxy → unauthenticated product/commerce data access, IDOR surface on catalog/order/price data; MEDIUM-HIGH
+testability: PASSIVE_GET
+[HYP] my.basf.com portal auth-stack discovery revealing OAuth redirect_uri/state flaws or ATO surface
+class: OATH
+asset: my.basf.com
+confidence: 52
+reasoning: HTTP 200 with 204KB content confirmed; `.well-known/openid-configuration` returns 404 — auth stack not at standard OIDC discovery path; portal likely uses NetIQ/ADFS/SAML (BASF's NAM OIDC found at federation.basf.com); SPA bundle (204KB) may contain OAuth client_id, redirect_uri, or auth endpoint URLs in JavaScript; customer/supplier portal is highest business value in scope; zero auth-flow probes performed beyond OIDC discovery 404
+evidence_needed: auth endpoint URLs (OAuth authorize, SAML SSO, ADFS metadata), client_id/redirect_uri pairs in SPA JS, session cookie names/flags indicating session management quality
+verify_steps: GET https://my.basf.com/ -I (inspect all response headers: Location, Set-Cookie, x-ms-* for Azure AD tenant, X-Powered-By); grep response body for `client_id`, `redirect_uri`, `authorize`, `saml`, `oauth`, `adfs`, `login`; GET https://my.basf.com/saml/metadata; GET https://my.basf.com/adfs/.well-known/openid-configuration; GET https://my.basf.com/oauth2/authorize?response_type=code&client_id=test&redirect_uri=https://evil.com
+impact: OAuth redirect_uri validation bypass or state parameter flaw → full portal account ATO on highest-value BASF customer/supplier platform; HIGH
+testability: PASSIVE_GET
+[HYP] api.commerce.basf.com AWS API Gateway stage-prefix switching reaches handler behind MissingAuthenticationToken
+class: AUTH
+asset: api.commerce.basf.com
+confidence: 45
+reasoning: `/copilot` returns 403 `MissingAuthenticationToken` (x-amzn-errortype) = REST API Gateway with staged routes; absent stage prefix makes every path 403; SPA config pairs navigator key `ahWV…` with baseUrl `…/copilot`, so a matching stage + gateway route is expected to accept it
+evidence_needed: a live stage-prefix combination returning non-403/non-400
+verify_steps: read-only GET `/v1/copilot`, `/prod/copilot`, `/dev/copilot`, `/staging/copilot`, `/copilot/v1`, `/api/copilot` with navigator key header at 1 rps; mark first non-403 response
+impact: reachable commerce copilot/handler via public browser key → LLM/business-data surface, possible prompt/IDOR access; MEDIUM if only metadata, HIGH if data
+testability: PASSIVE_GET
+[FINAL] prod.api.basf.com additional unauthenticated/public-key Apigee proxies beyond /productinformation — 55, MISCONFIG, prod.api.basf.com
+[FINAL] my.basf.com portal auth-stack discovery revealing OAuth redirect_uri/state flaws or ATO surface — 52, OATH, my.basf.com
+[FINAL] api.commerce.basf.com AWS API Gateway stage-prefix switching reaches handler behind MissingAuthenticationToken — 45, AUTH, api.commerce.basf.com
+[PARKED] federation.basf.com plain-PKCE OIDC code-flow exploit: confidence 40 — below actionable threshold; requires interactive login to capture authz params; passive discovery already completed (code_challenge_methods_supported: plain, S256); refresh_token scope on public client = high impact if confirmed but no passive verify step exists
+[PARKED] www.basf.com subdomain takeover via dangling CNAME: confidence 30 — 640KB live page suggests active hosting; no evidence of dangling records; low probability on primary corporate domain
+[NEXT] PROBE: read-only GET sweep of ~25 probable proxy base-paths on https://prod.api.basf.com (products, catalog, search, user, order, cart, price, availability, documents, copilot, mss, dus, v2/*) at 1 rps logging only status code; on first non-404 (401/200), apply the 3 discovered browser keys via `x-api-key` header and record result — a 200 key-only hit is the finding
+[LEARN] ACCEPTED RECON @ prod.api.basf.com: `/productinformation` returns 401 VerifyAPIKey; path-routed Apigee proxy confirmed; 401-vs-404 oracle operational
+[LEARN] ACCEPTED RECON @ api.commerce.basf.com: `/copilot` returns 403 MissingAuthenticationToken; AWS REST API Gateway confirmed; staged routes exist
+[LEARN] ACCEPTED RECON @ federation.basf.com: OIDC discovery at `.well-known/openid-configuration` lists plain+S256 PKCE; SPA uses code+refresh tokens with zero PKCE references; public client with refresh_token = long-lived bearer
+[LEARN] ACCEPTED RECON @ my.basf.com: HTTP 200, 204KB; `.well-known/openid-configuration` 404; portal auth stack not at standard OIDC discovery path; deep enum required
+[LEARN] ACCEPTED RECON @ api.basf.com: Connection refused on all probes; not publicly reachable; dead or internal-only DNS entry
+[LEARN] CHANGED RECON @ my.basf.com: `.well-known/openid-configuration` → HTTP 404 (was previously unprobed); auth stack not at standard OIDC discovery path
+[RISK] BASF SE: 45 — The prior `*.api.basf.com` "estate exhausted" conclusion was incomplete: the portal boot config exposed 7 production backend hosts the estate map never covered, including a production Apigee gateway with a live x-api-key proxy and an AWS API Gateway commerce tier, plus the corporate NetIQ identity provider. Defenses observed are solid (strict redirect_uri, key-gated gateway, mTLS-capable backends) and no unauth data access is demonstrated yet, but the proxy/stage enumeration surface is large and key-scoping of browser-shipped API keys is the single most probable real finding; any key-only proxy with a mis-scoped browser key yields HIGH impact data access on BASF's customer/supplier commerce platform.

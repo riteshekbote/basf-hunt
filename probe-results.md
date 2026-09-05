@@ -129,3 +129,17 @@ https://api.basf.com/developer -> ERR <urlopen error [Errno 111] Connection refu
 https://my.basf.com/ -> 200 len=204926
 https://my.basf.com/.well-known/openid-configuration -> HTTP 404
 https://www.basf.com/ -> 200 len=639986
+
+## 2026-09-05 13:34:43 UTC
+https://api.basf.com/ -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/openapi.json -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/swagger.json -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/docs -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/api-docs -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/developer -> ERR <urlopen error [Errno 111] Connection refused>
+https://my.basf.com/ -> 200 len=204926
+https://my.basf.com/.well-known/openid-configuration -> HTTP 404
+https://www.basf.com/ -> 200 len=639993
+https://my.basf.com/saml/metadata -> 200 len=204926
+https://my.basf.com/adfs/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/oauth2/authorize?response_type=code&client_id=test&redirect_uri=https://evil.com -> 200 len=204926

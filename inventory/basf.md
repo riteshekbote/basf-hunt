@@ -89,3 +89,14 @@ www.basf.com
 - NEW api.basf.com, my.basf.com, www.basf.com, basf.com: completely unprobed web estate (4 hosts) while *.api.basf.com estate (9 hosts) fully exhausted with zero unauth findings
 - CHANGED e-gate.api.basf.com: confirmed HTTP 404 at root + all 7 doc paths (not SSL error); server=Microsoft-HTTPAPI/2.0; no API gateway surface
 - CHANGED ap-eupf.api.basf.com: 150KB root confirmed as stock Azure Functions 3.0 placeholder (azureLogo, jQuery, go.microsoft.com); zero function refs or `/api/` routes
+
+## 2026-09-05 13:34:30 UTC
+- NEW `prod.api.basf.com` — HTTP 404 at root; `/productinformation` returns 401 VerifyAPIKey (key-gated Apigee proxy confirmed on one virtual host); 3 browser keys shipped in SPA bundle; zero proxy path enu
+- NEW `api.commerce.basf.com` — 403 `MissingAuthenticationToken` (x-amzn-errortype) = AWS REST API Gateway with staged routes; navigator key paired with `/copilot` baseUrl; zero stage-prefix enumeration per
+- NEW `federation.basf.com` — NAM OIDC provider; discovery lists `code_challenge_methods_supported: plain, S256`, `client_secret_post/basic`; SPA uses responseType=code + useRefreshToken=true + zero PKCE re
+- NEW `my.basf.com` — HTTP 200, 204KB content; `.well-known/openid-configuration` returns 404; zero deep auth-stack enumeration beyond root
+- NEW `www.basf.com` — HTTP 200, 640KB content; zero probes beyond root reachability
+- CHANGED `api.basf.com` — all probes return `Connection refused` (Errno 111); not publicly reachable; dead or internal-only DNS entry
+- NEW api.basf.com, my.basf.com, www.basf.com, basf.com: completely unprobed web estate (4 hosts) while *.api.basf.com estate (9 hosts) fully exhausted with zero unauth findings
+- CHANGED e-gate.api.basf.com: confirmed HTTP 404 at root + all 7 doc paths (not SSL error); server=Microsoft-HTTPAPI/2.0; no API gateway surface
+- CHANGED ap-eupf.api.basf.com: 150KB root confirmed as stock Azure Functions 3.0 placeholder (azureLogo, jQuery, go.microsoft.com); zero function refs or `/api/` routes
