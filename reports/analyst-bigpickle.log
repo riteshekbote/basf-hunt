@@ -1654,3 +1654,201 @@ testability: PASSIVE
 
 **STEP 7 — RISK**
 [RISK] BASF SE: 30 — Unauthenticated surface effectively exhausted: both Function Apps are stock-placeholder + fully auth-gated with no reachable functions, e-gate is a Windows HTTPAPI host 404 on everything (plus revoked/expired-trust cert — operational, out-of-scope), dev hosts require client certs. Only residual path = passive artifact search for ap-eupf function names (low probability) or obtaining authenticated access (host/function keys, client cert, CI/CD leak). Overall unauth exposure low.
+===== ANALYST bigpickle 2026-09-05 01:11:18 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead analyst-out.txt
+[0m→ [0mRead ctx.txt
+[0m→ [0mRead scope.yml
+[0m→ [0mRead probe-results.md
+[0m→ [0mRead analyst-prompt.txt
+[0m→ [0mRead reposcan-raw
+[0m→ [0mRead leads
+[0m→ [0mRead inventory
+[0m→ [0mRead reports
+[0m→ [0mRead reposcan-raw/summary.txt
+[0m→ [0mRead leads/reposcan-basf.md
+[0m→ [0mRead reports/valid-bugs.md
+[0m→ [0mRead reports/hypotheses.md
+[0m→ [0mRead state_bigpickle.json
+[0m→ [0mRead leads/lead-bigpickle.md
+[0m→ [0mRead leads/lead-nemotron3.md
+[0m→ [0mRead scripts
+[0m
+[0m$ [0mcurl -sS -i --max-time 30 https://ap-eupf.api.basf.com/ -o /tmp/opencode/eupf-root.txt -w 'HTTP %{http_code} size=%{size_download} ct=%{content_type} time=%{time_total}\n'
+HTTP 200 size=150093 ct=text/html time=0.508991
+[0m
+[0m$ [0mcurl -sk -v --max-time 30 https://e-gate.api.basf.com/ -o /dev/null 2>&1 | grep -Ei 'subject:|issuer:|SSL certificate|TLS|HTTP/' | head -30
+* ALPN: curl offers h2,http/1.1
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+* TLSv1.2 (IN), TLS handshake, Certificate (11):
+* TLSv1.2 (IN), TLS handshake, Server key exchange (12):
+* TLSv1.2 (IN), TLS handshake, Server finished (14):
+* TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
+* TLSv1.2 (OUT), TLS change cipher, Change cipher spec (1):
+* TLSv1.2 (OUT), TLS handshake, Finished (20):
+* TLSv1.2 (IN), TLS handshake, Finished (20):
+* SSL connection using TLSv1.2 / ECDHE-RSA-AES256-GCM-SHA384 / X25519 / rsaEncryption
+*  subject: C=DE; L=Ludwigshafen am Rhein; O=BASF Digital Solutions GmbH; CN=e-gate.api.basf.com
+*  issuer: C=US; O=DigiCert Inc; CN=DigiCert Global G2 TLS RSA SHA256 2020 CA1
+*  SSL certificate verify result: unable to get local issuer certificate (20), continuing anyway.
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://e-gate.api.basf.com/
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: e-gate.api.basf.com]
+* [HTTP/2] [1] [:path: /]
+* [HTTP/2] [1] [user-agent: curl/8.5.0]
+* [HTTP/2] [1] [accept: */*]
+> GET / HTTP/2
+< HTTP/2 404
+[0m
+[0m$ [0mprintf '=== HEADERS ===\n'; sed -n '1,30p' /tmp/opencode/eupf-root.txt; printf '\n=== BODY HEAD (first 2000 chars) ===\n'; sed -n '31,60p' /tmp/opencode/eupf-root.txt | head -c 2000
+...output truncated...
+
+Full output saved to: /home/runner/.local/share/opencode/tool-output/tool_06f1c0812001UhIPFwA39kKf5O
+
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            background-color: #002050;
+            color: #fff;
+            font-family: 'SegoeLight', helvetica, sans-serif;
+            font-size: 18px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content {
+
+=== BODY HEAD (first 2000 chars) ===
+            position: absolute;
+            left: 50px;
+            top: 38px;
+            width: 400px;
+        }
+
+            .content .azureLogo {
+                margin: 0 0 65px 0;
+            }
+
+            .content .bodyHeadline {
+                margin: 0 0 10px 0;
+                font-size: 40px;
+                line-height: 43px;
+            }
+
+            .content .bodyContent {
+                margin: 20px 0 20px 0;
+                line-height: 22px;
+            }
+
+                .content .bodyContent a {
+                    color: #fff;
+                    text-decoration: none;
+                }
+
+                    .content .bodyContent a:hover {
+                        opacity: .7;
+                    }
+[0m
+[0m$ [0mfor p in openapi.json swagger.json api-docs docs swagger/ui .well-known/openapi-schema; do printf '%-28s ' "$p"; curl -sk --max-time 20 -o /dev/null -w 'HTTP %{http_code} size=%{size_download}\n' "https://e-gate.api.basf.com/$p"; sleep 1.1; done
+openapi.json                 HTTP 404 size=315
+swagger.json                 HTTP 404 size=315
+api-docs                     HTTP 404 size=315
+docs                         HTTP 404 size=315
+swagger/ui                   HTTP 404 size=315
+.well-known/openapi-schema   HTTP 404 size=315
+[0m
+[0m$ [0msed -n '31,$p' /tmp/opencode/eupf-root.txt > /tmp/opencode/eupf-body.html; printf 'bytes after headers: '; wc -c < /tmp/opencode/eupf-body.html; printf '\n=== /api/ or fetch or script src or basf mentions ===\n'; grep -inE '/api/|fetch\(|script src|<script|basf|digital|eupf|azureLogo|httpTrigger' /tmp/opencode/eupf-body.html | head -40; printf '\n=== distinct host/domain refs ===\n'; grep -oiE 'https?://[a-z0-9.-]+' /tmp/opencode/eupf-body.html | sort -u | head -20
+bytes after headers: 71252
+
+=== /api/ or fetch or script src or basf mentions ===
+7:            .content .azureLogo {
+139:    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.6.0.min.js"></script>
+140:    <script src="https://ajax.aspnetcdn.com/ajax/jquery.ui/1.13.2/jquery-ui.min.js"></script>
+141:    <script>
+269:        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKgAAAAXCAYAAACf1wQUAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABJNJREFUeNrsWo1xnTAMzut1AEagGzCCuwHdgA3CBmED0glIJ3gj8DZwN3A2IBtQ0zM9RSfJEu/nmjx053st2MaWPsnS5zw87LLLfyyHXQXXl3meq/hTx/Z2OByed41sU6IDrTSOLdexxLsxtim2+k71OsxAruUASf/VZ1YklGGrEQjQrzLeITi7tPfFQXurXpXfKICOp3sB6KyNoil6shHiniNo2vciDfO+ie145jdaZLfmXgDaGaPE1Y6wT6BTJ70/8xsBROn5XMB/BGUG7XGRjpdpB6is063vlbnnKq319PsI8pV49jO2PrYFfE2sOl+E8cuxXeSKr790weFwyvQp01y/lxb7v3FzcHMuDhN/qtSW8a94LsrJUv/VqOIYYq2vse8rtWfu/5yOcnoi5DH9Lut9jvM8pXUtx3wnfUekduIaDHZ714ew1apfyl6r3su0h5MmgpYpb1zEK4+XQchB2Six5KVgjplL9sHzCvZHkbzH0RxIz3y/Z/rPTK7HzT8mQ3DpklrOyXGBHYIyjWPXoFkPUxjDORqoMxT5R8rurBMRE+fypxqB2gRQBI4pKXd55rlNA3D6FcQJnB708WvFjMB/FOgfn3Lpf2OEvgGvFTwvbgVQZKOCOPLdRoD2lwAoKp5HgK0KgDYkvXcIsFX2YzA6MosbIX1kASgC9wCjz/peUKwDRwcGepPhIRuCeWiloxCvNQOU4VY56OJwjOMFC1WYHDzgE/MCAB2gbde8GDj1KBTcRw1A2aSb8lQjQL2FG+WYBcQBdsL4dykL4mdz+WF2rYjJKK4NUORgjcC9FgagT9DOFwBooAKPVMhBe2oACiv0jolKQXGU43mhcmsjQJ1lw1SUI4DtubGoX6MEjLsBQFuOaZHAm+FQa+vaMgBthdPMo5tL2LwKoNgbc0YzANRtyLc4gHYaSoyKmESBdKSqby11Q0XyKwI0gNyOMnJQRH0nFZEXAKgTTjJ7Ls58rCTyt46qFG8E0IIB6GgFKIisgajIK+tabwVQlF5ppMzw137r2nJV/CUA+iXDhy383sqDPiHu7dcFiOzC0l/gM51hmlcw30ts3+I/f8R2AnMdCWeorPNfSR6N/alj/pj40kWf33MOYXmulNMhI2qPQVG05xJwQwStrPfGwtxOpCYUOZtQkdconWmVUa2yRlCLo4LI1yuLnyAUdM6aVnF5vTKCijzt5ms5IjQPBhBRm4B8ZnHm2ibpmEc0yqD91gpIsPfArVUAgxagTmmjRuOQHJeNispO6QhDht2wALTJBScWD5mJnSKv2cqDekRvVBhsmbW1qNDBc3mGRvFE5dpiAKC9e5TDlohnrTcCtNUcm5wjCI45AU6yRAQ5V0U7gj9u0Z6PXEGTsVWBcv4WvWvYvSmUGaS/ltlwkzRoqzjF2oZMzj1h42f6D4Lnc9Js0OmovUnCqZYy4uLbMstVZylc7c5bjnjiJkl/m6aYuNnyp2OKu3isuEDwrpqKsiYMvl6hlozxsKK8cPRUOHJw9JRBpwVac1BylqUSoO6c61Zmz166nFHaqrTqcpdddtllF6v8EWAA2wxYm4SN9zUAAAAASUVORK5CYII=" alt="Microsoft Azure" class="azureLogo" />
+
+=== distinct host/domain refs ===
+https://ajax.aspnetcdn.com
+https://go.microsoft.com
+[0m
+[0m◈ [0mExa Web Search ""ap-eupf.api.basf.com""
+[0m◈ [0mExa Web Search ""ap-digitalconnect.api.basf.com""
+[0m◈ [0mExa Web Search "basf digitalconnect azure function app github host key WEBSITE_AUTH"
+[0m
+[0m$ [0mprintf '=== ap-eupf /api: '/.auth/config'; "; curl -sS -o /dev/null -w 'ap-eupf /.auth/config -> HTTP %{http_code} size=%{size_download}\n' --max-time 20 https://ap-eupf.api.basf.com/.auth/config; sleep 1.1; curl -sS -o /dev/null -w 'ap-digitalconnect /.auth/config -> HTTP %{http_code} size=%{size_download}\n' --max-time 20 https://ap-digitalconnect.api.basf.com/.auth/config; sleep 1.1; curl -sS -o /dev/null -w 'ap-eupf /.auth/me -> HTTP %{http_code} size=%{size_download}\n' --max-time 20 https://ap-eupf.api.basf.com/.auth/me
+/bin/bash: -c: line 1: unexpected EOF while looking for matching `''
+[0m
+[0m$ [0mcurl -sS -o /dev/null -w 'ap-eupf /.auth/config -> HTTP %{http_code} size=%{size_download}\n' --max-time 20 https://ap-eupf.api.basf.com/.auth/config
+sleep 1.1
+curl -sS -o /dev/null -w 'ap-digitalconnect /.auth/config -> HTTP %{http_code} size=%{size_download}\n' --max-time 20 https://ap-digitalconnect.api.basf.com/.auth/config
+sleep 1.1
+curl -sS -o /dev/null -w 'ap-eupf /.auth/me -> HTTP %{http_code} size=%{size_download}\n' --max-time 20 https://ap-eupf.api.basf.com/.auth/me
+ap-eupf /.auth/config -> HTTP 404 size=0
+ap-digitalconnect /.auth/config -> HTTP 404 size=0
+ap-eupf /.auth/me -> HTTP 404 size=0
+[0m
+[0m$ [0mfor h in dev.api.basf.com dev-m.api.basf.com dev-sap.api.basf.com; do for p in openapi.json swagger.json api-docs; do printf '%-32s %-14s ' "$h" "$p"; curl -sS -o /dev/null -w 'HTTP %{http_code} size=%{size_download}\n' --max-time 15 "https://$h/$p"; sleep 1.1; done; done
+dev.api.basf.com                 openapi.json   HTTP 404 size=172
+dev.api.basf.com                 swagger.json   HTTP 404 size=172
+dev.api.basf.com                 api-docs       HTTP 404 size=168
+dev-m.api.basf.com               openapi.json   HTTP 404 size=183
+dev-m.api.basf.com               swagger.json   HTTP 404 size=183
+dev-m.api.basf.com               api-docs       HTTP 404 size=179
+dev-sap.api.basf.com             openapi.json   HTTP 404 size=197
+dev-sap.api.basf.com             swagger.json   HTTP 404 size=197
+dev-sap.api.basf.com             api-docs       HTTP 404 size=193
+[0m
+STEP 1 — DELTA
+[CHANGED] e-gate.api.basf.com: TLS handshake completes with NO client cert (`-k`) — NOT mTLS; presented cert CN=e-gate.api.basf.com / O=BASF Digital Solutions GmbH, issuer=DigiCert Global G2 TLS RSA SHA256 2020 CA1; prior CERTIFICATE_VERIFY_FAILED = client-side chain error (intermediate not served, out-of-scope TLS); root + 6/6 doc paths return HTTP 404 body=315 under `-k`
+[CHANGED] ap-eupf.api.basf.com/: HTTP 200 len=150093 Content-Type=text/html — body analyzed = stock Azure Functions 3.0 placeholder (azureLogo, jQuery via ajax.aspnetcdn.com, go.microsoft.com links); zero `/api/` refs, zero function names → 150KB route-discovery hypothesis conclusively closed
+[CHANGED] ap-eupf + ap-digitalconnect `/.auth/config` + `/.auth/me`: HTTP 404 size=0 → EasyAuth not exposed on either Function App (last untested App Service sub-surface, now closed)
+[CHANGED] RAG: passive web search for both hostnames + key artifacts → zero public repo/commit references; only indexed placeholder pages and generic Azure Functions docs; no leaked keys or function names recoverable
+[NEW] dev.api.basf.com / dev-m.api.basf.com / dev-sap.api.basf.com: openapi.json / swagger.json / api-docs all HTTP 404 (body 168–197) → catch-all 404 hosts, no gateway/docs surface
+
+STEP 2 — PRIORITIZE
+[PRIO] my.basf.com,7.0,attack_surface=6,business_value=9,tech_exposure=7,gate_ease=6,cloud_surface=3,freshness=10
+[PRIO] www.basf.com,6.9,attack_surface=7,business_value=9,tech_exposure=6,gate_ease=5,cloud_surface=2,freshness=10
+[PRIO] ap-eupf.api.basf.com,4.2,attack_surface=2,business_value=8,tech_exposure=2,gate_ease=3,cloud_surface=8,freshness=1
+[PRIO] ap-digitalconnect.api.basf.com,4.1,attack_surface=2,business_value=9,tech_exposure=2,gate_ease=1,cloud_surface=8,freshness=1
+[PRIO] dev-clientcert-sap.api.basf.com,3.8,attack_surface=3,business_value=7,tech_exposure=3,gate_ease=1,cloud_surface=6,freshness=1
+[PRIO] e-gate.api.basf.com,3.5,attack_surface=2,business_value=8,tech_exposure=2,gate_ease=2,cloud_surface=3,freshness=1
+
+STEP 3 — HYPOTHESES
+[HYP] BASF portal/web estate (my.basf.com, www.basf.com) unprobed while in program scope
+class: OTHER
+asset: my.basf.com / www.basf.com
+confidence: 50
+reasoning: Recorded facts — deep enum mapped the full `basf.com` zone to 9 dedicated hosts; this iteration exhausts every one of them unauthenticated (2 Azure Function placeholders, admin 8/8 paths 401/404, `/.auth/*` 404, SSRF edge-blocked 403/404; e-gate 404 on all paths with validly-issued DigiCert cert, not mTLS; 3 mTLS dev hosts; 3 catch-all 404 hosts). Program scope is BASF Group-wide ("all company-owned infrastructure… customer and supplier portals, websites"). Seed inventory lists my.basf.com and www.basf.com as live, dedicated, but ZERO probes have ever run against them. Basin of remaining HIGH-VALUE classes (portal OAuth redirect_uri/state, session/ATO, IDOR/BOLA in supplier flows) sits entirely in that unprobed estate.
+evidence_needed: live reachability and auth stack of both hosts (OAuth/OIDC/SAML discovery), presence of registrable supplier/customer portal entry
+verify_steps: once scoped — GET https://www.basf.com/ and https://my.basf.com/ (read-only, 1 rps); then passive OIDC/SAML discovery at /.well-known/openid-configuration, /saml/metadata, /oauth/authorize for provider/config disclosure
+impact: reopens HIGH-VALUE test surface (auth/business-logic/IDOR chains) currently invisible; MEDIUM-HIGH if either host is a portal
+testability: PASSIVE
+
+STEP 4 — SELF-CRITIQUE
+[PARKED] e-gate mTLS-gated host theory: disproven today — handshake completes without client cert; cert issued by DigiCert for exact hostname; all sub-paths 404; chain issue is out-of-scope TLS
+[PARKED] ap-eupf route discovery in 150KB root: closed — body is stock Azure Functions 3.0 placeholder, no routes/script refs
+[PARKED] ap-eupf function-name recovery via passive artifact search: performed today, 0 hits — hypothesis unverifiable and exhausted
+[PARKED] Function App key leak via private CI/CD: no passive verifiability; consistent with prior REJECTED master-key-hunt
+[FINAL] BASF portal/web estate unprobed — 50, OTHER, my.basf.com/www.basf.com (only survivor)
+
+STEP 5 — NEXT ACTION
+[NEXT] HUMAN: *.api.basf.com unauth surface fully consumed (2 placeholder Function Apps auth-gated + `/.auth/*` closed, 3 mTLS dev hosts, 3 catch-all 404 hosts, e-gate 404 everywhere with non-mTLS DigiCert cert) — request program operator: (a) scope confirmation + read-only green-light for `GET https://my.basf.com/` and `GET https://www.basf.com/` (highest remaining value, currently seed-listed only), and/or (b) an authenticated test vector (client cert for e-gate/dev hosts, Function access key, or supplier/customer portal account). Further unauth probing of *.api.basf.com yields nothing.
+
+STEP 6 — LEARNING
+[LEARN] REJECTED MISCONFIG @ e-gate.api.basf.com: not mTLS — handshake succeeds without client cert; cert CN=e-gate.api.basf.com issued by DigiCert Global G2 TLS RSA SHA256 2020 CA1 (O=BASF Digital Solutions GmbH); verify failure was client-side missing intermediate = out-of-scope TLS; 6/6 doc paths + root 404 under -k
+[LEARN] REJECTED MISCONFIG @ ap-eupf.api.basf.com: 150093-byte root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — no `/api/`, fetch(), or function-name refs; no route discovery possible from body
+[LEARN] REJECTED MISCONFIG @ ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: /.auth/config and /.auth/me return 404 — App Service EasyAuth not exposed on either Function App
+[LEARN] REJECTED OTHER @ ap-eupf.api.basf.com: passive artifact/code search for function names and keys returned zero public hits — unverifiable, exhausted
+[LEARN] ACCEPTED RECON @ dev.api.basf.com + dev-m.api.basf.com + dev-sap.api.basf.com: openapi.json/swagger.json/api-docs all 404 — catch-all hosts, no gateway/docs surface
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface now mapped end-to-end (2 placeholders auth-gated, 3 mTLS 400, 3 catch-all 404, e-gate 404) — no reachable endpoint, function, key, or config beyond auth gates/404
+
+STEP 7 — RISK
+[RISK] BASF SE: 15 — Unauthenticated exposure on the mapped estate is effectively zero: both Function Apps are stock placeholders fully auth-gated (8/8 admin paths 401/404, /.auth/* 404, SSRF blocked at edge, no reachable /api/<func>), dev hosts require client certs, e-gate and dev-* 404 everywhere, and passive search found no leaked keys/resource names. Verified-finding probability under current unauth constraints is nil; residual risk (managed-identity key theft, portal ATO/IDOR, supplier-flow logic) is only reachable via authenticated vectors (client certs, Function access keys, portal accounts) or by extending testing to the unprobed but in-scope my.basf.com/www.basf.com web estate.

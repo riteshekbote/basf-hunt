@@ -1,12 +1,34 @@
-## 2026-09-04 23:08:18 UTC [target] (model bigpickle)
-[HYP] ap-eupf unlisted function names recoverable via passive artifact/code search
+## 2026-09-05 01:11:06 UTC [target] (model bigpickle)
+[CHANGED] e-gate.api.basf.com: TLS handshake completes with NO client cert (`-k`) — NOT mTLS; presented cert CN=e-gate.api.basf.com / O=BASF Digital Solutions GmbH, issuer=DigiCert Global G2 TLS RSA SHA256 2020 CA1; prior CERTIFICATE_VERIFY_FAILED = client-side chain error (intermediate not served, out-of-scope TLS); root + 6/6 doc paths return HTTP 404 body=315 under `-k`
+[CHANGED] ap-eupf.api.basf.com/: HTTP 200 len=150093 Content-Type=text/html — body analyzed = stock Azure Functions 3.0 placeholder (azureLogo, jQuery via ajax.aspnetcdn.com, go.microsoft.com links); zero `/api/` refs, zero function names → 150KB route-discovery hypothesis conclusively closed
+[CHANGED] ap-eupf + ap-digitalconnect `/.auth/config` + `/.auth/me`: HTTP 404 size=0 → EasyAuth not exposed on either Function App (last untested App Service sub-surface, now closed)
+[CHANGED] RAG: passive web search for both hostnames + key artifacts → zero public repo/commit references; only indexed placeholder pages and generic Azure Functions docs; no leaked keys or function names recoverable
+[NEW] dev.api.basf.com / dev-m.api.basf.com / dev-sap.api.basf.com: openapi.json / swagger.json / api-docs all HTTP 404 (body 168–197) → catch-all 404 hosts, no gateway/docs surface
+[PRIO] my.basf.com,7.0,attack_surface=6,business_value=9,tech_exposure=7,gate_ease=6,cloud_surface=3,freshness=10
+[PRIO] www.basf.com,6.9,attack_surface=7,business_value=9,tech_exposure=6,gate_ease=5,cloud_surface=2,freshness=10
+[PRIO] ap-eupf.api.basf.com,4.2,attack_surface=2,business_value=8,tech_exposure=2,gate_ease=3,cloud_surface=8,freshness=1
+[PRIO] ap-digitalconnect.api.basf.com,4.1,attack_surface=2,business_value=9,tech_exposure=2,gate_ease=1,cloud_surface=8,freshness=1
+[PRIO] dev-clientcert-sap.api.basf.com,3.8,attack_surface=3,business_value=7,tech_exposure=3,gate_ease=1,cloud_surface=6,freshness=1
+[PRIO] e-gate.api.basf.com,3.5,attack_surface=2,business_value=8,tech_exposure=2,gate_ease=2,cloud_surface=3,freshness=1
+[HYP] BASF portal/web estate (my.basf.com, www.basf.com) unprobed while in program scope
 class: OTHER
-asset: ap-eupf.api.basf.com
-confidence: 45
-reasoning: Fact — all /api/<common-name> probes 404, root+placeholder bodies contain zero function names, runtime status 401 (key-gated), SSRF params edge-blocked. The only unknown on this live Function App is the real function-name set; Microsoft-HTTP-triggered write/IDOR surfaces are unreachable without it. Name enumeration is verifiable, unlike secret leak hunting previously rejected as un-verifiable.
-evidence_needed: any GitHub code/commit, CT log, or public Azure artifact mentioning ap-eupf function names or Azure resource/consumer-group names
-verify_steps: passive — GitHub code search + secret-scanning for "ap-eupf.api.basf.com", "ap-digitalconnect.api.basf.com", correlate resource-name patterns; if a name is recovered, single read-only GET /api/<name> — 403/200 = exists, 404 = dead
-impact: MEDIUM only if a function is recovered (targeted SSRF/IDOR/business-logic on the single live unauth-reachable app)
+asset: my.basf.com / www.basf.com
+confidence: 50
+reasoning: Recorded facts — deep enum mapped the full `basf.com` zone to 9 dedicated hosts; this iteration exhausts every one of them unauthenticated (2 Azure Function placeholders, admin 8/8 paths 401/404, `/.auth/*` 404, SSRF edge-blocked 403/404; e-gate 404 on all paths with validly-issued DigiCert cert, not mTLS; 3 mTLS dev hosts; 3 catch-all 404 hosts). Program scope is BASF Group-wide ("all company-owned infrastructure… customer and supplier portals, websites"). Seed inventory lists my.basf.com and www.basf.com as live, dedicated, but ZERO probes have ever run against them. Basin of remaining HIGH-VALUE classes (portal OAuth redirect_uri/state, session/ATO, IDOR/BOLA in supplier flows) sits entirely in that unprobed estate.
+evidence_needed: live reachability and auth stack of both hosts (OAuth/OIDC/SAML discovery), presence of registrable supplier/customer portal entry
+verify_steps: once scoped — GET https://www.basf.com/ and https://my.basf.com/ (read-only, 1 rps); then passive OIDC/SAML discovery at /.well-known/openid-configuration, /saml/metadata, /oauth/authorize for provider/config disclosure
+impact: reopens HIGH-VALUE test surface (auth/business-logic/IDOR chains) currently invisible; MEDIUM-HIGH if either host is a portal
 testability: PASSIVE
-[NEXT] RAG: passive GitHub-code/commit + secret-scanning + CT-log search for "ap-eupf.api.basf.com", "ap-digitalconnect.api.basf.com", "basf digitalconnect" to recover ap-eupf Azure function names/resource names; on any hit, single read-only GET /api/<name> to confirm
-[RISK] BASF SE: 30 — Unauthenticated surface effectively exhausted: both Function Apps are stock-placeholder + fully auth-gated with no reachable functions, e-gate is a Windows HTTPAPI host 404 on everything (plus revoked/expired-trust cert — operational, out-of-scope), dev hosts require client certs. Only residual path = passive artifact search for ap-eupf function names (low probability) or obtaining authenticated access (host/function keys, client cert, CI/CD leak). Overall unauth exposure low.
+[PARKED] e-gate mTLS-gated host theory: disproven today — handshake completes without client cert; cert issued by DigiCert for exact hostname; all sub-paths 404; chain issue is out-of-scope TLS
+[PARKED] ap-eupf route discovery in 150KB root: closed — body is stock Azure Functions 3.0 placeholder, no routes/script refs
+[PARKED] ap-eupf function-name recovery via passive artifact search: performed today, 0 hits — hypothesis unverifiable and exhausted
+[PARKED] Function App key leak via private CI/CD: no passive verifiability; consistent with prior REJECTED master-key-hunt
+[FINAL] BASF portal/web estate unprobed — 50, OTHER, my.basf.com/www.basf.com (only survivor)
+[NEXT] HUMAN: *.api.basf.com unauth surface fully consumed (2 placeholder Function Apps auth-gated + `/.auth/*` closed, 3 mTLS dev hosts, 3 catch-all 404 hosts, e-gate 404 everywhere with non-mTLS DigiCert cert) — request program operator: (a) scope confirmation + read-only green-light for `GET https://my.basf.com/` and `GET https://www.basf.com/` (highest remaining value, currently seed-listed only), and/or (b) an authenticated test vector (client cert for e-gate/dev hosts, Function access key, or supplier/customer portal account). Further unauth probing of *.api.basf.com yields nothing.
+[LEARN] REJECTED MISCONFIG @ e-gate.api.basf.com: not mTLS — handshake succeeds without client cert; cert CN=e-gate.api.basf.com issued by DigiCert Global G2 TLS RSA SHA256 2020 CA1 (O=BASF Digital Solutions GmbH); verify failure was client-side missing intermediate = out-of-scope TLS; 6/6 doc paths + root 404 under -k
+[LEARN] REJECTED MISCONFIG @ ap-eupf.api.basf.com: 150093-byte root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — no `/api/`, fetch(), or function-name refs; no route discovery possible from body
+[LEARN] REJECTED MISCONFIG @ ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: /.auth/config and /.auth/me return 404 — App Service EasyAuth not exposed on either Function App
+[LEARN] REJECTED OTHER @ ap-eupf.api.basf.com: passive artifact/code search for function names and keys returned zero public hits — unverifiable, exhausted
+[LEARN] ACCEPTED RECON @ dev.api.basf.com + dev-m.api.basf.com + dev-sap.api.basf.com: openapi.json/swagger.json/api-docs all 404 — catch-all hosts, no gateway/docs surface
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface now mapped end-to-end (2 placeholders auth-gated, 3 mTLS 400, 3 catch-all 404, e-gate 404) — no reachable endpoint, function, key, or config beyond auth gates/404
+[RISK] BASF SE: 15 — Unauthenticated exposure on the mapped estate is effectively zero: both Function Apps are stock placeholders fully auth-gated (8/8 admin paths 401/404, /.auth/* 404, SSRF blocked at edge, no reachable /api/<func>), dev hosts require client certs, e-gate and dev-* 404 everywhere, and passive search found no leaked keys/resource names. Verified-finding probability under current unauth constraints is nil; residual risk (managed-identity key theft, portal ATO/IDOR, supplier-flow logic) is only reachable via authenticated vectors (client certs, Function access keys, portal accounts) or by extending testing to the unprobed but in-scope my.basf.com/www.basf.com web estate.

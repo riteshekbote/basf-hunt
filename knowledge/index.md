@@ -40,3 +40,17 @@
 - 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; 6/6 documentation paths return SSL cert verify failure (not 404) — endpoints exist but TLS misconfigured
 - 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns SSL CERTIFICATE_VERIFY_FAILED at root; 6/6 documentation paths return SSL cert verify failure (not 404) — endpoints exist but TLS misconfigured
 - 2026-09-04 CHANGED RECON @ e-gate.api.basf.com/: root changed from HTTP 404 to SSL CERTIFICATE_VERIFY_FAILED — host is live with TLS misconfiguration (mTLS/self-signed)
+- 2026-09-05 REJECTED MISCONFIG @ e-gate.api.basf.com: not mTLS — handshake succeeds without client cert; cert CN=e-gate.api.basf.com issued by DigiCert Global G2 TLS RSA SHA256 2020 CA1 (O=BASF Digital Solutions GmbH); verify failure was client-side missing intermediate = out-of-scope TLS; 6/6 doc paths + root 404 under -k
+- 2026-09-05 REJECTED MISCONFIG @ ap-eupf.api.basf.com: 150093-byte root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — no `/api/`, fetch(), or function-name refs; no route discovery possible from body
+- 2026-09-05 REJECTED MISCONFIG @ ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: /.auth/config and /.auth/me return 404 — App Service EasyAuth not exposed on either Function App
+- 2026-09-05 REJECTED OTHER @ ap-eupf.api.basf.com: passive artifact/code search for function names and keys returned zero public hits — unverifiable, exhausted
+- 2026-09-05 ACCEPTED RECON @ dev.api.basf.com + dev-m.api.basf.com + dev-sap.api.basf.com: openapi.json/swagger.json/api-docs all 404 — catch-all hosts, no gateway/docs surface
+- 2026-09-05 ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface now mapped end-to-end (2 placeholders auth-gated, 3 mTLS 400, 3 catch-all 404, e-gate 404) — no reachable endpoint, function, key, or config beyond auth gates/404
+- 2026-09-05 ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 8 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface fully mapped — no unauthenticated path exists
+- 2026-09-05 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/functionkeys: returns 404; v4 function-level key endpoint not exposed
+- 2026-09-05 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/system: returns 404; admin system info endpoint not exposed
+- 2026-09-05 ACCEPTED RECON @ e-gate.api.basf.com: host returns SSL CERTIFICATE_VERIFY_FAILED at root; 6/6 documentation paths return SSL cert verify failure (not 404) — endpoints exist but TLS misconfigured
+- 2026-09-05 ACCEPTED RECON @ ap-eupf.api.basf.com/: root returns 200 with 150KB content (reconfirmed); indicates active function handler or custom landing page at root
+- 2026-09-05 REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404 (reconfirmed); common health endpoint not exposed
+- 2026-09-05 MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403 (reconfirmed); param-based SSRF blocked at edge/WAF for enumerated function names
+- 2026-09-05 CHANGED RECON @ e-gate.api.basf.com/: root changed from HTTP 404 to SSL CERTIFICATE_VERIFY_FAILED — host is live with TLS misconfiguration (mTLS/self-signed)

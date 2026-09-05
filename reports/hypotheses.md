@@ -157,3 +157,23 @@
 - LEARN: REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404 (reconfirmed); common health endpoint not exposed
 - LEARN: MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403 (reconfirmed); param-based SSRF blocked at edge/WAF for enumerated function names
 - LEARN: CHANGED RECON @ e-gate.api.basf.com/: root changed from HTTP 404 to SSL CERTIFICATE_VERIFY_FAILED — host is live with TLS misconfiguration (mTLS/self-signed)
+
+## RANKED HYPOTHESES 2026-09-05 01:11:18 UTC
+- [75] e-gate.api.basf.com: API gateway OpenAPI/Swagger documentation exposure on e-gate (from art/lead_nemotron3.txt)
+- [50] my.basf.com: BASF portal/web estate (my.basf.com, www.basf.com) unprobed while in program scope (from art/lead_bigpickle.txt)
+- NEXT(hypotheses-bigpickle.txt): HUMAN: *.api.basf.com unauth surface fully consumed (2 placeholder Function Apps auth-gated + `/.auth/*` closed, 3 mTLS dev hosts, 3 catch-all 404 hosts, e-gate
+- NEXT(hypotheses-nemotron3.txt): PROBE: GET https://e-gate.api.basf.com/openapi.json -k && GET https://e-gate.api.basf.com/swagger.json -k && GET https://e-gate.api.basf.com/api-docs -k && GET 
+- LEARN: REJECTED MISCONFIG @ e-gate.api.basf.com: not mTLS — handshake succeeds without client cert; cert CN=e-gate.api.basf.com issued by DigiCert Global G2 TLS RSA SH
+- LEARN: REJECTED MISCONFIG @ ap-eupf.api.basf.com: 150093-byte root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — no `/api/
+- LEARN: REJECTED MISCONFIG @ ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: /.auth/config and /.auth/me return 404 — App Service EasyAuth not exposed on either 
+- LEARN: REJECTED OTHER @ ap-eupf.api.basf.com: passive artifact/code search for function names and keys returned zero public hits — unverifiable, exhausted
+- LEARN: ACCEPTED RECON @ dev.api.basf.com + dev-m.api.basf.com + dev-sap.api.basf.com: openapi.json/swagger.json/api-docs all 404 — catch-all hosts, no gateway/docs sur
+- LEARN: ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface now mapped end-to-end (2 placeholders auth-gated, 3 mTLS 400, 3 catch-all 404, e-gate 404) — 
+- LEARN: ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 8 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface f
+- LEARN: REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/functionkeys: returns 404; v4 function-level key endpoint not exposed
+- LEARN: REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/system: returns 404; admin system info endpoint not exposed
+- LEARN: ACCEPTED RECON @ e-gate.api.basf.com: host returns SSL CERTIFICATE_VERIFY_FAILED at root; 6/6 documentation paths return SSL cert verify failure (not 404) — end
+- LEARN: ACCEPTED RECON @ ap-eupf.api.basf.com/: root returns 200 with 150KB content (reconfirmed); indicates active function handler or custom landing page at root
+- LEARN: REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404 (reconfirmed); common health endpoint not exposed
+- LEARN: MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403 (reconfirmed); param-based SSRF blocked at edge/WAF for enumerated function names
+- LEARN: CHANGED RECON @ e-gate.api.basf.com/: root changed from HTTP 404 to SSL CERTIFICATE_VERIFY_FAILED — host is live with TLS misconfiguration (mTLS/self-signed)
