@@ -54,3 +54,6 @@
 - 2026-09-05 REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404 (reconfirmed); common health endpoint not exposed
 - 2026-09-05 MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403 (reconfirmed); param-based SSRF blocked at edge/WAF for enumerated function names
 - 2026-09-05 CHANGED RECON @ e-gate.api.basf.com/: root changed from HTTP 404 to SSL CERTIFICATE_VERIFY_FAILED — host is live with TLS misconfiguration (mTLS/self-signed)
+- 2026-09-05 REJECTED MISCONFIG @ e-gate.api.basf.com: all 7 documentation paths + root return HTTP 404 (not SSL error) — server=Microsoft-HTTPAPI/2.0, no API gateway docs exposed
+- 2026-09-05 ACCEPTED RECON @ *.api.basf.com: full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+- 2026-09-05 REJECTED MISCONFIG @ ap-eupf.api.basf.com: 150KB root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — zero function refs

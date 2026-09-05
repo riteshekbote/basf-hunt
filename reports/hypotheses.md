@@ -177,3 +177,12 @@
 - LEARN: REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404 (reconfirmed); common health endpoint not exposed
 - LEARN: MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403 (reconfirmed); param-based SSRF blocked at edge/WAF for enumerated function names
 - LEARN: CHANGED RECON @ e-gate.api.basf.com/: root changed from HTTP 404 to SSL CERTIFICATE_VERIFY_FAILED — host is live with TLS misconfiguration (mTLS/self-signed)
+
+## RANKED HYPOTHESES 2026-09-05 05:58:39 UTC
+- [65] my.basf.com: Corporate portal authentication bypass via subdomain takeover or misconfigured Azure AD B2C (from art/lead_nemotron3.txt)
+- [55] prod.api.basf.com: prod.api.basf.com additional unauthenticated/public-key Apigee proxies beyond /productinformation (from art/lead_bigpickle.txt)
+- NEXT(hypotheses-bigpickle.txt): PROBE: read-only GET sweep of ~25 probable proxy base-paths on https://prod.api.basf.com (products, catalog, search, user, order, cart, price, availability, doc
+- NEXT(hypotheses-nemotron3.txt): PROBE: GET https://api.basf.com/ -I && GET https://api.basf.com/openapi.json -k && GET https://api.basf.com/swagger.json -k && GET https://api.basf.com/docs -k 
+- LEARN: REJECTED MISCONFIG @ e-gate.api.basf.com: all 7 documentation paths + root return HTTP 404 (not SSL error) — server=Microsoft-HTTPAPI/2.0, no API gateway docs e
+- LEARN: ACCEPTED RECON @ *.api.basf.com: full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+- LEARN: REJECTED MISCONFIG @ ap-eupf.api.basf.com: 150KB root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — zero function r

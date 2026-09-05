@@ -1852,3 +1852,409 @@ STEP 6 — LEARNING
 
 STEP 7 — RISK
 [RISK] BASF SE: 15 — Unauthenticated exposure on the mapped estate is effectively zero: both Function Apps are stock placeholders fully auth-gated (8/8 admin paths 401/404, /.auth/* 404, SSRF blocked at edge, no reachable /api/<func>), dev hosts require client certs, e-gate and dev-* 404 everywhere, and passive search found no leaked keys/resource names. Verified-finding probability under current unauth constraints is nil; residual risk (managed-identity key theft, portal ATO/IDOR, supplier-flow logic) is only reachable via authenticated vectors (client certs, Function access keys, portal accounts) or by extending testing to the unprobed but in-scope my.basf.com/www.basf.com web estate.
+===== ANALYST bigpickle 2026-09-05 05:58:39 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mcurl -sS -o /tmp/opencode/www_root.html -w "HTTP %{http_code} | size=%{size_download} | type=%{content_type} | redir=%{redirect_url} | server=%{header_json}" https://www.basf.com/ 2>&1 | head -c 2000
+HTTP 308 | size=61 | type=text/plain; charset=utf-8 | redir=https://www.basf.com/us/en | server={"content-type":["text/plain; charset=utf-8"],
+"content-length":["61"],
+"location":["https://www.basf.com/us/en"],
+"date":["Sat, 05 Sep 2026 05:52:17 GMT"],
+"vary":["Authorization, Accept-Encoding"],
+"x-cache":["Miss from cloudfront"],
+"via":["1.1 5857f2880c625037553dfc3541838030.cloudfront.net (CloudFront)"],
+"x-amz-cf-pop":["IAD61-P7"],
+"alt-svc":["h3=\":443\"; ma=86400"],
+"x-amz-cf-id":["FkJ-FlZprketiHXOviezm73mwsgtAMWr-35qXB_zyIJHj2aFYfrNfA=="],
+"referrer-policy":["strict-origin-when-cross-origin"],
+"content-security-policy":["child-src blob:; connect-src 'self' 'unsafe-inline' https:; default-src 'self'; font-src 'self' data: https://*.wcms.basf.com; frame-ancestors https://*.wcms.basf.com https://app.datadoghq.eu; frame-src https://* blob:; img-src 'self' data: https://*.basf.com https://assets.dcp-storefront.basf.com https://cdn.cookielaw.org https://collect.tealiumiq.com https://platform.b4u-cloud.de *.kampyle.com *.medallia.eu *.qualtrics.com *.facebook.com https://maps.gstatic.com/mapfiles/ https://maps.googleapis.com/maps/; media-src 'self' blob: https://*.wcms.basf.com; object-src 'none'; script-src 'wasm-unsafe-eval' 'unsafe-inline'; script-src-elem 'self' https: 'sha256-ttfnBjqp3Wtmn9FUPKkR3GLb0D3xMFCg7QcjYux8Y+o='; style-src 'unsafe-inline' 'self'; style-src-elem 'self' 'unsafe-inline' https://*.wcms.basf.com https://player.youku.com https://platform.b4u-cloud.de https://privacyportal-eu-cdn.onetrust.com; worker-src blob:"],
+"x-content-type-options":["nosniff"],
+"strict-transport-security":["max-age=63072000; includeSubDomains; preload"],
+"x-permitted-cross-domain-policies":["none"]
+}
+[0m
+[0m$ [0mcurl -sS -o /tmp/opencode/my_root.html -w "HTTP %{http_code} | size=%{size_download} | type=%{content_type} | redir=%{redirect_url} | server=%{header_json}" https://my.basf.com/ 2>&1 | head -c 2000
+HTTP 200 | size=204936 | type=text/html; charset=utf-8 | redir= | server={"content-type":["text/html; charset=utf-8"],
+"content-length":["204936"],
+"date":["Sat, 05 Sep 2026 05:52:18 GMT"],
+"etag":["W/\"32088-sqwSVe/KG8AbkX4/kfUrAd5QKUE\""],
+"x-cache":["Miss from cloudfront"],
+"via":["1.1 1389e3bf8be1906daa8019802b0774c8.cloudfront.net (CloudFront)"],
+"x-amz-cf-pop":["IAD89-P4"],
+"alt-svc":["h3=\":443\"; ma=86400"],
+"x-amz-cf-id":["9C3hh3z8XL65loICSTvgc7Ha-nZoD6qKwmIB3R3zLR6EGp_WHh138A=="],
+"referrer-policy":["strict-origin-when-cross-origin"],
+"content-security-policy":["child-src blob:; connect-src 'self' 'unsafe-inline' https:; default-src 'self'; font-src 'self' data: https://*.wcms.basf.com; frame-ancestors https://*.wcms.basf.com https://app.datadoghq.eu; frame-src https://* blob:; img-src 'self' data: https://*.basf.com https://assets.dcp-storefront.basf.com https://cdn.cookielaw.org https://collect.tealiumiq.com https://platform.b4u-cloud.de *.kampyle.com *.medallia.eu *.qualtrics.com *.facebook.com https://maps.gstatic.com/mapfiles/ https://maps.googleapis.com/maps/; media-src 'self' blob: https://*.wcms.basf.com; object-src 'none'; script-src 'wasm-unsafe-eval' 'unsafe-inline'; script-src-elem 'self' https: 'sha256-ttfnBjqp3Wtmn9FUPKkR3GLb0D3xMFCg7QcjYux8Y+o='; style-src 'unsafe-inline' 'self'; style-src-elem 'self' 'unsafe-inline' https://*.wcms.basf.com https://player.youku.com https://platform.b4u-cloud.de https://privacyportal-eu-cdn.onetrust.com; worker-src blob:"],
+"x-content-type-options":["nosniff"],
+"strict-transport-security":["max-age=63072000; includeSubDomains; preload"],
+"vary":["Authorization, Accept-Encoding"],
+"x-permitted-cross-domain-policies":["none"]
+}
+[0m
+[0m$ [0mgrep -oiE '(sap[^"'"'"' <]*|oauth[^"'"'"' <]*|saml[^"'"'"' <]*|login[^"'"'"' <]*|idp[^"'"'"' <]*|/api/[a-z0-9_./-]+|adyen|graphql)' /tmp/opencode/my_root.html | sort | uniq -c | sort -rn | head -40
+2 idp\u002Foauth\u002Fnam
+      1 sapplication-config
+      1 sApiKey
+      1 Login\u002FExternal
+      1 LoginAllowed
+[0m
+[0m$ [0mgrep -oiE '<script[^>]*src="[^"]+"' /tmp/opencode/my_root.html | sed -E 's/.*src="([^"]+)"/\1/' | sort -u | head -30
+main-CURZYBQE.js
+polyfills-5CFQRCPP.js
+[0m
+[0m$ [0mgrep -oE '<base href="[^"]*"' /tmp/opencode/my_root.html; grep -oE '<link[^>]*href="[^"]*.css"' /tmp/opencode/my_root.html | head -3
+<base href="/"
+<link rel="stylesheet" href="wxp-core-AI4RV77D.css"
+<link rel="stylesheet" href="wxp-core-AI4RV77D.css"
+<link rel="stylesheet" href="wxp-theme-BIT7RXVZ.css"
+[0m
+[0m$ [0mcurl -sS -o /tmp/opencode/main.js "https://my.basf.com/main-CURZYBQE.js" -w "HTTP %{http_code} size=%{size_download}\n"
+HTTP 200 size=1740555
+[0m
+[0m$ [0mgrep -oiE '(oauth2?[^"'"'"' ,]{0,90}|authorize[^"'"'"' ,]{0,90}|token[^"'"'"' ,]{0,60}|redirect[_-]?uri[^"'"'"' ,]{0,80}|client[_-]?id[^"'"'"' ,]{0,60}|response[_-]?type[^"'"'"' ,]{0,40}|/idp/[a-z0-9_/-]{0,60}|nam[a-z0-9_/-]{0,60})' /tmp/opencode/main.js | sort -u | head -60
+NAME
+Name
+NameLink
+NameLinkComponent
+NameMapper
+Names
+Namespace
+NamespaceList
+NamespacesByElement
+Token()&&n.authToken()!==
+Token())(
+Token()))
+Token()]))
+Token:Pa
+Token=uo(this.oidcSecurityService.isAuthenticated$.pipe(vo(()=>th
+TokenExpires()})}handleLogoutAfterTokenExpires(){let
+name
+namespaceId
+namespaceList
+namespaceLookup
+namespacesByHostElement
+namic
+namicContentPageComponent
+namicStyles
+responseType:
+token
+token:e
+[0m
+[0m$ [0mgrep -oiE '(stsServer[^,]{0,120}|issuer[^,]{0,120}|well-known[^,]{0,120}|openid[^,]{0,120}|redirectUri[^,]{0,120}|postLoginRoute[^,]{0,90}|clientId[^,]{0,90}|scope[^,]{0,120}|silentRenew[^,]{0,60}|responseType[^,]{0,60})' /tmp/opencode/main.js | sort -u | head -60; echo ---; grep -oE 'https://[a-z0-9.-]+/idp/[a-zA-Z0-9_/-]+' /tmp/opencode/main.js | sort -u | head -20
+responseType:"json"}))
+---
+[0m
+[0m$ [0mgrep -oE '"authorizeUrl"[^,]{0,120}|"tokenEndpointUrl"[^,]{0,120}|"redirectUrl"[^,]{0,120}|"postLogoutRedirectUri"[^,]{0,120}|authorize?.[a-zA-Z]+\(|loginUrl[^,]{0,120}|"/[a-z0-9_/.-]*login[a-z0-9_/.-]*"' /tmp/opencode/main.js | sort -u | head -30; echo ---; grep -oE 'https://[a-zA-Z0-9.-]+\.basf\.(com|de|net)[a-zA-Z0-9_./?=&-]*' /tmp/opencode/main.js | sort -u | head -40
+---
+[0m
+[0m$ [0mgrep -oE '"[a-z0-9-]+":\{[^}]{0,200}openid[^}]{0,200}\}' /tmp/opencode/main.js | head -5; echo ---AUTH-FLOW---; grep -oE '.{60}\(this\.openIdConfiguration.{200}' /tmp/opencode/main.js | head -3
+---AUTH-FLOW---
+[0m
+[0m$ [0mgrep -oc 'oidcSecurityService' /tmp/opencode/main.js; grep -oE '(assets/[a-zA-Z0-9_/.-]+\.json|config[a-zA-Z0-9_/.-]*\.json|\.well-known[a-zA-Z0-9_/.-]*|[a-zA-Z0-9]+\.config\.json)' /tmp/opencode/main.js | sort -u | head; echo ---; grep -oE 'angular-auth-oidc-client|oidc-client|@axa[a-z-]*' /tmp/opencode/main.js | sort -u | head
+1
+---
+[0m
+[0m$ [0mgrep -oE '"/[a-zA-Z0-9_/.-]{2,60}"' /tmp/opencode/main.js | sort -u | grep -iE 'api|user|auth|me|session|profile|account|sso|login|rest|graphql|gateway|token' | head -40
+"/.auth"
+"/account"
+"/accounts/"
+"/my-consignments"
+"/product-documents"
+"/shipments/"
+[0m
+[0m$ [0mgrep -oE '.{200}/\.auth.{200}' /tmp/opencode/main.js | head -3
+th("/products")||r.startsWith("/my-catalog")}getFirstStringValue(o,r){for(let n of r){let i=o[n];if(typeof i=="string"&&i.trim())return i.trim()}}shouldSkipRoute(o,r){return!o||o==="/"||o.startsWith("/.auth")?!0:!Ii(r)}static{this.\u0275fac=function(r){return new(r||e)(Ue(fe))}}static{this.\u0275prov=ho({token:e,factory:e.\u0275fac,providedIn:"root"})}}return e})();var dio=(()=>{class e extends rl{comme
+[0m
+[0m$ [0mgrep -oE '.{80}oidcSecurityService.{160}' /tmp/opencode/main.js | head -3
+2})}}return e})();var yno=(()=>{class e{constructor(){if(this.router=s(_o),this.oidcSecurityService=s(fr),this.windowRef=s(cn),this.platformId=s(Yo),this.route=s(je),!$o(this.platformId))return;let o=this.route.snapshot.queryParamMap.get("url");o&&this.isVali
+to root:",o),this.router.navigate(["/"]))}logoutAndRedirectToFederation(o){this.oidcSecurityService.logoff().subscribe({next:()=>{this.windowRef.location.href=o},error:r=>{console.error("[Impersonation] Logout failed:",r),this.windowRef.location.href=o}})}isV
+optional:!0}),this.impersonateMode=s(pn),this.accountFeaturesService=s(In),this.oidcSecurityService=s(fr),this.envService=s(Qe),this.dialogService=s(vr),this.hostConfig=s(K),this.loginLogicCanStart$=new At(!1)}startLoginLogic(){this.loginLogicCanStart$.next(!
+[0m
+[0m$ [0mcurl -sS -o /tmp/opencode/auth_config.json -w "HTTP %{http_code} size=%{size_download} type=%{content_type}\n" "https://my.basf.com/.auth/config"; echo ---; curl -sS -o /tmp/opencode/auth_me.json -w "HTTP %{http_code} size=%{size_download} type=%{content_type}\n" "https://my.basf.com/.auth/me"; echo ---; head -c 500 /tmp/opencode/auth_config.json
+HTTP 200 size=204936 type=text/html; charset=utf-8
+---
+HTTP 200 size=204926 type=text/html; charset=utf-8
+---
+<!DOCTYPE html><html lang="en" data-beasties-container><head>
+    <meta charset="utf-8">
+    <title>myBASFWorld</title>
+    <base href="/">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link href="/assets/favicons.v1/basf.svg" rel="icon" sizes="any" type="image/svg+xml">
+    <link color="#21a0d2" href="/assets/favicons.v1/basf.svg" rel="mask-icon">
+    <link href="/assets/favicons.v1/apple-touch-icon-180x180.png" rel="apple-touch-icon" sizes="180x180">
+    <meta c
+[0m
+[0m$ [0mgrep -oE '(assets/[a-zA-Z0-9_/.-]+\.(json|js)|env[a-zA-Z0-9_/.-]*\.(json|js)|config[a-zA-Z0-9_/.-]*\.(json|js)|bootstrap[a-zA-Z0-9_/.-]*\.js)' /tmp/opencode/my_root.html | sort -u | head; echo ---; grep -oE 'src="[^"]+"' /tmp/opencode/my_root.html | sed -E 's/^src="//;s/"$//' | sort -u | head -20
+---
+main-CURZYBQE.js
+polyfills-5CFQRCPP.js
+[0m
+[0m$ [0mgrep -oE '.{120}envService.{160}' /tmp/opencode/main.js | head -2; echo ---HOSTCONFIG---; grep -oE '.{80}hostConfig.{140}' /tmp/opencode/main.js | head -3
+{initialValue:!1}),this.document=s(fe),this.request=s(Pn,{optional:!0}),this.platformId=s(Yo),this.hostConfig=s(K),this.envService=s(Qe),this.imageService=s(On),this.linkService=s(yr),this.mgnlPageService=s(Se),this.authenticationService=s(Qo,{optional:!0}),this.redirectIntentService=s(dl,
+let n={label:"",description:"",link:o["@redirectUrl"]},i=this.linkService.getWXPLink(n);if($o(this.platformId)){if(this.envService.isAuthor()&&!this.envService.isInViewMode())return!1;if(i.target===Io.Blank)window.open(i.link,"_blank"),this.location.back();else if(i.link.startsWith("/")){l
+---HOSTCONFIG---
+nstructor(){this.userLocationsService=s(ls),this.http=s(gt),this.env=s(ye),this.hostConfig=s(K),this.CHECKOUT_FEATURE="checkout",this.sameKey=(o,r)=>o?.key===r?.key,this.userLocationComparator=(o,r)=>o==null||r==null?o===r:this.sa
+nStream("session").pipe(vo(({type:o,location:r})=>r?this.accountFeatures(r,this.hostConfig.commerce?.core.storeKey).pipe(oo(n=>({type:o,location:r,hasCheckoutFeature:n.includes(this.CHECKOUT_FEATURE)}))):No({type:o,location:r,hasC
+nstructor(){this.tracking=s(Xo,{optional:!0}),this.env=s(ye,{optional:!0}),this.hostConfig=s(K),this.logoUrl=A(""),this.individualLogo=A(""),this.isActive=A(!1),this.logoPath=A(),this.linkTarget=this.env?.logoLinkTarget??"_blank",
+[0m
+[0m$ [0mgrep -oE 'https://[a-zA-Z0-9.-]+\.(basf\.com|basf\.net|b4u-cloud\.de)[a-zA-Z0-9_./?=&-]*' /tmp/opencode/my_root.html | sort -u | head -30
+(no output)
+[0m
+[0m$ [0mgrep -oE '(https?:)?//[a-zA-Z0-9.-]+(\.[a-zA-Z]{2,})+[a-zA-Z0-9_./?=&-]*' /tmp/opencode/my_root.html | sort -u | head -30
+(no output)
+[0m
+[0m$ [0mgrep -oE '.{80}idp.\{0,3\}oauth.\{0,3\}nam.{120}' /tmp/opencode/my_root.html | head -2; echo ---; grep -oiE 'idp.{0,120}' /tmp/opencode/my_root.html | sort -u | head
+---
+idp\u002Foauth\u002Fnam","autoCleanStateAfterAuthentication":false,"autoUserInfo":false,"clientId":"86cc4bf9-cfdf-4215-bd7c
+idp\u002Foauth\u002Fnam"},"pdpConfig":{"useNewPdpRoutes":true,"withProductComparison":true},"profileConfig":{"businessPartn
+[0m
+[0m$ [0mgrep -oE '.{300}idp.0.0.0.0oauth.0.0.0.0nam.{400}' /tmp/opencode/my_root.html | head -1; echo ===; grep -oE '.{50}clientId.:.86cc4bf9[^,]{0,90}' /tmp/opencode/my_root.html
+===
+eAfterAuthentication":false,"autoUserInfo":false,"clientId":"86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4"
+[0m
+[0m$ [0mgrep -oE '.{120}86cc4bf9-cfdf-4215-bd7c.{300}' /tmp/opencode/my_root.html | head -1
+tion.basf.com\u002Fnidp\u002Foauth\u002Fnam","autoCleanStateAfterAuthentication":false,"autoUserInfo":false,"clientId":"86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4","configId":"0-basfFederationService","customParamsAuthRequest":{"acr_values":"3IAM\u002FLogin\u002FExternal"},"customParamsCodeRequest":{"resourceServer":"Unencrypted","scope":"openid DigitalCommercePlatform profile1"},"historyCleanupOff":true,"logLevel":3,"maxIdTokenIatOffsetAllowedI
+[0m
+[0m$ [0mgrep -oE '.{40}86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4.{1200}' /tmp/opencode/my_root.html | head -1 | sed 's/\\u002F/\//g'
+:false,"autoUserInfo":false,"clientId":"86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4","configId":"0-basfFederationService","customParamsAuthRequest":{"acr_values":"3IAM/Login/External"},"customParamsCodeRequest":{"resourceServer":"Unencrypted","scope":"openid DigitalCommercePlatform profile1"},"historyCleanupOff":true,"logLevel":3,"maxIdTokenIatOffsetAllowedInSeconds":600,"postLogoutRedirectUri":"https://my.basf.com/","redirectUrl":"https://my.basf.com/.auth","renewTimeBeforeTokenExpiresInSeconds":60,"responseType":"code","scope":"openid DigitalCommercePlatform profile1 refresh_token","secureRoutes":["/api","/dam","https://my.basf.com/dam","https://my.basf.com/api","https://api.commerce.basf.com","https://api-imp.commerce.basf.com","https://api-imp.productinformation.basf.com","https://mss.basf.com","https://api.productinformation.basf.com","https://dus.basf.com","https://prod.api.basf.com","https://videos.prod.wcms.basf.com"],"silentRenew":true,"triggerRefreshWhenIdTokenExpired":false,"useRefreshToken":true,"authWellknownEndpointUrl":"https://federation.basf.com/nidp/oauth/nam"},"p
+[0m
+New backend hosts discovered in portal config. Probing read-only.
+[0m$ [0msleep 1; curl -sS -o /tmp/opencode/fed_oidc.json -w "federation OIDC: HTTP %{http_code} size=%{size_download} type=%{content_type}\n" "https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration" 2>&1 | head -c 500; sleep 1; curl -sS -o /tmp/opencode/prod_api.txt -w "prod.api root: HTTP %{http_code} size=%{size_download} type=%{content_type}\n" "https://prod.api.basf.com/" 2>&1 | head -c 300; sleep 1; curl -sS -o /tmp/opencode/commerce.txt -w "api.commerce root: HTTP %{http_code} size=%{size_download} type=%{content_type}\n" "https://api.commerce.basf.com/" 2>&1 | head -c 300
+federation OIDC: HTTP 200 size=2029 type=application/json
+prod.api root: HTTP 404 size=160 type=application/json
+api.commerce root: HTTP 400 size=0 type=
+[0m
+[0m$ [0mcat /tmp/opencode/fed_oidc.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(json.dumps({k:d.get(k) for k in ['issuer','authorization_endpoint','token_endpoint','jwks_uri','userinfo_endpoint','end_session_endpoint','response_types_supported','token_endpoint_auth_methods_supported','scopes_supported','code_challenge_methods_supported']}, indent=1))"
+{
+ "issuer": "https://federation.basf.com/nidp/oauth/nam",
+ "authorization_endpoint": "https://federation.basf.com/nidp/oauth/nam/authz",
+ "token_endpoint": "https://federation.basf.com/nidp/oauth/nam/token",
+ "jwks_uri": "https://federation.basf.com/nidp/oauth/nam/keys",
+ "userinfo_endpoint": "https://federation.basf.com/nidp/oauth/nam/userinfo",
+ "end_session_endpoint": "https://federation.basf.com/nidp/oauth/v1/nam/end_session",
+ "response_types_supported": [
+  "token",
+  "id_token",
+  "token id_token",
+  "none",
+  "code",
+  "code token",
+  "code id_token",
+  "code id_token token"
+ ],
+ "token_endpoint_auth_methods_supported": [
+  "client_secret_post",
+  "client_secret_basic"
+ ],
+ "scopes_supported": [
+  "urn:netiq.com:nam:scope:oauth:registration:full",
+  "urn:netiq.com:nam:scope:oauth:registration:read",
+  "address",
+  "phone",
+  "maglis",
+  "profile",
+  "email",
+  "openid"
+ ],
+ "code_challenge_methods_supported": [
+  "plain",
+  "S256"
+ ]
+}
+[0m
+[0m$ [0msleep 1; curl -sS -o /tmp/opencode/api_imp_c.txt -w "api-imp.commerce root: HTTP %{http_code} size=%{size_download} type=%{content_type}\n" "https://api-imp.commerce.basf.com/" 2>&1 | head -c 300; sleep 1; curl -sS -o /tmp/opencode/pi.txt -w "api.productinformation root: HTTP %{http_code} size=%{size_download} type=%{content_type}\n" "https://api.productinformation.basf.com/" 2>&1 | head -c 300; sleep 1; curl -sS -o /tmp/opencode/mss.txt -w "mss root: HTTP %{http_code} size=%{size_download} type=%{content_type}\n" "https://mss.basf.com/" 2>&1 | head -c 300; sleep 1; curl -sS -o /tmp/opencode/dus.txt -w "dus root: HTTP %{http_code} size=%{size_download} type=%{content_type}\n" "https://dus.basf.com/" 2>&1 | head -c 300
+api-imp.commerce root: HTTP 400 size=0 type=
+api.productinformation root: HTTP 400 size=0 type=
+mss root: HTTP 403 size=23 type=application/json
+curl: (6) Could not resolve host: dus.basf.com
+dus root: HTTP 000 size=0 type=
+[0m
+[0m$ [0mcat /tmp/opencode/prod_api.txt; echo; echo ===MSS===; cat /tmp/opencode/mss.txt; echo; sleep 1; curl -sS -o /tmp/opencode/api_imp_pi.txt -w "api-imp.productinformation root: HTTP %{http_code} size=%{size_download} type=%{content_type}\n" "https://api-imp.productinformation.basf.com/" 2>&1 | head -c 300
+{"fault":{"faultstring":"Unable to identify proxy for host: BASF_secure and url: \/","detail":{"errorcode":"messaging.adaptors.http.flow.ApplicationNotFound"}}}
+===MSS===
+{"message":"Forbidden"}
+api-imp.productinformation root: HTTP 400 size=0 type=
+[0m
+[0m$ [0msleep 1; curl -sS -I "https://api.commerce.basf.com/" 2>&1 | head -25
+HTTP/2 400 
+content-length: 0
+date: Sat, 05 Sep 2026 05:54:27 GMT
+server: null
+x-cache: Error from cloudfront
+via: 1.1 e4938fc434947f57a79af6b9b403df6e.cloudfront.net (CloudFront)
+x-amz-cf-pop: IAD61-P1
+x-amz-cf-id: ejF16RRP1-VkgoBphRctbvlZy7ea6sSCxewd8e-hTkd5hosygg3fkA==
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+strict-transport-security: max-age=63072000; includeSubDomains; preload
+[0m
+[0m$ [0mgrep -oiE '(pkce[^,;]{0,60}|code_?challenge[^,;]{0,60}|code_challenge_method[^,;]{0,40}|generatePkce[^,;]{0,80}|sha256[^,;]{0,40})' /tmp/opencode/main.js | sort -u | head; echo ===; grep -oiE '"responseType":"[a-z _]+"' /tmp/opencode/my_root.html | sort -u | head
+===
+"responseType":"code"
+[0m
+[0m$ [0msleep 1; curl -sS -o /dev/null -D - --max-redirs 0 "https://federation.basf.com/nidp/oauth/nam/authz?client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&response_type=code&scope=openid&redirect_uri=https://attacker.example.com/basf-callback&state=deadbeef" 2>&1 | head -20
+HTTP/1.1 400 
+X-FED-Node: PROD 14
+Content-Security-Policy: frame-ancestors 'self' *.basf.net *.basf.net:* *.basf.com *.basf.com:* *.basf.be:* *.ondemand.com *.coresystems.net *.cloud.sap *.medallia.eu *.styroportal.com *.basf.com.br *.basf.com.ar *.adobesign.com https://basf-sf--devsb.sandbox.my.salesforce.com https://basf-sf--devsb.sandbox.lightning.force.com https://basf-sf.lightning.force.com https://basf-sf--qasb.sandbox.lightning.force.com https://basf-sf--stagesb.sandbox.lightning.force.com https://basf-sf--stagesb.sandbox.my.salesforce.com https://basfap--ecomdev2.sandbox.lightning.force.com https://basfap--ecomdev2.sandbox.my.site.com
+Strict-Transport-Security: max-age=31536000
+X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+Set-Cookie: JSESSIONID=CF0DBB3CC0FD707C7C7996C4189C56AE; Path=/nidp; Secure; HttpOnly; SameSite=None
+Access-Control-Allow-Methods: GET, POST, DELETE, PUT, OPTIONS
+Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization
+Set-Cookie: HJSESSIONID=a294576ff9e87cf9730c680ca1a50d1c3227e3dc3d3acb3346d0421db2e9ec5e; Path=/nidp/; Secure; HttpOnly; SameSite=None
+Content-Type: text/plain
+Content-Length: 0
+Date: Sat, 05 Sep 2026 05:56:01 GMT
+Connection: close
+Set-Cookie: BIGipServerfederation.basf.com_https8443_pool=244385421.64288.0000; path=/; Httponly; Secure
+Set-Cookie: TS01a5ae52=011bc2843b85e9cf68a39aa78f91cf126c971c01113c38e4765a03d52627a8be77f4bd7c15a6f6636507a0e8df1aee8745e3d5b492; Path=/; Domain=.federation.basf.com
+Set-Cookie: TS01530e29=011bc2843b85e9cf68a39aa78f91cf126c971c01113c38e4765a03d52627a8be77f4bd7c15a6f6636507a0e8df1aee8745e3d5b492; path=/nidp
+Set-Cookie: TS01f50325=011bc2843b85e9cf68a39aa78f91cf126c971c01113c38e4765a03d52627a8be77f4bd7c15a6f6636507a0e8df1aee8745e3d5b492; path=/nidp/
+[0m
+[0m$ [0msleep 1; curl -sS -o /dev/null -D - --max-redirs 0 "https://federation.basf.com/nidp/oauth/nam/authz?client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&response_type=code&scope=openid&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth&state=deadbeef" 2>&1 | grep -iE 'HTTP/|location:|content-type:|content-length' | head -8
+HTTP/1.1 302 
+Location: https://federation.basf.com/nidp//app/login?target=https%3A%2F%2Ffederation.basf.com%2Fnidp%2Foauth%2Fnam%2Fauthz%3Fclient_id%3D86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4%26response_type%3Dcode%26scope%3Dopenid%26redirect_uri%3Dhttps%3A%2F%2Fmy.basf.com%2F.auth%26state%3Ddeadbeef
+Content-Length: 0
+[0m
+[0m$ [0msleep 1; curl -sS -o /dev/null -D - --max-redirs 0 "https://federation.basf.com/nidp/oauth/nam/authz?client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&response_type=code&scope=openid&redirect_uri=https%3A%2F%2Fmy.basf.com.evil.com%2F.auth&state=deadbeef" 2>&1 | grep -iE 'HTTP/|location:' | head -3; sleep 1; curl -sS -o /dev/null -D - --max-redirs 0 "https://federation.basf.com/nidp/oauth/nam/authz?client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&response_type=code&scope=openid&redirect_uri=http%3A%2F%2Fmy.basf.com%2F.auth&state=deadbeef" 2>&1 | grep -iE 'HTTP/|location:' | head -3
+HTTP/1.1 400 
+HTTP/1.1 400
+[0m
+[0m$ [0mfor p in /v1 /v2 /api /oauth /health /commerce /productinformation /dus; do sleep 1; echo -n "prod.api$p -> "; curl -sS -o /dev/null -w "HTTP %{http_code} size=%{size_download}\n" "https://prod.api.basf.com$p"; done
+prod.api/v1 -> HTTP 404 size=162
+prod.api/v2 -> HTTP 404 size=162
+prod.api/api -> HTTP 404 size=163
+prod.api/oauth -> HTTP 404 size=165
+prod.api/health -> HTTP 404 size=166
+prod.api/commerce -> HTTP 404 size=168
+prod.api/productinformation -> HTTP 401 size=134
+prod.api/dus -> HTTP 404 size=163
+[0m
+[0m$ [0msleep 1; curl -sS -D - "https://prod.api.basf.com/productinformation" 2>&1 | head -25
+HTTP/1.1 401 Unauthorized
+Date: Sat, 05 Sep 2026 05:56:48 GMT
+Content-Type: application/json
+Content-Length: 134
+Connection: keep-alive
+
+{"fault":{"faultstring":"Failed to resolve API Key variable x-api-key","detail":{"errorcode":"steps.oauth.v2.FailedToResolveAPIKey"}}}
+[0m
+[0m$ [0mgrep -oiE '.{60}x-api-key.{120}|.{40}apikey.{100}' /tmp/opencode/main.js | head -6; echo ===; grep -oiE 'x-api-key|apikey|"Authorization"' /tmp/opencode/my_root.html | sort -u
+bleNewInvoiceDownloadEndpoint??!1},gmapsApiKey:t?.gmapsApiKey??"",routingConfig:t?.routingConfig??Ci}}function qno(e){let t=e.get(K).commerce?.car
+get(K).commerce?.core,r=o?.flags;return{apiKey:o?.apiKey||"",piApiKey:o?.piApiKey||"",cspApiKey:o?.cspApiKey||"",baseApiUrl:t?.baseApiUrl||"",stor
+(Kno),ps($no),As(jno),Os(qno),Vs(Qno),Rs(Zno),Ms(),Lg(),$l("x-api-key"),Pg(),{provide:bt,multi:!0,useClass:yi},vs(),rr([tr(()=>(t=>()=>{t.isLoaded()})(s(Ea))()),tl({pageLoadToken:Pa,pageSer
+cale",o.locale())("api-key",o.mbnConfig.apiKey)("base-url",o.mbnConfig.baseUrl)("token",o.authToken())("show-session-id",o.mbnConfig.showSessionId
+===
+ApiKey
+apiKey
+[0m
+[0m$ [0mgrep -oE '.{30}"apiKey":.{200}' /tmp/opencode/my_root.html | head -3 | sed 's/\\u002F/\//g'
+ipmentEnabled":true}},"core":{"apiKey":"1bGxwPYji82wTvIFjLgEG1T4x2WAxFO07XTiVhWw","cspApi":{"apiKey":"4a788782-6321-42f5-a99f-7dffc5506a75","apiUrl":"/api/csp"},"cspApiKey":"4a788782-6321-42f5-a99f-7dffc5506a75","flags":{"arePric
+ui5.html"},"myBasfNavigator":{"apiKey":"ahWVpas7g72agBIjAtUqr3v6Q7hjxGTl4BzngjYR","baseUrl":"https://api.commerce.basf.com/copilot","showSessionId":false},"portfolio":{"featureFlags":{"isBookletDownloadEnabled":true,"isConsi
+[0m
+[0m$ [0msleep 1; curl -sS -D - "https://prod.api.basf.com/productinformation" -H "x-api-key: 1bGxwPYji82wTvIFjLgEG1T4x2WAxFO07XTiVhWw" 2>&1 | head -30
+HTTP/1.1 401 Unauthorized
+Date: Sat, 05 Sep 2026 05:57:25 GMT
+Content-Type: application/json
+Content-Length: 90
+Connection: keep-alive
+
+{"fault":{"faultstring":"Invalid ApiKey","detail":{"errorcode":"oauth.v2.InvalidApiKey"}}}
+[0m
+[0m$ [0mgrep -oE '"piApiKey":"[^"]*"' /tmp/opencode/my_root.html | sort -u; grep -oE '.{20}piApiKey.{80}' /tmp/opencode/my_root.html | head -2 | sed 's/\\u002F/\//g'
+"piApiKey":"3OvViVDQyl1M0QlXIxxdN2xIjMYEp8fM8KKvpWyN"
+-ES","zh":"zh-CN"},"piApiKey":"3OvViVDQyl1M0QlXIxxdN2xIjMYEp8fM8KKvpWyN","pimData":{"catalogId":"/8a808
+[0m
+[0m$ [0msleep 1; curl -sS -D - "https://prod.api.basf.com/productinformation" -H "x-api-key: 3OvViVDQyl1M0QlXIxxdN2xIjMYEp8fM8KKvpWyN" 2>&1 | head -20
+HTTP/1.1 401 Unauthorized
+Date: Sat, 05 Sep 2026 05:57:31 GMT
+Content-Type: application/json
+Content-Length: 90
+Connection: keep-alive
+
+{"fault":{"faultstring":"Invalid ApiKey","detail":{"errorcode":"oauth.v2.InvalidApiKey"}}}
+[0m
+[0m$ [0msleep 1; curl -sS -D - "https://api.commerce.basf.com/copilot" -H "x-api-key: ahWVpas7g72agBIjAtUqr3v6Q7hjxGTl4BzngjYR" 2>&1 | head -20
+HTTP/2 403 
+content-type: application/json
+content-length: 42
+date: Sat, 05 Sep 2026 05:57:37 GMT
+x-amz-apigw-id: DNhUyGEDFiAEcrw=
+x-amzn-requestid: dfe56d12-6362-4949-af3a-5d29bc21330f
+x-amzn-errortype: MissingAuthenticationTokenException
+server: null
+x-cache: Error from cloudfront
+via: 1.1 030b88b6d8d9c6faf056723bb5f16078.cloudfront.net (CloudFront)
+x-amz-cf-pop: IAD61-P1
+x-amz-cf-id: 4w5y4sqLbml_v27JZfBTb8pGq2OJ1Vu40SsjsTvGgRkrVegmmiT1uw==
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+strict-transport-security: max-age=63072000; includeSubDomains; preload
+
+{"message":"Missing Authentication Token"}
+[0m
+STEP 1 — DELTA
+- [NEW] my.basf.com (myBASFWorld): live HTTP 200, Angular SSR commerce SPA (Magnolia WXP), CloudFront; SSR boot config disclosed 7 never-mapped backend hosts + 3 browser-shipped Apigee x-api-keys; OIDC client `86cc4bf9-…` against federation.basf.com; routes skip `/.auth`, responseType=code, useRefreshToken=true, autoUserInfo=false
+- [NEW] federation.basf.com: NetIQ Access Manager OIDC IdP live; full discovery 200 (issuer /nidp/oauth/nam, authz+token+keys+userinfo); strict redirect_uri validation — attacker.example.com, `.evil.com` suffix-confusion, and scheme-downgrade all HTTP 400; legit redirect_uri 302→/nidp/app/login; F5 front (JSESSIONID+HJSESSIONID+BIGip+TS cookies); CSP frame-ancestors = Salesforce/SAP/Adobe/partner allowlist
+- [NEW] prod.api.basf.com: Apigee gateway; root+8 base-paths 404 `messaging.adaptors.http.flow.ApplicationNotFound` leaking virtual host `BASF_secure`; `/productinformation` = live proxy → 401 `steps.oauth.v2.FailedToResolveAPIKey` (x-api-key); both published browser keys rejected (Invalid ApiKey) → browser keys mis-scoped/wrong gateway
+- [NEW] api.commerce.basf.com, api-imp.commerce.basf.com, api.productinformation.basf.com, api-imp.productinformation.basf.com: CloudFront→HTTP 400 empty (gate unknown); `/copilot` = 403 `MissingAuthenticationToken` with `x-amzn-errortype` → AWS API Gateway/Lambda stage-oracle
+- [NEW] mss.basf.com: 403 `{"message":"Forbidden"}` JSON; dus.basf.com: NXDOMAIN (dead config entry)
+- [CHANGED] www.basf.com: live HTTP 308→/us/en, CloudFront, first-ever probe on main site
+
+STEP 2 — PRIORITIZE
+- [PRIO] my.basf.com,7.4,attack_surface=7,business_value=9,tech_exposure=7,gate_ease=5,cloud_surface=6,freshness=10
+- [PRIO] federation.basf.com,6.5,attack_surface=4,business_value=10,tech_exposure=8,gate_ease=3,cloud_surface=3,freshness=10
+- [PRIO] prod.api.basf.com,5.8,attack_surface=3,business_value=9,tech_exposure=6,gate_ease=2,cloud_surface=6,freshness=10
+- [PRIO] api.commerce.basf.com,5.8,attack_surface=3,business_value=9,tech_exposure=6,gate_ease=2,cloud_surface=6,freshness=10
+
+STEP 3 — HYPOTHESES
+[HYP] prod.api.basf.com additional unauthenticated/public-key Apigee proxies beyond /productinformation
+class: MISCONFIG
+asset: prod.api.basf.com
+confidence: 55
+reasoning: Recorded — gateway 404s (ApplicationNotFound) on 8/9 probes but `/productinformation` returns 401 VerifyAPIKey, proving path-routed proxy deployment on one virtual host (`BASF_secure`); the SPA ships 3 static browser keys (core/csp/navigator prefixes) implying key-only VerifyAPIKey proxies exist somewhere in estate; 401-vs-404 status split is a reliable live-vs-dead proxy oracle
+evidence_needed: any probe path returning unique non-404 (401/200) indicating a deployed proxy; then whether a shipped browser key is accepted and what resource class it gates
+verify_steps: passive→read-only GET sweep of ~25 probable proxy base paths (`/products,/catalog,/search,/user,/order,/cart,/price,/availability,/documents,/mss,/dus,/copilot,/v1/productinformation,/v2/*…`) at 1 rps, noting status split; on any 401/200, retry with each of the 3 discovered x-api-keys; any 200 w/o user token = key-only read access finding
+impact: if a browser-published key opens a key-only proxy → unauthenticated product/commerce data access, IDOR surface on catalog/order/price data; MEDIUM-HIGH
+testability: PASSIVE_GET (read-only, live)
+[HYP] api.commerce.basf.com AWS API Gateway stage-prefix switching reaches handler behind MissingAuthenticationToken
+class: AUTH
+asset: api.commerce.basf.com
+confidence: 45
+reasoning: Recorded — `/copilot` returns 403 `MissingAuthenticationToken` (x-amzn-errortype) = REST API Gateway with staged routes; absent stage prefix makes every path 403; config pairs navigator key `ahWV…` with baseUrl `…/copilot`, so a matching stage + gateway route is expected to accept it
+evidence_needed: a live stage-prefix combination returning non-403/non-400
+verify_steps: read-only GET `/v1/copilot`, `/prod/copilot`, `/dev/copilot`, `/staging/copilot`, `/copilot/v1`, `/api/copilot` with navigator key header at 1 rps; mark first non-403 response
+impact: reachable commerce copilot/handler via public browser key → LLM/business-data surface, possible prompt/IDOR access; MEDIUM if only metadata, HIGH if data
+testability: PASSIVE_GET
+[HYP] federation.basf.com NAM OIDC client uses plain-PKCE or non-PKCE code flow making authz-code replay feasible for client `86cc4bf9-…`
+class: OATH
+asset: federation.basf.com
+confidence: 40
+reasoning: Recorded — discovery lists `code_challenge_methods_supported: plain, S256` (issuer allows deprecated plain PKCE) and token auth `client_secret_post/basic` (no `none`); SPA config: responseType=code, useRefreshToken=true, refresh_token scope, SPA bundle contains zero PKCE/challenge references; public client with refresh_token = long-lived bearer
+evidence_needed: observed code exchange/PKCE params in an authentic login flow; refresh-token lifetime/rotation
+verify_steps: AUTH_HELPED — requires interactive login to capture authz request params and token response; passive parts exhausted
+impact: code interception/refresh-token replay → full portal account ATO on the highest-value BASF customer/supplier commerce platform; HIGH
+testability: AUTH_HELPED
+
+STEP 4 — SELF-CRITIQUE
+- [PARKED] federation.basf.com plain-PKCE/code-replay (40) — issuer already strict on redirect_uri; token-exchange verification requires interactive credentials = not passively testable this cycle
+- [PARKED] my.basf.com browser-key reuse on api.productinformation (—) — both public keys already rejected on live `/productinformation` proxy; key mis-scope confirmed, no further yield
+- [PARKED] mss.basf.com 403 body / dus.basf.com NXDOMAIN — no reachable path, dead/misconfigured entries only
+- [FINAL] prod.api.basf.com Apigee proxy-path enumeration — 55, MISCONFIG, strongest because status-split oracle proven live
+- [FINAL] api.commerce.basf.com API Gateway stage enumeration — 45, AUTH, direct key+URL pairing evidence
+
+STEP 5 — NEXT ACTION
+[NEXT] PROBE: read-only GET sweep of ~25 probable proxy base-paths on https://prod.api.basf.com (products, catalog, search, user, order, cart, price, availability, documents, copilot, mss, dus, v2/*) at 1 rps logging only status code; on first non-404 (401/200), apply the 3 discovered browser keys via `x-api-key` and record result — a 200 key-only hit is the finding
+
+STEP 6 — LEARNING
+- [LEARN] ACCEPTED RECON @ my.basf.com: live commerce SPA (Magnolia+Angular SSR, CloudFront); SSR boot config discloses estate: federation.basf.com, prod.api.basf.com, api.commerce.basf.com, api-imp.commerce.basf.com, api.productinformation.basf.com, api-imp.productinformation.basf.com, mss.basf.com (dus.basf.com NXDOMAIN) — 7 new in-scope hosts unmapped until now
+- [LEARN] ACCEPTED RECON @ federation.basf.com: NetIQ AM OIDC discovery at /nidp/oauth/nam 200; redirect_uri validation strict — attacker.example.com, suffix `.evil.com`, and http downgrade all 400; legit redirect 302→/nidp/app/login; issuer supports plain PKCE + client_secret; F5/ASM fronted, X-FED-Node PROD 14
+- [LEARN] ACCEPTED RECON @ prod.api.basf.com: Apigee gateway, virtual host `BASF_secure` leaked via ApplicationNotFound fault on 8/9 base-paths; `/productinformation` is a live VerifyAPIKey proxy → 401; browser-shipped keys from my.basf.com rejected (Invalid ApiKey) — keys scoped elsewhere
+- [LEARN] ACCEPTED RECON @ api.commerce.basf.com: CloudFront→AWS API Gateway (x-amzn-errortype); root 400, /copilot 403 MissingAuthenticationToken = stage-prefix routing, live route behind unguessed stage
+- [LEARN] REJECTED OTHER @ dus.basf.com / mss.basf.com: NXDOMAIN / static 403 JSON — dead or fully gated, no reachable surface
+
+STEP 7 — RISK
+[RISK] BASF SE: 45 — The prior `*.api.basf.com` "estate exhausted" conclusion was incomplete: the portal boot config exposed 7 production backend hosts the estate map never covered, including a production Apigee gateway with a live x-api-key proxy and an AWS API Gateway commerce tier, plus the corporate NetIQ identity provider. Defenses observed are solid (strict redirect_uri, key-gated gateway, mTLS-capable backends) and no unauth data access is demonstrated yet, but the proxy/stage enumeration surface is large and key-scoping of browser-shipped API keys is the single most probable real finding; any key-only proxy with a mis-scoped browser key yields HIGH impact data access on BASF's customer/supplier commerce platform.
