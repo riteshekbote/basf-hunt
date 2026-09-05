@@ -1,11 +1,11 @@
-## 2026-09-05 20:48:44 UTC [target] (model bigpickle)
-[HYP] DigitalCommercePlatform public OAuth client code+refresh_token with no PKCE → authz-code interception / refresh-token replay ATO
+## 2026-09-05 22:47:01 UTC [target] (model bigpickle)
+[HYP] NAM IdP exposes unprotected OIDC/SAML admin discovery or registration endpoints leaking client config / JWKS / supported flows
 class: OATH
-asset: federation.basf.com (client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4)
-confidence: 45
-reasoning: my.basf.com now proven server-side blind (4/4 catch-all SPA → all auth funnels through federation.basf.com); SSR config responseType=code, useRefreshToken=true, zero code_challenge refs; registered allowlist oracle re-confirms exact-match ({my.basf.com, my.basf.com/.auth, my-basf-world.basf.com root}); implicit disabled (response_type=token → unauthorized_client) so fragment-token width is closed; residual vector = code/refresh theft requiring interception layer, not redirect manipulation
-evidence_needed: capture of a genuine authorize request proving absence of code_challenge + a refresh_token that does not rotate on reuse
-verify_steps: AUTH_HELPED — with sandbox account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-…&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth, log uttered params (code_challenge/code_challenge_method), exchange at /nidp/oauth/nam/token, reuse refresh_token twice and compare JTI/lifetime
-impact: intercepted authz code or stolen non-rotating refresh_token = full ATO of BASF customer/supplier portal account, order/price/PII access; HIGH
-testability: AUTH_HELPED
-[NEXT] HUMAN: all passive threads on the OAuth chain now exhausted (portal server-surface blind, redirect oracle exact-match, implicit disabled, allowlist enumerated, dead-host default identified). Request from program operator: (a) a sandbox/supplier test account to run the interactive code-exchange for client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` and record whether authorize carries `code_challenge` and whether `refresh_token` rotates on reuse — the single remaining high-severity candidate; and/or (b) scoped confirmation for the adult-resolving `my-basf-world.basf.com` entry (legacy WorldAccount OAuth redirect host, externally dead). Report channel bugs.olivermaicher.eu.
+asset: federation.basf.com (NetIQ Access Manager provider)
+confidence: 42
+reasoning: provider is NAM (error page styling + `/nidp/app/login` reached); NAM exposes OAuth metadata under `/nidp/oauth/nam/discovery*` and SAML metadata under `/nidp/idp/...` in addition to browser-config `.well-known`; root `.well-known/openid-configuration` returns provider HTML 404 (off-standard path config) so the real discovery surface was never enumerated; only `authz` confirmed live
+evidence_needed: any 200 JSON at discovery/registration/metadata paths, or a body embedding issuer/client-id/jwks/key-id
+verify_steps: at 1 rps: GET /nidp/oauth/nam/discovery/token and /nidp/oauth/nam/discovery/authorize and /nidp/oauth/nam/discovery and /nidp/oauth/nam/clientRegistration and /nidp/idp/saml2/metadata and /nidp/saml2/metadata — log status, Content-Type, first 2KB; then GET /nidp/app/login (200 known) and grep body for `client_id`,`entityID`,`metadata`,`oauth`,`issuer`,`jwks`
+impact: exposed metadata discloses issuer, PKCE mode policy, token/introspection/userinfo endpoints, supported signing/server-assertion — feeds alg-confusion/JWK-confusion and unregistered OAuth client testing; MEDIUM (→ HIGH if registration/keys readable); exploit-only-read, no customer data touched
+testability: PASSIVE
+[NEXT] PROBE: GET https://federation.basf.com/nidp/oauth/nam/discovery/token -k and /nidp/oauth/nam/discovery/authorize and /nidp/oauth/nam/discovery and /nidp/oauth/nam/clientRegistration and /nidp/idp/saml2/metadata and /nidp/saml2/metadata at 1 rps (log status + Content-Type + first 2KB), then GET /nidp/app/login and grep the saved body for `client_id`,`clientId`,`oauth`,`entityID`,`jwks`,`issuer`,`registration`

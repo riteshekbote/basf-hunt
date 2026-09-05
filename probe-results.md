@@ -181,3 +181,17 @@ https://my.basf.com/nidp/.well-known/openid-configuration -> 200 len=204926
 https://my.basf.com/saml/metadata -> 200 len=204926
 https://my.basf.com/.auth -> 200 len=205013
 https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-…&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth -> ERR 'ascii' codec can't encode character '\u2026' in p
+
+## 2026-09-05 22:49:13 UTC
+https://my.basf.com/.auth` -> 200 len=204936
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://www.basf.com/us/en -> 200 len=639988
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration -> 200 len=2029
+https://federation.basf.com/.well-known/oauth-authorization-server -> 200 len=14920
+https://my.basf.com/ -> 200 len=204926
+https://my.basf.com/auth/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/basf/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/nidp/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/saml/metadata -> 200 len=204926
+https://my.basf.com/.auth -> 200 len=205023
