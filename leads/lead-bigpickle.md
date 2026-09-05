@@ -521,3 +521,14 @@ testability: AUTH_HELPED
 [LEARN] ACCEPTED RECON @ federation.basf.com: authorize endpoint live; legit full flow → 302 /nidp/app/login; error pages styled as BASF Authentication Service
 [LEARN] ACCEPTED RECON @ products.basf.com: CloudFront Magnolia SPA (252KB), same WCMS stack, zero auth entry in HTML
 [RISK] BASF SE: 30 — Unauthenticated backend exposure across the full 11-host estate now proven gated (Apigee VerifyAPIKey, AWS IAM/authorizer, NAM OIDC exact-match redirect). The only genuine high-severity weakness is the digital-commerce public OAuth client emitting refresh_token without PKCE — a design-level flaw whose exploitability requires interactive code capture, not currently demonstrable passively. Without an authenticated test vector, no further unauth progress is possible.
+## 2026-09-05 20:48:44 UTC [target] (model bigpickle)
+[HYP] DigitalCommercePlatform public OAuth client code+refresh_token with no PKCE → authz-code interception / refresh-token replay ATO
+class: OATH
+asset: federation.basf.com (client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4)
+confidence: 45
+reasoning: my.basf.com now proven server-side blind (4/4 catch-all SPA → all auth funnels through federation.basf.com); SSR config responseType=code, useRefreshToken=true, zero code_challenge refs; registered allowlist oracle re-confirms exact-match ({my.basf.com, my.basf.com/.auth, my-basf-world.basf.com root}); implicit disabled (response_type=token → unauthorized_client) so fragment-token width is closed; residual vector = code/refresh theft requiring interception layer, not redirect manipulation
+evidence_needed: capture of a genuine authorize request proving absence of code_challenge + a refresh_token that does not rotate on reuse
+verify_steps: AUTH_HELPED — with sandbox account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-…&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth, log uttered params (code_challenge/code_challenge_method), exchange at /nidp/oauth/nam/token, reuse refresh_token twice and compare JTI/lifetime
+impact: intercepted authz code or stolen non-rotating refresh_token = full ATO of BASF customer/supplier portal account, order/price/PII access; HIGH
+testability: AUTH_HELPED
+[NEXT] HUMAN: all passive threads on the OAuth chain now exhausted (portal server-surface blind, redirect oracle exact-match, implicit disabled, allowlist enumerated, dead-host default identified). Request from program operator: (a) a sandbox/supplier test account to run the interactive code-exchange for client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` and record whether authorize carries `code_challenge` and whether `refresh_token` rotates on reuse — the single remaining high-severity candidate; and/or (b) scoped confirmation for the adult-resolving `my-basf-world.basf.com` entry (legacy WorldAccount OAuth redirect host, externally dead). Report channel bugs.olivermaicher.eu.

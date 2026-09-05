@@ -111,3 +111,5 @@ www.basf.com
 - CHANGED federation.basf.com OIDC discovery returns HTML error page (NetIQ/Access Manager), not JSON — standard `.well-known/openid-configuration` not exposed
 
 ## 2026-09-05 18:46:05 UTC
+
+## 2026-09-05 20:52:44 UTC
