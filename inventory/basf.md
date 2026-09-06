@@ -139,3 +139,10 @@ www.basf.com
 ## 2026-09-06 05:50:51 UTC
 - CHANGED www.basf.com/us/en: HTTP 200 640KB body probed (probe-results.md lines 167,188,202) but auth-link grep analysis not completed/saved
 - CHANGED federation.basf.com/nidp/oauth/nam/discovery/registration: HTTP 404 (probe-results.md line 203) — NetIQ dynamic client registration endpoint not exposed
+
+## 2026-09-06 10:59:02 UTC
+- CHANGED federation.basf.com: NAM OIDC discovery at /nidp/oauth/nam/.well-known/openid-configuration discloses real registration_endpoint /nidp/oauth/nam/clients (401 auth-required — earlier 404 test hit wrong
+- NEW federation.basf.com/nidp/saml2/metadata -> 200 signed text/xml IdP+SP SAML2 descriptor (21434B): entityID, SSO POST/Redirect /nidp/saml2/sso, SLO /nidp/saml2/slo(+_return), SOAP /nidp/saml2/soap + sps
+- NEW federation.basf.com OIDC discovery content: grant_types incl password(ROPC)+hybrid, code_challenge_methods plain+S256, scopes urn:netiq.com:nam:scope:oauth:registration:full|read, claims incl '/UserAt
+- CHANGED www.basf.com/us/en: 640KB body analyzed — Magnolia CMS corporate site; no partner/supplier OAuth authorize endpoints or login links found in HTML/JSON (checked footer eBusiness page, stage carousel, m
+- CHANGED federation.basf.com/nidp/oauth/nam/discovery/registration: HTTP 404 confirmed — NetIQ dynamic client registration not exposed

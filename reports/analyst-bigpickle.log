@@ -3365,3 +3365,520 @@ STEP 6 — LEARNING
 
 STEP 7 — RISK
 [RISK] BASF SE: 28 — Remaining IdP discovery surface (SAML metadata, JWKS, registration, end_session, grant matrix) fully enumerated this run: every unauth path gated, SAML/JWKS disclosure standard, public client rejected client_credentials. Residual risk narrowly singular: no-PKCE refresh_token public OAuth client, interactive-proof only. Drops to baseline if operator confirms password-grant disabled + PKCE/rotation enforced.
+===== ANALYST bigpickle 2026-09-06 10:59:02 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la && git log --oneline -5 2>/dev/null
+total 208
+drwxr-xr-x 12 runner runner  4096 Sep  6 10:46 .
+drwxr-xr-x  3 runner runner  4096 Sep  6 10:45 ..
+drwxr-xr-x  7 runner runner  4096 Sep  6 10:46 .git
+drwxr-xr-x  3 runner runner  4096 Sep  6 10:45 .github
+-rw-r--r--  1 runner runner  1801 Sep  6 10:45 README.md
+-rw-r--r--  1 runner runner    32 Sep  6 10:46 analyst-out.txt
+-rw-r--r--  1 runner runner 53405 Sep  6 10:46 analyst-prompt.txt
+-rw-r--r--  1 runner runner 49533 Sep  6 10:46 ctx.txt
+drwxr-xr-x  2 runner runner  4096 Sep  6 10:45 inventory
+drwxr-xr-x  2 runner runner  4096 Sep  6 10:45 knowledge
+drwxr-xr-x  2 runner runner  4096 Sep  6 10:45 leads
+-rw-r--r--  1 runner runner 12998 Sep  6 10:45 probe-results.md
+drwxr-xr-x  2 runner runner  4096 Sep  6 10:45 recon-notes
+drwxr-xr-x  2 runner runner  4096 Sep  6 10:45 reports
+drwxr-xr-x  2 runner runner  4096 Sep  6 10:45 reposcan-raw
+-rw-r--r--  1 runner runner  3285 Sep  6 10:45 scope.yml
+drwxr-xr-x  2 runner runner  4096 Sep  6 10:45 scripts
+-rw-r--r--  1 runner runner    33 Sep  6 10:45 state_bigpickle.json
+-rw-r--r--  1 runner runner    33 Sep  6 10:45 state_laguna.json
+-rw-r--r--  1 runner runner    33 Sep  6 10:45 state_ling3.json
+-rw-r--r--  1 runner runner    33 Sep  6 10:45 state_longcat.json
+-rw-r--r--  1 runner runner    33 Sep  6 10:45 state_mimo.json
+-rw-r--r--  1 runner runner    33 Sep  6 10:45 state_nemotron3.json
+drwxr-xr-x  2 runner runner  4096 Sep  6 10:45 triage
+16bd833 triage 2026-09-06-09-06
+[0m
+[0m✱ [0mGlob "**/*.md"[90m 39 matches[0m
+[0m→ [0mRead triage/run-2026-09-06-09-06.md
+[0m→ [0mRead probe-results.md[90m [offset=180][0m
+[0m→ [0mRead leads/lead-bigpickle.md
+[0m→ [0mRead leads/lead-bigpickle.md[90m [offset=402][0m
+[0m→ [0mRead probe-results.md[90m [limit=80][0m
+My active lead (2026-09-05 22:47) targeted untested NetIQ NAM discovery/registration paths on `federation.basf.com`; only `/nidp/oauth/nam/discovery/registration` (404) was confirmed. Running the remaining read-only probes at 1 rps now.
+[0m
+[0m$ [0mmkdir -p /tmp/opencode/nam && cd /tmp/opencode/nam
+urls=(
+"https://federation.basf.com/nidp/oauth/nam/discovery/token"
+"https://federation.basf.com/nidp/oauth/nam/discovery/authorize"
+"https://federation.basf.com/nidp/oauth/nam/discovery"
+"https://federation.basf.com/nidp/oauth/nam/clientRegistration"
+"https://federation.basf.com/nidp/idp/saml2/metadata"
+"https://federation.basf.com/nidp/saml2/metadata"
+)
+i=0
+for u in "${urls[@]}"; do
+  i=$((i+1))
+  f="resp_$i"
+  code=$(curl -sk --max-time 20 -A "Mozilla/5.0 (X11; Linux x86_64) research-readonly" -o "$f.body" -w "%{http_code} %{content_type} %{size_download}" "$u")
+  echo "PROBE $i [$code] $u"
+  sleep 1
+done
+PROBE 1 [404 text/html 120] https://federation.basf.com/nidp/oauth/nam/discovery/token
+PROBE 2 [404 text/html 120] https://federation.basf.com/nidp/oauth/nam/discovery/authorize
+PROBE 3 [404 text/html 120] https://federation.basf.com/nidp/oauth/nam/discovery
+PROBE 4 [404 text/html 120] https://federation.basf.com/nidp/oauth/nam/clientRegistration
+PROBE 5 [200 text/html; charset=utf-8 14920] https://federation.basf.com/nidp/idp/saml2/metadata
+PROBE 6 [200 text/xml;charset=UTF-8 21434] https://federation.basf.com/nidp/saml2/metadata
+[0m
+[0m$ [0mcd /tmp/opencode/nam
+echo "=== resp_5 (nidp/idp/saml2/metadata) first 600 bytes ==="
+head -c 600 resp_5.body; echo
+echo
+echo "=== resp_6 (nidp/saml2/metadata) first 2500 bytes ==="
+head -c 2500 resp_6.body; echo
+=== resp_5 (nidp/idp/saml2/metadata) first 600 bytes ===
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication Service - Error</title>
+  
+  <link rel="icon" type="image/png" href="/nidp/images/basf/redesign/favicon.ico"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" />
+
+  <style>
+    a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fiel
+
+=== resp_6 (nidp/saml2/metadata) first 2500 bytes ===
+<?xml version="1.0" encoding="UTF-8" ?><md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="idsgZT1jJTf_2CRSjXCrURv5IzXms" entityID="https://federation.basf.com/nidp/saml2/metadata"><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+<ds:Reference URI="#idsgZT1jJTf_2CRSjXCrURv5IzXms">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+<ds:DigestValue>X/mdETzY3nC2c05+BK+eEgSSi3zwqoV62xCDAKyveMQ=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+t5Rtxp7dErTL7E2HE+ItjZuRalIFNyXJzW2Sswetc7sZatFFZTAIpu5cksfVkbaqusIUjpDaiFqO
+YtJdf/6KQytVPHxw8+dmWp6gJCcg2evZV+AsNJMPccxkvm2u+RYCojxpEZFswXZ/O/RRxwelYM1t
++wZpWpZ/yXWQEbYFdfkR4jrVcroeeXNu8bDTR0/onefu9QZheFdv8El0jXz1+b6JIdJJNhIBfvdY
+9S2gTMZIT9xs/WR8w/A+vOgn5l9MQHINxiI9FM2Y0WBA4LjhJ0BUW0xvf7KGr/qQAwRkhetc7lGn
+1zKlQ/mzQ+CfGTL++gC69iP9+t0TNEhF7VKB7mpiFWzUd6jhWdYaU3Ap/EKZKnzXWNgr7s8yTgML
++Xcghu/hVsYwlae6Ky9xqYxZW7g12byDKkRGQQzRNb7jk/urk4+yoY26MZNn7pbqp2eoik3KOy/P
+rrDi2rdhGouTRF8OsnVe+KgJ6rsqcAQlhq5GxN6TK2uUQQYXsqdzWJRDoOHzbfm2SB3ruzT5cztx
+JXo6AsnLzEecJax1iLLePbkRB9Y5/FkXModw3Y7X1B8SXvIHt9JmsGtgbE4YjDmHvc8mDZ6IBqyo
+SrZe9ofax3R40U//PTUJdws0rVswkI8YqpOM5LyQiJFrbV0z9eghBR0/odWZjUDDh47n0U+nt/U=
+</ds:SignatureValue>
+<ds:KeyInfo>
+<ds:X509Data>
+<ds:X509Certificate>
+MIIFSDCCAzCgAwIBAgIE2QH2ejANBgkqhkiG9w0BAQsFADBXMQswCQYDVQQGEwJERTEVMBMGA1UE
+BxMMTHVkd2lnc2hhZmVuMRAwDgYDVQQKEwdCQVNGIFNFMR8wHQYDVQQDExZCQVNGLUZlZF9TaWdu
+LUVuY19Sb290MB4XDTE4MDYwNTAwMDAwMFoXDTMwMTEzMDAwMDAwMFowYTEpMCcGA1UEAxQgQkFT
+Ri1GZWRfU2lnbi1FbmNfU0hBMjU2X0RlZmF1bHQxEDAOBgNVBAoTB0JBU0YgU0UxFTATBgNVBAcT
+DEx1ZHdpZ3NoYWZlbjELMAkGA1UEBhMCREUwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoIC
+AQDid4c4zrrideRvAtSM8vqAM9WAb1es9P7DmfYuyRifbQgCd5A5b5X1zl9KnhU8wA0FA4Hg3XRG
+jLxP9VifWb6j8c3sSRzstN7cUZ9HPf6bNoD4JCj/TZEJ+QYJzTOhkZ7X8WcnWSaNI9KdjuAvXTOD
+G1AATH0Z6Faul1Lu16L1DGgb7FezunC8vDcXq29cYVjh+2KhycL0g6kzdF2riHrePuykCnFBSGcV
+8/hwy5mkvGhZsh6d9O5C7cZYZfIwVAF1VD0gV0z5ArJpjZLXQx0sK8AkpLlgYcAti3qrZry0a5A7
+OpKYrTyu1szkB7ACRgyb4Jrwc+z4qX8k/1qk/DxQsILiS1ls6fv3lfcPqbyC/ABtryyfkQHJTkFF
+2UNyX+c48aHZvw2kNGuKvH1GSsjX6IUoqKWXgp+Z8Fzg3vmKdsnssik1EWw+3dILl4MseDFMZ4KX
+/3+PnIQIg9
+[0m
+Probe 6 returned real `text/xml` SAML metadata (21KB). Probe 5's 14920 bytes matches the known 404-disguised-as-200 HTML. Inspecting both bodies.
+Root cause of the newer leads is confirmed material. `/nidp/saml2/metadata` discloses a signed NetIQ NAM IdP descriptor. Extracting endpoints, NameID formats, and cert fingerprints.
+[0m$ [0mcd /tmp/opencode/nam
+echo "=== SSO/LOGOUT/artifact endpoints ==="
+grep -oE '(SingleSignOnService|SingleLogoutService|ArtifactResolutionService|NameIDFormat|AssertionConsumerService)[^>]*Location="[^"]*"' resp_6.body | head -40
+echo
+echo "=== NameIDFormat values ==="
+grep -oE '<NameIDFormat>[^<]*</NameIDFormat>' resp_6.body | sort -u
+echo
+echo "=== ct: / KeyDescriptor ==="
+grep -oE '<KeyDescriptor[^>]*>' resp_6.body
+echo
+echo "=== interfaces/organization ==="
+grep -oE '<OrganizationName[^>]*>[^<]*<|Language>en' resp_6.body | head -5
+echo
+echo "=== extract PEM certs and fingerprint ==="
+python3 - <<'EOF'
+import re, hashlib, base64, subprocess
+b = open('resp_6.body','rb').read().decode('utf-8','replace')
+certs = re.findall(r'<ds:X509Certificate>\s*(.*?)\s*</ds:X509Certificate>', b, re.S)
+for i,c in enumerate(certs):
+    pem = "-----BEGIN CERTIFICATE-----\n" + c + "\n-----END CERTIFICATE-----"
+    open(f'cert_{i}.pem','w').write(pem)
+print(f"{len(certs)} certificates found")
+for i in range(len(certs)):
+    out = subprocess.run(['openssl','x509','-in',f'cert_{i}.pem','-noout','-subject','-issuer','-serial','-dates'],capture_output=True,text=True).stdout
+    fp = subprocess.run(['openssl','x509','-in',f'cert_{i}.pem','-noout','-fingerprint','-sha256'],capture_output=True,text=True).stdout.strip()
+    print(f"--- cert {i} ---")
+    print(out.strip())
+    print(fp)
+EOF
+=== SSO/LOGOUT/artifact endpoints ===
+ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://federation.basf.com/nidp/saml2/soap"
+SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://federation.basf.com/nidp/saml2/slo" ResponseLocation="https://federation.basf.com/nidp/saml2/slo_return"
+SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://federation.basf.com/nidp/saml2/slo" ResponseLocation="https://federation.basf.com/nidp/saml2/slo_return"
+SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://federation.basf.com/nidp/saml2/soap"
+SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://federation.basf.com/nidp/saml2/sso"
+SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://federation.basf.com/nidp/saml2/sso"
+ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://federation.basf.com/nidp/saml2/spsoap"
+SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://federation.basf.com/nidp/saml2/spslo" ResponseLocation="https://federation.basf.com/nidp/saml2/spslo_return"
+SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://federation.basf.com/nidp/saml2/spslo" ResponseLocation="https://federation.basf.com/nidp/saml2/spslo_return"
+SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://federation.basf.com/nidp/saml2/spsoap"
+AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://federation.basf.com/nidp/saml2/spassertion_consumer"
+AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://federation.basf.com/nidp/saml2/spassertion_consumer"
+AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://federation.basf.com/nidp/saml2/spassertion_consumer"
+
+=== NameIDFormat values ===
+
+=== ct: / KeyDescriptor ===
+
+=== interfaces/organization ===
+
+=== extract PEM certs and fingerprint ===
+7 certificates found
+--- cert 0 ---
+subject=CN = BASF-Fed_Sign-Enc_SHA256_Default, O = BASF SE, L = Ludwigshafen, C = DE
+issuer=C = DE, L = Ludwigshafen, O = BASF SE, CN = BASF-Fed_Sign-Enc_Root
+serial=-26FE0986
+notBefore=Jun  5 00:00:00 2018 GMT
+notAfter=Nov 30 00:00:00 2030 GMT
+sha256 Fingerprint=DB:98:65:CD:1F:AE:F5:07:45:32:81:F7:2B:A9:43:7F:AF:45:8A:35:63:76:81:87:1A:CE:42:B6:25:39:55:2C
+--- cert 1 ---
+subject=CN = BASF-Fed_Sign-Enc_SHA256_Default, O = BASF SE, L = Ludwigshafen, C = DE
+issuer=C = DE, L = Ludwigshafen, O = BASF SE, CN = BASF-Fed_Sign-Enc_Root
+serial=-26FE0986
+notBefore=Jun  5 00:00:00 2018 GMT
+notAfter=Nov 30 00:00:00 2030 GMT
+sha256 Fingerprint=DB:98:65:CD:1F:AE:F5:07:45:32:81:F7:2B:A9:43:7F:AF:45:8A:35:63:76:81:87:1A:CE:42:B6:25:39:55:2C
+--- cert 2 ---
+subject=CN = BASF-Fed_Encryption, OU = G-FDI, O = BASF SE, L = Ludwigshafen, C = DE
+issuer=C = DE, L = Ludwigshafen, O = BASF SE, CN = BASF-Fed_Sign-Enc_Root
+serial=-26FE0985
+notBefore=Apr 30 00:00:00 2019 GMT
+notAfter=Dec 16 00:00:00 2030 GMT
+sha256 Fingerprint=88:EF:D1:F2:4E:1D:5F:6E:D4:A9:22:68:02:B0:ED:5B:AC:E7:49:34:4D:08:84:E7:3B:42:E1:1F:EF:33:A6:8B
+--- cert 3 ---
+subject=CN = BASF-Fed_Sign-Enc_SHA256_Default, O = BASF SE, L = Ludwigshafen, C = DE
+issuer=C = DE, L = Ludwigshafen, O = BASF SE, CN = BASF-Fed_Sign-Enc_Root
+serial=-26FE0986
+notBefore=Jun  5 00:00:00 2018 GMT
+notAfter=Nov 30 00:00:00 2030 GMT
+sha256 Fingerprint=DB:98:65:CD:1F:AE:F5:07:45:32:81:F7:2B:A9:43:7F:AF:45:8A:35:63:76:81:87:1A:CE:42:B6:25:39:55:2C
+--- cert 4 ---
+subject=CN = BASF-Fed_Encryption, OU = G-FDI, O = BASF SE, L = Ludwigshafen, C = DE
+issuer=C = DE, L = Ludwigshafen, O = BASF SE, CN = BASF-Fed_Sign-Enc_Root
+serial=-26FE0985
+notBefore=Apr 30 00:00:00 2019 GMT
+notAfter=Dec 16 00:00:00 2030 GMT
+sha256 Fingerprint=88:EF:D1:F2:4E:1D:5F:6E:D4:A9:22:68:02:B0:ED:5B:AC:E7:49:34:4D:08:84:E7:3B:42:E1:1F:EF:33:A6:8B
+--- cert 5 ---
+subject=CN = BASF-Fed_Sign-Enc_SHA256_Default, O = BASF SE, L = Ludwigshafen, C = DE
+issuer=C = DE, L = Ludwigshafen, O = BASF SE, CN = BASF-Fed_Sign-Enc_Root
+serial=-26FE0986
+notBefore=Jun  5 00:00:00 2018 GMT
+notAfter=Nov 30 00:00:00 2030 GMT
+sha256 Fingerprint=DB:98:65:CD:1F:AE:F5:07:45:32:81:F7:2B:A9:43:7F:AF:45:8A:35:63:76:81:87:1A:CE:42:B6:25:39:55:2C
+--- cert 6 ---
+subject=CN = BASF-Fed_Encryption, OU = G-FDI, O = BASF SE, L = Ludwigshafen, C = DE
+issuer=C = DE, L = Ludwigshafen, O = BASF SE, CN = BASF-Fed_Sign-Enc_Root
+serial=-26FE0985
+notBefore=Apr 30 00:00:00 2019 GMT
+notAfter=Dec 16 00:00:00 2030 GMT
+sha256 Fingerprint=88:EF:D1:F2:4E:1D:5F:6E:D4:A9:22:68:02:B0:ED:5B:AC:E7:49:34:4D:08:84:E7:3B:42:E1:1F:EF:33:A6:8B
+[0m
+SAML IdP descriptor exposes the full NAM endpoint set + signing/encryption certs (internal `BASF-Fed_Sign-Enc_Root` CA). Probing the newly disclosed SAML SP/IdP service endpoints read-only, and re-mining the two OIDC discovery docs for `jwks_uri`/userinfo.
+[0m$ [0mcd /tmp/opencode/nam
+urls=(
+"https://federation.basf.com/nidp/saml2/sso"
+"https://federation.basf.com/nidp/saml2/slo"
+"https://federation.basf.com/nidp/saml2/soap"
+"https://federation.basf.com/nidp/saml2/spsoap"
+"https://federation.basf.com/nidp/saml2/spassertion_consumer"
+"https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration"
+"https://federation.basf.com/nidp/.well-known/openid-configuration"
+)
+i=0
+for u in "${urls[@]}"; do
+  i=$((i+1))
+  f="p_$i"
+  code=$(curl -sk --max-time 20 -A "Mozilla/5.0 (X11; Linux x86_64) research-readonly" -o "$f.body" -w "%{http_code} %{content_type} %{size_download}" "$u")
+  echo "PROBE $i [$code] $u  -> $f.body"
+  sleep 1
+done
+echo
+echo "=== mine OIDC discovery (p_6) for endpoints ==="
+python3 - <<'EOF'
+import json
+try:
+    d = json.load(open('p_6.body'))
+    keys = ['issuer','authorization_endpoint','token_endpoint','jwks_uri','userinfo_endpoint','registration_endpoint','token_endpoint_auth_methods_supported','code_challenge_methods_supported','grant_types_supported','response_types_supported','revocation_endpoint','introspection_endpoint','end_session_endpoint','scopes_supported','claims_supported','id_token_signing_alg_values_supported']
+    for k in keys:
+        if k in d: print(f"{k} = {d[k]}")
+except Exception as e:
+    print("p_6 not JSON:", e)
+    print(open('p_6.body').read()[:2000])
+EOF
+PROBE 1 [200 text/html;charset=UTF-8 4755] https://federation.basf.com/nidp/saml2/sso  -> p_1.body
+PROBE 2 [302  0] https://federation.basf.com/nidp/saml2/slo  -> p_2.body
+PROBE 3 [200 text/xml;charset=ISO-8859-1 262] https://federation.basf.com/nidp/saml2/soap  -> p_3.body
+PROBE 4 [200 text/xml;charset=ISO-8859-1 262] https://federation.basf.com/nidp/saml2/spsoap  -> p_4.body
+PROBE 5 [200 text/html;charset=ISO-8859-1 503] https://federation.basf.com/nidp/saml2/spassertion_consumer  -> p_5.body
+PROBE 6 [200 application/json 2029] https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration  -> p_6.body
+PROBE 7 [200 text/html; charset=utf-8 14920] https://federation.basf.com/nidp/.well-known/openid-configuration  -> p_7.body
+
+=== mine OIDC discovery (p_6) for endpoints ===
+issuer = https://federation.basf.com/nidp/oauth/nam
+authorization_endpoint = https://federation.basf.com/nidp/oauth/nam/authz
+token_endpoint = https://federation.basf.com/nidp/oauth/nam/token
+jwks_uri = https://federation.basf.com/nidp/oauth/nam/keys
+userinfo_endpoint = https://federation.basf.com/nidp/oauth/nam/userinfo
+registration_endpoint = https://federation.basf.com/nidp/oauth/nam/clients
+token_endpoint_auth_methods_supported = ['client_secret_post', 'client_secret_basic']
+code_challenge_methods_supported = ['plain', 'S256']
+grant_types_supported = ['authorization_code', 'implicit', 'password', 'client_credentials', 'hybrid', 'refresh_token']
+response_types_supported = ['token', 'id_token', 'token id_token', 'none', 'code', 'code token', 'code id_token', 'code id_token token']
+revocation_endpoint = https://federation.basf.com/nidp/oauth/nam/revoke
+introspection_endpoint = https://federation.basf.com/nidp/oauth/v1/nam/introspect
+end_session_endpoint = https://federation.basf.com/nidp/oauth/v1/nam/end_session
+scopes_supported = ['address', 'urn:netiq.com:nam:scope:oauth:registration:full', 'email', 'phone', 'urn:netiq.com:nam:scope:oauth:registration:read', 'maglis', 'profile', 'openid']
+claims_supported = ['address', 'add', 'modify', 'delete', 'read', 'email_verified', 'email', 'phone_number_verified', 'phone_number', 'Language', 'guid', 'cn', 'co', 'basfOTPUsed', 'website', 'birthdate', 'gender', 'profile', 'preferred_username', 'given_name', 'middle_name', 'locale', 'picture', 'UPN', 'zone_info', 'updated_at', '/UserAttribute[@ldap:targetAttribute="groupMembership"]', 'nickname', 'name', 'family_name']
+id_token_signing_alg_values_supported = ['RS256']
+[0m
+Disclosed NAM discovery exposes a full secondary OAuth surface: `jwks_uri /nidp/oauth/nam/keys`, **registration_endpoint /nidp/oauth/nam/clients** (≠ the 404 registration path tested before), `introspect`, `revoke`, `userinfo`, `end_session`, plus `password`/`hybrid` grants and **registration:full/registration:read scopes**. Inspecting SOAP/SLO/ACS bodies and probing the new endpoints.
+[0m$ [0mcd /tmp/opencode/nam
+echo "=== p_1 /nidp/saml2/sso (4755) — grep for interesting bits ==="
+grep -oiE '<title>[^<]*</title>|SAMLRequest|unable|error|missing|Redirect' p_1.body | sort -u | head
+echo
+echo "=== p_2 /nidp/saml2/slo Location ==="
+curl -sk --max-time 20 -A "research-readonly" -o /dev/null -w "%{http_code} -> %{redirect_url}\n" "https://federation.basf.com/nidp/saml2/slo"
+sleep 1
+echo "=== p_3 /nidp/saml2/soap body ==="
+cat p_3.body; echo
+echo "=== p_4 /nidp/saml2/spsoap body ==="
+cat p_4.body; echo
+echo "=== p_5 /nidp/saml2/spassertion_consumer body ==="
+cat p_5.body; echo
+=== p_1 /nidp/saml2/sso (4755) — grep for interesting bits ===
+<title>BASF Federation Service</title>
+
+=== p_2 /nidp/saml2/slo Location ===
+302 -> https://federation.basf.com/nidp
+=== p_3 /nidp/saml2/soap body ===
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body><SOAP-ENV:Fault><faultcode>Client</faultcode><faultstring>Invalid or unsupported XML content type: {0}</faultstring></SOAP-ENV:Fault></SOAP-ENV:Body></SOAP-ENV:Envelope>
+=== p_4 /nidp/saml2/spsoap body ===
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body><SOAP-ENV:Fault><faultcode>Client</faultcode><faultstring>Invalid or unsupported XML content type: {0}</faultstring></SOAP-ENV:Fault></SOAP-ENV:Body></SOAP-ENV:Envelope>
+=== p_5 /nidp/saml2/spassertion_consumer body ===
+
+
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//Dtd HTML 4.0 transitional//en">
+
+<html lang="en">
+        <head>
+                
+                    <META HTTP-EQUIV="expires" CONTENT="0">
+                
+        </head>
+        <body>
+            
+                <script type="text/javascript">
+                    <!--
+                                    window.location.href='/nidp/app?first=false'+window.location.hash;
+                    -->
+                </script>
+            
+
+        </body>
+</html>
+[0m
+SAML endpoints behave benignly on GET (SOAP faults, redirects to `/nidp`). Now probing the six newly-disclosed OIDC endpoints at 1 rps.
+[0m$ [0mcd /tmp/opencode/nam
+urls=(
+"https://federation.basf.com/nidp/oauth/nam/keys"
+"https://federation.basf.com/nidp/oauth/nam/clients"
+"https://federation.basf.com/nidp/oauth/v1/nam/introspect"
+"https://federation.basf.com/nidp/oauth/nam/userinfo"
+"https://federation.basf.com/nidp/oauth/nam/revoke"
+"https://federation.basf.com/nidp/oauth/v1/nam/end_session"
+)
+i=0
+for u in "${urls[@]}"; do
+  i=$((i+1))
+  f="r_$i"
+  code=$(curl -sk --max-time 20 -A "research-readonly" -o "$f.body" -w "%{http_code} %{content_type} %{size_download} redirect:%{redirect_url}" "$u")
+  echo "PROBE $i [$code] $u -> $f.body"
+  sleep 1
+done
+echo
+echo "=== keys (r_1) ==="
+head -c 1500 r_1.body; echo
+echo "=== clients (r_2) body head ==="
+head -c 800 r_2.body; echo
+echo "=== userinfo (r_4) head ==="
+head -c 400 r_4.body; echo
+echo "=== end_session (r_6) head ==="
+head -c 400 r_6.body; echo
+PROBE 1 [200 application/json 4566 redirect:] https://federation.basf.com/nidp/oauth/nam/keys -> r_1.body
+PROBE 2 [401 application/json 37 redirect:] https://federation.basf.com/nidp/oauth/nam/clients -> r_2.body
+PROBE 3 [405 text/html;charset=utf-8 449 redirect:] https://federation.basf.com/nidp/oauth/v1/nam/introspect -> r_3.body
+PROBE 4 [401 application/json 27 redirect:] https://federation.basf.com/nidp/oauth/nam/userinfo -> r_4.body
+PROBE 5 [405 text/html;charset=utf-8 449 redirect:] https://federation.basf.com/nidp/oauth/nam/revoke -> r_5.body
+PROBE 6 [302  0 redirect:https://federation.basf.com/nidp/app/logout] https://federation.basf.com/nidp/oauth/v1/nam/end_session -> r_6.body
+
+=== keys (r_1) ===
+{"keys":[{"kty":"RSA","use":"sig","alg":"RS256","kid":"1111010011111111","x5c":["MIIFgDCCA2igAwIBAgIHA/J1LQ3exzANBgkqhkiG9w0BAQsFADBXMQswCQYDVQQGEwJERTEVMBMGA1UEBxMMTHVkd2lnc2hhZmVuMRAwDgYDVQQKEwdCQVNGIFNFMR8wHQYDVQQDExZCQVNGLUZlZGVyYXRpb24tUm9vdENBMB4XDTI1MTAxNDAwMDAwMFoXDTMyMTIxNjAwMDAwMFowgZUxCzAJBgNVBAYTAkRFMQwwCgYDVQQIDANSTFAxFTATBgNVBAcMDEx1ZHdpZ3NoYWZlbjEPMA0GA1UECwwGR0RTL0NCMSQwIgYDVQQKDBtCQVNGIERpZ2l0YWwgU29sdXRpb25zIEdtYkgxKjAoBgNVBAMMIW9wZW5pZHNpZ25pbmcuZmVkZXJhdGlvbi5iYXNmLmNvbTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBANY0682agKn5ZkJ01TA4Sh8yW9ROTI8NArsKKIJLY3N4Asds5wJzc6xWZIiPAKU0zratn7cU5W4b4fh8gEeDuaHNw5aQMKfdjwkWQ0dugu6HMo4Pm4zmeLd2cefD/uDXDQr9kjRZvL/WQrsecV/DWY0O2DvYwTAg8zdDkp3tPSmmgOBQN1POR67WGe6ZyNzPPtbA4MA2TDk4Fn+F3/Ac09LXQTgH9aRhc7f6uYprd18c8Hf9DgxJe5t3KoKoYK/hLznK8JcmjupTyE1R3XY6y571WyNMSZxaUYi8cbnmo9eoJXuE9cVdfU2V/+vtp9ZLuJZFON6szGegw5e8n25G95e0MqCozik+UPg/m4yICZY8C08gFgSu1YqjJKtsgQVdX6LbEW73GHgjZBYprY6BPNbcHbvlNE1ZWrp7KfptyDDmi1qLK/SPcV7+qjEZkJ+3P+fiGAra83Xs33NFfZqn8ob0xXdPXY4X35CHBVM45ne0EWkqWfOk58LqQ6T1pqwU4MdnszS5SkzCbf8ZjqBNcYH51HC8rcOEn1Xpb41PIkIY/RYI0UDMOLSx4/G/5hYbilZ5dKtlAuGq4LrhEDwl5yqs7juregJFFD/F5142hYw2fkbqrwP8F9uTo/xuprZf6Dvarm1CF5BBACq7oKovKxiXKaAoog15E47/0GFT4GKtAgMBAAGjEjAQMA4GA1UdDwEBAAQEAwIEsDANBgkqhkiG9w0BAQsFAAOCAgEAVaimrEbElYNCEvT64O5B76YSVybhwJdaPTEsA/pi0APRY36EcaAdptezVZcVUUgecl2hF13eOtr4MXBrDdvXZZeG2qHc/Xsz0oZXBm2lMq7Lbsi5rKXRW+ni8ojapa1YS4pQSTuGVhQJY1it8swMmV33iX8u1PlPg23pqx0Y/7Pk5M3tLBFVlGwtSERgFdiUOauxJwyO7mF4Rt5nOJEzSl0AC0+
+=== clients (r_2) body head ===
+{"error" : "authentication required"}
+=== userinfo (r_4) head ===
+{"error" : "invalid_token"}
+=== end_session (r_6) head ===
+[0m
+All gated properly. Let me mine the full JWKS (key count/algs) and the SAML descriptor structure (IdP vs SP role, dual certs noted).
+[0m$ [0mcd /tmp/opencode/nam
+echo "=== JWKS key inventory ==="
+python3 - <<'EOF'
+import json
+d = json.load(open('r_1.body'))
+for k in d.get('keys', []):
+    print("kid:", k.get('kid'), "| kty:", k.get('kty'), "| use:", k.get('use'), "| alg:", k.get('alg'), "| n_len?:", len(k.get('n','')), "| x5c count:", len(k.get('x5c',[])))
+EOF
+echo
+echo "=== SAML descriptors ==="
+grep -oE '<md:[A-Z]+SSODescriptor[^>]*>' resp_6.body | sort | uniq -c
+echo
+echo "=== protocol support / NameID / org ==="
+grep -oE 'ProtocolSupportEnumeration="[^"]*"' resp_6.body | head -3
+grep -oE '<NameIDFormat>[^<]*' resp_6.body | sort -u
+echo
+echo "=== any SP partner entries / other entityIDs ==="
+grep -oE 'entityID="[^"]*"' resp_6.body | sort -u
+=== JWKS key inventory ===
+kid: 1111010011111111 | kty: RSA | use: sig | alg: RS256 | n_len?: 683 | x5c count: 2
+
+=== SAML descriptors ===
+      1 <md:IDPSSODescriptor ID="idKbn2guiHG6aK_Bd6p0RkSeQ-OgA" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+      1 <md:SPSSODescriptor ID="id_IYl5HGhXHEgwfavOaD6Og8knY4" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+
+=== protocol support / NameID / org ===
+
+=== any SP partner entries / other entityIDs ===
+entityID="https://federation.basf.com/nidp/saml2/metadata"
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt
+cat >> probe-results.md <<'EOF'
+
+## 2026-09-06 10:50:00 UTC
+https://federation.basf.com/nidp/oauth/nam/discovery/token -> HTTP 404
+https://federation.basf.com/nidp/oauth/nam/discovery/authorize -> HTTP 404
+https://federation.basf.com/nidp/oauth/nam/discovery -> HTTP 404
+https://federation.basf.com/nidp/oauth/nam/clientRegistration -> HTTP 404
+https://federation.basf.com/nidp/idp/saml2/metadata -> HTTP 200 text/html len=14920 (NAM auth error page, catch-all)
+https://federation.basf.com/nidp/saml2/metadata -> HTTP 200 text/xml len=21434 (signed IdP+SP SAML2 descriptor)
+https://federation.basf.com/nidp/saml2/sso -> HTTP 200 "BASF Federation Service" page (len=4755, no SAMLRequest -> error page)
+https://federation.basf.com/nidp/saml2/slo -> HTTP 302 -> https://federation.basf.com/nidp
+https://federation.basf.com/nidp/saml2/soap -> HTTP 200 SOAP Fault "Invalid or unsupported XML content type: {0}"
+https://federation.basf.com/nidp/saml2/spsoap -> HTTP 200 SOAP Fault (same)
+https://federation.basf.com/nidp/saml2/spassertion_consumer -> HTTP 200 len=503 JS redirect to /nidp/app?first=false
+https://federation.basf.com/nidp/oauth/nam/keys -> HTTP 200 application/json len=4566 (JWKS: 1 RSA sig key, RS256, kid=1111010011111111, x5c[0] CN=openidsigning.federation.basf.com O=BASF Digital Solutions GmbH OU=GDS/CB issuer=BASF-Federation-RootCA, 2025-10-14..2032-12-16)
+https://federation.basf.com/nidp/oauth/nam/clients -> HTTP 401 {"error":"authentication required"} (real NAM registration endpoint, auth-gated; earlier /nidp/oauth/nam/discovery/registration was wrong path)
+https://federation.basf.com/nidp/oauth/v1/nam/introspect -> HTTP 405 (POST-only)
+https://federation.basf.com/nidp/oauth/nam/userinfo -> HTTP 401 {"error":"invalid_token"}
+https://federation.basf.com/nidp/oauth/nam/revoke -> HTTP 405 (POST-only)
+https://federation.basf.com/nidp/oauth/v1/nam/end_session -> HTTP 302 -> https://federation.basf.com/nidp/app/logout
+SAML metadata detail: entityID=https://federation.basf.com/nidp/saml2/metadata; IdP+SP hybrid descriptor; SSO POST/Redirect at /nidp/saml2/sso, SLO /nidp/saml2/slo(+_return), SOAP /nidp/saml2/soap & spsoap, ACS /nidp/saml2/spassertion_consumer; signing cert BASF-Fed_Sign-Enc_SHA256_Default (root BASF-Fed_Sign-Enc_Root, 2018-06-05..2030-11-30, FP SHA256 DB:98:65:CD:1F:AE:F5:07:45:32:81:F7:2B:A9:43:7F:AF:45:8A:35:63:76:81:87:1A:CE:42:B6:25:39:55:2C), encryption cert BASF-Fed_Encryption OU=G-FDI (FP SHA256 88:EF:D1:F2:4E:1D:5F:6E:D4:A9:22:68:02:B0:ED:5B:AC:E7:49:34:4D:08:84:E7:3B:42:E1:1F:EF:33:A6:8B)
+OIDC discovery detail (/nidp/oauth/nam/.well-known/openid-configuration, len=2029): grant_types=[authorization_code, implicit, password, client_credentials, hybrid, refresh_token]; response_types includes token id_token (implicit), code token, code id_token (hybrid); code_challenge_methods=[plain, S256]; token_auth=[client_secret_post, client_secret_basic]; jwks_uri=/nidp/oauth/nam/keys; registration_endpoint=/nidp/oauth/nam/clients; introspect=/nidp/oauth/v1/nam/introspect; revoke=/nidp/oauth/nam/revoke; end_session=/nidp/oauth/v1/nam/end_session; userinfo=/nidp/oauth/nam/userinfo; id_token alg=RS256 only; scopes include urn:netiq.com:nam:scope:oauth:registration:full/:read (client-registration-management scopes); claims include '/UserAttribute[@ldap:targetAttribute="groupMembership"]' + basfOTPUsed (LDAP/label leak, recon-only)
+EOF
+echo appended
+appended
+[0m
+Full NAM surface mapped and all-gated. Recording the new probe results.
+[0m→ [0mRead knowledge/index.md[90m [limit=20][0m
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt
+cat >> knowledge/index.md <<'EOF'
+- 2026-09-06 REJECTED OATH @ federation.basf.com: NAM OIDC/SAML admin-discovery hunt closed — `/nidp/oauth/nam/discovery*` and `clientRegistration` all 404; real registration endpoint `/nidp/oauth/nam/clients` (from discovery) returns 401 auth-required; introspect/revoke 405 (POST-only); userinfo 401 invalid_token; end_session 302 /nidp/app/logout; keys 200 JWKS (1x RS256, kid 1111010011111111, leaf openidsigning.federation.basf.com, BASF-Federation-RootCA); SAML metadata 200 signed IdP+SP descriptor (sso/slo/soap/acs, BASF-Fed_Sign-Enc_SHA256_Default sig cert + BASF-Fed_Encryption) — full NAM surface gated, no unauth config/registration/key hole
+- 2026-09-06 ACCEPTED RECON @ federation.basf.com: OIDC discovery discloses grant_types incl password/ROPC + hybrid, code_challenge_methods plain+S256, registration:full/read scopes, LDAP-style claim '/UserAttribute[@ldap:targetAttribute="groupMembership"]', basfOTPUsed claim — provider-level config/attribute-name disclosure, informational only
+EOF
+echo done
+done
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt
+cat >> leads/lead-bigpickle.md <<'EOF'
+## 2026-09-06 10:51:00 UTC [target] (model bigpickle)
+[CHANGED] federation.basf.com: NAM OIDC discovery at /nidp/oauth/nam/.well-known/openid-configuration discloses real registration_endpoint /nidp/oauth/nam/clients (401 auth-required — earlier 404 test hit wrong path), jwks_uri /nidp/oauth/nam/keys (200, 1x RS256 kid=1111010011111111, leaf openidsigning.federation.basf.com O=BASF Digital Solutions GmbH, issuer BASF-Federation-RootCA), introspect /nidp/oauth/v1/nam/introspect (405), revoke (405), userinfo (401 invalid_token), end_session (302 /nidp/app/logout)
+[NEW] federation.basf.com/nidp/saml2/metadata -> 200 signed text/xml IdP+SP SAML2 descriptor (21434B): entityID, SSO POST/Redirect /nidp/saml2/sso, SLO /nidp/saml2/slo(+_return), SOAP /nidp/saml2/soap + spsoap, ACS /nidp/saml2/spassertion_consumer; signing cert BASF-Fed_Sign-Enc_SHA256_Default (root BASF-Fed_Sign-Enc_Root) + encryption cert BASF-Fed_Encryption (OU=G-FDI); all SAML endpoints benign on GET (error page / 302 /nidp / SOAP fault)
+[NEW] federation.basf.com OIDC discovery content: grant_types incl password(ROPC)+hybrid, code_challenge_methods plain+S256, scopes urn:netiq.com:nam:scope:oauth:registration:full|read, claims incl '/UserAttribute[@ldap:targetAttribute="groupMembership"]' + basfOTPUsed, id_token alg RS256 only
+[PARKED] federation.basf.com NAM ROPC/plain-PKCE/registration exploitation: surface fully gated (401/405/302); ROPC+plain-PKCE require a misconfigured REGISTERED client + creds for Password-grant (credential/brute-force = out-of-scope class); no passive verify step
+[FINAL] DigitalCommercePlatform public OAuth client no-PKCE refresh_token — 75 (ranked), AUTH_HELPED, OATH: single surviving high-severity candidate; NAM IAM-surface mapping this session adds no unauth vector
+[NEXT] HUMAN: NAM discovery-exposed surface now fully mapped & gated (registration 401, introspect/revoke 405, userinfo 401, keys public, SAML services benign). No unauth vector opened. Still request from program operator: sandbox/supplier account for interactive OIDC code-exchange on client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 — record whether authorize carries code_challenge and whether refresh_token rotates on reuse (the [75] no-PKCE refresh_token ATO proof), or confirmation to report. Report channel bugs.olivermaicher.eu.
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC/SAML/JWKS surface mapped end-to-end via discovery-advertised paths; all administrative endpoints auth-gated (clients 401, introspect/revoke 405, userinfo 401, end_session 302 logout) — no unauth config/registration/key hole
+[LEARN] REJECTED OATH @ federation.basf.com: /nidp/oauth/nam/discovery/* + clientRegistration all 404 — wrong path guess; the NAM registration endpoint is /nidp/oauth/nam/clients (401)
+[LEARN] ACCEPTED RECON @ federation.basf.com: discovery exposes provider config — password(ROPC)+hybrid grants, plain+S256 PKCE, registration:full/read scopes, LDAP groupMembership + basfOTPUsed claims; informational config/attr-name leak only, exploitation needs a misconfigured registered client (out-of-scope class)
+[RISK] BASF SE: 30 — NAM identity plane re-verified fully gated after complete discovery+JWKS+SAML enumeration; deepest remaining exposure unchanged: my.basf.com/federation public OAuth client 86cc4bf9 emits refresh_token without PKCE (provider allows plain PKCE + ROPC provider-wide) — interactive proof still required; no new unauth surface opened anywhere in the 11-host estate
+EOF
+echo done && git add -A && git commit -q -m "recon: map full NAM OIDC+SAML discovery surface on federation.basf.com (all gated)" && git log --oneline -1
+done
+Author identity unknown
+
+*** Please tell me who you are.
+
+Run
+
+  git config --global user.email "you@example.com"
+  git config --global user.name "Your Name"
+
+to set your account's default identity.
+Omit --global to set the identity only in this repository.
+
+fatal: empty ident name (for <runner@runnervmejwal.jpqeddjxl4eezgpbowuxs5aqxe.xx.internal.cloudapp.net>) not allowed
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && git -c user.email="opencode@local" -c user.name="opencode" commit -q -m "recon: map full NAM OIDC+SAML discovery surface on federation.basf.com (all gated)" && git log --oneline -1
+dea2213 recon: map full NAM OIDC+SAML discovery surface on federation.basf.com (all gated)
+[0m
+STEP 1 — DELTA
+- [CHANGED] federation.basf.com: NAM OIDC discovery (`/nidp/oauth/nam/.well-known/openid-configuration`) discloses the real registration endpoint `/nidp/oauth/nam/clients` → 401 auth-required (prior 404 test on `/nidp/oauth/nam/discovery/registration` was the wrong path), jwks `/nidp/oauth/nam/keys` → 200 JWKS, introspect/revoke 405, userinfo 401, end_session 302 — full secondary OAuth surface now mapped and gated
+- [NEW] federation.basf.com/nidp/saml2/metadata → 200 signed IdP+SP SAML2 descriptor (sso/slo/soap/ACS + internal-CA signing/encryption certs)
+- [NEW] federation.basf.com OIDC discovery content: `grant_types` incl `password`(ROPC)+`hybrid`, `code_challenge_methods plain+S256`, `registration:full/:read` scopes, LDAP-style `groupMembership` claim, `basfOTPUsed`
+
+STEP 2 — PRIORITIZE
+- [PRIO] my.basf.com,6.6,attack_surface=6,business_value=9,tech_exposure=7,gate_ease=6,cloud_surface=3,freshness=10
+- [PRIO] federation.basf.com,5.6,attack_surface=5,business_value=8,tech_exposure=8,gate_ease=2,cloud_surface=5,freshness=10
+- [PRIO] prod.api.basf.com,3.4,attack_surface=3,business_value=9,tech_exposure=5,gate_ease=2,cloud_surface=4,freshness=8
+
+STEP 3 — HYPOTHESES
+[HYP] DigitalCommercePlatform public OAuth client `86cc4bf9-…` emits refresh_token with no PKCE → authz-code/refresh-token replay ATO
+class: OATH
+asset: federation.basf.com / my.basf.com (client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4)
+confidence: 75
+reasoning: SSR boot config — response_type=code, useRefreshToken=true, refresh_token in scope, zero code_challenge refs; NAM discovery confirms provider allows code_challenge S256 AND plain, and newly confirms ROPC `password`/`hybrid` grants provider-wide; public client (no secret in SPA); redirect_uri exact-match oracle verified clean (10 variants, no bypass), implicit closed (token→unauthorized_client); residual theft plane is code/refresh interception, not redirect manipulation
+evidence_needed: authentic authorize request showing absence of code_challenge + token response refresh_token that does not rotate on reuse (compare JTI/lifetime on repeat use)
+verify_steps: AUTH_HELPED — with sandbox account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth, log uttered params; exchange at /nidp/oauth/nam/token (client_secret_post), reuse refresh_token twice, diff JTI/lifetime
+impact: intercepted code or stolen non-rotating refresh_token = full ATO of BASF customer/supplier portal account (orders, pricing, PII); HIGH
+testability: AUTH_HELPED
+
+STEP 4 — SELF-CRITIQUE
+- [PARKED] federation.basf.com NAM ROPC/plain-PKCE/registration exploitation: registration 401, introspect/revoke 405, userinfo 401, end_session 302 — full administrative surface gated; ROPC+plain-PKCE need a misconfigured registered client + creds (credential/brute-force class = out of scope); no passive verify step
+- [PARKED] NAM JWKS/SAML key or alg weakness: single RSA RS256 key (kid 1111010011111111), id_token alg RS256 only, SAML RSA-SHA256 — no weak-alg/confusion surface; public-by-design metadata
+- [FINAL] my.basf.com no-PKCE refresh_token — 75, OATH (only survivor; interactive proof required)
+
+STEP 5 — NEXT ACTION
+[NEXT] HUMAN: NAM discovery-exposed OIDC/SAML/JWKS surface fully mapped and gated — no unauth vector opened anywhere in the 11-host estate. Request from program operator: sandbox/supplier test account for the interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (record whether authorize carries `code_challenge`, and whether the returned `refresh_token` rotates on reuse) — the single requiring-evidence candidate for the [75] no-PKCE refresh_token ATO — or confirmation to report. Report channel bugs.olivermaicher.eu.
+
+STEP 6 — LEARNING
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery + JWKS + SAML metadata + admin/registration/introspection endpoints mapped end-to-end — clients 401, introspect/revoke 405, userinfo 401, keys 200 public, SAML services benign on GET; no unauth config/registration/key hole
+[LEARN] REJECTED OATH @ federation.basf.com: /nidp/oauth/nam/discovery/* + clientRegistration 404 — wrong-path guesses; real NAM registration endpoint is /nidp/oauth/nam/clients (401)
+[LEARN] ACCEPTED RECON @ federation.basf.com: discovery exposes provider-level config — password(ROPC)+hybrid grants, plain+S256 PKCE, registration:full/read scopes, LDAP groupMembership + basfOTPUsed claims; informational, exploitation needs a misconfigured registered client (out-of-scope class)
+
+STEP 7 — RISK
+[RISK] BASF SE: 30 — NAM identity plane re-verified fully gated after complete discovery+JWKS+SAML enumeration (registration 401, introspect/revoke 405, userinfo 401, JWKS single RS256). Deepest real exposure unchanged: public OAuth client `86cc4bf9` emitting refresh_token without PKCE, on an IdP that allows plain PKCE+ROPC provider-wide — exploitability still requires interactive proof; no new unauth surface across the 11-host estate.

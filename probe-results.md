@@ -205,3 +205,8 @@ https://federation.basf.com/nidp/oauth/nam/discovery/registration -> HTTP 404
 ## 2026-09-06 05:50:55 UTC
 https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
 https://federation.basf.com/nidp/oauth/nam/discovery/registration -> HTTP 404
+
+## 2026-09-06 10:59:08 UTC
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/oauth/nam/discovery/registration -> HTTP 404
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth -> 200 len=4950

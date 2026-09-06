@@ -312,3 +312,30 @@
 - LEARN: REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused on all probes — dead/internal-only DNS entry, zero external attack surfa
 - LEARN: ACCEPTED RECON @ ap-eupf.api.basf.com: 150KB root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — zero function refs
 - LEARN: ACCEPTED RECON @ ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: `/.auth/config` and `/.auth/me` return 404 — App Service EasyAuth not exposed on either 
+
+## RANKED HYPOTHESES 2026-09-06 10:59:02 UTC
+- [75] my.basf.com: my.basf.com public OAuth client emits refresh_token without PKCE — authz-code interception / refresh-token replay ATO (from art/lead_nemotron3.txt)
+- [75] federation.basf.com: DigitalCommercePlatform public OAuth client `86cc4bf9-…` emits refresh_token with no PKCE → authz-code/refresh-token replay ATO (from art/lead_bigpickle.txt)
+- NEXT(hypotheses-bigpickle.txt): HUMAN: NAM discovery-exposed surface now fully mapped & gated (registration 401, introspect/revoke 405, userinfo 401, keys public, SAML services benign). No una
+- NEXT(hypotheses-nemotron3.txt): HUMAN: Provide supplier test account or program-issued client cert to demonstrate AUTH_HELPED flow for my.basf.com OAuth client (86cc4bf9-cfdf-4215-bd7c-e9fbbbe
+- LEARN: ACCEPTED RECON @ federation.basf.com: NAM OIDC/SAML/JWKS surface mapped end-to-end via discovery-advertised paths; all administrative endpoints auth-gated (clie
+- LEARN: REJECTED OATH @ federation.basf.com: /nidp/oauth/nam/discovery/* + clientRegistration all 404 — wrong path guess; the NAM registration endpoint is /nidp/oauth/n
+- LEARN: ACCEPTED RECON @ federation.basf.com: discovery exposes provider config — password(ROPC)+hybrid grants, plain+S256 PKCE, registration:full/read scopes, LDAP gro
+- LEARN: ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery + JWKS + SAML metadata + admin/registration/introspection endpoints mapped end-to-end — clients 401, in
+- LEARN: REJECTED OATH @ federation.basf.com: /nidp/oauth/nam/discovery/* + clientRegistration 404 — wrong-path guesses; real NAM registration endpoint is /nidp/oauth/na
+- LEARN: ACCEPTED RECON @ federation.basf.com: discovery exposes provider-level config — password(ROPC)+hybrid grants, plain+S256 PKCE, registration:full/read scopes, LD
+- LEARN: REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys (core/pi/csp/navigator) rejected Invalid ApiKe
+- LEARN: REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+- LEARN: REJECTED MISCONFIG @ api.productinformation.basf.com + api-imp.productinformation.basf.com: 403 ForbiddenException / 400 empty with pi+core keys — Lambda author
+- LEARN: REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — @ userinfo, %2f%2f, CRLF, port, suffix, dot-segment all rejected; no bypass
+- LEARN: REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed
+- LEARN: ACCEPTED RECON @ my.basf.com: SSR boot config discloses full OAuth client (86cc4bf9-…, redirect /.auth, refresh_token scope, acr 3IAM/Login/External, code flow,
+- LEARN: ACCEPTED RECON @ federation.basf.com: authorize endpoint live; legit full flow → 302 /nidp/app/login; error pages styled as BASF Authentication Service; OIDC di
+- LEARN: ACCEPTED RECON @ products.basf.com: CloudFront Magnolia SPA (252KB), same WCMS stack, zero auth entry in HTML
+- LEARN: ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/4
+- LEARN: ACCEPTED RECON @ prod.api.basf.com: CNAME basf-prod-prod.apigee.net (Apigee); `/productinformation` returns 401 VerifyAPIKey; 66 proxy paths all 404; 401-vs-404
+- LEARN: ACCEPTED RECON @ api.commerce.basf.com: AWS REST API Gateway (x-amz-apigw-id); `/copilot` returns 403 MissingAuthenticationToken; root returns 400; staged route
+- LEARN: ACCEPTED RECON @ e-gate.api.basf.com: TLS handshake succeeds without client cert; cert CN=e-gate.api.basf.com issued by DigiCert Global G2 TLS RSA SHA256 2020 C
+- LEARN: REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused on all probes — dead/internal-only DNS entry, zero external attack surfa
+- LEARN: ACCEPTED RECON @ ap-eupf.api.basf.com: 150KB root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — zero function refs
+- LEARN: ACCEPTED RECON @ ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: `/.auth/config` and `/.auth/me` return 404 — App Service EasyAuth not exposed on either 
