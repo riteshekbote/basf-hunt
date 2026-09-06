@@ -124,3 +124,14 @@ www.basf.com
 - CHANGED ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: `/.auth/config` and `/.auth/me` return HTTP 404 — App Service EasyAuth not exposed on either Function App
 - CHANGED api.basf.com: resolves to 127.0.0.1 (loopback); connection refused on all probes — dead/internal-only DNS entry, zero external attack surface
 - CHANGED *.api.basf.com estate (9 hosts): full unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+
+## 2026-09-06 00:56:42 UTC
+- NEW my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with `redirect_uri=https://my.basf.com/.auth`, `scope=openid profile refresh_token`, `acr_values
+- NEW federation.basf.com: NetIQ OIDC discovery JSON at `/nidp/.well-known/openid-configuration` (14.9KB) and `/nidp/oauth/nam/.well-known/openid-configuration` (2KB) — confirms `code_challenge_methods_supp
+- NEW prod.api.basf.com: 66 proxy paths probed — all HTTP 404 except `/productinformation` (401 VerifyAPIKey); 4 browser-sourced API keys (core, pi, csp, navigator) all rejected "Invalid ApiKey"
+- NEW api.commerce.basf.com: 8 stage prefixes (dev, test, staging, prod, v1, v2, beta, internal) + `/copilot` all return 403 `MissingAuthenticationTokenException` — AWS API Gateway IAM/SigV4 authorizer, x-a
+- NEW e-gate.api.basf.com: TLS handshake succeeds without client cert (`-k`); cert CN=e-gate.api.basf.com issued by DigiCert Global G2 TLS RSA SHA256 2020 CA1 (O=BASF Digital Solutions GmbH); root + 7 doc p
+- CHANGED ap-eupf.api.basf.com: 150KB root confirmed as stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com links) — zero `/api/`, fetch(), or function-name references; no route
+- CHANGED ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: `/.auth/config` and `/.auth/me` return HTTP 404 — App Service EasyAuth not exposed on either Function App
+- CHANGED api.basf.com: resolves to 127.0.0.1 (loopback); connection refused on all probes — dead/internal-only DNS entry, zero external attack surface
+- CHANGED *.api.basf.com estate (9 hosts): full unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404

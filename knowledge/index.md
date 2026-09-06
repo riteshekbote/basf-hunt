@@ -90,3 +90,18 @@
 - 2026-09-05 ACCEPTED RECON @ e-gate.api.basf.com: TLS handshake succeeds without client cert; cert CN=e-gate.api.basf.com issued by DigiCert Global G2 TLS RSA SHA256 2020 CA1 (O=BASF Digital Solutions GmbH); root + 7 doc paths all HTTP 404; server=Microsoft-HTTPAPI/2.0
 - 2026-09-05 ACCEPTED RECON @ ap-eupf.api.basf.com: 150KB root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — zero function refs
 - 2026-09-05 ACCEPTED RECON @ ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: `/.auth/config` and `/.auth/me` return 404 — App Service EasyAuth not exposed on either Function App
+- 2026-09-06 REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys (core/pi/csp/navigator) rejected Invalid ApiKey — no additional proxy, key scope exhausted
+- 2026-09-06 REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+- 2026-09-06 REJECTED MISCONFIG @ api.productinformation.basf.com + api-imp.productinformation.basf.com: 403 ForbiddenException / 400 empty with pi+core keys — Lambda authorizer denies
+- 2026-09-06 REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — @ userinfo, %2f%2f, CRLF, port, suffix, dot-segment all rejected; no bypass
+- 2026-09-06 ACCEPTED RECON @ my.basf.com: SSR boot config discloses full OAuth client (86cc4bf9-…, redirect /.auth, refresh_token scope, acr 3IAM/Login/External, code flow, no PKCE)
+- 2026-09-06 ACCEPTED RECON @ federation.basf.com: authorize endpoint live; legit full flow → 302 /nidp/app/login; error pages styled as BASF Authentication Service
+- 2026-09-06 ACCEPTED RECON @ products.basf.com: CloudFront Magnolia SPA (252KB), same WCMS stack, zero auth entry in HTML
+- 2026-09-06 ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+- 2026-09-06 ACCEPTED RECON @ federation.basf.com: OIDC discovery JSON at `/nidp/.well-known/openid-configuration` (14920 bytes) and `/nidp/oauth/nam/.well-known/openid-configuration` (2029 bytes) — confirms plain+S256 PKCE, client_secret_post/basic, full endpoint set
+- 2026-09-06 ACCEPTED RECON @ prod.api.basf.com: CNAME basf-prod-prod.apigee.net (Apigee); `/productinformation` returns 401 VerifyAPIKey; 66 proxy paths all 404; 401-vs-404 oracle operational
+- 2026-09-06 ACCEPTED RECON @ api.commerce.basf.com: AWS REST API Gateway (x-amz-apigw-id); `/copilot` returns 403 MissingAuthenticationToken; root returns 400; staged routes exist but IAM-gated
+- 2026-09-06 ACCEPTED RECON @ e-gate.api.basf.com: TLS handshake succeeds without client cert; cert CN=e-gate.api.basf.com issued by DigiCert Global G2 TLS RSA SHA256 2020 CA1 (O=BASF Digital Solutions GmbH); root + 7 doc paths all HTTP 404; server=Microsoft-HTTPAPI/2.0
+- 2026-09-06 REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused on all probes; dead/internal-only DNS entry — zero external attack surface
+- 2026-09-06 ACCEPTED RECON @ ap-eupf.api.basf.com: 150KB root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — zero function refs
+- 2026-09-06 ACCEPTED RECON @ ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: `/.auth/config` and `/.auth/me` return 404 — App Service EasyAuth not exposed on either Function App

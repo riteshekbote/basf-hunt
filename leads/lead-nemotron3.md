@@ -805,3 +805,69 @@ testability: PASSIVE_GET
 [LEARN] ACCEPTED RECON @ ap-eupf.api.basf.com: 150KB root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — zero function refs
 [LEARN] ACCEPTED RECON @ ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: `/.auth/config` and `/.auth/me` return 404 — App Service EasyAuth not exposed on either Function App
 [RISK] basf: 30 — Unauthenticated backend exposure across the full 11-host estate (9 *.api + prod.api + api.commerce + federation + my.basf + www + products + api.basf) now proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere. The only genuine high-severity weakness is the digital-commerce public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE — a design-level flaw whose exploitability requires interactive code capture (AUTH_HELPED), not currently demonstrable passively. Without an authenticated test vector (supplier test account or program-provided client cert), no further unauth progress is possible. Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise on BASF customer/supplier platform).
+## 2026-09-06 00:56:33 UTC [target] (model nemotron3)
+[NEW] my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with `redirect_uri=https://my.basf.com/.auth`, `scope=openid profile refresh_token`, `acr_values=3IAM/Login/External`, code flow, **zero PKCE machinery** in bundle  
+[NEW] federation.basf.com: NetIQ OIDC discovery JSON at `/nidp/.well-known/openid-configuration` (14.9KB) and `/nidp/oauth/nam/.well-known/openid-configuration` (2KB) — confirms `code_challenge_methods_supported: ["plain","S256"]`, `token_endpoint_auth_methods_supported: ["client_secret_post","client_secret_basic"]`, full endpoint set live  
+[NEW] prod.api.basf.com: 66 proxy paths probed — all HTTP 404 except `/productinformation` (401 VerifyAPIKey); 4 browser-sourced API keys (core, pi, csp, navigator) all rejected "Invalid ApiKey"  
+[NEW] api.commerce.basf.com: 8 stage prefixes (dev, test, staging, prod, v1, v2, beta, internal) + `/copilot` all return 403 `MissingAuthenticationTokenException` — AWS API Gateway IAM/SigV4 authorizer, x-api-key not accepted as credential class  
+[NEW] e-gate.api.basf.com: TLS handshake succeeds without client cert (`-k`); cert CN=e-gate.api.basf.com issued by DigiCert Global G2 TLS RSA SHA256 2020 CA1 (O=BASF Digital Solutions GmbH); root + 7 doc paths all HTTP 404 under `-k`; server=Microsoft-HTTPAPI/2.0 — **not mTLS**, TLS verify failure was client-side missing intermediate  
+[CHANGED] ap-eupf.api.basf.com: 150KB root confirmed as stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com links) — zero `/api/`, fetch(), or function-name references; no route discovery possible from body  
+[CHANGED] ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: `/.auth/config` and `/.auth/me` return HTTP 404 — App Service EasyAuth not exposed on either Function App  
+[CHANGED] api.basf.com: resolves to 127.0.0.1 (loopback); connection refused on all probes — dead/internal-only DNS entry, zero external attack surface  
+[CHANGED] *.api.basf.com estate (9 hosts): full unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+[PRIO] my.basf.com,8.5,attack_surface=9,business_value=10,tech_exposure=9,gate_ease=8,cloud_surface=7,freshness=10  
+[PRIO] federation.basf.com,7.2,attack_surface=6,business_value=9,tech_exposure=8,gate_ease=5,cloud_surface=6,freshness=10  
+[PRIO] www.basf.com,6.8,attack_surface=7,business_value=10,tech_exposure=5,gate_ease=8,cloud_surface=7,freshness=10  
+[PRIO] basf.com,6.3,attack_surface=5,business_value=10,tech_exposure=4,gate_ease=7,cloud_surface=7,freshness=10  
+[PRIO] prod.api.basf.com,3.8,attack_surface=3,business_value=9,tech_exposure=5,gate_ease=2,cloud_surface=4,freshness=10  
+[PRIO] api.commerce.basf.com,3.2,attack_surface=3,business_value=8,tech_exposure=4,gate_ease=1,cloud_surface=6,freshness=10  
+[PRIO] products.basf.com,3.0,attack_surface=3,business_value=7,tech_exposure=3,gate_ease=6,cloud_surface=3,freshness=10  
+[PRIO] e-gate.api.basf.com,1.8,attack_surface=1,business_value=8,tech_exposure=1,gate_ease=2,cloud_surface=3,freshness=10  
+[PRIO] api.basf.com,1.0,attack_surface=1,business_value=9,tech_exposure=1,gate_ease=1,cloud_surface=1,freshness=10
+[HYP] my.basf.com public OAuth client emits refresh_token without PKCE — authz-code interception / refresh-token replay ATO  
+class: OATH  
+asset: my.basf.com / federation.basf.com  
+confidence: 75  
+reasoning: SSR boot config confirms public client (no secret in bundle), code flow with `refresh_token` scope, redirect to `/.auth` (Azure Static Web Apps built-in auth), `acr_values=3IAM/Login/External` (NetIQ NAM external auth), **zero PKCE machinery** in client; federation.basf.com discovery allows `plain` + `S256` PKCE methods — IdP accepts downgraded/plain challenges; redirect_uri oracle tested exact-match (10 variants rejected) so exploitation requires code interception at transport/browser layer, not redirect manipulation  
+evidence_needed: capture of authentic authorize request proving absence of `code_challenge` parameter; token response showing `refresh_token` issued with no rotation on reuse  
+verify_steps: AUTH_HELPED — with test account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External — record uttered params; exchange code for tokens; verify refresh_token lifetime/rotation on reuse  
+impact: Intercepted authz code or stolen refresh_token = full ATO of BASF customer/supplier portal account → order/price/PII access, procurement fraud, supplier impersonation; CRITICAL  
+testability: AUTH_HELPED
+[HYP] www.basf.com embeds partner/supplier login links routing to central IdP — passive discovery of additional OAuth authorize endpoints  
+class: OATH  
+asset: www.basf.com  
+confidence: 55  
+reasoning: 640KB corporate estate via CloudFront (308→/us/en); SPA config at my.basf.com points to same portal integration; BASF corporate sites historically embed BASF WorldAccount/Connect/B2B partner login links routing to federation.basf.com or similar IdP; any embedded `authorize` endpoint URL in HTML/JS is passive discovery win for redirect_uri/orchestration testing  
+evidence_needed: login/partner-portal URLs, SSO links, embedded OAuth authorize endpoints in 640KB body (or country-specific roots /us/en, /de/de, /cn/zh, /fr/fr)  
+verify_steps: GET https://www.basf.com/us/en (already probed); grep saved body for `login`, `my.basf`, `WorldAccount`, `Connect`, `sso`, `oauth`, `signin`, `/auth/`, `federation.basf.com`, `authorize`; resolve found auth endpoints read-only with GET -I  
+impact: Discovers additional IdP-facing OAuth surfaces for redirect_uri/state/response_mode testing; MEDIUM (roadmap to HIGH if vulnerable endpoint found)  
+testability: PASSIVE_GET
+[HYP] federation.basf.com NetIQ OIDC metadata at non-standard path discloses all registered clients + grant types  
+class: MISCONFIG  
+asset: federation.basf.com  
+confidence: 48  
+reasoning: Standard OIDC discovery returns HTML error page (NetIQ Access Manager login) not JSON; NetIQ NAM commonly exposes OIDC metadata at `/nidp/.well-known/openid-configuration` or `/nidp/oauth/nam/.well-known/openid-configuration`; JSON already confirmed at both paths (200, 14.9KB + 2KB) — discloses all registered clients, grant types, and endpoints for systematic client enumeration  
+evidence_needed: Parse captured JSON (already retrieved) for `client_id` array or registration endpoint  
+verify_steps: Parse existing capture: `cat probe-results.json | jq '.["federation.basf.com/nidp/.well-known/openid-configuration"].body'` — extract client identifiers; GET https://federation.basf.com/nidp/oauth/nam/discovery/registration -k (NetIQ dynamic client registration endpoint)  
+impact: Full client enumeration → targeted OAuth testing per client; MEDIUM  
+testability: PASSIVE_GET
+[PARKED] federation.basf.com NetIQ OIDC metadata at non-standard path discloses all registered clients + grant types: confidence 48 — below 50 actionable threshold; JSON already captured and confirmed at both NetIQ-specific paths (probe-results.md lines 174-176); requires parsing existing capture, not new probing  
+[FINAL] 1. my.basf.com public OAuth client emits refresh_token without PKCE — authz-code interception / refresh-token replay ATO (75)  
+[FINAL] 2. www.basf.com embeds partner/supplier login links routing to central IdP — passive discovery of additional OAuth authorize endpoints (55)
+[NEXT] PROBE: GET https://www.basf.com/us/en -H "Accept: text/html" (save body); grep for `login\|my\.basf\|WorldAccount\|Connect\|sso\|oauth\|signin\|/auth/\|federation\.basf\.com\|authorize`; for each unique auth URL found: GET -I <url> (read-only, ≤1 rps)
+[LEARN] REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys (core/pi/csp/navigator) rejected Invalid ApiKey — no additional proxy, key scope exhausted  
+[LEARN] REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class  
+[LEARN] REJECTED MISCONFIG @ api.productinformation.basf.com + api-imp.productinformation.basf.com: 403 ForbiddenException / 400 empty with pi+core keys — Lambda authorizer denies  
+[LEARN] REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — @ userinfo, %2f%2f, CRLF, port, suffix, dot-segment all rejected; no bypass  
+[LEARN] ACCEPTED RECON @ my.basf.com: SSR boot config discloses full OAuth client (86cc4bf9-…, redirect /.auth, refresh_token scope, acr 3IAM/Login/External, code flow, no PKCE)  
+[LEARN] ACCEPTED RECON @ federation.basf.com: authorize endpoint live; legit full flow → 302 /nidp/app/login; error pages styled as BASF Authentication Service  
+[LEARN] ACCEPTED RECON @ products.basf.com: CloudFront Magnolia SPA (252KB), same WCMS stack, zero auth entry in HTML  
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404  
+[LEARN] ACCEPTED RECON @ federation.basf.com: OIDC discovery JSON at `/nidp/.well-known/openid-configuration` (14920 bytes) and `/nidp/oauth/nam/.well-known/openid-configuration` (2029 bytes) — confirms plain+S256 PKCE, client_secret_post/basic, full endpoint set  
+[LEARN] ACCEPTED RECON @ prod.api.basf.com: CNAME basf-prod-prod.apigee.net (Apigee); `/productinformation` returns 401 VerifyAPIKey; 66 proxy paths all 404; 401-vs-404 oracle operational  
+[LEARN] ACCEPTED RECON @ api.commerce.basf.com: AWS REST API Gateway (x-amz-apigw-id); `/copilot` returns 403 MissingAuthenticationToken; root returns 400; staged routes exist but IAM-gated  
+[LEARN] ACCEPTED RECON @ e-gate.api.basf.com: TLS handshake succeeds without client cert; cert CN=e-gate.api.basf.com issued by DigiCert Global G2 TLS RSA SHA256 2020 CA1 (O=BASF Digital Solutions GmbH); root + 7 doc paths all HTTP 404; server=Microsoft-HTTPAPI/2.0  
+[LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused on all probes; dead/internal-only DNS entry — zero external attack surface  
+[LEARN] ACCEPTED RECON @ ap-eupf.api.basf.com: 150KB root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — zero function refs  
+[LEARN] ACCEPTED RECON @ ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: `/.auth/config` and `/.auth/me` return 404 — App Service EasyAuth not exposed on either Function App
+[RISK] basf: 30 — Unauthenticated backend exposure across the full 11-host estate (9 *.api + prod.api + api.commerce + federation + my.basf + www + products + api.basf) now proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere. The only genuine high-severity weakness is the digital-commerce public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE — a design-level flaw whose exploitability requires interactive code capture (AUTH_HELPED), not currently demonstrable passively. Without an authenticated test vector (supplier test account or program-provided client cert), no further unauth progress is possible. Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise on BASF customer/supplier platform).

@@ -543,3 +543,4 @@ verify_steps: at 1 rps: GET /nidp/oauth/nam/discovery/token and /nidp/oauth/nam/
 impact: exposed metadata discloses issuer, PKCE mode policy, token/introspection/userinfo endpoints, supported signing/server-assertion — feeds alg-confusion/JWK-confusion and unregistered OAuth client testing; MEDIUM (→ HIGH if registration/keys readable); exploit-only-read, no customer data touched
 testability: PASSIVE
 [NEXT] PROBE: GET https://federation.basf.com/nidp/oauth/nam/discovery/token -k and /nidp/oauth/nam/discovery/authorize and /nidp/oauth/nam/discovery and /nidp/oauth/nam/clientRegistration and /nidp/idp/saml2/metadata and /nidp/saml2/metadata at 1 rps (log status + Content-Type + first 2KB), then GET /nidp/app/login and grep the saved body for `client_id`,`clientId`,`oauth`,`entityID`,`jwks`,`issuer`,`registration`
+## 2026-09-06 00:50:51 UTC [target] (model bigpickle)

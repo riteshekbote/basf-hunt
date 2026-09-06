@@ -195,3 +195,9 @@ https://my.basf.com/basf/.well-known/openid-configuration -> 200 len=204926
 https://my.basf.com/nidp/.well-known/openid-configuration -> 200 len=204926
 https://my.basf.com/saml/metadata -> 200 len=204926
 https://my.basf.com/.auth -> 200 len=205023
+
+## 2026-09-06 00:56:48 UTC
+https://my.basf.com/.auth` -> 200 len=204936
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://www.basf.com/us/en -> 200 len=640035
+https://federation.basf.com/nidp/oauth/nam/discovery/registration -> HTTP 404

@@ -1,11 +1,1 @@
-## 2026-09-05 22:47:01 UTC [target] (model bigpickle)
-[HYP] NAM IdP exposes unprotected OIDC/SAML admin discovery or registration endpoints leaking client config / JWKS / supported flows
-class: OATH
-asset: federation.basf.com (NetIQ Access Manager provider)
-confidence: 42
-reasoning: provider is NAM (error page styling + `/nidp/app/login` reached); NAM exposes OAuth metadata under `/nidp/oauth/nam/discovery*` and SAML metadata under `/nidp/idp/...` in addition to browser-config `.well-known`; root `.well-known/openid-configuration` returns provider HTML 404 (off-standard path config) so the real discovery surface was never enumerated; only `authz` confirmed live
-evidence_needed: any 200 JSON at discovery/registration/metadata paths, or a body embedding issuer/client-id/jwks/key-id
-verify_steps: at 1 rps: GET /nidp/oauth/nam/discovery/token and /nidp/oauth/nam/discovery/authorize and /nidp/oauth/nam/discovery and /nidp/oauth/nam/clientRegistration and /nidp/idp/saml2/metadata and /nidp/saml2/metadata — log status, Content-Type, first 2KB; then GET /nidp/app/login (200 known) and grep body for `client_id`,`entityID`,`metadata`,`oauth`,`issuer`,`jwks`
-impact: exposed metadata discloses issuer, PKCE mode policy, token/introspection/userinfo endpoints, supported signing/server-assertion — feeds alg-confusion/JWK-confusion and unregistered OAuth client testing; MEDIUM (→ HIGH if registration/keys readable); exploit-only-read, no customer data touched
-testability: PASSIVE
-[NEXT] PROBE: GET https://federation.basf.com/nidp/oauth/nam/discovery/token -k and /nidp/oauth/nam/discovery/authorize and /nidp/oauth/nam/discovery and /nidp/oauth/nam/clientRegistration and /nidp/idp/saml2/metadata and /nidp/saml2/metadata at 1 rps (log status + Content-Type + first 2KB), then GET /nidp/app/login and grep the saved body for `client_id`,`clientId`,`oauth`,`entityID`,`jwks`,`issuer`,`registration`
+## 2026-09-06 00:50:51 UTC [target] (model bigpickle)
