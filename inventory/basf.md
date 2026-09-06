@@ -135,3 +135,7 @@ www.basf.com
 - CHANGED ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: `/.auth/config` and `/.auth/me` return HTTP 404 — App Service EasyAuth not exposed on either Function App
 - CHANGED api.basf.com: resolves to 127.0.0.1 (loopback); connection refused on all probes — dead/internal-only DNS entry, zero external attack surface
 - CHANGED *.api.basf.com estate (9 hosts): full unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+
+## 2026-09-06 05:50:51 UTC
+- CHANGED www.basf.com/us/en: HTTP 200 640KB body probed (probe-results.md lines 167,188,202) but auth-link grep analysis not completed/saved
+- CHANGED federation.basf.com/nidp/oauth/nam/discovery/registration: HTTP 404 (probe-results.md line 203) — NetIQ dynamic client registration endpoint not exposed
