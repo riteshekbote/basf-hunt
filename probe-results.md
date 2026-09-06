@@ -224,3 +224,11 @@ https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=149
 https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
 https://federation.basf.com/nidp/saml2/metadata -> 200 len=?
 https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth -> 200 len=4950
+
+## 2026-09-06 19:22:51 UTC
+https://my.basf.com/.auth` -> 200 len=204936
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://federation.basf.com/nidp/saml2/metadata -> 200 len=?
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth -> 200 len=4950

@@ -159,3 +159,17 @@ www.basf.com
 - CHANGED prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey
 - CHANGED api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
 - CHANGED api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry
+
+## 2026-09-06 19:22:41 UTC
+- CHANGED federation.basf.com: OIDC discovery at `/nidp/.well-known/openid-configuration` and `/nidp/oauth/nam/.well-known/openid-configuration` fully mapped — exposes ROPC (password) + hybrid grants, plain+S25
+- CHANGED federation.basf.com: NAM OIDC/SAML/JWKS surface mapped end-to-end via discovery-advertised paths; all administrative endpoints auth-gated (clients 401, introspect/revoke 405, userinfo 401, end_session
+- CHANGED my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with `redirect_uri=https://my.basf.com/.auth`, `scope=openid profile refresh_token`, `acr_values
+- CHANGED *.api.basf.com estate (9 hosts): full unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+- CHANGED prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401 VerifyAPIKey); 4 browser-sourced keys (core/pi/csp/navigator) rejected Invalid ApiKey — key scope exhausted
+- CHANGED api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — AWS REST API Gateway IAM/SigV4 authorizer, x-api-key not a credential class
+- CHANGED api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface
+- CHANGED www.basf.com: 640KB Magnolia CMS body fully analyzed — zero partner/supplier OAuth/SSO links
+- CHANGED products.basf.com: CloudFront Magnolia SPA (252KB), same WCMS stack, zero auth entry in HTML
+- CHANGED e-gate.api.basf.com: TLS handshake succeeds without client cert; cert CN=e-gate.api.basf.com issued by DigiCert Global G2 TLS RSA SHA256 2020 CA1 (O=BASF Digital Solutions GmbH); root + 7 doc paths al
+- CHANGED ap-eupf.api.basf.com: 150KB root confirmed stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — zero function refs
+- CHANGED ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: `/.auth/config` and `/.auth/me` return 404 — App Service EasyAuth not exposed on either Function App

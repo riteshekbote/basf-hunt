@@ -625,3 +625,24 @@ testability: AUTH_HELPED
 [LEARN] REJECTED MISCONFIG @ api.productinformation.basf.com + api-imp.productinformation.basf.com: 403 ForbiddenException / 400 with pi+core keys — Lambda authorizer denies
 [LEARN] REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey — no additional proxy, key scope exhausted
 [RISK] BASF SE: 30 — NAM identity plane re-verified fully gated after complete discovery+JWKS+SAML enumeration (registration 401, introspect/revoke 405, userinfo 401, JWKS single RS256). Deepest real exposure unchanged: public OAuth client `86cc4bf9` emitting refresh_token without PKCE, on an IdP that allows plain PKCE+ROPC provider-wide — exploitability still requires interactive proof; no new unauth surface across the 11-host estate.
+## 2026-09-06 19:18:59 UTC [target] (model bigpickle)
+[PRIO] my.basf.com / federation.basf.com (OAuth no-PKCE),42,9/3/8/0/6/4 — ATO via refresh_token theft; highest value class; but gate_ease=0 (AUTH_HELPED required, no test creds available)
+[HYP] DigitalCommercePlatform public OAuth client code+refresh_token with no PKCE → authz-code interception / refresh-token replay ATO
+class: OATH
+asset: federation.basf.com / my.basf.com (client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4)
+confidence: 75
+reasoning: SSR boot config — response_type=code, useRefreshToken=true, refresh_token in scope, zero code_challenge refs; NAM discovery confirms provider allows code_challenge S256 AND plain, and confirms ROPC password/hybrid grants provider-wide; public client (no secret in SPA); redirect_uri exact-match oracle verified clean (10 variants, no bypass), implicit closed (token→unauthorized_client); residual theft plane is code/refresh interception, not redirect manipulation
+evidence_needed: authentic authorize request showing absence of code_challenge + token response refresh_token that does not rotate on reuse (compare JTI/lifetime on repeat use)
+verify_steps: AUTH_HELPED — with sandbox account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth, log uttered params (code_challenge/code_challenge_method); exchange at /nidp/oauth/nam/token (client_secret_post); reuse refresh_token twice and diff JTI/lifetime
+impact: intercepted code or stolen non-rotating refresh_token = full ATO of BASF customer/supplier portal account (orders, pricing, PII); HIGH
+testability: AUTH_HELPED
+[PARKED] NAM IdP ROPC/plain-PKCE exploitation: surface fully gated (401/405/302); ROPC+plain-PKCE require misconfigured REGISTERED client + creds for Password-grant (credential/brute-force = out-of-scope class); no passive verify step
+[PARKED] federation.basf.com redirect_uri bypass: exact-match verified across 10 variants — all rejected; no bypass possible
+[PARKED] *.api.basf.com (9 hosts): full unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
+[FINAL] DigitalCommercePlatform public OAuth client no-PKCE refresh_token — 75 (ranked), AUTH_HELPED, OATH: single surviving high-severity candidate; all other hypotheses passively exhausted
+[NEXT] HUMAN: All passive threads consumed across 11-host estate. Provide sandbox/supplier test account for interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (record whether authorize carries `code_challenge`, and whether the returned `refresh_token` rotates on reuse) — the single requiring-evidence candidate for the [75] no-PKCE refresh_token ATO — or confirmation to report. Report channel bugs.olivermaicher.eu.
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+[LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC/SAML/JWKS surface mapped end-to-end via discovery-advertised paths; all administrative endpoints auth-gated — no unauth config/registration/key hole
+[LEARN] REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — all 10 bypass variants rejected; no open redirect or path traversal possible
+[RISK] BASF SE: 30 — 11-host estate fully mapped end-to-end; zero unauth vectors found; sole surviving candidate (no-PKCE refresh_token ATO, confidence 75) is AUTH_HELPED — requires sandbox/supplier test account to demonstrate. No new attack surface discoverable without interactive access.
