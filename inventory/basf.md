@@ -146,3 +146,5 @@ www.basf.com
 - NEW federation.basf.com OIDC discovery content: grant_types incl password(ROPC)+hybrid, code_challenge_methods plain+S256, scopes urn:netiq.com:nam:scope:oauth:registration:full|read, claims incl '/UserAt
 - CHANGED www.basf.com/us/en: 640KB body analyzed — Magnolia CMS corporate site; no partner/supplier OAuth authorize endpoints or login links found in HTML/JSON (checked footer eBusiness page, stage carousel, m
 - CHANGED federation.basf.com/nidp/oauth/nam/discovery/registration: HTTP 404 confirmed — NetIQ dynamic client registration not exposed
+
+## 2026-09-06 14:16:19 UTC

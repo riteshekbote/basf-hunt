@@ -3754,3 +3754,113 @@ testability: PASSIVE_GET
 **STEP 7 — RISK**
 
 [RISK] basf: 30 — Unauthenticated backend exposure across the full 11-host estate (9 *.api + prod.api + api.commerce + federation + my.basf + www + products + api.basf) now proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere. The only genuine high-severity weakness is the digital-commerce public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE — a design-level flaw whose exploitability requires interactive code capture (AUTH_HELPED), not currently demonstrable passively. Without an authenticated test vector (supplier test account or program-provided client cert), no further unauth progress is possible. Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise on BASF customer/supplier platform).
+===== ANALYST nemotron3 2026-09-06 14:16:19 UTC =====
+[0m
+> build · nemotron-3-ultra-free
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/
+total 208
+drwxr-xr-x 12 runner runner  4096 Sep  6 14:05 .
+drwxr-xr-x  3 runner runner  4096 Sep  6 14:05 ..
+drwxr-xr-x  7 runner runner  4096 Sep  6 14:05 .git
+drwxr-xr-x  3 runner runner  4096 Sep  6 14:05 .github
+-rw-r--r--  1 runner runner  1801 Sep  6 14:05 README.md
+-rw-r--r--  1 runner runner    43 Sep  6 14:05 analyst-out.txt
+-rw-r--r--  1 runner runner 56817 Sep  6 14:05 analyst-prompt.txt
+-rw-r--r--  1 runner runner 52945 Sep  6 14:05 ctx.txt
+drwxr-xr-x  2 runner runner  4096 Sep  6 14:05 inventory
+drwxr-xr-x  2 runner runner  4096 Sep  6 14:05 knowledge
+drwxr-xr-x  2 runner runner  4096 Sep  6 14:05 leads
+-rw-r--r--  1 runner runner 13517 Sep  6 14:05 probe-results.md
+drwxr-xr-x  2 runner runner  4096 Sep  6 14:05 recon-notes
+drwxr-xr-x  2 runner runner  4096 Sep  6 14:05 reports
+drwxr-xr-x  2 runner runner  4096 Sep  6 14:05 reposcan-raw
+-rw-r--r--  1 runner runner  3285 Sep  6 14:05 scope.yml
+drwxr-xr-x  2 runner runner  4096 Sep  6 14:05 scripts
+-rw-r--r--  1 runner runner    33 Sep  6 14:05 state_bigpickle.json
+-rw-r--r--  1 runner runner    33 Sep  6 14:05 state_laguna.json
+-rw-r--r--  1 runner runner    33 Sep  6 14:05 state_ling3.json
+-rw-r--r--  1 runner runner    33 Sep  6 14:05 state_longcat.json
+-rw-r--r--  1 runner runner    33 Sep  6 14:05 state_mimo.json
+-rw-r--r--  1 runner runner    33 Sep  6 14:05 state_nemotron3.json
+drwxr-xr-x  2 runner runner  4096 Sep  6 14:05 triage
+[0m
+[0m→ [0mRead probe-results.md
+[0m→ [0mRead scope.yml
+[0m→ [0mRead inventory/basf.md
+[0m→ [0mRead analyst-out.txt
+**STEP 1 — DELTA**
+- [NEW] `federation.basf.com/nidp/saml2/metadata` → HTTP 200, signed SAML2 descriptor (21434B): entityID, SSO POST/Redirect `/nidp/saml2/sso`, SLO `/nidp/saml2/slo(+_return)`, SOAP `/nidp/saml2/soap`
+- [NEW] `federation.basf.com` OIDC discovery fully parsed: `grant_types` includes `password` (ROPC) + `hybrid`; `code_challenge_methods_supported: plain, S256`; scopes `urn:netiq.com:nam:scope:oauth:registration:full|read`; claims `groupMembership`, `basfOTPUsed`
+- [CHANGED] `www.basf.com/us/en` 640KB body fully analyzed — Magnolia CMS corporate site; zero partner/supplier OAuth authorize endpoints or login links in HTML/JSON
+- [CHANGED] `federation.basf.com/nidp/oauth/nam/discovery/registration` → HTTP 404 confirmed; real registration endpoint is `/nidp/oauth/nam/clients` (401)
+- [CHANGED] `*.api.basf.com` estate (9 hosts): full unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+
+**STEP 2 — PRIORITIZE**
+[PRIO] my.basf.com,8.5,attack_surface=9,business_value=10,tech_exposure=9,gate_ease=8,cloud_surface=7,freshness=10
+[PRIO] federation.basf.com,7.5,attack_surface=7,business_value=9,tech_exposure=8,gate_ease=6,cloud_surface=6,freshness=10
+[PRIO] www.basf.com,6.8,attack_surface=7,business_value=10,tech_exposure=5,gate_ease=8,cloud_surface=7,freshness=10
+[PRIO] basf.com,6.3,attack_surface=5,business_value=10,tech_exposure=4,gate_ease=7,cloud_surface=7,freshness=10
+[PRIO] prod.api.basf.com,3.8,attack_surface=3,business_value=9,tech_exposure=5,gate_ease=2,cloud_surface=4,freshness=10
+[PRIO] api.commerce.basf.com,3.2,attack_surface=3,business_value=8,tech_exposure=4,gate_ease=1,cloud_surface=6,freshness=10
+[PRIO] products.basf.com,3.0,attack_surface=3,business_value=7,tech_exposure=3,gate_ease=6,cloud_surface=3,freshness=10
+[PRIO] e-gate.api.basf.com,1.8,attack_surface=1,business_value=8,tech_exposure=1,gate_ease=2,cloud_surface=3,freshness=10
+[PRIO] api.basf.com,1.0,attack_surface=1,business_value=9,tech_exposure=1,gate_ease=1,cloud_surface=1,freshness=10
+
+**STEP 3 — HYPOTHESES**
+
+[HYP] federation.basf.com ROPC grant enabled on NetIQ NAM — password-grant token acquisition for known usernames
+class: AUTH
+asset: federation.basf.com/nidp/oauth/nam/token
+confidence: 65
+reasoning: OIDC discovery at `/nidp/.well-known/openid-configuration` and `/nidp/oauth/nam/.well-known/openid-configuration` explicitly lists `password` in `grant_types_supported`; NetIQ NAM allows ROPC for registered confidential clients; public SPA client `86cc4bf9-…` has no secret but other registered clients may be confidential; ROPC + valid credentials = direct access/refresh tokens without user interaction
+evidence_needed: valid username/password for a test account + client_id/client_secret of a confidential registered client; token response showing access_token + refresh_token issued via password grant
+verify_steps: PASSIVE_GET https://federation.basf.com/nidp/.well-known/openid-configuration (already captured, parse grant_types); AUTH_HELPED POST https://federation.basf.com/nidp/oauth/nam/token with grant_type=password&username=<test>&password=<test>&client_id=<confidential_client>&client_secret=<secret> — observe token issuance
+impact: credential-stuffing or leaked creds → full token set (access+refresh) for any user; bypasses MFA/acr_values; CRITICAL if confidential client credentials leak
+testability: AUTH_HELPED
+
+[HYP] federation.basf.com SAML2 metadata exposes SSO/SLO endpoints — potential SAML assertion replay or signature validation bypass
+class: AUTH
+asset: federation.basf.com/nidp/saml2/sso
+confidence: 55
+reasoning: `/nidp/saml2/metadata` returns signed SAML2 descriptor (21434B) advertising SSO POST/Redirect at `/nidp/saml2/sso`, SLO at `/nidp/saml2/slo`, SOAP at `/nidp/saml2/soap`; NetIQ Access Manager SAML IdP/SP; if SP validation is weak (e.g., accepts unsigned assertions, replays, or weak signature algorithms), forged assertions could grant access to BASF supplier/customer portals
+evidence_needed: valid SAML assertion from legitimate flow; test POST to `/nidp/saml2/sso` with modified/unsigned/replayed assertion; observe session creation
+verify_steps: PASSIVE_GET https://federation.basf.com/nidp/saml2/metadata (captured); AUTH_HELPED — with test account: capture legitimate SAMLResponse via browser devtools; replay to `/nidp/saml2/sso` (POST, SAMLResponse=...); test unsigned assertion; test assertion with altered NameID
+impact: forged SAML assertion → authentication bypass on any SP trusting this IdP; supplier/customer portal ATO; HIGH
+testability: AUTH_HELPED
+
+[HYP] my.basf.com public OAuth client emits refresh_token without PKCE — authz-code interception / refresh-token replay ATO
+class: OATH
+asset: my.basf.com / federation.basf.com
+confidence: 75
+reasoning: SSR boot config confirms public client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (no secret in bundle), code flow with `refresh_token` scope, redirect to `/.auth` (Azure Static Web Apps built-in auth), `acr_values=3IAM/Login/External` (NetIQ NAM external auth), **zero PKCE machinery** in client; federation.basf.com discovery allows `plain` + `S256` PKCE methods — IdP accepts downgraded/plain challenges; redirect_uri oracle tested exact-match (10 variants rejected) so exploitation requires code interception at transport/browser layer, not redirect manipulation
+evidence_needed: capture of authentic authorize request proving absence of `code_challenge` parameter; token response showing `refresh_token` issued with no rotation on reuse
+verify_steps: AUTH_HELPED — with test account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External — record uttered params; exchange code for tokens; verify refresh_token lifetime/rotation on reuse
+impact: Intercepted authz code or stolen refresh_token = full ATO of BASF customer/supplier portal account → order/price/PII access, procurement fraud, supplier impersonation; CRITICAL
+testability: AUTH_HELPED
+
+**STEP 4 — SELF-CRITIQUE**
+[PARKED] federation.basf.com NetIQ OIDC metadata discloses all registered clients + grant types: confidence 48 — below 50 actionable threshold; JSON already captured at both NetIQ paths; requires parsing existing capture, not new probing; dynamic registration endpoint already tested (404)
+[PARKED] www.basf.com country-specific roots embed partner/supplier portal SSO links: confidence 40 — below 50 threshold; 640KB body fully analyzed (Magnolia JSON), no auth/partner/supplier/OAuth links found; only standard corporate footer links (eBusiness, legal, careers); hypothesis not supported by evidence
+[FINAL] 1. my.basf.com public OAuth client emits refresh_token without PKCE — authz-code interception / refresh-token replay ATO (75)
+[FINAL] 2. federation.basf.com ROPC grant enabled on NetIQ NAM — password-grant token acquisition for known usernames (65)
+[FINAL] 3. federation.basf.com SAML2 metadata exposes SSO/SLO endpoints — potential SAML assertion replay or signature validation bypass (55)
+
+**STEP 5 — NEXT ACTION**
+[NEXT] HUMAN: Provide supplier test account or program-issued client cert to demonstrate AUTH_HELPED flow for my.basf.com OAuth client (86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4) — capture authorize request, verify absent code_challenge, exchange code for tokens, confirm refresh_token issuance and non-rotation on reuse
+
+**STEP 6 — LEARNING**
+[LEARN] ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
+[LEARN] ACCEPTED RECON @ federation.basf.com: OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims
+[LEARN] REJECTED MISCONFIG @ federation.basf.com: dynamic client registration at `/nidp/oauth/nam/discovery/registration` returns 404; real endpoint `/nidp/oauth/nam/clients` returns 401
+[LEARN] REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — @ userinfo, %2f%2f, CRLF, port, suffix, dot-segment all rejected; no bypass
+[LEARN] ACCEPTED RECON @ www.basf.com: 640KB Magnolia CMS body fully analyzed — zero partner/supplier OAuth/SSO links
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
+[LEARN] ACCEPTED RECON @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey
+[LEARN] REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+[LEARN] REJECTED MISCONFIG @ api.productinformation.basf.com + api-imp.productinformation.basf.com: 403 ForbiddenException / 400 with pi+core keys — Lambda authorizer denies
+[LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry
+[LEARN] ACCEPTED RECON @ my.basf.com: SSR boot config discloses full OAuth client (86cc4bf9-…, redirect /.auth, refresh_token scope, acr 3IAM/Login/External, code flow, no PKCE)
+
+**STEP 7 — RISK**
+[RISK] basf: 30 — Unauthenticated backend exposure across the full 11-host estate (9 *.api + prod.api + api.commerce + federation + my.basf + www + products + api.basf) now proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere. The only genuine high-severity weakness is the digital-commerce public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE — a design-level flaw whose exploitability requires interactive code capture (AUTH_HELPED), not currently demonstrable passively. Without an authenticated test vector (supplier test account or program-provided client cert), no further unauth progress is possible. Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise on BASF customer/supplier platform).
