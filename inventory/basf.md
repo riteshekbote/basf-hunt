@@ -148,3 +148,14 @@ www.basf.com
 - CHANGED federation.basf.com/nidp/oauth/nam/discovery/registration: HTTP 404 confirmed — NetIQ dynamic client registration not exposed
 
 ## 2026-09-06 14:16:19 UTC
+
+## 2026-09-06 17:13:13 UTC
+- NEW federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
+- NEW federation.basf.com: OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims
+- NEW federation.basf.com: NAM OIDC/SAML/JWKS surface mapped end-to-end via discovery-advertised paths; all administrative endpoints auth-gated
+- CHANGED my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with redirect_uri, scope, refresh_token, zero PKCE refs
+- CHANGED www.basf.com: 640KB Magnolia CMS body fully analyzed — zero partner/supplier OAuth/SSO links
+- CHANGED *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
+- CHANGED prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey
+- CHANGED api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+- CHANGED api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry
