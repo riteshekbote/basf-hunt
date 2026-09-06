@@ -1,21 +1,21 @@
-## 2026-09-06 19:18:59 UTC [target] (model bigpickle)
-[PRIO] my.basf.com / federation.basf.com (OAuth no-PKCE),42,9/3/8/0/6/4 — ATO via refresh_token theft; highest value class; but gate_ease=0 (AUTH_HELPED required, no test creds available)
-[HYP] DigitalCommercePlatform public OAuth client code+refresh_token with no PKCE → authz-code interception / refresh-token replay ATO
+## 2026-09-06 21:30:24 UTC [target] (model bigpickle)
+[NEW] my.basf.com/.auth/config + /.auth/me → HTTP 200 (204926B) = SPA fallback (title `myBASFWorld`, boot config incl. clientId 86cc4bf9) — NOT App Service EasyAuth; the OAuth redirect_uri callback is a pure client-side SPA route; EasyAuth consumer surface closed even on the host where redirect_uri literally points to `/.auth`
+[CHANGED] federation.basf.com discovery reconfirmed unchanged: grant_types still incl. authorization_code/password/hybrid, code_challenge plain+S256, registration_endpoint /nidp/oauth/nam/clients — no provider-side hardening since last sweep
+[PRIO] my.basf.com / federation.basf.com (OAuth no-PKCE ATO),6.5,9/9/8/0/6/2 — highest business value class; gate_ease=0 (NAM login required); public client + client-side code/token handling confirmed at `/.auth`, but demonstration needs interactive session
+[PRIO] products.basf.com (companion SPA API surface),4.1,3/5/6/6/4/2 — same WCMS stack; JS bundle OAuth/api refs not re-grepped since "zero auth HTML" note; low likelihood of portal-grade auth plane
+[HYP] my.basf.com public OAuth client performs code+refresh handling entirely in browser JS with no PKCE — code interception / non-rotating refresh_token replay = ATO
 class: OATH
-asset: federation.basf.com / my.basf.com (client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4)
+asset: my.basf.com / federation.basf.com (client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4)
 confidence: 75
-reasoning: SSR boot config — response_type=code, useRefreshToken=true, refresh_token in scope, zero code_challenge refs; NAM discovery confirms provider allows code_challenge S256 AND plain, and confirms ROPC password/hybrid grants provider-wide; public client (no secret in SPA); redirect_uri exact-match oracle verified clean (10 variants, no bypass), implicit closed (token→unauthorized_client); residual theft plane is code/refresh interception, not redirect manipulation
-evidence_needed: authentic authorize request showing absence of code_challenge + token response refresh_token that does not rotate on reuse (compare JTI/lifetime on repeat use)
-verify_steps: AUTH_HELPED — with sandbox account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth, log uttered params (code_challenge/code_challenge_method); exchange at /nidp/oauth/nam/token (client_secret_post); reuse refresh_token twice and diff JTI/lifetime
-impact: intercepted code or stolen non-rotating refresh_token = full ATO of BASF customer/supplier portal account (orders, pricing, PII); HIGH
+reasoning: SSR boot config response_type=code, useRefreshToken=true, refresh_token scope, zero code_challenge refs (reconfirmed today in /.auth body); NAM discovery allows code_challenge plain+S256; redirect_uri exact-match oracle clean (10 variants); today's delta confirms /.auth is a client-side SPA route, so the SPA itself exchanges code→refresh_token and persists it — public client, no secret, no PKCE
+evidence_needed: authorize request without code_challenge yielding code; exchanged refresh_token that does not rotate on reuse (diff JTI/lifetime)
+verify_steps: AUTH_HELPED — with sandbox account: GET /nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth, capture uttered params; POST /nidp/oauth/nam/token; reuse refresh_token twice; diff JTI/lifetime
+impact: full ATO of BASF customer/supplier portal account (orders, pricing, PII) from stolen code/refresh token; HIGH
 testability: AUTH_HELPED
-[PARKED] NAM IdP ROPC/plain-PKCE exploitation: surface fully gated (401/405/302); ROPC+plain-PKCE require misconfigured REGISTERED client + creds for Password-grant (credential/brute-force = out-of-scope class); no passive verify step
-[PARKED] federation.basf.com redirect_uri bypass: exact-match verified across 10 variants — all rejected; no bypass possible
-[PARKED] *.api.basf.com (9 hosts): full unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
-[FINAL] DigitalCommercePlatform public OAuth client no-PKCE refresh_token — 75 (ranked), AUTH_HELPED, OATH: single surviving high-severity candidate; all other hypotheses passively exhausted
-[NEXT] HUMAN: All passive threads consumed across 11-host estate. Provide sandbox/supplier test account for interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (record whether authorize carries `code_challenge`, and whether the returned `refresh_token` rotates on reuse) — the single requiring-evidence candidate for the [75] no-PKCE refresh_token ATO — or confirmation to report. Report channel bugs.olivermaicher.eu.
-[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
-[LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry
-[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC/SAML/JWKS surface mapped end-to-end via discovery-advertised paths; all administrative endpoints auth-gated — no unauth config/registration/key hole
-[LEARN] REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — all 10 bypass variants rejected; no open redirect or path traversal possible
-[RISK] BASF SE: 30 — 11-host estate fully mapped end-to-end; zero unauth vectors found; sole surviving candidate (no-PKCE refresh_token ATO, confidence 75) is AUTH_HELPED — requires sandbox/supplier test account to demonstrate. No new attack surface discoverable without interactive access.
+[PARKED] products.basf.com JS re-grep: informational-only; zero auth entry already in HTML, no portal-grade plane expected
+[PARKED] EasyAuth surface on my.basf.com: closed (/.auth/* = SPA fallback); nothing to enumerate behind it
+[FINAL] [75] my.basf.com no-PKCE public-client refresh_token ATO — single survivor; evidence accrual (client-side /.auth route) does not change need for interactive proof
+[NEXT] HUMAN: easyauth/SPA-fallback closure was the last passive sub-surface on the 11-host estate (reconfirmed unchanged today). Deliverable stands: sandbox/supplier test account for interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` — record whether authorize carries `code_challenge` and whether refresh_token rotates on reuse — or confirmation to report. Report channel bugs.olivermaicher.eu.
+[LEARN] REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle (204926B, myBASFWorld, clientId 86cc4bf9) — EasyAuth not exposed; `/.auth` is a client-side callback route confirming public-client code handling; no server-side token surface
+[LEARN] ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clients registration 401) — no provider hardening; prior mapping stable
+[RISK] BASF SE: 30 — estate re-verified stable end-to-end after the one previously-unprobed host surface (my.basf.com/.auth) was tested and closed. Sole surviving candidate remains the [75] no-PKCE public-client refresh_token on the NAM identity plane (client-side code/token handling confirmed); exploitability still requires interactive proof. No new unrestricted attack surface across the 11-host estate.
