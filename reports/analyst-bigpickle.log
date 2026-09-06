@@ -4155,3 +4155,2080 @@ STEP 6 — LEARNING
 
 STEP 7 — RISK
 [RISK] BASF SE: 30 — estate re-verified stable end-to-end after the one previously-unprobed host surface (my.basf.com/.auth) was tested and closed. Sole surviving candidate remains the [75] no-PKCE public-client refresh_token on the NAM identity plane (client-side code/token handling confirmed); exploitability still requires interactive proof. No new unrestricted attack surface across the 11-host estate.
+===== ANALYST bigpickle 2026-09-06 23:16:09 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la && echo '---' && ls art/ 2>/dev/null && echo '---' && ls inventory/ 2>/dev/null
+total 232
+drwxr-xr-x 12 runner runner  4096 Sep  6 23:09 .
+drwxr-xr-x  3 runner runner  4096 Sep  6 23:09 ..
+drwxr-xr-x  7 runner runner  4096 Sep  6 23:09 .git
+drwxr-xr-x  3 runner runner  4096 Sep  6 23:09 .github
+-rw-r--r--  1 runner runner  1801 Sep  6 23:09 README.md
+-rw-r--r--  1 runner runner    32 Sep  6 23:09 analyst-out.txt
+-rw-r--r--  1 runner runner 66388 Sep  6 23:09 analyst-prompt.txt
+-rw-r--r--  1 runner runner 62516 Sep  6 23:09 ctx.txt
+drwxr-xr-x  2 runner runner  4096 Sep  6 23:09 inventory
+drwxr-xr-x  2 runner runner  4096 Sep  6 23:09 knowledge
+drwxr-xr-x  2 runner runner  4096 Sep  6 23:09 leads
+-rw-r--r--  1 runner runner 15997 Sep  6 23:09 probe-results.md
+drwxr-xr-x  2 runner runner  4096 Sep  6 23:09 recon-notes
+drwxr-xr-x  2 runner runner  4096 Sep  6 23:09 reports
+drwxr-xr-x  2 runner runner  4096 Sep  6 23:09 reposcan-raw
+-rw-r--r--  1 runner runner  3285 Sep  6 23:09 scope.yml
+drwxr-xr-x  2 runner runner  4096 Sep  6 23:09 scripts
+-rw-r--r--  1 runner runner    33 Sep  6 23:09 state_bigpickle.json
+-rw-r--r--  1 runner runner    33 Sep  6 23:09 state_laguna.json
+-rw-r--r--  1 runner runner    33 Sep  6 23:09 state_ling3.json
+-rw-r--r--  1 runner runner    33 Sep  6 23:09 state_longcat.json
+-rw-r--r--  1 runner runner    33 Sep  6 23:09 state_mimo.json
+-rw-r--r--  1 runner runner    33 Sep  6 23:09 state_nemotron3.json
+drwxr-xr-x  2 runner runner  4096 Sep  6 23:09 triage
+---
+[0m
+[0m$ [0mls art leads knowledge recon-notes reports triage scripts 2>/dev/null; echo '---SCOPE---'; cat scope.yml
+knowledge:
+index.md
+
+leads:
+lead-bigpickle.md
+lead-laguna.md
+lead-ling3.md
+lead-longcat.md
+lead-mimo.md
+lead-nemotron3.md
+reposcan-basf.md
+
+recon-notes:
+DEDICATED-DEEP.md
+DEEPER-FINDINGS.md
+
+reports:
+analyst-bigpickle.log
+analyst-laguna.log
+analyst-ling3.log
+analyst-longcat.log
+analyst-nemotron3.log
+hypotheses-bigpickle.txt
+hypotheses-laguna.txt
+hypotheses-ling3.txt
+hypotheses-longcat.txt
+hypotheses-nemotron3.txt
+hypotheses.md
+valid-bugs.md
+
+scripts:
+sync-issues.py
+
+triage:
+run-2026-09-03-11-40.md
+run-2026-09-03-15-10.md
+run-2026-09-03-18-42.md
+run-2026-09-03-21-29.md
+run-2026-09-03-23-30.md
+run-2026-09-04-01-18.md
+run-2026-09-04-05-59.md
+run-2026-09-04-10-40.md
+run-2026-09-04-14-32.md
+run-2026-09-04-17-45.md
+run-2026-09-04-20-00.md
+run-2026-09-04-22-10.md
+run-2026-09-05-00-07.md
+run-2026-09-05-04-31.md
+run-2026-09-05-08-33.md
+run-2026-09-05-12-01.md
+run-2026-09-05-14-46.md
+run-2026-09-05-16-59.md
+run-2026-09-05-18-48.md
+run-2026-09-05-20-48.md
+run-2026-09-05-22-26.md
+run-2026-09-06-00-12.md
+run-2026-09-06-04-41.md
+run-2026-09-06-09-06.md
+run-2026-09-06-12-54.md
+run-2026-09-06-15-52.md
+run-2026-09-06-17-51.md
+run-2026-09-06-19-42.md
+run-2026-09-06-21-49.md
+---SCOPE---
+programs:
+  basf:
+    name: BASF SE / BASF Group Bug Bounty
+    disclosure_policy: via bugs.olivermaicher.eu (Oliver Maicher private program) - report + PoC + contact + payment
+    assets:
+      - name: "All company-owned infrastructure, corporate IT systems, research and development platforms, customer and supplier portals, APIs, cloud environments, websites, and domains operated by BASF Group and its subsidiaries"
+        priority: In
+    out_of_scope:
+- "Network level Denial of Service attacks"
+      - "Application Denial of Service by locking user accounts"
+      - "Descriptive error messages or headers (e.g. Stack Traces, banner grabbing)"
+      - "Disclosure of known public files or directories (e.g. robots.txt)"
+      - "Outdated software / library versions"
+      - "OPTIONS / TRACE HTTP method enabled"
+      - "CSRF on logout"
+      - "CSRF on forms that are available to anonymous users"
+      - "Cookies that lack HTTP Only or Secure settings for non-sensitive data"
+      - "Self-XSS and issues exploitable only through Self-XSS"
+      - "Reports resulting from automated scanning utilities without additional details or a POC demonstrating a specific exploit"
+      - "Attacks requiring physical access to a user's device"
+      - "Attacks dependent upon social engineering of employees or vendors"
+      - "Username enumeration based on login or forgot password pages"
+      - "Enforcement policies for brute force, rate limiting, or account lockout"
+      - "SSL/TLS best practices"
+      - "SSL attacks such as BEAST, BREACH, Renegotiation attack"
+      - "Clickjacking, without additional details demonstrating a specific exploit"
+      - "Mail configuration issues including SPF, DKIM, DMARC settings"
+      - "Use of a known-vulnerable library without a description of an exploit specific to our implementation"
+      - "Password and account recovery policies"
+      - "Presence of autocomplete functionality in form fields"
+      - "Publicly accessible login panels"
+      - "Lack of email address verification during account registration or account invitation"
+      - "Lack of email address verification password restore"
+      - "Session control during email/password changes"
+      - "Social engineering, physical attacks, and DoS/DDoS testing (per program notes)"
+      - "Exposure of customer/employee/financial/authentication data during testing (per program notes)"
+    github_orgs:
+      - none-configured
+
+rules:
+  passive_first: false          # deep-hunt agent: active probes allowed when scoped
+  max_requests_per_second: 1    # never hammer live infra
+  no_doom: true                 # no DoS/DDoS, no account-lockout attacks
+  account_creation: restricted  # only on test/sandbox assets, never live customer data
+  no_data_modification: true    # no writes/deletes on live customer data
+  no_pre_disclosure: true       # never disclose before program response
+  poc_required: true            # scanner output alone is REJECTED
+  redact_secrets_in_commits: true
+
+models:
+  - { id: opencode/big-pickle, name: bigpickle }
+  - { id: opencode/nemotron-3-ultra-free, name: nemotron3 }
+  - { id: opencode/longcat-2.0-free, name: longcat }
+  - { id: opencode/ling-3.0-flash-free, name: ling3 }
+  - { id: opencode/laguna-s-2.1-free, name: laguna }
+[0m
+[0m$ [0mecho '===lead-bigpickle==='; cat leads/lead-bigpickle.md; echo; echo '===knowledge/index==='; cat knowledge/index.md 2>/dev/null | head -50
+...output truncated...
+
+Full output saved to: /home/runner/.local/share/opencode/tool-output/tool_078fc80d80021MJiQL4jVs4GFq
+
+evidence_needed: auth endpoint URLs (OAuth authorize, SAML SSO, ADFS metadata), client_id/redirect_uri pairs in SPA JS, session cookie names/flags indicating session management quality
+verify_steps: GET https://my.basf.com/ -I (inspect all response headers: Location, Set-Cookie, x-ms-* for Azure AD tenant, X-Powered-By); grep response body for `client_id`, `redirect_uri`, `authorize`, `saml`, `oauth`, `adfs`, `login`; GET https://my.basf.com/saml/metadata; GET https://my.basf.com/adfs/.well-known/openid-configuration; GET https://my.basf.com/oauth2/authorize?response_type=code&client_id=test&redirect_uri=https://evil.com
+impact: OAuth redirect_uri validation bypass or state parameter flaw → full portal account ATO on highest-value BASF customer/supplier platform; HIGH
+testability: PASSIVE_GET
+[HYP] prod.api.basf.com additional unauthenticated/public-key Apigee proxies beyond /productinformation
+class: MISCONFIG
+asset: prod.api.basf.com
+confidence: 55
+reasoning: Gateway 404s (ApplicationNotFound) on 8/9 probes but `/productinformation` returns 401 VerifyAPIKey, proving path-routed proxy deployment on one virtual host (`BASF_secure`); the SPA ships 3 static browser keys (core/csp/navigator prefixes) implying key-only VerifyAPIKey proxies exist somewhere in estate; 401-vs-404 status split is a reliable live-vs-dead proxy oracle
+evidence_needed: any probe path returning unique non-404 (401/200) indicating a deployed proxy; then whether a shipped browser key is accepted and what resource class it gates
+verify_steps: passive→read-only GET sweep of ~25 probable proxy base paths (`/products,/catalog,/search,/user,/order,/cart,/price,/availability,/documents,/mss,/dus,/copilot,/v1/productinformation,/v2/*…`) at 1 rps, noting status split; on any 401/200, retry with each of the 3 discovered x-api-keys; any 200 w/o user token = key-only read access finding
+impact: if a browser-published key opens a key-only proxy → unauthenticated product/commerce data access, IDOR surface on catalog/order/price data; MEDIUM-HIGH
+testability: PASSIVE_GET
+[HYP] api.commerce.basf.com AWS API Gateway stage-prefix switching reaches handler behind MissingAuthenticationToken
+class: AUTH
+asset: api.commerce.basf.com
+confidence: 45
+reasoning: `/copilot` returns 403 `MissingAuthenticationToken` (x-amzn-errortype) = REST API Gateway with staged routes; absent stage prefix makes every path 403; SPA config pairs navigator key `ahWV…` with baseUrl `…/copilot`, so a matching stage + gateway route is expected to accept it
+evidence_needed: a live stage-prefix combination returning non-403/non-400
+verify_steps: read-only GET `/v1/copilot`, `/prod/copilot`, `/dev/copilot`, `/staging/copilot`, `/copilot/v1`, `/api/copilot` with navigator key header at 1 rps; mark first non-403 response
+impact: reachable commerce copilot/handler via public browser key → LLM/business-data surface, possible prompt/IDOR access; MEDIUM if only metadata, HIGH if data
+testability: PASSIVE_GET
+[PARKED] federation.basf.com plain-PKCE OIDC code-flow exploit: confidence 40 — below actionable threshold; requires interactive login to capture authz params; passive discovery already completed (code_challenge_methods_supported: plain, S256); refresh_token scope on public client = high impact if confirmed but no passive verify step exists
+[PARKED] www.basf.com subdomain takeover via dangling CNAME: confidence 30 — 640KB live page suggests active hosting; no evidence of dangling records; low probability on primary corporate domain
+[FINAL] my.basf.com — 52, OATH
+[FINAL] prod.api.basf.com — 55, MISCONFIG
+[FINAL] api.commerce.basf.com — 45, AUTH
+[NEXT] PROBE: read-only GET sweep of ~25 probable proxy base-paths on https://prod.api.basf.com (products, catalog, search, user, order, cart, price, availability, documents, copilot, mss, dus, v2/*) at 1 rps logging only status code; on first non-404 (401/200), apply the 3 discovered browser keys via `x-api-key` header and record result — a 200 key-only hit is the finding
+[PRIO] my.basf.com,7.0,attack_surface=6,business_value=9,tech_exposure=7,gate_ease=6,cloud_surface=3,freshness=10
+[PRIO] www.basf.com,6.9,attack_surface=7,business_value=9,tech_exposure=4,gate_ease=6,cloud_surface=2,freshness=10
+[PRIO] federation.basf.com,5.8,attack_surface=5,business_value=8,tech_exposure=8,gate_ease=3,cloud_surface=5,freshness=10
+[HYP] my.basf.com portal auth-stack discovery revealing OAuth client config / redirect_uri or state flaw → ATO
+class: OATH
+asset: my.basf.com
+confidence: 52
+reasoning: Live 204KB Magnolia+Angular commerce SPA; `.well-known/openid-configuration` 404 — auth stack off-standard path; SSR boot config discloses OIDC client `86cc4bf9-…`, responseType=code, useRefreshToken=true, zero PKCE refs; the remaining in-scope HIGH-VALUE surface with no probes past root
+evidence_needed: client_id/redirect_uri/authorize-endpoint strings in SPA body; alternative OIDC discovery JSON; SAML/ADFS metadata
+verify_steps: GET https://my.basf.com/ -I (headers); grep saved body for `client_id`,`redirect_uri`,`authorize`,`oauth`,`openid-configuration`,`saml`,`adfs`,`token`; GET /auth/./well-known/openid-configuration, /basf/./well-known/openid-configuration, /nidp/./well-known/openid-configuration, /saml/metadata at 1 rps
+impact: redirected/auth-code or state flaw → ATO on BASF customer/supplier portal; HIGH
+testability: PASSIVE_GET
+[HYP] www.basf.com hosts login/portal sub-surfaces exposing OAuth redirects or supplier-registration flows
+class: OATH
+asset: www.basf.com
+confidence: 48
+reasoning: Live 308→/us/en via CloudFront, 640KB corporate estate, SPA config pointed to my.basf.com portal integration; corporate site commonly embeds partner/supplier login links (BASF WorldAccount, Connect) that route to a central IdP; any embedded authz endpoint URL is a passive discovery win for redirect_uri/orchestration testing
+evidence_needed: login/partner-portal URLs, SSO links, embedded OAuth authorize endpoints in the 640KB body
+verify_steps: GET https://www.basf.com/us/en each of top-3 country roots, grep for `login`, `my.basf`, `WorldAccount`, `sso`, `oauth`, `signin`, `/auth/`; resolve found auth endpoints read-only
+impact: discovers additional IdP-facing OAuth surfaces for redirect_uri/state testing; MEDIUM (roadmap to HIGH)
+testability: PASSIVE_GET
+[PARKED] prod.api.basf.com additional proxies: dead — 66 paths 404, only `/productinformation` live, all 4 browser keys rejected (Invalid ApiKey); key-scope exhausted
+[PARKED] api.commerce.basf.com stage-switch: dead — MissingAuthenticationToken on every prefix; route is IAM-gated, x-api-key is not the credential class, no passive bypass
+[PARKED] api.productinformation key-scope: dead — ForbiddenException with pi+core keys; Lambda-authorizer deny, needs IAM/AWS creds
+[PARKED] federation.basf.com plain-PKCE: confidence 40 < threshold; requires interactive login (AUTH_HELPED)
+[FINAL] my.basf.com — 52, OATH
+[FINAL] www.basf.com — 48, OATH
+[NEXT] PROBE: GET https://my.basf.com/ -I (capture full headers), then grep saved 204KB SPA body for `client_id`,`redirect_uri`,`authorize`,`oauth`,`openid-configuration`,`saml`,`adfs`,`token`; then GET the 4 alternative discovery paths (`/auth/.well-known/openid-configuration`, `/basf/.well-known/openid-configuration`, `/nidp/.well-known/openid-configuration`, `/saml/metadata`) at 1 rps, logging status + body-type
+[LEARN] REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy-path probes all 404 except `/productinformation` (401); 4 browser keys (core/pi/csp/navigator) rejected Invalid ApiKey — no additional proxy, key-scope exhausted
+[LEARN] REJECTED AUTH @ api.commerce.basf.com: `/copilot` + 8 stage prefixes all 403 MissingAuthenticationTokenException with navigator key — route IAM/SigV4-gated, x-api-key not credential class, stage-switching irrelevant
+[LEARN] REJECTED MISCONFIG @ api.productinformation.basf.com + api-imp.productinformation.basf.com: 403 ForbiddenException with pi+core keys — Lambda-authorizer/API-GW-policy deny regardless of key
+[LEARN] ACCEPTED RECON @ api-imp.commerce.basf.com: HTTP 400 empty root gate (CloudFront→API GW ingest); no auth oracle; imp-* = import/processing tier
+[RISK] BASF SE: 35 — AWS commerce/productinformation tier uniformly auth-gated (IAM MissingAuthenticationToken / Lambda-authorizer Forbidden), Apigee key-gated with all browser keys rejected; proxy/stage/key enumeration exhausted across all 6 SPA-disclosed backend hosts. Residual risk concentrates on my.basf.com portal auth-stack (off-standard discovery, NetIQ NAM OIDC allowing plain PKCE) and the federation.basf.com OIDC public client with refresh_token (interactive-only). Unauth surface thin; exploit value concentrates in portal OAuth/ATO chain.
+[PRIO] my.basf.com,6.6,attack_surface=6,business_value=9,tech_exposure=7,gate_ease=6,cloud_surface=3,freshness=10
+[PRIO] federation.basf.com,5.9,attack_surface=5,business_value=8,tech_exposure=8,gate_ease=3,cloud_surface=5,freshness=10
+[PRIO] prod.api.basf.com,3.4,attack_surface=3,business_value=9,tech_exposure=5,gate_ease=2,cloud_surface=4,freshness=10
+[HYP] DigitalCommercePlatform public OAuth client uses code+refresh_token flow with NO PKCE → authz-code interception / refresh-token replay
+class: OATH
+asset: federation.basf.com (client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4)
+confidence: 42
+reasoning: Recovered SSR config: responseType=code, scope includes refresh_token, redirectUrl my.basf.com/.auth, customParams only resourceServer+scope — no code_challenge machinery; IdP discovery allows S256 plugin; public client (no secret in bundle); redirect_uri exact-match mitigation verified strong, so exploitation needs code interception at another layer (malware/browser addon/compromised sub-origin), not redirect manipulation
+evidence_needed: capture of an authentic authorize request proving absence of code_challenge + a token-response refresh_token with no rotation
+verify_steps: AUTH_HELPED — with a test account, log in via https://federation.basf.com/nidp/oauth/nam/authz (client_id=86cc4bf9-…, redirect_uri=https://my.basf.com/.auth), record uttered params + refresh_token lifetime/rotation on reuse
+impact: intercepted authz code or stolen refresh_token = full ATO of BASF customer/supplier portal account, order/price/PII access; HIGH
+testability: AUTH_HELPED
+[PARKED] prod.api.basf.com extra proxies / browser-key scope: dead — 66/66 paths 404 except productinformation; 4/4 keys Invalid ApiKey
+[PARKED] api.commerce.basf.com stage-switch: dead — every prefix MissingAuthenticationToken; IAM-gated; x-api-key not credential class
+[PARKED] api.productinformation.basf.com key-scope: dead — ForbiddenException; Lambda-authorizer deny
+[PARKED] federation.basf.com redirect_uri/open-redirect chain: dead — exact-match oracle across 10 variants, no bypass
+[PARKED] www/metrics products deep-hunt: dead — static marketing facade, no IdP entry, login client-side only
+[FINAL] DigitalCommercePlatform OAuth public-client no-PKCE refresh_token — 42, OATH (only survivor; interactive proof required)
+[NEXT] HUMAN: passive estate fully exercised — every backend key/IAM/authorizer-gated, redirect_uri oracle clean, proxy+stage enumeration exhausted across 11 hosts. Request from program operator: (a) a sandbox/supplier test account to run the interactive OIDC code-exchange for client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` and check whether the authorize request carries `code_challenge` and whether the returned `refresh_token` rotates on reuse (the one real high-severity candidate), and/or (b) confirmation to report. Report channel bugs.olivermaicher.eu.
+[LEARN] REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except /productinformation (401); 4 browser keys Invalid ApiKey — no extra proxy, key scope exhausted
+[LEARN] REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+[LEARN] REJECTED MISCONFIG @ api.productinformation.basf.com + api-imp.productinformation.basf.com: 403 ForbiddenException / 400 empty with pi+core keys — authorizer denies
+[LEARN] REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — @ userinfo, %2f%2f, CRLF, port, suffix, dot-segment all rejected; no bypass
+[LEARN] ACCEPTED RECON @ my.basf.com: SSR boot config discloses full OAuth client (86cc4bf9-…, redirect /.auth, refresh_token scope, acr 3IAM/Login/External, code flow, no PKCE)
+[LEARN] ACCEPTED RECON @ federation.basf.com: authorize endpoint live; legit full flow → 302 /nidp/app/login; error pages styled as BASF Authentication Service
+[LEARN] ACCEPTED RECON @ products.basf.com: CloudFront Magnolia SPA (252KB), same WCMS stack, zero auth entry in HTML
+[RISK] BASF SE: 30 — Unauthenticated backend exposure across the full 11-host estate now proven gated (Apigee VerifyAPIKey, AWS IAM/authorizer, NAM OIDC exact-match redirect). The only genuine high-severity weakness is the digital-commerce public OAuth client emitting refresh_token without PKCE — a design-level flaw whose exploitability requires interactive code capture, not currently demonstrable passively. Without an authenticated test vector, no further unauth progress is possible.
+## 2026-09-05 20:48:44 UTC [target] (model bigpickle)
+[HYP] DigitalCommercePlatform public OAuth client code+refresh_token with no PKCE → authz-code interception / refresh-token replay ATO
+class: OATH
+asset: federation.basf.com (client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4)
+confidence: 45
+reasoning: my.basf.com now proven server-side blind (4/4 catch-all SPA → all auth funnels through federation.basf.com); SSR config responseType=code, useRefreshToken=true, zero code_challenge refs; registered allowlist oracle re-confirms exact-match ({my.basf.com, my.basf.com/.auth, my-basf-world.basf.com root}); implicit disabled (response_type=token → unauthorized_client) so fragment-token width is closed; residual vector = code/refresh theft requiring interception layer, not redirect manipulation
+evidence_needed: capture of a genuine authorize request proving absence of code_challenge + a refresh_token that does not rotate on reuse
+verify_steps: AUTH_HELPED — with sandbox account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-…&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth, log uttered params (code_challenge/code_challenge_method), exchange at /nidp/oauth/nam/token, reuse refresh_token twice and compare JTI/lifetime
+impact: intercepted authz code or stolen non-rotating refresh_token = full ATO of BASF customer/supplier portal account, order/price/PII access; HIGH
+testability: AUTH_HELPED
+[NEXT] HUMAN: all passive threads on the OAuth chain now exhausted (portal server-surface blind, redirect oracle exact-match, implicit disabled, allowlist enumerated, dead-host default identified). Request from program operator: (a) a sandbox/supplier test account to run the interactive code-exchange for client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` and record whether authorize carries `code_challenge` and whether `refresh_token` rotates on reuse — the single remaining high-severity candidate; and/or (b) scoped confirmation for the adult-resolving `my-basf-world.basf.com` entry (legacy WorldAccount OAuth redirect host, externally dead). Report channel bugs.olivermaicher.eu.
+## 2026-09-05 22:47:01 UTC [target] (model bigpickle)
+[HYP] NAM IdP exposes unprotected OIDC/SAML admin discovery or registration endpoints leaking client config / JWKS / supported flows
+class: OATH
+asset: federation.basf.com (NetIQ Access Manager provider)
+confidence: 42
+reasoning: provider is NAM (error page styling + `/nidp/app/login` reached); NAM exposes OAuth metadata under `/nidp/oauth/nam/discovery*` and SAML metadata under `/nidp/idp/...` in addition to browser-config `.well-known`; root `.well-known/openid-configuration` returns provider HTML 404 (off-standard path config) so the real discovery surface was never enumerated; only `authz` confirmed live
+evidence_needed: any 200 JSON at discovery/registration/metadata paths, or a body embedding issuer/client-id/jwks/key-id
+verify_steps: at 1 rps: GET /nidp/oauth/nam/discovery/token and /nidp/oauth/nam/discovery/authorize and /nidp/oauth/nam/discovery and /nidp/oauth/nam/clientRegistration and /nidp/idp/saml2/metadata and /nidp/saml2/metadata — log status, Content-Type, first 2KB; then GET /nidp/app/login (200 known) and grep body for `client_id`,`entityID`,`metadata`,`oauth`,`issuer`,`jwks`
+impact: exposed metadata discloses issuer, PKCE mode policy, token/introspection/userinfo endpoints, supported signing/server-assertion — feeds alg-confusion/JWK-confusion and unregistered OAuth client testing; MEDIUM (→ HIGH if registration/keys readable); exploit-only-read, no customer data touched
+testability: PASSIVE
+[NEXT] PROBE: GET https://federation.basf.com/nidp/oauth/nam/discovery/token -k and /nidp/oauth/nam/discovery/authorize and /nidp/oauth/nam/discovery and /nidp/oauth/nam/clientRegistration and /nidp/idp/saml2/metadata and /nidp/saml2/metadata at 1 rps (log status + Content-Type + first 2KB), then GET /nidp/app/login and grep the saved body for `client_id`,`clientId`,`oauth`,`entityID`,`jwks`,`issuer`,`registration`
+## 2026-09-06 00:50:51 UTC [target] (model bigpickle)
+## 2026-09-06 05:50:39 UTC [target] (model bigpickle)
+## 2026-09-06 10:50:38 UTC [target] (model bigpickle)
+[CHANGED] federation.basf.com: NAM OIDC discovery at /nidp/oauth/nam/.well-known/openid-configuration discloses real registration_endpoint /nidp/oauth/nam/clients (401 auth-required — earlier 404 test hit wrong path), jwks_uri /nidp/oauth/nam/keys (200, 1x RS256 kid=1111010011111111, leaf openidsigning.federation.basf.com O=BASF Digital Solutions GmbH, issuer BASF-Federation-RootCA), introspect /nidp/oauth/v1/nam/introspect (405), revoke (405), userinfo (401 invalid_token), end_session (302 /nidp/app/logout)
+[NEW] federation.basf.com/nidp/saml2/metadata -> 200 signed text/xml IdP+SP SAML2 descriptor (21434B): entityID, SSO POST/Redirect /nidp/saml2/sso, SLO /nidp/saml2/slo(+_return), SOAP /nidp/saml2/soap + spsoap, ACS /nidp/saml2/spassertion_consumer; signing cert BASF-Fed_Sign-Enc_SHA256_Default (root BASF-Fed_Sign-Enc_Root) + encryption cert BASF-Fed_Encryption (OU=G-FDI); all SAML endpoints benign on GET (error page / 302 /nidp / SOAP fault)
+[NEW] federation.basf.com OIDC discovery content: grant_types incl password(ROPC)+hybrid, code_challenge_methods plain+S256, scopes urn:netiq.com:nam:scope:oauth:registration:full|read, claims incl '/UserAttribute[@ldap:targetAttribute="groupMembership"]' + basfOTPUsed, id_token alg RS256 only
+[PARKED] federation.basf.com NAM ROPC/plain-PKCE/registration exploitation: surface fully gated (401/405/302); ROPC+plain-PKCE require a misconfigured REGISTERED client + creds for Password-grant (credential/brute-force = out-of-scope class); no passive verify step
+[FINAL] DigitalCommercePlatform public OAuth client no-PKCE refresh_token — 75 (ranked), AUTH_HELPED, OATH: single surviving high-severity candidate; NAM IAM-surface mapping this session adds no unauth vector
+[NEXT] HUMAN: NAM discovery-exposed surface now fully mapped & gated (registration 401, introspect/revoke 405, userinfo 401, keys public, SAML services benign). No unauth vector opened. Still request from program operator: sandbox/supplier account for interactive OIDC code-exchange on client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 — record whether authorize carries code_challenge and whether refresh_token rotates on reuse (the [75] no-PKCE refresh_token ATO proof), or confirmation to report. Report channel bugs.olivermaicher.eu.
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC/SAML/JWKS surface mapped end-to-end via discovery-advertised paths; all administrative endpoints auth-gated (clients 401, introspect/revoke 405, userinfo 401, end_session 302 logout) — no unauth config/registration/key hole
+[LEARN] REJECTED OATH @ federation.basf.com: /nidp/oauth/nam/discovery/* + clientRegistration all 404 — wrong path guess; the NAM registration endpoint is /nidp/oauth/nam/clients (401)
+[LEARN] ACCEPTED RECON @ federation.basf.com: discovery exposes provider config — password(ROPC)+hybrid grants, plain+S256 PKCE, registration:full/read scopes, LDAP groupMembership + basfOTPUsed claims; informational config/attr-name leak only, exploitation needs a misconfigured registered client (out-of-scope class)
+[RISK] BASF SE: 30 — NAM identity plane re-verified fully gated after complete discovery+JWKS+SAML enumeration; deepest remaining exposure unchanged: my.basf.com/federation public OAuth client 86cc4bf9 emits refresh_token without PKCE (provider allows plain PKCE + ROPC provider-wide) — interactive proof still required; no new unauth surface opened anywhere in the 11-host estate
+[HYP] DigitalCommercePlatform public OAuth client `86cc4bf9-…` emits refresh_token with no PKCE → authz-code/refresh-token replay ATO
+class: OATH
+asset: federation.basf.com / my.basf.com (client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4)
+confidence: 75
+reasoning: SSR boot config — response_type=code, useRefreshToken=true, refresh_token in scope, zero code_challenge refs; NAM discovery confirms provider allows code_challenge S256 AND plain, and newly confirms ROPC `password`/`hybrid` grants provider-wide; public client (no secret in SPA); redirect_uri exact-match oracle verified clean (10 variants, no bypass), implicit closed (token→unauthorized_client); residual theft plane is code/refresh interception, not redirect manipulation
+evidence_needed: authentic authorize request showing absence of code_challenge + token response refresh_token that does not rotate on reuse (compare JTI/lifetime on repeat use)
+verify_steps: AUTH_HELPED — with sandbox account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth, log uttered params; exchange at /nidp/oauth/nam/token (client_secret_post), reuse refresh_token twice, diff JTI/lifetime
+impact: intercepted code or stolen non-rotating refresh_token = full ATO of BASF customer/supplier portal account (orders, pricing, PII); HIGH
+testability: AUTH_HELPED
+[NEXT] HUMAN: NAM discovery-exposed OIDC/SAML/JWKS surface fully mapped and gated — no unauth vector opened anywhere in the 11-host estate. Request from program operator: sandbox/supplier test account for the interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (record whether authorize carries `code_challenge`, and whether the returned `refresh_token` rotates on reuse) — the single requiring-evidence candidate for the [75] no-PKCE refresh_token ATO — or confirmation to report. Report channel bugs.olivermaicher.eu.
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery + JWKS + SAML metadata + admin/registration/introspection endpoints mapped end-to-end — clients 401, introspect/revoke 405, userinfo 401, keys 200 public, SAML services benign on GET; no unauth config/registration/key hole
+[LEARN] REJECTED OATH @ federation.basf.com: /nidp/oauth/nam/discovery/* + clientRegistration 404 — wrong-path guesses; real NAM registration endpoint is /nidp/oauth/nam/clients (401)
+[LEARN] ACCEPTED RECON @ federation.basf.com: discovery exposes provider-level config — password(ROPC)+hybrid grants, plain+S256 PKCE, registration:full/read scopes, LDAP groupMembership + basfOTPUsed claims; informational, exploitation needs a misconfigured registered client (out-of-scope class)
+[RISK] BASF SE: 30 — NAM identity plane re-verified fully gated after complete discovery+JWKS+SAML enumeration (registration 401, introspect/revoke 405, userinfo 401, JWKS single RS256). Deepest real exposure unchanged: public OAuth client `86cc4bf9` emitting refresh_token without PKCE, on an IdP that allows plain PKCE+ROPC provider-wide — exploitability still requires interactive proof; no new unauth surface across the 11-host estate.
+## 2026-09-06 14:06:46 UTC [target] (model bigpickle)
+[HYP] DigitalCommercePlatform public OAuth client code+refresh_token with no PKCE → authz-code interception / refresh-token replay ATO
+class: OATH
+asset: federation.basf.com / my.basf.com (client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4)
+confidence: 75
+reasoning: SSR boot config — response_type=code, useRefreshToken=true, refresh_token in scope, zero code_challenge refs; NAM discovery confirms provider allows code_challenge S256 AND plain, and newly confirms ROPC password/hybrid grants provider-wide; public client (no secret in SPA); redirect_uri exact-match oracle verified clean (10 variants, no bypass), implicit closed (token→unauthorized_client); residual theft plane is code/refresh interception, not redirect manipulation
+evidence_needed: authentic authorize request showing absence of code_challenge + token response refresh_token that does not rotate on reuse (compare JTI/lifetime on repeat use)
+verify_steps: AUTH_HELPED — with sandbox account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth, log uttered params (code_challenge/code_challenge_method); exchange at /nidp/oauth/nam/token (client_secret_post); reuse refresh_token twice and diff JTI/lifetime
+impact: intercepted code or stolen non-rotating refresh_token = full ATO of BASF customer/supplier portal account (orders, pricing, PII); HIGH
+testability: AUTH_HELPED
+[PARKED] NAM IdP ROPC/plain-PKCE exploitation: surface fully gated (401/405/302); ROPC+plain-PKCE require misconfigured REGISTERED client + creds for Password-grant (credential/brute-force = out-of-scope class); no passive verify step
+[PARKED] federation.basf.com redirect_uri bypass: exact-match verified across 10 variants (userinfo, %2f%2f, CRLF, port, suffix, dot-segment) — all rejected; no bypass possible
+[PARKED] *.api.basf.com (9 hosts): full unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+[FINAL] DigitalCommercePlatform public OAuth client no-PKCE refresh_token — 75 (ranked), AUTH_HELPED, OATH: single surviving high-severity candidate; all other hypotheses passively exhausted
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC/SAML/JWKS surface mapped end-to-end via discovery-advertised paths; all administrative endpoints auth-gated (clients 401, introspect/revoke 405, userinfo 401, end_session 302 logout) — no unauth config/registration/key hole
+[LEARN] ACCEPTED RECON @ federation.basf.com: discovery exposes provider config — password(ROPC)+hybrid grants, plain+S256 PKCE, registration:full/read scopes, LDAP groupMembership + basfOTPUsed claims; informational config/attr-name leak only, exploitation needs a misconfigured registered client (out-of-scope class)
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery + JWKS + SAML metadata + admin/registration/introspection endpoints mapped end-to-end — clients 401, introspect/revoke 405, userinfo 401, keys 200 public, SAML services benign on GET; no unauth config/registration/key hole
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+[LEARN] REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — all 10 bypass variants rejected; no open redirect or path traversal possible
+[LEARN] REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed
+[LEARN] ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with redirect_uri, scope, refresh_token, zero PKCE refs
+[LEARN] ACCEPTED RECON @ federation.basf.com: authorize endpoint live; legit full flow → 302 /nidp/app/login; error pages styled as BASF Authentication Service; OIDC discovery JSON at two NetIQ paths confirms plain+S256 PKCE
+[LEARN] ACCEPTED RECON @ my.basf.com + products.basf.com: CloudFront Magnolia SPA (252KB/640KB), same WCMS stack, zero auth entry in HTML — no login links or partner portals discoverable
+[LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused on all probes — dead/internal-only DNS entry, zero external attack surface
+[LEARN] REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+[LEARN] REJECTED MISCONFIG @ api.productinformation.basf.com + api-imp.productinformation.basf.com: 403 ForbiddenException / 400 empty with pi+core keys — Lambda authorizer denies
+[LEARN] REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys (core/pi/csp/navigator) rejected Invalid ApiKey — no additional proxy, key scope exhausted
+[RISK] BASF SE: 30
+## 2026-09-06 17:13:02 UTC [target] (model bigpickle)
+[HYP] DigitalCommercePlatform public OAuth client code+refresh_token with no PKCE → authz-code interception / refresh-token replay ATO
+class: OATH
+asset: federation.basf.com / my.basf.com (client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4)
+confidence: 75
+reasoning: SSR boot config — response_type=code, useRefreshToken=true, refresh_token in scope, zero code_challenge refs; NAM discovery confirms provider allows code_challenge S256 AND plain, and confirms ROPC password/hybrid grants provider-wide; public client (no secret in SPA); redirect_uri exact-match oracle verified clean (10 variants, no bypass), implicit closed (token→unauthorized_client); residual theft plane is code/refresh interception, not redirect manipulation
+evidence_needed: authentic authorize request showing absence of code_challenge + token response refresh_token that does not rotate on reuse (compare JTI/lifetime on repeat use)
+verify_steps: AUTH_HELPED — with sandbox account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth, log uttered params (code_challenge/code_challenge_method); exchange at /nidp/oauth/nam/token (client_secret_post); reuse refresh_token twice and diff JTI/lifetime
+impact: intercepted code or stolen non-rotating refresh_token = full ATO of BASF customer/supplier portal account (orders, pricing, PII); HIGH
+testability: AUTH_HELPED
+[PARKED] NAM IdP ROPC/plain-PKCE exploitation: surface fully gated (401/405/302); ROPC+plain-PKCE require misconfigured REGISTERED client + creds for Password-grant (credential/brute-force = out-of-scope class); no passive verify step
+[PARKED] federation.basf.com redirect_uri bypass: exact-match verified across 10 variants — all rejected; no bypass possible
+[PARKED] *.api.basf.com (9 hosts): full unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+[FINAL] DigitalCommercePlatform public OAuth client no-PKCE refresh_token — 75 (ranked), AUTH_HELPED, OATH: single surviving high-severity candidate; all other hypotheses passively exhausted
+[NEXT] HUMAN: NAM discovery-exposed OIDC/SAML/JWKS surface fully mapped & gated — no unauth vector opened anywhere in the 11-host estate. All passive threads consumed. Request from program operator: sandbox/supplier test account for the interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (record whether authorize carries `code_challenge`, and whether the returned `refresh_token` rotates on reuse) — the single requiring-evidence candidate for the [75] no-PKCE refresh_token ATO — or confirmation to report. Report channel bugs.olivermaicher.eu.
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC/SAML/JWKS surface mapped end-to-end via discovery-advertised paths; all administrative endpoints auth-gated (clients 401, introspect/revoke 405, userinfo 401, end_session 302 logout) — no unauth config/registration/key hole
+[LEARN] ACCEPTED RECON @ federation.basf.com: discovery exposes provider config — password(ROPC)+hybrid grants, plain+S256 PKCE, registration:full/read scopes, LDAP groupMembership + basfOTPUsed claims; informational config/attr-name leak only, exploitation needs a misconfigured registered client (out-of-scope class)
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery + JWKS + SAML metadata + admin/registration/introspection endpoints mapped end-to-end — clients 401, introspect/revoke 405, userinfo 401, keys 200 public, SAML services benign on GET; no unauth config/registration/key hole
+[LEARN] REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — all 10 bypass variants rejected; no open redirect or path traversal possible
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
+[LEARN] REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed
+[LEARN] ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with redirect_uri, scope, refresh_token, zero PKCE refs
+[LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry
+[LEARN] REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+[LEARN] REJECTED MISCONFIG @ api.productinformation.basf.com + api-imp.productinformation.basf.com: 403 ForbiddenException / 400 with pi+core keys — Lambda authorizer denies
+[LEARN] REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey — no additional proxy, key scope exhausted
+[RISK] BASF SE: 30 — NAM identity plane re-verified fully gated after complete discovery+JWKS+SAML enumeration (registration 401, introspect/revoke 405, userinfo 401, JWKS single RS256). Deepest real exposure unchanged: public OAuth client `86cc4bf9` emitting refresh_token without PKCE, on an IdP that allows plain PKCE+ROPC provider-wide — exploitability still requires interactive proof; no new unauth surface across the 11-host estate.
+## 2026-09-06 19:18:59 UTC [target] (model bigpickle)
+[PRIO] my.basf.com / federation.basf.com (OAuth no-PKCE),42,9/3/8/0/6/4 — ATO via refresh_token theft; highest value class; but gate_ease=0 (AUTH_HELPED required, no test creds available)
+[HYP] DigitalCommercePlatform public OAuth client code+refresh_token with no PKCE → authz-code interception / refresh-token replay ATO
+class: OATH
+asset: federation.basf.com / my.basf.com (client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4)
+confidence: 75
+reasoning: SSR boot config — response_type=code, useRefreshToken=true, refresh_token in scope, zero code_challenge refs; NAM discovery confirms provider allows code_challenge S256 AND plain, and confirms ROPC password/hybrid grants provider-wide; public client (no secret in SPA); redirect_uri exact-match oracle verified clean (10 variants, no bypass), implicit closed (token→unauthorized_client); residual theft plane is code/refresh interception, not redirect manipulation
+evidence_needed: authentic authorize request showing absence of code_challenge + token response refresh_token that does not rotate on reuse (compare JTI/lifetime on repeat use)
+verify_steps: AUTH_HELPED — with sandbox account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth, log uttered params (code_challenge/code_challenge_method); exchange at /nidp/oauth/nam/token (client_secret_post); reuse refresh_token twice and diff JTI/lifetime
+impact: intercepted code or stolen non-rotating refresh_token = full ATO of BASF customer/supplier portal account (orders, pricing, PII); HIGH
+testability: AUTH_HELPED
+[PARKED] NAM IdP ROPC/plain-PKCE exploitation: surface fully gated (401/405/302); ROPC+plain-PKCE require misconfigured REGISTERED client + creds for Password-grant (credential/brute-force = out-of-scope class); no passive verify step
+[PARKED] federation.basf.com redirect_uri bypass: exact-match verified across 10 variants — all rejected; no bypass possible
+[PARKED] *.api.basf.com (9 hosts): full unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
+[FINAL] DigitalCommercePlatform public OAuth client no-PKCE refresh_token — 75 (ranked), AUTH_HELPED, OATH: single surviving high-severity candidate; all other hypotheses passively exhausted
+[NEXT] HUMAN: All passive threads consumed across 11-host estate. Provide sandbox/supplier test account for interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (record whether authorize carries `code_challenge`, and whether the returned `refresh_token` rotates on reuse) — the single requiring-evidence candidate for the [75] no-PKCE refresh_token ATO — or confirmation to report. Report channel bugs.olivermaicher.eu.
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+[LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC/SAML/JWKS surface mapped end-to-end via discovery-advertised paths; all administrative endpoints auth-gated — no unauth config/registration/key hole
+[LEARN] REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — all 10 bypass variants rejected; no open redirect or path traversal possible
+[RISK] BASF SE: 30 — 11-host estate fully mapped end-to-end; zero unauth vectors found; sole surviving candidate (no-PKCE refresh_token ATO, confidence 75) is AUTH_HELPED — requires sandbox/supplier test account to demonstrate. No new attack surface discoverable without interactive access.
+## 2026-09-06 21:30:24 UTC [target] (model bigpickle)
+[NEW] my.basf.com/.auth/config + /.auth/me → HTTP 200 (204926B) = SPA fallback (title `myBASFWorld`, boot config incl. clientId 86cc4bf9) — NOT App Service EasyAuth; the OAuth redirect_uri callback is a pure client-side SPA route; EasyAuth consumer surface closed even on the host where redirect_uri literally points to `/.auth`
+[CHANGED] federation.basf.com discovery reconfirmed unchanged: grant_types still incl. authorization_code/password/hybrid, code_challenge plain+S256, registration_endpoint /nidp/oauth/nam/clients — no provider-side hardening since last sweep
+[PRIO] my.basf.com / federation.basf.com (OAuth no-PKCE ATO),6.5,9/9/8/0/6/2 — highest business value class; gate_ease=0 (NAM login required); public client + client-side code/token handling confirmed at `/.auth`, but demonstration needs interactive session
+[PRIO] products.basf.com (companion SPA API surface),4.1,3/5/6/6/4/2 — same WCMS stack; JS bundle OAuth/api refs not re-grepped since "zero auth HTML" note; low likelihood of portal-grade auth plane
+[HYP] my.basf.com public OAuth client performs code+refresh handling entirely in browser JS with no PKCE — code interception / non-rotating refresh_token replay = ATO
+class: OATH
+asset: my.basf.com / federation.basf.com (client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4)
+confidence: 75
+reasoning: SSR boot config response_type=code, useRefreshToken=true, refresh_token scope, zero code_challenge refs (reconfirmed today in /.auth body); NAM discovery allows code_challenge plain+S256; redirect_uri exact-match oracle clean (10 variants); today's delta confirms /.auth is a client-side SPA route, so the SPA itself exchanges code→refresh_token and persists it — public client, no secret, no PKCE
+evidence_needed: authorize request without code_challenge yielding code; exchanged refresh_token that does not rotate on reuse (diff JTI/lifetime)
+verify_steps: AUTH_HELPED — with sandbox account: GET /nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth, capture uttered params; POST /nidp/oauth/nam/token; reuse refresh_token twice; diff JTI/lifetime
+impact: full ATO of BASF customer/supplier portal account (orders, pricing, PII) from stolen code/refresh token; HIGH
+testability: AUTH_HELPED
+[PARKED] products.basf.com JS re-grep: informational-only; zero auth entry already in HTML, no portal-grade plane expected
+[PARKED] EasyAuth surface on my.basf.com: closed (/.auth/* = SPA fallback); nothing to enumerate behind it
+[FINAL] [75] my.basf.com no-PKCE public-client refresh_token ATO — single survivor; evidence accrual (client-side /.auth route) does not change need for interactive proof
+[NEXT] HUMAN: easyauth/SPA-fallback closure was the last passive sub-surface on the 11-host estate (reconfirmed unchanged today). Deliverable stands: sandbox/supplier test account for interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` — record whether authorize carries `code_challenge` and whether refresh_token rotates on reuse — or confirmation to report. Report channel bugs.olivermaicher.eu.
+[LEARN] REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle (204926B, myBASFWorld, clientId 86cc4bf9) — EasyAuth not exposed; `/.auth` is a client-side callback route confirming public-client code handling; no server-side token surface
+[LEARN] ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clients registration 401) — no provider hardening; prior mapping stable
+[RISK] BASF SE: 30 — estate re-verified stable end-to-end after the one previously-unprobed host surface (my.basf.com/.auth) was tested and closed. Sole surviving candidate remains the [75] no-PKCE public-client refresh_token on the NAM identity plane (client-side code/token handling confirmed); exploitability still requires interactive proof. No new unrestricted attack surface across the 11-host estate.
+
+===knowledge/index===
+# Knowledge Base (seed)
+- 2026-09-03 REJECTED AUTH @ ap-digitalconnect.api.basf.com: master key leak hypothesis lacks concrete verify step without auth; passive GitHub search is opportunistic not systematic
+- 2026-09-03 REJECTED AUTH @ dev-clientcert-sap.api.basf.com: client cert bypass speculative; no CT evidence BASF uses public CA for mTLS; dev endpoints may be non-production
+- 2026-09-03 ACCEPTED SSRF @ ap-eupf.api.basf.com: Azure Functions HTTP triggers are known SSRF vectors; cloud metadata endpoint confirmed reachable from App Service; concrete param list for testing
+- 2026-09-03 CHANGED AUTH @ ap-digitalconnect.api.basf.com: `/admin/host/keys` returns 404 not 401; admin surface non-standard — shifts key leak hunt to alt paths + passive repo search
+- 2026-09-03 MITIGATED SSRF @ ap-eupf.api.basf.com: common `url` param probes return 403; WAF/edge blocks metadata endpoint; header-based or alternate function triggers remain untested
+- 2026-09-03 ACCEPTED SSRF @ ap-eupf.api.basf.com: Azure Functions confirmed via KB; metadata endpoint reachable from App Service; concrete url param for testing
+- 2026-09-03 REJECTED AUTH @ ap-digitalconnect.api.basf.com: master key leak lacks verify without auth; passive GitHub search not systematic
+- 2026-09-03 REJECTED AUTH @ dev-clientcert-sap.api.basf.com: mTLS bypass speculative; no CT evidence of public CA use
+- 2026-09-03 ACCEPTED AUTH @ ap-digitalconnect.api.basf.com: standard `/admin/host/keys` and `/runtime/webhooks/host/keys` return 401 (not 404); admin surface is standard Azure Functions, auth-gated — shifts key leak hunt to alt paths (`.azurefunctions/keys`, versioned) + passive repo search
+- 2026-09-03 MITIGATED SSRF @ ap-eupf.api.basf.com: common `url` param probes return 403; WAF/edge blocks metadata endpoint; header-based probes (`X-Forwarded-Url`, `X-Callback-Url`) return 200 but headers ignored; no function names resolve at `/api/`; SSRF vector appears mitigated at edge for unauthenticated requests
+- 2026-09-03 REJECTED MISCONFIG @ dev-ext001.api.basf.com: confidence too low for active probe; dev client cert requirement blocks passive disclosure
+- 2026-09-03 ACCEPTED SSRF @ ap-eupf.api.basf.com: Azure Functions confirmed; metadata endpoint reachable from App Service; url param blocked by WAF; header injection remains untested
+- 2026-09-03 REJECTED AUTH @ ap-digitalconnect.api.basf.com/.azurefunctions/keys: returns 404; Azure internal alternate keys path not exposed
+- 2026-09-03 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/v2/keys: returns 404; versioned admin keys path not exposed
+- 2026-09-03 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/list: returns 404; admin list endpoint not exposed
+- 2026-09-03 ACCEPTED RECON @ ap-eupf.api.basf.com/: root returns 200 with 150KB content; indicates active function handler or custom landing page at root
+- 2026-09-03 REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404; common health endpoint not exposed
+- 2026-09-03 MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403; param-based SSRF blocked at edge/WAF for enumerated function names
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/keys?slot=staging: returns 404; deployment slot staging admin keys path not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/keys?slot=production: returns 404; deployment slot production admin keys path not exposed
+- 2026-09-04 ACCEPTED RECON @ ap-eupf.api.basf.com/: root returns 200 with 150KB content (reconfirmed); indicates active function handler or custom landing page at root
+- 2026-09-04 REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404 (reconfirmed); common health endpoint not exposed
+- 2026-09-04 ACCEPTED AUTH @ ap-digitalconnect.api.basf.com: standard `/admin/host/keys` and `/runtime/webhooks/host/keys` return 401 (not 404); admin surface is standard Azure Functions, auth-gated
+- 2026-09-04 MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403 (reconfirmed); param-based SSRF blocked at edge/WAF for enumerated function names
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/systemkeys: returns 404; slot/system keys endpoint not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/functions: returns 404; function list endpoint not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/status: returns 404; host status endpoint not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/systemkeys: returns 404; system keys endpoint not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/functions: returns 404; admin function list not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/status: returns 404; admin host status not exposed
+- 2026-09-04 ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 6 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface fully mapped — no unauthenticated path exists
+- 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; zero probes run; API gateway naming convention warrants documentation path enumeration
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/functionkeys: returns 404; v4 function-level key endpoint not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/system: returns 404; admin system info endpoint not exposed
+- 2026-09-04 ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 8 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface fully mapped — no unauthenticated path exists
+- 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; zero probes run against any sub-paths; API gateway naming convention warrants documentation path enumeration
+- 2026-09-04 MITIGATED SSRF @ e-gate.api.basf.com: all 6 API doc probes return SSL CERTIFICATE_VERIFY_FAILED; host likely mTLS-gated like dev endpoints; SSL error blocks all unauthenticated HTTP probing
+- 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; SSL errors on all sub-paths; mTLS or self-signed cert required; surface inaccessible without client cert
+- 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; 6/6 documentation paths return SSL cert verify failure (not 404) — endpoints exist but TLS misconfigured
+- 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns SSL CERTIFICATE_VERIFY_FAILED at root; 6/6 documentation paths return SSL cert verify failure (not 404) — endpoints exist but TLS misconfigured
+- 2026-09-04 CHANGED RECON @ e-gate.api.basf.com/: root changed from HTTP 404 to SSL CERTIFICATE_VERIFY_FAILED — host is live with TLS misconfiguration (mTLS/self-signed)
+- 2026-09-05 REJECTED MISCONFIG @ e-gate.api.basf.com: not mTLS — handshake succeeds without client cert; cert CN=e-gate.api.basf.com issued by DigiCert Global G2 TLS RSA SHA256 2020 CA1 (O=BASF Digital Solutions GmbH); verify failure was client-side missing intermediate = out-of-scope TLS; 6/6 doc paths + root 404 under -k
+- 2026-09-05 REJECTED MISCONFIG @ ap-eupf.api.basf.com: 150093-byte root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — no `/api/`, fetch(), or function-name refs; no route discovery possible from body
+- 2026-09-05 REJECTED MISCONFIG @ ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: /.auth/config and /.auth/me return 404 — App Service EasyAuth not exposed on either Function App
+- 2026-09-05 REJECTED OTHER @ ap-eupf.api.basf.com: passive artifact/code search for function names and keys returned zero public hits — unverifiable, exhausted
+- 2026-09-05 ACCEPTED RECON @ dev.api.basf.com + dev-m.api.basf.com + dev-sap.api.basf.com: openapi.json/swagger.json/api-docs all 404 — catch-all hosts, no gateway/docs surface
+- 2026-09-05 ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface now mapped end-to-end (2 placeholders auth-gated, 3 mTLS 400, 3 catch-all 404, e-gate 404) — no reachable endpoint, function, key, or config beyond auth gates/404
+- 2026-09-05 ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 8 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface fully mapped — no unauthenticated path exists
+- 2026-09-05 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/functionkeys: returns 404; v4 function-level key endpoint not exposed
+[0m
+[0m$ [0mcat probe-results.md; echo '=====DEEPER-FINDINGS====='; cat recon-notes/DEEPER-FINDINGS.md 2>/dev/null; echo '=====LEAD-NEMOTRON3 (tail)====='; tail -40 leads/lead-nemotron3.md 2>/dev/null
+## 2026-09-03 09:40:45 UTC
+
+
+## 2026-09-03 14:03:05 UTC
+https://ap-digitalconnect.api.basf.com/admin/host/keys -> HTTP 404
+https://dev-clientcert-sap.api.basf.com/ -> HTTP 400
+https://ap-eupf.api.basf.com/api/<function>?url=http://attacker.com -> HTTP 403
+https://ap-eupf.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+
+## 2026-09-03 17:55:37 UTC
+https://ap-digitalconnect.api.basf.com/admin/keys -> HTTP 404
+https://ap-digitalconnect.api.basf.com/runtime/webhooks/host/keys -> HTTP 404
+https://ap-eupf.api.basf.com/api/HttpTrigger1?url=http://attacker.com -> HTTP 403
+https://ap-eupf.api.basf.com/api/HttpTrigger1 -> HTTP 404
+https://dev-clientcert-sap.api.basf.com/ -> HTTP 400
+https://ap-eupf.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+https://ap-digitalconnect.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+https://dev-ext001.api.basf.com/ -> HTTP 400
+
+## 2026-09-03 21:00:34 UTC
+https://ap-digitalconnect.api.basf.com/.azurefunctions/keys -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/v2/keys -> HTTP 404
+https://ap-eupf.api.basf.com/api/<enum>?url=http://attacker.com -> HTTP 403
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://dev-clientcert-sap.api.basf.com/ -> HTTP 400
+https://ap-eupf.api.basf.com/api/health -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/list -> HTTP 404
+https://dev-ext001.api.basf.com/ -> HTTP 400
+
+## 2026-09-03 23:13:36 UTC
+https://ap-digitalconnect.api.basf.com/admin/host/keys?slot=staging -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/host/keys?slot=production -> HTTP 404
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://dev-clientcert-sap.api.basf.com/ -> HTTP 400
+https://ap-eupf.api.basf.com/api/health -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/list -> HTTP 404
+https://dev-ext001.api.basf.com/ -> HTTP 400
+
+## 2026-09-04 01:13:47 UTC
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://ap-digitalconnect.api.basf.com/admin/host/systemkeys -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/functions -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/host/status -> HTTP 404
+
+## 2026-09-04 06:06:04 UTC
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://e-gate.api.basf.com/openapi.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://ap-digitalconnect.api.basf.com/admin/host/functionkeys -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/system -> HTTP 404
+
+## 2026-09-04 11:37:50 UTC
+https://e-gate.api.basf.com/openapi.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/api-docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger/ui -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/.well-known/openapi-schema -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://ap-digitalconnect.api.basf.com/admin/host/functionkeys -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/system -> HTTP 404
+
+## 2026-09-04 15:26:14 UTC
+https://e-gate.api.basf.com/openapi.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://ap-digitalconnect.api.basf.com/admin/host/functionkeys -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/system -> HTTP 404
+
+## 2026-09-04 18:36:18 UTC
+https://e-gate.api.basf.com/openapi.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/api-docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger/ui -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/.well-known/openapi-schema -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://e-gate.api.basf.com/ -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+
+## 2026-09-04 21:06:33 UTC
+https://e-gate.api.basf.com/openapi.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/api-docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger/ui -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/.well-known/openapi-schema -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+
+## 2026-09-04 23:09:10 UTC
+https://e-gate.api.basf.com/openapi.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/api-docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger/ui -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/.well-known/openapi-schema -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+
+## 2026-09-05 01:11:37 UTC
+https://e-gate.api.basf.com/openapi.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/api-docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger/ui -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/.well-known/openapi-schema -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://www.basf.com/ -> 200 len=640003
+https://my.basf.com/ -> 200 len=204926
+https://my.basf.com/` -> 200 len=204936
+https://www.basf.com/` -> 200 len=640003
+
+## 2026-09-05 05:58:51 UTC
+https://my.basf.com/ -> 200 len=204936
+https://my.basf.com/.well-known/openid-configuration -> HTTP 404
+https://api.basf.com/ -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/openapi.json -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/swagger.json -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/docs -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/api-docs -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/developer -> ERR <urlopen error [Errno 111] Connection refused>
+https://www.basf.com/ -> 200 len=640000
+https://prod.api.basf.com -> HTTP 404
+
+## 2026-09-05 10:30:37 UTC
+https://api.basf.com/ -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/openapi.json -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/swagger.json -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/docs -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/api-docs -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/developer -> ERR <urlopen error [Errno 111] Connection refused>
+https://my.basf.com/ -> 200 len=204926
+https://my.basf.com/.well-known/openid-configuration -> HTTP 404
+https://www.basf.com/ -> 200 len=639986
+
+## 2026-09-05 13:34:43 UTC
+https://api.basf.com/ -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/openapi.json -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/swagger.json -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/docs -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/api-docs -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/developer -> ERR <urlopen error [Errno 111] Connection refused>
+https://my.basf.com/ -> 200 len=204926
+https://my.basf.com/.well-known/openid-configuration -> HTTP 404
+https://www.basf.com/ -> 200 len=639993
+https://my.basf.com/saml/metadata -> 200 len=204926
+https://my.basf.com/adfs/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/oauth2/authorize?response_type=code&client_id=test&redirect_uri=https://evil.com -> 200 len=204926
+
+## 2026-09-05 16:26:31 UTC
+https://my.basf.com/ -> 200 len=204926
+https://my.basf.com/auth/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/basf/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/nidp/.well-known/openid-configuration -> 200 len=204926
+https://federation.basf.com/.well-known/openid-configuration -> 200 len=14920
+https://prod.api.basf.com/products -> HTTP 404
+https://prod.api.basf.com/catalog -> HTTP 404
+https://prod.api.basf.com/search -> HTTP 404
+https://prod.api.basf.com/user -> HTTP 404
+https://prod.api.basf.com/order -> HTTP 404
+https://prod.api.basf.com/cart -> HTTP 404
+https://prod.api.basf.com/price -> HTTP 404
+
+## 2026-09-05 18:46:19 UTC
+https://my.basf.com/ -> 200 len=204936
+https://my.basf.com/saml/metadata -> 200 len=204926
+https://my.basf.com/adfs/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/oauth2/authorize?response_type=code&client_id=test&redirect_uri=https://evil.com -> 200 len=204936
+https://prod.api.basf.com -> HTTP 404
+https://www.basf.com/us/en -> 200 len=639943
+https://federation.basf.com/nidp/oauth/nam/authz -> HTTP 400
+https://my.basf.com/.auth -> 200 len=205013
+
+## 2026-09-05 20:53:00 UTC
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://www.basf.com/us/en -> 200 len=639979
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration -> 200 len=2029
+https://federation.basf.com/.well-known/oauth-authorization-server -> 200 len=14920
+https://my.basf.com/ -> 200 len=204926
+https://my.basf.com/auth/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/basf/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/nidp/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/saml/metadata -> 200 len=204926
+https://my.basf.com/.auth -> 200 len=205013
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-…&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth -> ERR 'ascii' codec can't encode character '\u2026' in p
+
+## 2026-09-05 22:49:13 UTC
+https://my.basf.com/.auth` -> 200 len=204936
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://www.basf.com/us/en -> 200 len=639988
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration -> 200 len=2029
+https://federation.basf.com/.well-known/oauth-authorization-server -> 200 len=14920
+https://my.basf.com/ -> 200 len=204926
+https://my.basf.com/auth/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/basf/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/nidp/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/saml/metadata -> 200 len=204926
+https://my.basf.com/.auth -> 200 len=205023
+
+## 2026-09-06 00:56:48 UTC
+https://my.basf.com/.auth` -> 200 len=204936
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://www.basf.com/us/en -> 200 len=640035
+https://federation.basf.com/nidp/oauth/nam/discovery/registration -> HTTP 404
+
+## 2026-09-06 05:50:55 UTC
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/oauth/nam/discovery/registration -> HTTP 404
+
+## 2026-09-06 10:59:08 UTC
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/oauth/nam/discovery/registration -> HTTP 404
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth -> 200 len=4950
+
+## 2026-09-06 14:16:29 UTC
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://federation.basf.com/nidp/saml2/metadata -> 200 len=?
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth -> 200 len=4950
+
+## 2026-09-06 17:13:23 UTC
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://federation.basf.com/nidp/saml2/metadata -> 200 len=?
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth -> 200 len=4950
+
+## 2026-09-06 19:22:51 UTC
+https://my.basf.com/.auth` -> 200 len=204936
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://federation.basf.com/nidp/saml2/metadata -> 200 len=?
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth -> 200 len=4950
+
+## 2026-09-06 21:31:36 UTC
+https://my.basf.com/.auth` -> 200 len=204926
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://www.basf.com/us/en -> 200 len=639999
+=====DEEPER-FINDINGS=====
+# Deeper findings — session 2026-09-03
+
+_Generated 2026-09-03 | read-only passive enumeration | no active testing_
+
+## 1. alfaview — OpenAPI spec exposed (HIGH VALUE)
+
+**Location:** `https://apis.alfaview.com/v2/docs/openapi.yaml` (159KB)
+**Discovery:** Stoplight Elements UI at `https://apis.alfaview.com/docs` loads the spec via `apiDescriptionUrl="/v2/docs/openapi.yaml"`.
+
+### Endpoints (35+)
+
+**Authentication:**
+- `/v2/auth/api-key` — API key auth (companyId + clientId + key)
+- `/v2/auth/password` — Password auth
+- `/v2/auth/group-link` — Guest auth via group link (accessKey)
+- `/v2/auth/guest-link` — Guest auth via guest link
+- `/v2/auth/token-info` — Token introspection
+
+**Rooms & Meetings:**
+- `/v2/rooms` — List rooms
+- `/v2/rooms/{id}` — Get room
+- `/v2/rooms/{roomId}/participants` — List participants
+- `/v2/rooms/{roomId}/permissions` — Room permissions
+- `/v2/rooms/{roomId}/permissions/{userId}` — Per-user permissions (IDOR potential)
+- `/v2/rooms/{roomId}/passcode` — Room passcode
+- `/v2/rooms/{roomId}/features` — Room features
+- `/v2/rooms/{roomId}/group-links` / `guest-links` — Guest access management
+- `/v2/rooms/{roomId}/file-share-settings` / `file-share-limits`
+- `/v2/rooms/{roomId}/subrooms` — Subroom management
+- `/v2/meetings` — List/Create meetings
+- `/v2/meetings/{id}` — Get/Update meeting
+- `/v2/meetings/{id}/cancellation` — Cancel meeting
+
+**Users & Admin:**
+- `/v2/users` — List users
+- `/v2/users/{id}` — Get user
+- `/v2/users/me` — Current user
+- `/v2/users/invitation` — Invite user
+- `/v2/permission-groups` — Permission groups
+- `/v2/room-types` — Room types
+- `/v2/stats` — Statistics
+- `/v2/languages` — Available languages
+
+### Auth model
+- API keys: `companyId` + `clientId` + `key` (in request body)
+- Bearer tokens: base64-encoded `accessToken` in `Authorization` header
+- Guest access: `accessKey` from group-link or guest-link
+
+### Attack-relevant observations
+- `/v2/rooms/{roomId}/permissions/{userId}` — classic IDOR pattern (room ID + user ID in path)
+- Guest auth via `accessKey` — if keys are predictable/brute-forceable, guest impersonation possible
+- `/v2/users/invitation` — user invitation endpoint (potential user enumeration or abuse)
+- `/v2/stats` — statistics endpoint (potential info disclosure)
+- `/v2/rooms/{roomId}/passcode` — passcode management (potential bypass)
+
+### Additional alfaview observations
+- All hosts behind `edge-proxy` (reverse proxy fingerprint)
+- CSP on `app.alfaview.com` allows `omega-lectures.com` as frame-ancestor (third-party integration)
+- No X-Frame-Options on ANY alfaview host (potential clickjacking, mitigated by CSP frame-ancestors on app)
+- `internal.alfaview.com` and `beta-app.alfaview.com` use HTTP Basic auth
+
+---
+
+## 2. BASF — Azure Function Apps exposed (MEDIUM VALUE)
+
+**Hosts:** `ap-digitalconnect.api.basf.com`, `ap-eupf.api.basf.com`
+**Fingerprint:** Azure Function Apps (default page: "Your Azure Function App is up and running")
+
+### Exposed admin endpoints
+- `/admin/functions` → 401 (Bearer auth required)
+- `/admin/host/status` → 401 (Bearer auth required)
+- `/admin/host/keys` → 401 (Bearer auth required)
+- `/.env` → 403 (exists, blocked)
+
+### Attack surface
+- Azure Functions admin API requires function master key or system key
+- If key is weak/default/leaked, full admin access to Function App
+- Common Azure Functions key patterns: `<hex>-<hex>`, default keys in `host.json`
+- Dev endpoints (`dev-clientcert-sap`, `dev-ext001`) require client certificates (400)
+
+---
+
+## 3. daimlertruck — Lockdown confirmed (NO UNAUTH FINDING)
+
+- APIM gateways: all paths return `OperationNotFound` (no unauth surface)
+- Developer portals: Next.js, login-gated (307 → callbackUrl)
+- Authz services: empty 404 at root
+- Management/capacitor hosts: unreachable (NAT64/IPv6 only)
+
+**Honest assessment: surface is properly locked down against unauthenticated attackers.**
+
+---
+
+## 4. betpanda — Vite SPA with affiliate portal
+
+- `affiliates.betpanda.io` — Vite-built SPA (main.1ae50aab.js)
+- Cloudflare-fronted
+- No API routes found in JS bundle
+- Standard affiliate portal structure
+
+---
+
+## 5. elringklinger — Third-party integrations
+
+- `go.events.elringklinger.com` — 302 redirect (event management platform)
+- `ir.elringklinger.com` — Apache, investor relations page
+
+---
+
+## 6. avatarux — Atlassian + cPanel
+
+- `help.desk.avatarux.com` — Atlassian Edge (Jira/Confluence help desk)
+- `autoconfig.avatarux.com` — Apache autoconfig
+- `cpanel.avatarux.com` — cPanel (if accessible)
+
+---
+
+_Honest framing: all observations from read-only passive enumeration. No vulnerability claimed. Scope must be confirmed before active testing on any of these live production assets._
+# Deeper finding re-verification — 2026-09-03
+
+_Appended to DEEPER-FINDINGS.md | read-only re-check, no active testing_
+
+## Re-verification results
+
+### alfaview API — all endpoints auth-gated (CONFIRMED, no unauth vuln)
+
+Live checks against `https://apis.alfaview.com`:
+- `/v2/languages` → 401 "No access token was provided in the Authorization header."
+- `/v2/room-types` → 401 (same)
+- `/v2/users/me` → 401 (same)
+- `/v2/rooms` → 401 (same)
+- `/v2/auth/token-info` → 422 "invalid access token format" — **endpoint works and validates token format**; could act as an oracle distinguishing valid vs malformed tokens, but no unauth info disclosure
+- `/v2/stats` → 422 "validation failed" (requires query params)
+
+**Conclusion:** The alfaview API is properly auth-gated. No unauthenticated vulnerability. The exposed OpenAPI spec is a **roadmap for authenticated testing** — the IDOR-shaped operations (`/v2/rooms/{roomId}/permissions/{userId}`, `DELETE /v2/users/{id}`, `/v2/users/invitation`) only become testable with a valid access token obtained via one of the 4 auth methods.
+
+### Auth model (documented in spec, verified structure)
+- All requests require `Authorization: Bearer <base64 accessToken>`
+- Tokens valid for 1 hour
+- Auth methods: API-key (companyId+clientId+key), password (username+password), group-link (companyId+roomId+accessKey), guest-link (companyId+accessKey)
+- Group/guest-link auth accepts only a companyId + roomId + accessKey — **potential guest-auth brute force IF access keys are low-entropy**, but companyId+roomId are long random IDs raising the bar. Not exploitable without scope-authorized testing.
+
+### BASF Azure Functions — admin API exposed, Bearer-auth-gated (CONFIRMED)
+- `/admin/host/status` → 401 with `WWW-Authenticate: Bearer`
+- `/admin/functions` → 401 Bearer
+- `/admin/host/keys` → 401 Bearer
+- `/.env` → 403 (blocked)
+- Requires Azure Functions master/system key. No default/weak key confirmed (no auth testing done). This is a legitimate **documented-observation**: the admin endpoints are reachable but properly key-authenticated.
+
+### daimlertruck developer portal — login-gated (CONFIRMED still)
+- `developer.eu.api.daimlertruck.com/api` → 307 to `/?callbackUrl=%2Fapi` (login gate intact)
+
+## Overall honest conclusion
+
+Each deeper dig confirmed the same reality: **the 6 live targets are all auth-gated at the application/API layer.** The genuinely valuable output of this session:
+
+1. **alfaview OpenAPI spec** (159KB, 60 operations) recovered and stored — the single highest-value artifact; enables targeted authenticated testing later.
+2. **BASF Azure Functions admin surface** documented — reachable admin API requiring keys.
+3. Honest negative results recorded for daimlertruck and the 22 subdomain-thin targets.
+
+No unauthenticated compromise was achieved, and per triage discipline **no vulnerability is claimed.** The path to real findings is **authenticated testing on alfaview** (obtain a legitimate developer account + written scope confirmation).
+=====LEAD-NEMOTRON3 (tail)=====
+class: OATH
+asset: my.basf.com / federation.basf.com
+confidence: 75
+reasoning: SSR boot config confirms public client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (no secret in bundle), code flow with `refresh_token` scope, redirect to `/.auth` (Azure Static Web Apps built-in auth), `acr_values=3IAM/Login/External` (NetIQ NAM external auth), **zero PKCE machinery** in client; federation.basf.com discovery allows `plain` + `S256` PKCE methods — IdP accepts downgraded/plain challenges; redirect_uri oracle tested exact-match (10 variants rejected) so exploitation requires code interception at transport/browser layer, not redirect manipulation
+evidence_needed: capture of authentic authorize request proving absence of `code_challenge` parameter; token response showing `refresh_token` issued with no rotation on reuse
+verify_steps: AUTH_HELPED — with test account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External — record uttered params; exchange code for tokens; verify refresh_token lifetime/rotation on reuse
+impact: Intercepted authz code or stolen refresh_token = full ATO of BASF customer/supplier portal account → order/price/PII access, procurement fraud, supplier impersonation; CRITICAL
+testability: AUTH_HELPED
+[HYP] federation.basf.com ROPC grant enabled on NetIQ NAM — password-grant token acquisition for known usernames
+class: AUTH
+asset: federation.basf.com/nidp/oauth/nam/token
+confidence: 65
+reasoning: OIDC discovery at `/nidp/.well-known/openid-configuration` and `/nidp/oauth/nam/.well-known/openid-configuration` explicitly lists `password` in `grant_types_supported`; NetIQ NAM allows ROPC for registered confidential clients; public SPA client `86cc4bf9-…` has no secret but other registered clients may be confidential; ROPC + valid credentials = direct access/refresh tokens without user interaction
+evidence_needed: valid username/password for a test account + client_id/client_secret of a confidential registered client; token response showing access_token + refresh_token issued via password grant
+verify_steps: PASSIVE_GET https://federation.basf.com/nidp/.well-known/openid-configuration (already captured, parse grant_types); AUTH_HELPED POST https://federation.basf.com/nidp/oauth/nam/token with grant_type=password&username=<test>&password=<test>&client_id=<confidential_client>&client_secret=<secret> — observe token issuance
+impact: credential-stuffing or leaked creds → full token set (access+refresh) for any user; bypasses MFA/acr_values; CRITICAL if confidential client credentials leak
+testability: AUTH_HELPED
+[HYP] www.basf.com Magnolia CMS partner/supplier portal entry undiscovered in analyzed HTML
+class: MISCONFIG
+asset: www.basf.com
+confidence: 40
+reasoning: 640KB Magnolia CMS body fully analyzed — zero partner/supplier OAuth/SSO links in HTML/JSON (checked footer eBusiness page, stage carousel, main nav); however, Magnolia often serves personalized content via SSR/AJAX after auth; unauthenticated crawl may miss protected portal entry points rendered only for authenticated sessions or specific geo/IP segments
+evidence_needed: discovery of login/partner/supplier portal link in authenticated session, or JS-rendered navigation not present in static HTML
+verify_steps: PASSIVE_GET https://www.basf.com/us/en with varied Accept-Language, Geo-IP headers; inspect all `<a>` hrefs, JS navigation bundles, and XHR endpoints for `/partner`, `/supplier`, `/login`, `/portal`, `/b2b` patterns; check for `data-auth`, `data-role` attributes gating portal links
+impact: undiscovered high-value portal entry enabling OAuth/IDOR/ATO chains on supplier/customer flows; HIGH if portal exists
+testability: PASSIVE
+[PARKED] www.basf.com Magnolia CMS partner/supplier portal entry undiscovered in analyzed HTML: confidence 40 < threshold; unauthenticated crawl already exhaustive on static HTML; any portal link would require authenticated session or geo-specific rendering — no passive verify step possible without test account
+[FINAL] 1. my.basf.com public OAuth client emits refresh_token without PKCE — authz-code interception / refresh-token replay ATO (75)
+[FINAL] 2. federation.basf.com ROPC grant enabled on NetIQ NAM — password-grant token acquisition for known usernames (65)
+[NEXT] HUMAN: Provide supplier test account or program-issued client cert to demonstrate AUTH_HELPED flow for my.basf.com OAuth client (86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4) — capture authorize request, verify absent code_challenge, exchange code for tokens, confirm refresh_token issuance and non-rotation on reuse
+[LEARN] REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint `/nidp/oauth/nam/clients` returns 401
+[LEARN] ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
+[LEARN] ACCEPTED RECON @ federation.basf.com: OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims
+[LEARN] REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — all 10 bypass variants rejected; no open redirect or path traversal possible
+[LEARN] ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with redirect_uri, scope, refresh_token, acr_values, zero PKCE refs
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
+[LEARN] REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey — no additional proxy, key scope exhausted
+[LEARN] REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+[LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry
+[RISK] basf: 30 — Unauthenticated backend exposure across the full 11-host estate (9 *.api + prod.api + api.commerce + federation + my.basf + www + products + api.basf) now proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere. The only genuine high-severity weakness is the digital-commerce public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE — a design-level flaw whose exploitability requires interactive code capture (AUTH_HELPED), not currently demonstrable passively. Without an authenticated test vector (supplier test account or program-provided client cert), no further unauth progress is possible. Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise on BASF customer/supplier platform).
+[0m
+[0m$ [0mcat analyst-out.txt; echo '---'; cat state_bigpickle.json; echo; echo '---valid-bugs---'; cat reports/valid-bugs.md 2>/dev/null; echo; echo '---hypotheses tail---'; tail -25 reports/hypotheses-bigpickle.txt 2>/dev/null
+...output truncated...
+
+Full output saved to: /home/runner/.local/share/opencode/tool-output/tool_078fcf4b70014001CWqN2mQljF
+
+[NEXT] HUMAN: NAM discovery-exposed OIDC/SAML/JWKS surface fully mapped & gated — no unauth vector opened anywhere in the 11-host estate. All passive threads consumed. Request from program operator: sandbox/supplier test account for the interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (record whether authorize carries `code_challenge`, and whether the returned `refresh_token` rotates on reuse) — the single requiring-evidence candidate for the [75] no-PKCE refresh_token ATO — or confirmation to report. Report channel bugs.olivermaicher.eu.
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC/SAML/JWKS surface mapped end-to-end via discovery-advertised paths; all administrative endpoints auth-gated (clients 401, introspect/revoke 405, userinfo 401, end_session 302 logout) — no unauth config/registration/key hole
+[LEARN] ACCEPTED RECON @ federation.basf.com: discovery exposes provider config — password(ROPC)+hybrid grants, plain+S256 PKCE, registration:full/read scopes, LDAP groupMembership + basfOTPUsed claims; informational config/attr-name leak only, exploitation needs a misconfigured registered client (out-of-scope class)
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery + JWKS + SAML metadata + admin/registration/introspection endpoints mapped end-to-end — clients 401, introspect/revoke 405, userinfo 401, keys 200 public, SAML services benign on GET; no unauth config/registration/key hole
+[LEARN] REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — all 10 bypass variants rejected; no open redirect or path traversal possible
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
+[LEARN] REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed
+[LEARN] ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with redirect_uri, scope, refresh_token, zero PKCE refs
+[LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry
+[LEARN] REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+[LEARN] REJECTED MISCONFIG @ api.productinformation.basf.com + api-imp.productinformation.basf.com: 403 ForbiddenException / 400 with pi+core keys — Lambda authorizer denies
+[LEARN] REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey — no additional proxy, key scope exhausted
+[RISK] BASF SE: 30 — NAM identity plane re-verified fully gated after complete discovery+JWKS+SAML enumeration (registration 401, introspect/revoke 405, userinfo 401, JWKS single RS256). Deepest real exposure unchanged: public OAuth client `86cc4bf9` emitting refresh_token without PKCE, on an IdP that allows plain PKCE+ROPC provider-wide — exploitability still requires interactive proof; no new unauth surface across the 11-host estate.
+## 2026-09-06 19:18:59 UTC [target] (model bigpickle)
+[PRIO] my.basf.com / federation.basf.com (OAuth no-PKCE),42,9/3/8/0/6/4 — ATO via refresh_token theft; highest value class; but gate_ease=0 (AUTH_HELPED required, no test creds available)
+[HYP] DigitalCommercePlatform public OAuth client code+refresh_token with no PKCE → authz-code interception / refresh-token replay ATO
+class: OATH
+asset: federation.basf.com / my.basf.com (client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4)
+confidence: 75
+reasoning: SSR boot config — response_type=code, useRefreshToken=true, refresh_token in scope, zero code_challenge refs; NAM discovery confirms provider allows code_challenge S256 AND plain, and confirms ROPC password/hybrid grants provider-wide; public client (no secret in SPA); redirect_uri exact-match oracle verified clean (10 variants, no bypass), implicit closed (token→unauthorized_client); residual theft plane is code/refresh interception, not redirect manipulation
+evidence_needed: authentic authorize request showing absence of code_challenge + token response refresh_token that does not rotate on reuse (compare JTI/lifetime on repeat use)
+verify_steps: AUTH_HELPED — with sandbox account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth, log uttered params (code_challenge/code_challenge_method); exchange at /nidp/oauth/nam/token (client_secret_post); reuse refresh_token twice and diff JTI/lifetime
+impact: intercepted code or stolen non-rotating refresh_token = full ATO of BASF customer/supplier portal account (orders, pricing, PII); HIGH
+testability: AUTH_HELPED
+[PARKED] NAM IdP ROPC/plain-PKCE exploitation: surface fully gated (401/405/302); ROPC+plain-PKCE require misconfigured REGISTERED client + creds for Password-grant (credential/brute-force = out-of-scope class); no passive verify step
+[PARKED] federation.basf.com redirect_uri bypass: exact-match verified across 10 variants — all rejected; no bypass possible
+[PARKED] *.api.basf.com (9 hosts): full unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
+[FINAL] DigitalCommercePlatform public OAuth client no-PKCE refresh_token — 75 (ranked), AUTH_HELPED, OATH: single surviving high-severity candidate; all other hypotheses passively exhausted
+[NEXT] HUMAN: All passive threads consumed across 11-host estate. Provide sandbox/supplier test account for interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (record whether authorize carries `code_challenge`, and whether the returned `refresh_token` rotates on reuse) — the single requiring-evidence candidate for the [75] no-PKCE refresh_token ATO — or confirmation to report. Report channel bugs.olivermaicher.eu.
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+[LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC/SAML/JWKS surface mapped end-to-end via discovery-advertised paths; all administrative endpoints auth-gated — no unauth config/registration/key hole
+[LEARN] REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — all 10 bypass variants rejected; no open redirect or path traversal possible
+[RISK] BASF SE: 30 — 11-host estate fully mapped end-to-end; zero unauth vectors found; sole surviving candidate (no-PKCE refresh_token ATO, confidence 75) is AUTH_HELPED — requires sandbox/supplier test account to demonstrate. No new attack surface discoverable without interactive access.
+## 2026-09-06 21:30:24 UTC [target] (model bigpickle)
+[NEW] my.basf.com/.auth/config + /.auth/me → HTTP 200 (204926B) = SPA fallback (title `myBASFWorld`, boot config incl. clientId 86cc4bf9) — NOT App Service EasyAuth; the OAuth redirect_uri callback is a pure client-side SPA route; EasyAuth consumer surface closed even on the host where redirect_uri literally points to `/.auth`
+[CHANGED] federation.basf.com discovery reconfirmed unchanged: grant_types still incl. authorization_code/password/hybrid, code_challenge plain+S256, registration_endpoint /nidp/oauth/nam/clients — no provider-side hardening since last sweep
+[PRIO] my.basf.com / federation.basf.com (OAuth no-PKCE ATO),6.5,9/9/8/0/6/2 — highest business value class; gate_ease=0 (NAM login required); public client + client-side code/token handling confirmed at `/.auth`, but demonstration needs interactive session
+[PRIO] products.basf.com (companion SPA API surface),4.1,3/5/6/6/4/2 — same WCMS stack; JS bundle OAuth/api refs not re-grepped since "zero auth HTML" note; low likelihood of portal-grade auth plane
+[HYP] my.basf.com public OAuth client performs code+refresh handling entirely in browser JS with no PKCE — code interception / non-rotating refresh_token replay = ATO
+class: OATH
+asset: my.basf.com / federation.basf.com (client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4)
+confidence: 75
+reasoning: SSR boot config response_type=code, useRefreshToken=true, refresh_token scope, zero code_challenge refs (reconfirmed today in /.auth body); NAM discovery allows code_challenge plain+S256; redirect_uri exact-match oracle clean (10 variants); today's delta confirms /.auth is a client-side SPA route, so the SPA itself exchanges code→refresh_token and persists it — public client, no secret, no PKCE
+evidence_needed: authorize request without code_challenge yielding code; exchanged refresh_token that does not rotate on reuse (diff JTI/lifetime)
+verify_steps: AUTH_HELPED — with sandbox account: GET /nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth, capture uttered params; POST /nidp/oauth/nam/token; reuse refresh_token twice; diff JTI/lifetime
+impact: full ATO of BASF customer/supplier portal account (orders, pricing, PII) from stolen code/refresh token; HIGH
+testability: AUTH_HELPED
+[PARKED] products.basf.com JS re-grep: informational-only; zero auth entry already in HTML, no portal-grade plane expected
+[PARKED] EasyAuth surface on my.basf.com: closed (/.auth/* = SPA fallback); nothing to enumerate behind it
+[FINAL] [75] my.basf.com no-PKCE public-client refresh_token ATO — single survivor; evidence accrual (client-side /.auth route) does not change need for interactive proof
+[NEXT] HUMAN: easyauth/SPA-fallback closure was the last passive sub-surface on the 11-host estate (reconfirmed unchanged today). Deliverable stands: sandbox/supplier test account for interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` — record whether authorize carries `code_challenge` and whether refresh_token rotates on reuse — or confirmation to report. Report channel bugs.olivermaicher.eu.
+[LEARN] REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle (204926B, myBASFWorld, clientId 86cc4bf9) — EasyAuth not exposed; `/.auth` is a client-side callback route confirming public-client code handling; no server-side token surface
+[LEARN] ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clients registration 401) — no provider hardening; prior mapping stable
+[RISK] BASF SE: 30 — estate re-verified stable end-to-end after the one previously-unprobed host surface (my.basf.com/.auth) was tested and closed. Sole surviving candidate remains the [75] no-PKCE public-client refresh_token on the NAM identity plane (client-side code/token handling confirmed); exploitability still requires interactive proof. No new unrestricted attack surface across the 11-host estate.
+
+===knowledge/index===
+# Knowledge Base (seed)
+- 2026-09-03 REJECTED AUTH @ ap-digitalconnect.api.basf.com: master key leak hypothesis lacks concrete verify step without auth; passive GitHub search is opportunistic not systematic
+- 2026-09-03 REJECTED AUTH @ dev-clientcert-sap.api.basf.com: client cert bypass speculative; no CT evidence BASF uses public CA for mTLS; dev endpoints may be non-production
+- 2026-09-03 ACCEPTED SSRF @ ap-eupf.api.basf.com: Azure Functions HTTP triggers are known SSRF vectors; cloud metadata endpoint confirmed reachable from App Service; concrete param list for testing
+- 2026-09-03 CHANGED AUTH @ ap-digitalconnect.api.basf.com: `/admin/host/keys` returns 404 not 401; admin surface non-standard — shifts key leak hunt to alt paths + passive repo search
+- 2026-09-03 MITIGATED SSRF @ ap-eupf.api.basf.com: common `url` param probes return 403; WAF/edge blocks metadata endpoint; header-based or alternate function triggers remain untested
+- 2026-09-03 ACCEPTED SSRF @ ap-eupf.api.basf.com: Azure Functions confirmed via KB; metadata endpoint reachable from App Service; concrete url param for testing
+- 2026-09-03 REJECTED AUTH @ ap-digitalconnect.api.basf.com: master key leak lacks verify without auth; passive GitHub search not systematic
+- 2026-09-03 REJECTED AUTH @ dev-clientcert-sap.api.basf.com: mTLS bypass speculative; no CT evidence of public CA use
+- 2026-09-03 ACCEPTED AUTH @ ap-digitalconnect.api.basf.com: standard `/admin/host/keys` and `/runtime/webhooks/host/keys` return 401 (not 404); admin surface is standard Azure Functions, auth-gated — shifts key leak hunt to alt paths (`.azurefunctions/keys`, versioned) + passive repo search
+- 2026-09-03 MITIGATED SSRF @ ap-eupf.api.basf.com: common `url` param probes return 403; WAF/edge blocks metadata endpoint; header-based probes (`X-Forwarded-Url`, `X-Callback-Url`) return 200 but headers ignored; no function names resolve at `/api/`; SSRF vector appears mitigated at edge for unauthenticated requests
+- 2026-09-03 REJECTED MISCONFIG @ dev-ext001.api.basf.com: confidence too low for active probe; dev client cert requirement blocks passive disclosure
+- 2026-09-03 ACCEPTED SSRF @ ap-eupf.api.basf.com: Azure Functions confirmed; metadata endpoint reachable from App Service; url param blocked by WAF; header injection remains untested
+- 2026-09-03 REJECTED AUTH @ ap-digitalconnect.api.basf.com/.azurefunctions/keys: returns 404; Azure internal alternate keys path not exposed
+- 2026-09-03 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/v2/keys: returns 404; versioned admin keys path not exposed
+- 2026-09-03 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/list: returns 404; admin list endpoint not exposed
+- 2026-09-03 ACCEPTED RECON @ ap-eupf.api.basf.com/: root returns 200 with 150KB content; indicates active function handler or custom landing page at root
+- 2026-09-03 REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404; common health endpoint not exposed
+- 2026-09-03 MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403; param-based SSRF blocked at edge/WAF for enumerated function names
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/keys?slot=staging: returns 404; deployment slot staging admin keys path not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/keys?slot=production: returns 404; deployment slot production admin keys path not exposed
+- 2026-09-04 ACCEPTED RECON @ ap-eupf.api.basf.com/: root returns 200 with 150KB content (reconfirmed); indicates active function handler or custom landing page at root
+- 2026-09-04 REJECTED SSRF @ ap-eupf.api.basf.com/api/health: returns 404 (reconfirmed); common health endpoint not exposed
+- 2026-09-04 ACCEPTED AUTH @ ap-digitalconnect.api.basf.com: standard `/admin/host/keys` and `/runtime/webhooks/host/keys` return 401 (not 404); admin surface is standard Azure Functions, auth-gated
+- 2026-09-04 MITIGATED SSRF @ ap-eupf.api.basf.com/api/<enum>?url=: returns 403 (reconfirmed); param-based SSRF blocked at edge/WAF for enumerated function names
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/systemkeys: returns 404; slot/system keys endpoint not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/functions: returns 404; function list endpoint not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/status: returns 404; host status endpoint not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/systemkeys: returns 404; system keys endpoint not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/functions: returns 404; admin function list not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/status: returns 404; admin host status not exposed
+- 2026-09-04 ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 6 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface fully mapped — no unauthenticated path exists
+- 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; zero probes run; API gateway naming convention warrants documentation path enumeration
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/functionkeys: returns 404; v4 function-level key endpoint not exposed
+- 2026-09-04 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/system: returns 404; admin system info endpoint not exposed
+- 2026-09-04 ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 8 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface fully mapped — no unauthenticated path exists
+- 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; zero probes run against any sub-paths; API gateway naming convention warrants documentation path enumeration
+- 2026-09-04 MITIGATED SSRF @ e-gate.api.basf.com: all 6 API doc probes return SSL CERTIFICATE_VERIFY_FAILED; host likely mTLS-gated like dev endpoints; SSL error blocks all unauthenticated HTTP probing
+- 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; SSL errors on all sub-paths; mTLS or self-signed cert required; surface inaccessible without client cert
+- 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns 404 at root; 6/6 documentation paths return SSL cert verify failure (not 404) — endpoints exist but TLS misconfigured
+- 2026-09-04 ACCEPTED RECON @ e-gate.api.basf.com: host returns SSL CERTIFICATE_VERIFY_FAILED at root; 6/6 documentation paths return SSL cert verify failure (not 404) — endpoints exist but TLS misconfigured
+- 2026-09-04 CHANGED RECON @ e-gate.api.basf.com/: root changed from HTTP 404 to SSL CERTIFICATE_VERIFY_FAILED — host is live with TLS misconfiguration (mTLS/self-signed)
+- 2026-09-05 REJECTED MISCONFIG @ e-gate.api.basf.com: not mTLS — handshake succeeds without client cert; cert CN=e-gate.api.basf.com issued by DigiCert Global G2 TLS RSA SHA256 2020 CA1 (O=BASF Digital Solutions GmbH); verify failure was client-side missing intermediate = out-of-scope TLS; 6/6 doc paths + root 404 under -k
+- 2026-09-05 REJECTED MISCONFIG @ ap-eupf.api.basf.com: 150093-byte root is stock Azure Functions 3.0 placeholder (azureLogo, aspnetcdn jQuery, go.microsoft.com) — no `/api/`, fetch(), or function-name refs; no route discovery possible from body
+- 2026-09-05 REJECTED MISCONFIG @ ap-eupf.api.basf.com + ap-digitalconnect.api.basf.com: /.auth/config and /.auth/me return 404 — App Service EasyAuth not exposed on either Function App
+- 2026-09-05 REJECTED OTHER @ ap-eupf.api.basf.com: passive artifact/code search for function names and keys returned zero public hits — unverifiable, exhausted
+- 2026-09-05 ACCEPTED RECON @ dev.api.basf.com + dev-m.api.basf.com + dev-sap.api.basf.com: openapi.json/swagger.json/api-docs all 404 — catch-all hosts, no gateway/docs surface
+- 2026-09-05 ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface now mapped end-to-end (2 placeholders auth-gated, 3 mTLS 400, 3 catch-all 404, e-gate 404) — no reachable endpoint, function, key, or config beyond auth gates/404
+- 2026-09-05 ACCEPTED RECON @ ap-digitalconnect.api.basf.com: all 8 standard Azure Functions admin endpoints tested (401 on auth-gated, 404 on non-existent); admin surface fully mapped — no unauthenticated path exists
+- 2026-09-05 REJECTED AUTH @ ap-digitalconnect.api.basf.com/admin/host/functionkeys: returns 404; v4 function-level key endpoint not exposed
+[0m
+[0m$ [0mcat probe-results.md; echo '=====DEEPER-FINDINGS====='; cat recon-notes/DEEPER-FINDINGS.md 2>/dev/null; echo '=====LEAD-NEMOTRON3 (tail)====='; tail -40 leads/lead-nemotron3.md 2>/dev/null
+## 2026-09-03 09:40:45 UTC
+
+
+## 2026-09-03 14:03:05 UTC
+https://ap-digitalconnect.api.basf.com/admin/host/keys -> HTTP 404
+https://dev-clientcert-sap.api.basf.com/ -> HTTP 400
+https://ap-eupf.api.basf.com/api/<function>?url=http://attacker.com -> HTTP 403
+https://ap-eupf.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+
+## 2026-09-03 17:55:37 UTC
+https://ap-digitalconnect.api.basf.com/admin/keys -> HTTP 404
+https://ap-digitalconnect.api.basf.com/runtime/webhooks/host/keys -> HTTP 404
+https://ap-eupf.api.basf.com/api/HttpTrigger1?url=http://attacker.com -> HTTP 403
+https://ap-eupf.api.basf.com/api/HttpTrigger1 -> HTTP 404
+https://dev-clientcert-sap.api.basf.com/ -> HTTP 400
+https://ap-eupf.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+https://ap-digitalconnect.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+https://dev-ext001.api.basf.com/ -> HTTP 400
+
+## 2026-09-03 21:00:34 UTC
+https://ap-digitalconnect.api.basf.com/.azurefunctions/keys -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/v2/keys -> HTTP 404
+https://ap-eupf.api.basf.com/api/<enum>?url=http://attacker.com -> HTTP 403
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://dev-clientcert-sap.api.basf.com/ -> HTTP 400
+https://ap-eupf.api.basf.com/api/health -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/list -> HTTP 404
+https://dev-ext001.api.basf.com/ -> HTTP 400
+
+## 2026-09-03 23:13:36 UTC
+https://ap-digitalconnect.api.basf.com/admin/host/keys?slot=staging -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/host/keys?slot=production -> HTTP 404
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://dev-clientcert-sap.api.basf.com/ -> HTTP 400
+https://ap-eupf.api.basf.com/api/health -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/list -> HTTP 404
+https://dev-ext001.api.basf.com/ -> HTTP 400
+
+## 2026-09-04 01:13:47 UTC
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://ap-digitalconnect.api.basf.com/admin/host/systemkeys -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/functions -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/host/status -> HTTP 404
+
+## 2026-09-04 06:06:04 UTC
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://e-gate.api.basf.com/openapi.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://ap-digitalconnect.api.basf.com/admin/host/functionkeys -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/system -> HTTP 404
+
+## 2026-09-04 11:37:50 UTC
+https://e-gate.api.basf.com/openapi.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/api-docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger/ui -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/.well-known/openapi-schema -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://ap-digitalconnect.api.basf.com/admin/host/functionkeys -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/system -> HTTP 404
+
+## 2026-09-04 15:26:14 UTC
+https://e-gate.api.basf.com/openapi.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://ap-digitalconnect.api.basf.com/admin/host/functionkeys -> HTTP 404
+https://ap-digitalconnect.api.basf.com/admin/system -> HTTP 404
+
+## 2026-09-04 18:36:18 UTC
+https://e-gate.api.basf.com/openapi.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/api-docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger/ui -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/.well-known/openapi-schema -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://e-gate.api.basf.com/ -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+
+## 2026-09-04 21:06:33 UTC
+https://e-gate.api.basf.com/openapi.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/api-docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger/ui -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/.well-known/openapi-schema -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+
+## 2026-09-04 23:09:10 UTC
+https://e-gate.api.basf.com/openapi.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/api-docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger/ui -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/.well-known/openapi-schema -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+
+## 2026-09-05 01:11:37 UTC
+https://e-gate.api.basf.com/openapi.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger.json -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/api-docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/docs -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/swagger/ui -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://e-gate.api.basf.com/.well-known/openapi-schema -> ERR <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] ce
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://www.basf.com/ -> 200 len=640003
+https://my.basf.com/ -> 200 len=204926
+https://my.basf.com/` -> 200 len=204936
+https://www.basf.com/` -> 200 len=640003
+
+## 2026-09-05 05:58:51 UTC
+https://my.basf.com/ -> 200 len=204936
+https://my.basf.com/.well-known/openid-configuration -> HTTP 404
+https://api.basf.com/ -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/openapi.json -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/swagger.json -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/docs -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/api-docs -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/developer -> ERR <urlopen error [Errno 111] Connection refused>
+https://www.basf.com/ -> 200 len=640000
+https://prod.api.basf.com -> HTTP 404
+
+## 2026-09-05 10:30:37 UTC
+https://api.basf.com/ -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/openapi.json -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/swagger.json -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/docs -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/api-docs -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/developer -> ERR <urlopen error [Errno 111] Connection refused>
+https://my.basf.com/ -> 200 len=204926
+https://my.basf.com/.well-known/openid-configuration -> HTTP 404
+https://www.basf.com/ -> 200 len=639986
+
+## 2026-09-05 13:34:43 UTC
+https://api.basf.com/ -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/openapi.json -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/swagger.json -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/docs -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/api-docs -> ERR <urlopen error [Errno 111] Connection refused>
+https://api.basf.com/developer -> ERR <urlopen error [Errno 111] Connection refused>
+https://my.basf.com/ -> 200 len=204926
+https://my.basf.com/.well-known/openid-configuration -> HTTP 404
+https://www.basf.com/ -> 200 len=639993
+https://my.basf.com/saml/metadata -> 200 len=204926
+https://my.basf.com/adfs/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/oauth2/authorize?response_type=code&client_id=test&redirect_uri=https://evil.com -> 200 len=204926
+
+## 2026-09-05 16:26:31 UTC
+https://my.basf.com/ -> 200 len=204926
+https://my.basf.com/auth/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/basf/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/nidp/.well-known/openid-configuration -> 200 len=204926
+https://federation.basf.com/.well-known/openid-configuration -> 200 len=14920
+https://prod.api.basf.com/products -> HTTP 404
+https://prod.api.basf.com/catalog -> HTTP 404
+https://prod.api.basf.com/search -> HTTP 404
+https://prod.api.basf.com/user -> HTTP 404
+https://prod.api.basf.com/order -> HTTP 404
+https://prod.api.basf.com/cart -> HTTP 404
+https://prod.api.basf.com/price -> HTTP 404
+
+## 2026-09-05 18:46:19 UTC
+https://my.basf.com/ -> 200 len=204936
+https://my.basf.com/saml/metadata -> 200 len=204926
+https://my.basf.com/adfs/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/oauth2/authorize?response_type=code&client_id=test&redirect_uri=https://evil.com -> 200 len=204936
+https://prod.api.basf.com -> HTTP 404
+https://www.basf.com/us/en -> 200 len=639943
+https://federation.basf.com/nidp/oauth/nam/authz -> HTTP 400
+https://my.basf.com/.auth -> 200 len=205013
+
+## 2026-09-05 20:53:00 UTC
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://www.basf.com/us/en -> 200 len=639979
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration -> 200 len=2029
+https://federation.basf.com/.well-known/oauth-authorization-server -> 200 len=14920
+https://my.basf.com/ -> 200 len=204926
+https://my.basf.com/auth/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/basf/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/nidp/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/saml/metadata -> 200 len=204926
+https://my.basf.com/.auth -> 200 len=205013
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-…&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth -> ERR 'ascii' codec can't encode character '\u2026' in p
+
+## 2026-09-05 22:49:13 UTC
+https://my.basf.com/.auth` -> 200 len=204936
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://www.basf.com/us/en -> 200 len=639988
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration -> 200 len=2029
+https://federation.basf.com/.well-known/oauth-authorization-server -> 200 len=14920
+https://my.basf.com/ -> 200 len=204926
+https://my.basf.com/auth/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/basf/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/nidp/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/saml/metadata -> 200 len=204926
+https://my.basf.com/.auth -> 200 len=205023
+
+## 2026-09-06 00:56:48 UTC
+https://my.basf.com/.auth` -> 200 len=204936
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://www.basf.com/us/en -> 200 len=640035
+https://federation.basf.com/nidp/oauth/nam/discovery/registration -> HTTP 404
+
+## 2026-09-06 05:50:55 UTC
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/oauth/nam/discovery/registration -> HTTP 404
+
+## 2026-09-06 10:59:08 UTC
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/oauth/nam/discovery/registration -> HTTP 404
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth -> 200 len=4950
+
+## 2026-09-06 14:16:29 UTC
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://federation.basf.com/nidp/saml2/metadata -> 200 len=?
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth -> 200 len=4950
+
+## 2026-09-06 17:13:23 UTC
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://federation.basf.com/nidp/saml2/metadata -> 200 len=?
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth -> 200 len=4950
+
+## 2026-09-06 19:22:51 UTC
+https://my.basf.com/.auth` -> 200 len=204936
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://federation.basf.com/nidp/saml2/metadata -> 200 len=?
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth -> 200 len=4950
+
+## 2026-09-06 21:31:36 UTC
+https://my.basf.com/.auth` -> 200 len=204926
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://www.basf.com/us/en -> 200 len=639999
+=====DEEPER-FINDINGS=====
+# Deeper findings — session 2026-09-03
+
+_Generated 2026-09-03 | read-only passive enumeration | no active testing_
+
+## 1. alfaview — OpenAPI spec exposed (HIGH VALUE)
+
+**Location:** `https://apis.alfaview.com/v2/docs/openapi.yaml` (159KB)
+**Discovery:** Stoplight Elements UI at `https://apis.alfaview.com/docs` loads the spec via `apiDescriptionUrl="/v2/docs/openapi.yaml"`.
+
+### Endpoints (35+)
+
+**Authentication:**
+- `/v2/auth/api-key` — API key auth (companyId + clientId + key)
+- `/v2/auth/password` — Password auth
+- `/v2/auth/group-link` — Guest auth via group link (accessKey)
+- `/v2/auth/guest-link` — Guest auth via guest link
+- `/v2/auth/token-info` — Token introspection
+
+**Rooms & Meetings:**
+- `/v2/rooms` — List rooms
+- `/v2/rooms/{id}` — Get room
+- `/v2/rooms/{roomId}/participants` — List participants
+- `/v2/rooms/{roomId}/permissions` — Room permissions
+- `/v2/rooms/{roomId}/permissions/{userId}` — Per-user permissions (IDOR potential)
+- `/v2/rooms/{roomId}/passcode` — Room passcode
+- `/v2/rooms/{roomId}/features` — Room features
+- `/v2/rooms/{roomId}/group-links` / `guest-links` — Guest access management
+- `/v2/rooms/{roomId}/file-share-settings` / `file-share-limits`
+- `/v2/rooms/{roomId}/subrooms` — Subroom management
+- `/v2/meetings` — List/Create meetings
+- `/v2/meetings/{id}` — Get/Update meeting
+- `/v2/meetings/{id}/cancellation` — Cancel meeting
+
+**Users & Admin:**
+- `/v2/users` — List users
+- `/v2/users/{id}` — Get user
+- `/v2/users/me` — Current user
+- `/v2/users/invitation` — Invite user
+- `/v2/permission-groups` — Permission groups
+- `/v2/room-types` — Room types
+- `/v2/stats` — Statistics
+- `/v2/languages` — Available languages
+
+### Auth model
+- API keys: `companyId` + `clientId` + `key` (in request body)
+- Bearer tokens: base64-encoded `accessToken` in `Authorization` header
+- Guest access: `accessKey` from group-link or guest-link
+
+### Attack-relevant observations
+- `/v2/rooms/{roomId}/permissions/{userId}` — classic IDOR pattern (room ID + user ID in path)
+- Guest auth via `accessKey` — if keys are predictable/brute-forceable, guest impersonation possible
+- `/v2/users/invitation` — user invitation endpoint (potential user enumeration or abuse)
+- `/v2/stats` — statistics endpoint (potential info disclosure)
+- `/v2/rooms/{roomId}/passcode` — passcode management (potential bypass)
+
+### Additional alfaview observations
+- All hosts behind `edge-proxy` (reverse proxy fingerprint)
+- CSP on `app.alfaview.com` allows `omega-lectures.com` as frame-ancestor (third-party integration)
+- No X-Frame-Options on ANY alfaview host (potential clickjacking, mitigated by CSP frame-ancestors on app)
+- `internal.alfaview.com` and `beta-app.alfaview.com` use HTTP Basic auth
+
+---
+
+## 2. BASF — Azure Function Apps exposed (MEDIUM VALUE)
+
+**Hosts:** `ap-digitalconnect.api.basf.com`, `ap-eupf.api.basf.com`
+**Fingerprint:** Azure Function Apps (default page: "Your Azure Function App is up and running")
+
+### Exposed admin endpoints
+- `/admin/functions` → 401 (Bearer auth required)
+- `/admin/host/status` → 401 (Bearer auth required)
+- `/admin/host/keys` → 401 (Bearer auth required)
+- `/.env` → 403 (exists, blocked)
+
+### Attack surface
+- Azure Functions admin API requires function master key or system key
+- If key is weak/default/leaked, full admin access to Function App
+- Common Azure Functions key patterns: `<hex>-<hex>`, default keys in `host.json`
+- Dev endpoints (`dev-clientcert-sap`, `dev-ext001`) require client certificates (400)
+
+---
+
+## 3. daimlertruck — Lockdown confirmed (NO UNAUTH FINDING)
+
+- APIM gateways: all paths return `OperationNotFound` (no unauth surface)
+- Developer portals: Next.js, login-gated (307 → callbackUrl)
+- Authz services: empty 404 at root
+- Management/capacitor hosts: unreachable (NAT64/IPv6 only)
+
+**Honest assessment: surface is properly locked down against unauthenticated attackers.**
+
+---
+
+## 4. betpanda — Vite SPA with affiliate portal
+
+- `affiliates.betpanda.io` — Vite-built SPA (main.1ae50aab.js)
+- Cloudflare-fronted
+- No API routes found in JS bundle
+- Standard affiliate portal structure
+
+---
+
+## 5. elringklinger — Third-party integrations
+
+- `go.events.elringklinger.com` — 302 redirect (event management platform)
+- `ir.elringklinger.com` — Apache, investor relations page
+
+---
+
+## 6. avatarux — Atlassian + cPanel
+
+- `help.desk.avatarux.com` — Atlassian Edge (Jira/Confluence help desk)
+- `autoconfig.avatarux.com` — Apache autoconfig
+- `cpanel.avatarux.com` — cPanel (if accessible)
+
+---
+
+_Honest framing: all observations from read-only passive enumeration. No vulnerability claimed. Scope must be confirmed before active testing on any of these live production assets._
+# Deeper finding re-verification — 2026-09-03
+
+_Appended to DEEPER-FINDINGS.md | read-only re-check, no active testing_
+
+## Re-verification results
+
+### alfaview API — all endpoints auth-gated (CONFIRMED, no unauth vuln)
+
+Live checks against `https://apis.alfaview.com`:
+- `/v2/languages` → 401 "No access token was provided in the Authorization header."
+- `/v2/room-types` → 401 (same)
+- `/v2/users/me` → 401 (same)
+- `/v2/rooms` → 401 (same)
+- `/v2/auth/token-info` → 422 "invalid access token format" — **endpoint works and validates token format**; could act as an oracle distinguishing valid vs malformed tokens, but no unauth info disclosure
+- `/v2/stats` → 422 "validation failed" (requires query params)
+
+**Conclusion:** The alfaview API is properly auth-gated. No unauthenticated vulnerability. The exposed OpenAPI spec is a **roadmap for authenticated testing** — the IDOR-shaped operations (`/v2/rooms/{roomId}/permissions/{userId}`, `DELETE /v2/users/{id}`, `/v2/users/invitation`) only become testable with a valid access token obtained via one of the 4 auth methods.
+
+### Auth model (documented in spec, verified structure)
+- All requests require `Authorization: Bearer <base64 accessToken>`
+- Tokens valid for 1 hour
+- Auth methods: API-key (companyId+clientId+key), password (username+password), group-link (companyId+roomId+accessKey), guest-link (companyId+accessKey)
+- Group/guest-link auth accepts only a companyId + roomId + accessKey — **potential guest-auth brute force IF access keys are low-entropy**, but companyId+roomId are long random IDs raising the bar. Not exploitable without scope-authorized testing.
+
+### BASF Azure Functions — admin API exposed, Bearer-auth-gated (CONFIRMED)
+- `/admin/host/status` → 401 with `WWW-Authenticate: Bearer`
+- `/admin/functions` → 401 Bearer
+- `/admin/host/keys` → 401 Bearer
+- `/.env` → 403 (blocked)
+- Requires Azure Functions master/system key. No default/weak key confirmed (no auth testing done). This is a legitimate **documented-observation**: the admin endpoints are reachable but properly key-authenticated.
+
+### daimlertruck developer portal — login-gated (CONFIRMED still)
+- `developer.eu.api.daimlertruck.com/api` → 307 to `/?callbackUrl=%2Fapi` (login gate intact)
+
+## Overall honest conclusion
+
+Each deeper dig confirmed the same reality: **the 6 live targets are all auth-gated at the application/API layer.** The genuinely valuable output of this session:
+
+1. **alfaview OpenAPI spec** (159KB, 60 operations) recovered and stored — the single highest-value artifact; enables targeted authenticated testing later.
+2. **BASF Azure Functions admin surface** documented — reachable admin API requiring keys.
+3. Honest negative results recorded for daimlertruck and the 22 subdomain-thin targets.
+
+No unauthenticated compromise was achieved, and per triage discipline **no vulnerability is claimed.** The path to real findings is **authenticated testing on alfaview** (obtain a legitimate developer account + written scope confirmation).
+=====LEAD-NEMOTRON3 (tail)=====
+class: OATH
+asset: my.basf.com / federation.basf.com
+confidence: 75
+reasoning: SSR boot config confirms public client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (no secret in bundle), code flow with `refresh_token` scope, redirect to `/.auth` (Azure Static Web Apps built-in auth), `acr_values=3IAM/Login/External` (NetIQ NAM external auth), **zero PKCE machinery** in client; federation.basf.com discovery allows `plain` + `S256` PKCE methods — IdP accepts downgraded/plain challenges; redirect_uri oracle tested exact-match (10 variants rejected) so exploitation requires code interception at transport/browser layer, not redirect manipulation
+evidence_needed: capture of authentic authorize request proving absence of `code_challenge` parameter; token response showing `refresh_token` issued with no rotation on reuse
+verify_steps: AUTH_HELPED — with test account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External — record uttered params; exchange code for tokens; verify refresh_token lifetime/rotation on reuse
+impact: Intercepted authz code or stolen refresh_token = full ATO of BASF customer/supplier portal account → order/price/PII access, procurement fraud, supplier impersonation; CRITICAL
+testability: AUTH_HELPED
+[HYP] federation.basf.com ROPC grant enabled on NetIQ NAM — password-grant token acquisition for known usernames
+class: AUTH
+asset: federation.basf.com/nidp/oauth/nam/token
+confidence: 65
+reasoning: OIDC discovery at `/nidp/.well-known/openid-configuration` and `/nidp/oauth/nam/.well-known/openid-configuration` explicitly lists `password` in `grant_types_supported`; NetIQ NAM allows ROPC for registered confidential clients; public SPA client `86cc4bf9-…` has no secret but other registered clients may be confidential; ROPC + valid credentials = direct access/refresh tokens without user interaction
+evidence_needed: valid username/password for a test account + client_id/client_secret of a confidential registered client; token response showing access_token + refresh_token issued via password grant
+verify_steps: PASSIVE_GET https://federation.basf.com/nidp/.well-known/openid-configuration (already captured, parse grant_types); AUTH_HELPED POST https://federation.basf.com/nidp/oauth/nam/token with grant_type=password&username=<test>&password=<test>&client_id=<confidential_client>&client_secret=<secret> — observe token issuance
+impact: credential-stuffing or leaked creds → full token set (access+refresh) for any user; bypasses MFA/acr_values; CRITICAL if confidential client credentials leak
+testability: AUTH_HELPED
+[HYP] www.basf.com Magnolia CMS partner/supplier portal entry undiscovered in analyzed HTML
+class: MISCONFIG
+asset: www.basf.com
+confidence: 40
+reasoning: 640KB Magnolia CMS body fully analyzed — zero partner/supplier OAuth/SSO links in HTML/JSON (checked footer eBusiness page, stage carousel, main nav); however, Magnolia often serves personalized content via SSR/AJAX after auth; unauthenticated crawl may miss protected portal entry points rendered only for authenticated sessions or specific geo/IP segments
+evidence_needed: discovery of login/partner/supplier portal link in authenticated session, or JS-rendered navigation not present in static HTML
+verify_steps: PASSIVE_GET https://www.basf.com/us/en with varied Accept-Language, Geo-IP headers; inspect all `<a>` hrefs, JS navigation bundles, and XHR endpoints for `/partner`, `/supplier`, `/login`, `/portal`, `/b2b` patterns; check for `data-auth`, `data-role` attributes gating portal links
+impact: undiscovered high-value portal entry enabling OAuth/IDOR/ATO chains on supplier/customer flows; HIGH if portal exists
+testability: PASSIVE
+[PARKED] www.basf.com Magnolia CMS partner/supplier portal entry undiscovered in analyzed HTML: confidence 40 < threshold; unauthenticated crawl already exhaustive on static HTML; any portal link would require authenticated session or geo-specific rendering — no passive verify step possible without test account
+[FINAL] 1. my.basf.com public OAuth client emits refresh_token without PKCE — authz-code interception / refresh-token replay ATO (75)
+[FINAL] 2. federation.basf.com ROPC grant enabled on NetIQ NAM — password-grant token acquisition for known usernames (65)
+[NEXT] HUMAN: Provide supplier test account or program-issued client cert to demonstrate AUTH_HELPED flow for my.basf.com OAuth client (86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4) — capture authorize request, verify absent code_challenge, exchange code for tokens, confirm refresh_token issuance and non-rotation on reuse
+[LEARN] REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint `/nidp/oauth/nam/clients` returns 401
+[LEARN] ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
+[LEARN] ACCEPTED RECON @ federation.basf.com: OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims
+[LEARN] REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — all 10 bypass variants rejected; no open redirect or path traversal possible
+[LEARN] ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with redirect_uri, scope, refresh_token, acr_values, zero PKCE refs
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
+[LEARN] REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey — no additional proxy, key scope exhausted
+[LEARN] REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+[LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry
+[RISK] basf: 30 — Unauthenticated backend exposure across the full 11-host estate (9 *.api + prod.api + api.commerce + federation + my.basf + www + products + api.basf) now proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere. The only genuine high-severity weakness is the digital-commerce public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE — a design-level flaw whose exploitability requires interactive code capture (AUTH_HELPED), not currently demonstrable passively. Without an authenticated test vector (supplier test account or program-provided client cert), no further unauth progress is possible. Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise on BASF customer/supplier platform).
+[0m
+[0m
+[0m$ [0mecho '== tools =='; which dig host nslookup getent python3 curl 2>/dev/null; echo '== crt.sh CT names for basf.com =='; curl -s --max-time 60 'https://crt.sh/?q=%25.basf.com&output=json' -o /tmp/opencode/basf-ct.json && wc -c /tmp/opencode/basf-ct.json
+== tools ==
+/usr/bin/dig
+/usr/bin/host
+/usr/bin/nslookup
+/usr/bin/getent
+/usr/bin/python3
+/usr/bin/curl
+== crt.sh CT names for basf.com ==
+1351565 /tmp/opencode/basf-ct.json
+[0m
+[0m$ [0mpython3 - <<'EOF'
+import json,re
+data=json.load(open('/tmp/opencode/basf-ct.json'))
+names=set()
+for e in data:
+    for k in ('name_value','common_name'):
+        v=e.get(k)
+        if v:
+            for part in v.split('\n'):
+                p=part.strip().lower().rstrip('.').lstrip('*.')
+                if p and ('basf.com' in p or p.endswith('.basf.com')):
+                    names.add(p)
+def interesting(n):
+    pats=['api','shop','commerce','order','portal','login','account','sso','oauth','id','auth','b2b','supplier','procure','ebus','my','connect','fed','sap','gate','int','ext','dev','prod','test','uat','stage','crm','erp','partner','customer','digital','world']
+    return any(p in n for p in pats)
+core=sorted(n for n in names if not n.startswith(('www','mail','ftp','ns','mx','localhost')))
+print('TOTAL unique names:',len(names))
+print('--- non-api, likely-relevant ---')
+for n in sorted(names):
+    if 'api.basf.com' in n: continue
+    if interesting(n): print(n)
+EOF
+TOTAL unique names: 1245
+--- non-api, likely-relevant ---
+a.qual.aem.publish.e-commerce.basf.com
+a.qual.btc.aem.publish.e-commerce.basf.com
+a.qual.mbs.aem.publish.e-commerce.basf.com
+a.qual.pci.aem.publish.e-commerce.basf.com
+a.qual.wolman.aem.publish.e-commerce.basf.com
+adfs.development.federation.basf.com
+aem-cloud-dev.basf.com
+aem-cloud-test.basf.com
+aem.publish.e-commerce.basf.com
+agriculture.basf.aem-cloud-dev.basf.com
+agriculture.basf.aem-cloud-test.basf.com
+agriculture.cdn-test-aem-dev.basf.com
+agriculture.publish-aem-prod.basf.com
+agriculture.test.aem-cloud-dev.basf.com
+agriculture.test.aem-cloud-staging.basf.com
+agriculture.test.aem-cloud-test.basf.com
+ap.maglis-preprod.basf.com
+apigw.basf.com
+apps-prod.catalysts.basf.com
+apps-stage.catalysts.basf.com
+arauth-dev.global.basf.com
+arauth.global.basf.com
+aroma-products.basf.com
+asap.basf.com
+auth.federation-qa.basf.com
+auth.federation.basf.com
+auth.supplier-enters-quality-data.basf.com
+author-prod-aem64.basf.com
+author-stage-aem64.basf.com
+author.aem-cloud-dev.basf.com
+author.aem-cloud-staging.basf.com
+author.aem-cloud-test.basf.com
+author.aem-cloud.basf.com
+b.qual.aem.publish.e-commerce.basf.com
+b.qual.btc.aem.publish.e-commerce.basf.com
+b.qual.mbs.aem.publish.e-commerce.basf.com
+b.qual.pci.aem.publish.e-commerce.basf.com
+b.qual.wolman.aem.publish.e-commerce.basf.com
+basf.aem-cloud-dev.basf.com
+basf.aem-cloud-test.basf.com
+basfeaidev20.basf.com
+basfeaidev20cl.basf.com
+bconnected.basf.com
+brandshop.ecovio.basf.com
+btc.b.qual.aem.publish.e-commerce.basf.com
+bz-guides.basf.com
+c.qual.aem.publish.e-commerce.basf.com
+c.qual.btc.aem.publish.e-commerce.basf.com
+c.qual.mbs.aem.publish.e-commerce.basf.com
+c.qual.pci.aem.publish.e-commerce.basf.com
+c.qual.wolman.aem.publish.e-commerce.basf.com
+catalysts-portal.basf.com
+cdn-aem-prod.basf.com
+cdn-test-aem-dev.basf.com
+cdn-test-sandbox1-dev.basf.com
+cdn-test-sandbox2-dev.basf.com
+certauth.dev-farm-adfs.dev-adfs.global.basf.com
+certauth.farm-adfs.adfs.global.basf.com
+certauth.qual-farm-adfs.qual-adfs.global.basf.com
+circular-economy-cleaning.basf.com
+colordesign-test.basf.com
+communications.extranet.basf.com
+comshop.basf.com
+connect.basf.com
+connected-to-care.basf.com
+construction-chemicals-academy.basf.com
+cts-formulafinder-prod.basf.com
+cts-formulafinder-test.basf.com
+customer-relation-cons.basf.com
+customer-relation.basf.com
+dev-developer.basf.com
+dev-farm-adfs.dev-adfs.global.basf.com
+dev-mu-arauth.ar.global.basf.com
+dev-mu-auth.ar.global.basf.com
+dev-public.maglis.basf.com
+dev.apigw.basf.com
+dev.azure-reference-1.basf.com
+dev.azure-reference-2.basf.com
+dev.basfeai30.basf.com
+dev.basfeai30cl.basf.com
+dev.cloudmanagement.basf.com
+dev.developer.basf.com
+dev.dispatch-pad.basf.com
+dev.human-centric-processes.basf.com
+dev.pinotage.basf.com
+dev.terminal-dispatch-pad.basf.com
+dev2.human-centric-processes.basf.com
+developer-sharepoint-apps.basf.com
+developer.basf.com
+development.federation.basf.com
+dialin.test-ms-poc.basf.com
+digital-cockpit.basf.com
+dlite3-dataint.basf.com
+dualcareerplatform.basf.com
+eanv-test.basf.com
+ecommerce.publish-aem-prod-b.basf.com
+ecommerce.publish-aem-prod.basf.com
+ecommerce.publish-aem-qual-b.basf.com
+enable-webservice-test.nutrition-and-health.basf.com
+energy-resources.basf.aem-cloud-dev.basf.com
+energy-resources.basf.aem-cloud-test.basf.com
+engineering-and-maintenance.global.basf.com
+esp.federation-qa.basf.com
+esp.federation.basf.com
+experience-stage.basf.com
+external-profile-management.basf.com
+externalsynthesis.basf.com
+extranet-agricultural-solutions.basf.com
+extranet.intermediates.basf.com
+federation-qa.basf.com
+federation.basf.com
+gastronomy-app-admin.basf.com
+gastronomy-app.basf.com
+hciiproductfinder.basf.com
+hds-preprod.basf.com
+industries.cdn-test-aem-dev.basf.com
+industries.publish-aem-prod.basf.com
+intelatrac.global.basf.com
+jobstest.europe.basf.com
+kidslab.basf.com
+kube-dev-auth.qknows.basf.com
+lacour-test.coatings.basf.com
+ldeluhvexeb2b-cluster.vc.basf.com
+ldeluhvexeb2b01.vc.basf.com
+ldeluhvexeb2b02.vc.basf.com
+login-test.symphony.basf.com
+login.symphony.basf.com
+lyncdiscover.test-ms-poc.basf.com
+maglis-preprod.basf.com
+master-builders-solutions-academy.basf.com
+master-builders-solutions.basf.com.my
+masteridea.basf.com
+mbs.b.qual.aem.publish.e-commerce.basf.com
+mbs.worldaccount.basf.com
+meet.test-ms-poc.basf.com
+middle-near-east.master-builders-solutions.basf.com
+mobi-test.basf.com
+mobile-product-finder.basf.com
+mosys-test.basf.com
+mu-arauth.ar.global.basf.com
+mu-auth.ar.global.basf.com
+my-digital-basecamp.basf.com
+my-digital-basecamptest.basf.com
+my-link.basf.com
+mypharmaregdocservice-test.nutrition-and-health.basf.com
+mypharmaregdocservice.nutrition-and-health.basf.com
+myregdocx-test.nutrition-and-health.basf.com
+myregdocx.nutrition-and-health.basf.com
+oase-connect.basf.com
+oicd-auth.qknows.basf.com
+oidc-auth.qknows.basf.com
+order.is-servicedesk.basf.com
+orders.basf.com
+packaging-print.aem-cloud.basf.com
+packaging-print.basf.aem-cloud-staging.basf.com
+packaging-print.basf.com
+paint-coatings.aem-cloud.basf.com
+paint-coatings.basf.aem-cloud-staging.basf.com
+paint-coatings.basf.com
+paints-coatings.basf.com
+partners.basf.com
+pci.b.qual.aem.publish.e-commerce.basf.com
+petrochemicals-extranet.basf.com
+pigmentviewer-prod.basf.com
+plastics-rubber.publish-aem-prod.basf.com
+plastics.basf.aem-cloud-dev.basf.com
+plastics.basf.aem-cloud-test.basf.com
+plastics.test.aem-cloud-dev.basf.com
+plastics.test.aem-cloud-staging.basf.com
+plastics.test.aem-cloud-test.basf.com
+pmbb-ne-dev-analysis-rgrid.basf.com
+pmbb-ne-int-analysis-rgrid.basf.com
+pmbb-ne-prod-analysis-rgrid.basf.com
+pmbb-ne-test-analysis-rgrid.basf.com
+pmpcapplication-test.basf.com
+preprod-public.maglis.basf.com
+preprod.apigw.basf.com
+preprod.companion.basf.com
+procurement.basf.com
+procurement1.basf.com
+prod.apigw.basf.com
+prod.cloudmanagement.basf.com
+product-finder.basf.com
+product-info-test.nutrition-and-health.basf.com
+product-info.nutrition-and-health.basf.com
+products.basf.com
+products.cdn-aem-qual-a.basf.com
+products.cdn-aem-qual-b.basf.com
+products.cdn-test-aem-dev.basf.com
+products.publish-aem-prod.basf.com
+publish-aem-prod.basf.com
+qa-developer.basf.com
+qa.apigw.basf.com
+qa.developer.basf.com
+qual-external-profile-management.basf.com
+qual-procurement.basf.com
+qual-sharepoint-apps.basf.com
+quality.engineering-and-maintenance.global.basf.com
+quicklead-test.basf.com
+reconciliation-dev.basf.com
+repfinder-stage.basf.com
+rodim-test.basf.com
+sales-notification-tool-dev.basf.com
+sales-notification-tool-prod.basf.com
+sales-notification-tool-test.basf.com
+se01-ext.test-ms-poc.basf.com
+securestage.basf.com
+sharepoint-apps.basf.com
+sharepoint.basf.com
+shop.basf.com
+shop.system-partner.basf.com
+shopclean.basf.com
+sip.test-ms-poc.basf.com
+solucionesparapinturas.basf.com
+solucoesparatintas.basf.com
+ssl-vpn-test.basf.com
+sts.test-ms-poc.basf.com
+styleguide.basf.com
+sunscreensimulator-test.basf.com
+supplier-enters-quality-data.basf.com
+supplier-questionnaire-test.nutrition-and-health.basf.com
+supplier-questionnaire.nutrition-and-health.basf.com
+system-partner.basf.com
+territory-management-test.basf.com
+test-developer.basf.com
+test-ms-poc.basf.com
+test.aem-cloud-dev.basf.com
+test.aem-cloud-staging.basf.com
+test.aem-cloud-test.basf.com
+test.apigw.basf.com
+test.cloudmanagement.basf.com
+textile-leather-footwear.aem-cloud.basf.com
+textile-leather-footwear.basf.aem-cloud-staging.basf.com
+textile-leather-footwear.basf.com
+uat-public.maglis.basf.com
+ultramidextrusao.basf.com
+voffice-partners-ap.basf.com
+voffice-partners-na.basf.com
+voffice-partners.basf.com
+voffice-test-1.basf.com
+voffice-test-2.basf.com
+voffice-test-3.basf.com
+wac01-ext.test-ms-poc.basf.com
+webcon.test-ms-poc.basf.com
+wolman.b.qual.aem.publish.e-commerce.basf.com
+wolman.worldaccount.basf.com
+worldaccount.basf.com
+www.a.qual.aem.publish.e-commerce.basf.com
+www.apigw.basf.com
+www.arauth-dev.global.basf.com
+www.arauth.global.basf.com
+www.aroma-products.basf.com
+www.asap.basf.com
+www.auth.federation-qa.basf.com
+www.auth.federation.basf.com
+www.auth.supplier-enters-quality-data.basf.com
+www.author.aem-cloud.basf.com
+www.b.qual.aem.publish.e-commerce.basf.com
+www.basf.aem-cloud-dev.basf.com
+www.basf.aem-cloud-test.basf.com
+www.basfeaidev20.basf.com
+www.basfeaidev20cl.basf.com
+www.bconnected.basf.com
+www.bz-guides.basf.com
+www.catalysts-portal.basf.com
+www.ciba-integration.basf.com
+www.colordesign-test.basf.com
+www.communications.extranet.basf.com
+www.connect.basf.com
+www.connected-to-care.basf.com
+www.connectivity.master-builders-solutions.basf.com
+www.customer-relation-cons.basf.com
+www.customer-relation.basf.com
+www.dev-mu-arauth.ar.global.basf.com
+www.dev-mu-auth.ar.global.basf.com
+www.dev-public.maglis.basf.com
+www.dev.apigw.basf.com
+www.dev.azure-reference-1.basf.com
+www.dev.azure-reference-2.basf.com
+www.dev.basfeai30.basf.com
+www.dev.basfeai30cl.basf.com
+www.dev.human-centric-processes.basf.com
+www.dev.pinotage.basf.com
+www.dev2.human-centric-processes.basf.com
+www.developer.basf.com
+www.digital-cockpit.basf.com
+www.dlite3-dataint.basf.com
+www.dualcareerplatform.basf.com
+www.ed.extranet.basf.com
+www.esp.federation-qa.basf.com
+www.experience-stage.basf.com
+www.external-profile-management.basf.com
+www.externalsynthesis.basf.com
+www.extranet-agricultural-solutions.basf.com
+www.extranet.intermediates.basf.com
+www.federation-qa.basf.com
+www.federation.basf.com
+www.jobstest.europe.basf.com
+www.kidslab.basf.com
+www.lacour-test.coatings.basf.com
+www.ldeluhvexeb2b01.vc.basf.com
+www.ldeluhvexeb2b02.vc.basf.com
+www.login-test.symphony.basf.com
+www.login.symphony.basf.com
+www.master-builders-solutions-academy.basf.com
+www.master-builders-solutions.basf.com.my
+www.middle-near-east.master-builders-solutions.basf.com
+www.mobi-test.basf.com
+www.mobile-product-finder.basf.com
+www.mosys-test.basf.com
+www.mu-arauth.ar.global.basf.com
+www.mu-auth.ar.global.basf.com
+www.my-digital-basecamp.basf.com
+www.my-link.basf.com
+www.mypharmaregdocservice-test.nutrition-and-health.basf.com
+www.mypharmaregdocservice.nutrition-and-health.basf.com
+www.myregdocx-test.nutrition-and-health.basf.com
+www.myregdocx.nutrition-and-health.basf.com
+www.oase-connect.basf.com
+www.oidc-auth.qknows.basf.com
+www.order.is-servicedesk.basf.com
+www.packaging-print.basf.com
+www.paint-coatings.basf.com
+www.paints-coatings.basf.com
+www.petrochemicals-extranet.basf.com
+www.pigmentviewer-prod.basf.com
+www.pmbb-ne-dev-analysis-rgrid.basf.com
+www.pmbb-ne-int-analysis-rgrid.basf.com
+www.pmbb-ne-prod-analysis-rgrid.basf.com
+www.pmbb-ne-test-analysis-rgrid.basf.com
+www.preprod-public.maglis.basf.com
+www.preprod.apigw.basf.com
+www.preprod.companion.basf.com
+www.procurement.basf.com
+www.procurement1.basf.com
+www.product-info-test.nutrition-and-health.basf.com
+www.product-info.nutrition-and-health.basf.com
+www.products.basf.com
+www.promoshop.basf.com
+www.publish-aem-prod.basf.com
+www.qa.apigw.basf.com
+www.qual-external-profile-management.basf.com
+www.qual-procurement.basf.com
+www.quicklead-test.basf.com
+www.reconciliation-dev.basf.com
+www.sales-notification-tool-dev.basf.com
+www.sales-notification-tool-prod.basf.com
+www.sales-notification-tool-test.basf.com
+www.securestage.basf.com
+www.shop.basf.com
+www.shop.system-partner.basf.com
+www.shopclean.basf.com
+www.solucionesparapinturas.basf.com
+www.solucoesparatintas.basf.com
+www.ssl-vpn-test.basf.com
+www.styleguide.basf.com
+www.sunscreensimulator-test.basf.com
+www.supplier-enters-quality-data.basf.com
+www.supplier-questionnaire-test.nutrition-and-health.basf.com
+www.system-partner.basf.com
+www.territory-management-test.basf.com
+www.test.aem-cloud-dev.basf.com
+www.test.aem-cloud-staging.basf.com
+www.test.aem-cloud-test.basf.com
+www.test.apigw.basf.com
+www.textile-leather-footwear.basf.com
+www.uat-public.maglis.basf.com
+www.ultramidextrusao.basf.com
+www.voffice-partners-na.basf.com
+www.voffice-partners.basf.com
+www.voffice-test-1.basf.com
+www.voffice-test-2.basf.com
+www.worldaccount.basf.com
+www.xarvio-test.aem-cloud-dev.basf.com
+www.xarvio-test.aem-cloud-test.basf.com
+www.xarvio.aem-cloud-dev.basf.com
+www.xarvio.aem-cloud-test.basf.com
+[0m
+[0m$ [0mfor h in worldaccount.basf.com www.worldaccount.basf.com auth.federation.basf.com auth.federation-qa.basf.com esp.federation.basf.com development.federation.basf.com shop.basf.com comshop.basf.com orders.basf.com procurement.basf.com qual-procurement.basf.com apigw.basf.com prod.apigw.basf.com dev.apigw.basf.com developer.basf.com connect.basf.com supplier-enters-quality-data.basf.com bconnected.basf.com extranet.intermediates.basf.com sharepoint.basf.com login.symphony.basf.com mu-auth.ar.global.basf.com basfeaidev20.basf.com; do ip=$(dig +short +time=3 +tries=1 "$h" A 2>/dev/null | tr '\n' ' '); echo "$h -> ${ip:-NODNS}"; done
+worldaccount.basf.com -> d27f1wkxq0p556.cloudfront.net. 18.160.213.73 18.160.213.125 18.160.213.121 18.160.213.101 
+www.worldaccount.basf.com -> d27f1wkxq0p556.cloudfront.net. 18.160.213.121 18.160.213.101 18.160.213.125 18.160.213.73 
+auth.federation.basf.com -> NODNS
+auth.federation-qa.basf.com -> federation-qa-auth.basf-ag.de. 
+esp.federation.basf.com -> esp-fed-prod.basf-ag.de. 141.6.7.83 
+development.federation.basf.com -> 104.18.14.245 104.18.15.245 
+shop.basf.com -> 20.36.155.75 
+comshop.basf.com -> 213.9.20.152 
+orders.basf.com -> d342uad5e1mzd2.cloudfront.net. 18.172.122.53 18.172.122.66 18.172.122.104 18.172.122.26 
+procurement.basf.com -> 141.6.3.241 
+qual-procurement.basf.com -> 104.18.26.51 104.18.27.51 
+apigw.basf.com -> 141.6.7.162 
+prod.apigw.basf.com -> 141.6.7.162 
+dev.apigw.basf.com -> NODNS
+developer.basf.com -> 104.18.0.85 104.18.1.85 
+connect.basf.com -> NODNS
+supplier-enters-quality-data.basf.com -> NODNS
+bconnected.basf.com -> NODNS
+extranet.intermediates.basf.com -> NODNS
+sharepoint.basf.com -> NODNS
+login.symphony.basf.com -> NODNS
+mu-auth.ar.global.basf.com -> 141.6.7.175 
+basfeaidev20.basf.com -> xi-ped.basf-ag.de. 141.6.3.190
+[0m
+[0m$ [0mfor h in worldaccount.basf.com shop.basf.com orders.basf.com procurement.basf.com apigw.basf.com prod.apigw.basf.com developer.basf.com esp.federation.basf.com comshop.basf.com qual-procurement.basf.com mu-auth.ar.global.basf.com; do echo -n "$h | "; curl -sk --max-time 20 -o /dev/null -w '%{http_code} size=%{size_download} ct=%{content_type} server=%header{server} loc=%{redirect_url}\n' "https://$h/" ; sleep 1; done
+worldaccount.basf.com | 301 size=0 ct= server=null loc=https://my.basf.com/
+shop.basf.com | 200 size=241 ct=text/html server= loc=
+orders.basf.com | 301 size=0 ct= server=null loc=https://my.basf.com/
+procurement.basf.com | 302 size=0 ct= server=BigIP loc=https://procurement.basf.com/irj/portal/procurement?guest_user=Guest_Procurement
+apigw.basf.com | 000 size=0 ct= server= loc=
+prod.apigw.basf.com | 000 size=0 ct= server= loc=
+developer.basf.com | 403 size=5345 ct=text/html; charset=UTF-8 server=cloudflare loc=
+esp.federation.basf.com | 502 size=2864 ct=text/html; charset=utf-8 server= loc=
+comshop.basf.com | 000 size=0 ct= server= loc=
+qual-procurement.basf.com | 301 size=167 ct=text/html; charset=UTF-8 server=cloudflare loc=https://qual-procurement.basf.com/irj/portal/procurement?guest_user=Guest_Procurement
+mu-auth.ar.global.basf.com | 000 size=0 ct= server= loc=
+[0m
+[0m$ [0mecho '== shop.basf.com body =='; curl -sk --max-time 20 'https://shop.basf.com/'; echo; sleep 1; echo '== apigw over http =='; curl -sk --max-time 15 -o /dev/null -w 'http: %{http_code} size=%{size_download} loc=%{redirect_url}\n' 'http://apigw.basf.com/' 2>&1 | tail -1; sleep 1; curl -svk --max-time 12 -o /dev/null 'https://apigw.basf.com/' 2>&1 | grep -E 'SSL|error|refused|timed|Connected|HTTP/' | head -5; sleep 1; echo '== comshop http =='; curl -sk --max-time 15 -o /dev/null -w 'http: %{http_code} size=%{size_download} loc=%{redirect_url}\n' 'http://comshop.basf.com/' 2>&1 | tail -1; sleep 1; echo '== developer.basf.com w/ UA =='; curl -sk --max-time 20 -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0 Safari/537.36' -o /dev/null -w '%{http_code} size=%{size_download}\n' 'https://developer.basf.com/'; sleep 1; echo '== procurement portal follow =='; curl -sk --max-time 20 -A 'Mozilla/5.0' -o /dev/null -w '%{http_code} size=%{size_download} ct=%{content_type}\n' 'https://procurement.basf.com/irj/portal/procurement?guest_user=Guest_Procurement'
+== shop.basf.com body ==
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Redirect</title>
+
+    <meta http-equiv="refresh" content="0.00000001; URL='https://www.basf.com/global/en/legal/e-business/shop-basf.html'"/>
+</head>
+<body>
+</body>
+</html>
+== apigw over http ==
+http: 000 size=0 loc=
+* Connection timed out after 12002 milliseconds
+== comshop http ==
+http: 000 size=0 loc=
+== developer.basf.com w/ UA ==
+403 size=5580
+== procurement portal follow ==
+200 size=1635 ct=text/html; charset=UTF-8
+[0m
+[0m$ [0mecho '== procurement body head =='; curl -sk --max-time 20 -A 'Mozilla/5.0' 'https://procurement.basf.com/irj/portal/procurement?guest_user=Guest_Procurement' | head -60; echo; sleep 1; echo '== developer.basf.com 403 body =='; curl -sk --max-time 20 -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0 Safari/537.36' 'https://developer.basf.com/' | head -40
+== procurement body head ==
+<html><head>
+<script type="text/javascript">
+/*HTML Business for Java, 6.0*/
+ur_system = {doc : window.document , mimepath :"/com.sap.portal.design.urdesigndata/themes/portal/fw2/common/", stylepath : "/com.sap.portal.design.urdesigndata/themes/portal/fw2/", is508 : false, domainrelaxing : "MINIMAL"};
+var popup_emptydoc = "/htmlb/jslib/emptyhover.html";</script>
+<link rel="stylesheet" href="/com.sap.portal.theming.webdav.themeswebdavlistener/Portal/prtl_std/fw2/default.css?v=733eb20e110b9d97bdaadb9f8382e186" />
+<style id='SAP-antiClickjackStyle'>body { display: none !important; }</style><script src='/sap.com~tc~lm~itsam~servlet~clickjacking/js/ClickjackingProtection.js' id='SAP-antiClickjackScript'	data-checkService='/sap.com~tc~lm~itsam~servlet~clickjacking/check' data-styleId='SAP-antiClickjackStyle'></script><title>SAP&#x20;NetWeaver&#x20;Portal</title><meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8"><link  REL=STYLESHEET  HREF="/com.sap.portal.theming.webdav.themeswebdavlistener/Portal/ctrl/fw2/default.css?rid=32d6afd67cb352c5b22d539ee6b88772&v=733eb20e110b9d97bdaadb9f8382e186"  TYPE="text/css" ></head><body class="prtlBody urFontBaseFam urScrl"><table  border="0" cellspacing="5" cellpadding="0"><tr> <td class="ctrlMsgBarImgError">&nbsp;</td><td class="ctrlTxtEmph"><SPAN CLASS="ctrlLblReq">Could&#x20;not&#x20;open&#x20;iView.&#x20;The&#x20;iView&#x20;is&#x20;not&#x20;compatible&#x20;with&#x20;your&#x20;browser,&#x20;operating&#x20;system,&#x20;or&#x20;device.&#x20;Contact&#x20;your&#x20;system&#x20;administrator&#x20;for&#x20;more&#x20;information.</SPAN></td></tr></table></body></html>
+== developer.basf.com 403 body ==
+<!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=Edge"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="content-security-policy" content="default-src &#39;none&#39;; script-src &#39;nonce-5wpHI6Vt2WJAv2e8k925Yu&#39; &#39;unsafe-eval&#39; https://challenges.cloudflare.com; script-src-attr &#39;none&#39;; style-src &#39;unsafe-inline&#39;; img-src &#39;self&#39; https://challenges.cloudflare.com; connect-src &#39;self&#39; https://challenges.cloudflare.com; frame-src &#39;self&#39; https://challenges.cloudflare.com blob:; child-src &#39;self&#39; https://challenges.cloudflare.com blob:; worker-src blob:; form-action http: https:; base-uri &#39;self&#39;"><style>*{box-sizing:border-box;margin:0;padding:0}html{line-height:1.15;-webkit-text-size-adjust:100%;color:#313131;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"}body{display:flex;flex-direction:column;height:100vh;min-height:100vh}.main-content{margin:8rem auto;padding-left:1.5rem;max-width:60rem}@media (width <= 720px){.main-content{margin-top:4rem}}#challenge-error-text{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0ibm9uZSI+PHBhdGggZmlsbD0iI0IyMEYwMyIgZD0iTTE2IDNhMTMgMTMgMCAxIDAgMTMgMTNBMTMuMDE1IDEzLjAxNSAwIDAgMCAxNiAzbTAgMjRhMTEgMTEgMCAxIDEgMTEtMTEgMTEuMDEgMTEuMDEgMCAwIDEtMTEgMTEiLz48cGF0aCBmaWxsPSIjQjIwRjAzIiBkPSJNMTcuMDM4IDE4LjYxNUgxNC44N0wxNC41NjMgOS41aDIuNzgzem0tMS4wODQgMS40MjdxLjY2IDAgMS4wNTcuMzg4LjQwNy4zODkuNDA3Ljk5NCAwIC41OTYtLjQwNy45ODQtLjM5Ny4zOS0xLjA1Ny4zODktLjY1IDAtMS4wNTYtLjM4OS0uMzk4LS4zODktLjM5OC0uOTg0IDAtLjU5Ny4zOTgtLjk4NS40MDYtLjM5NyAxLjA1Ni0uMzk3Ii8+PC9zdmc+");background-repeat:no-repeat;background-size:contain;padding-left:34px}</style><meta http-equiv="refresh" content="360"></head><body><div class="main-wrapper" role="main"><div class="main-content"><noscript><div class="h2"><span id="challenge-error-text">Enable JavaScript and cookies to continue</span></div></noscript></div></div><script nonce="5wpHI6Vt2WJAv2e8k925Yu">(function(){window._cf_chl_opt = {cFPWv: 'g',cH: 'QvCAhgQmndm9J5cwlkmwTtXG11B9XVSfdv0_A_M0rzk-1788736441-1.2.1.1-G_zLUA5kEzCPKsoLfv04fqt9FwhWdxddFkiejFWoJIo8i5271cyRwBDyviNuyo8K',cITimeS: '1788736441',cN: '5wpHI6Vt2WJAv2e8k925Yu',cRay: 'a3712ae99e9d7e6b',cTplB: '0',cTplC:0,cTplO:0,cTplV:5,cType: 'managed',cUPMDTk:"/?__cf_chl_tk=g7yY11qj1IMpw1ErFhf7b.yogkJHvWsS93QEvjdrPHs-1788736441-1.0.1.1-zp6XXc425qvQj.WhVI5mSfwHIiZMrYIaiinuNIZ8bP0",cvId: '3',cZone: 'developer.basf.com',fa:"/?__cf_chl_f_tk=g7yY11qj1IMpw1ErFhf7b.yogkJHvWsS93QEvjdrPHs-1788736441-1.0.1.1-zp6XXc425qvQj.WhVI5mSfwHIiZMrYIaiinuNIZ8bP0",md: 'svdIvD6Cs4w_WZ6J1aRcjc09loccQwZZc3P9fSQ8Stc-1788736441-1.2.1.1-eEUlnBfVtm6j9LwhhkEQWBV8BHz5vtpuI5i5.pZv9VF2rMvh9WPYpQGOKF9doePXAhEJq7U11xY1qsJ0.vZIs2TU8Jah4Fg5O4jyLd1yb7rxru3Q.MLtHAfxaVsh7nIbGbDVigZRFVB8U83GLvPZUzWVNRwFMeCE0jpdXEu_hSC0Wpl9xV5rLYpqE9Ri_Ykk1l46QrsD6PfFpuqhdBobfAEkckuovMyfLW1TrIQlYjeW3S0g_O6JMOhc9xOhHE5dNyNj9lME2cqlt3htIvuj7LsCh6KqayEnIfb4.ubcjLUMzH5SpvSvKRU1q8hvyeOBDnnvEZTXp.UIM4x_Z.DqvSpn_HvOhtsNPB3f9VqYnAYvXKDflvyJ9SVg6W38ogJjb_VPRp8BEs5Bp7O7pRR1Pr7YeE5PxkonZ3msd.m2AjpOmmpj41qHTcmYyfdMKZV6v9Ke.Uk8AcJbfeyacQ2SOQ7AqS5KvY.W6hXwxBB2A9H4MyGkbW12dlwV4h7VgokluuNhKkceJOAKidUvsI87Lfl6kPBIa7FiRfW3UMqClgsHejmXUUBqFid53zW.SZJgM6dqEX06UFJa9eleHyL01F1HTBfCEEhvBNWDBW5cSUl9pFBPsumb_PT1.0M51PCNwp3rv3sw1gRbhyvX63dbhcJzau055KElxrJrjFrBRGdzw6x0Lle.ZBVVq48BLZO2EDsajZtCaMDmvr6dLChnBJ7cA86b7GkFrJj_Z5JEAyGwEXuhpxGq.ljrjNtoXfnPSGImB1sImO.zVbQQ0XkocQuJucoHl_FeZTGxV7LMfW4wKtXXM5AYBY5wfqQQkI6MZtBaR.MT9XLEcOgEbhmaLsmNooOqQy4V1Ej1Je.nPPXWrvLsqZqW93wCZ8Z7zJHtWRzjwnUGWJT_BmuzucmWWmf664Dnu.dn6T9rzmkvh6QiuagQoxTW6WH2WDS00TK3iI53E.GZrsxtfXprZpd8icbbXe0JHpAmdzDaXDbVhTdMEiu71rusLNIIXfBaYTMyvNT2qO5lQR5WirPC.5mpb3SXiCleX6e8ZU4qJHcI75f4H6TXDgv6OBCIex932Z8aMsxzURBYIHAm0iZrDKkAB7Iya2fBR75WmGwmIHsrjZ2NbuWAxepdvKi_gPVVnoVD7N01waFFTwoGByz08Qcqtg',mdrd: 'KUsdNYqoktoxC7cHE3rMx93qJAox4czJP1p3LMhaQT0-1788736441-1.2.1.1-JZC1ZsrRJqtyuC5C.c.3gZsy41P.pf.MUuNa2tbD6kkWg5vyTuFD47GTTKWt45prwaeImwg9ibrMmL5QNhjprGf807p.hGsfWPtPWzTt4LkLVluo8mt7EjgwWTdgwd48e..6A5MqbwtIgg5ut3MUfEgJ8w82J21lE1r7ZpbQS_D2kkrHK6.Wv7FT4lNwj5to85obqYvlYcO23dQemlJL60C1Uasq6fncEEWlaxxNDhqzlN.ADWdYiSPz0MByJ6.C0V3DwgVMpZdtHC9_OYZFBITf2H2SgC0dkmChg1jjqVMXz0qRI0SuKxaNFzad4HMJBBpIwQ9._4FvClThPkxCAg',};var a = document.createElement('script');a.nonce = '5wpHI6Vt2WJAv2e8k925Yu';a.src = '/cdn-cgi/challenge-platform/h/g/orchestrate/chl_page/v1?ray=a3712ae99e9d7e6b';window._cf_chl_opt.cOgUHash = location.hash === '' && location.href.indexOf('#') !== -1 ? '#' : location.hash;window._cf_chl_opt.cOgUQuery = location.search === '' && location.href.slice(0, location.href.length - window._cf_chl_opt.cOgUHash.length).indexOf('?') !== -1 ? '?' : location.search;if (window.history && window.history.replaceState) {var ogU = location.pathname + window._cf_chl_opt.cOgUQuery + window._cf_chl_opt.cOgUHash;history.replaceState(null, null,"/?__cf_chl_rt_tk=g7yY11qj1IMpw1ErFhf7b.yogkJHvWsS93QEvjdrPHs-1788736441-1.0.1.1-zp6XXc425qvQj.WhVI5mSfwHIiZMrYIaiinuNIZ8bP0"+ window._cf_chl_opt.cOgUHash);a.onload = function() {history.replaceState(null, null, ogU);}}document.getElementsByTagName('head')[0].appendChild(a);}());</script></body></html>
+[0m
+[0m$ [0mfor u in 'https://procurement.basf.com/irj/portal' 'https://procurement.basf.com/irj/portal/procurement' 'https://procurement.basf.com/irj/portal/procurement?guest_user=Guest_Procurement'; do echo "== $u =="; curl -sk --max-time 20 -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' -o /tmp/opencode/pr-body.html -w 'code=%{http_code} size=%{size_download} ct=%{content_type} server=%header{server}\n' "$u"; rg -o -m3 'Could not open iView|Logon|guest_user|sapep|irj|Log On|username|password' /tmp/opencode/pr-body.html | head -3; sleep 1; done
+== https://procurement.basf.com/irj/portal ==
+code=200 size=236 ct=text/html; charset=utf-8 server=
+/bin/bash: line 1: rg: command not found
+== https://procurement.basf.com/irj/portal/procurement ==
+code=200 size=49545 ct=text/html; charset=UTF-8 server=
+/bin/bash: line 1: rg: command not found
+== https://procurement.basf.com/irj/portal/procurement?guest_user=Guest_Procurement ==
+code=200 size=49697 ct=text/html; charset=UTF-8 server=
+/bin/bash: line 1: rg: command not found
+[0m
+[0m$ [0mgrep -o '<title>[^<]*</title>' /tmp/opencode/pr-body.html; echo '---forms---'; grep -oE '<form[^>]*action="[^"]*"[^>]*>' /tmp/opencode/pr-body.html | head -5; echo '---inputs---'; grep -oE 'name="[^"]+"' /tmp/opencode/pr-body.html | sort -u | head -20; echo '---keywords---'; grep -oiE 'log[ _]?on|logon|guest|sap netweaver portal|prt/portal|iView|irj/go|portal_role|bmc' /tmp/opencode/pr-body.html | sort | uniq -c | sort -rn | head -15
+<title>Procurement Portal</title>
+---forms---
+<form action="" method="post" id="frmChangeContent" name="frmChangeContent">
+<form action="/irj/servlet/prt/portal/prtroot/com.sap.portal.navigation.objbased.ObjBasedNavigation" id="obnNavForm" method="post" target="obnNavIFrame" >
+<form id="loginForm" name="LoginForm" method="post" action="/irj/portal/procurement?loginTried&amp;guest_user&#61;Guest_Procurement">
+<form id="loginFormStart" name="LoginFormStart" method="post" action="/irj/portal/procurement?loginTried&amp;guest_user&#61;Guest_Procurement">
+---inputs---
+name="LoginForm"
+name="LoginFormStart"
+name="NavigationTarget"
+name="RelativeNavBase"
+name="businessObjName"
+name="frmChangeContent"
+name="j_password"
+name="j_username"
+name="language"
+name="objValue"
+name="obnNavIFrame"
+name="operation"
+name="resolvingMode"
+name="source"
+name="systemAlias"
+name="usePost"
+---keywords---
+     30 iview
+     23 prt/portal
+      9 iView
+      7 IView
+      5 Guest
+      4 guest
+      3 Iview
+      2 irj/go
+      1 logon
+[0m
+[0m$ [0mgrep -oE 'href="[^"]{0,120}"' /tmp/opencode/pr-body.html | grep -viE 'css|js|ico|\.png|\.gif|#|javascript' | sort -u | head -25; echo '---portal role/iView path markers---'; grep -oE 'prt/portal/prtroot/[A-Za-z0-9._-]+' /tmp/opencode/pr-body.html | sort -u | head -15; grep -oE '/irj/go/km/docs[^"]{0,60}' /tmp/opencode/pr-body.html | head -5
+href="/irj/portal/procurement"
+href="/irj/portal/procurement?NavigationTarget=navurl://aa30852a803a2ce8c1b61a82e14cb64b"
+href="http://www.basf.com/einkauf"
+href="https://www.basf.com/global/de/who-we-are/organization/suppliers-and-partners/downloadcenter.html"
+href="https://www.basf.com/global/en/legal/contact.html"
+href="https://www.basf.com/global/en/legal/credits.html"
+href="https://www.basf.com/global/en/legal/disclaimer.html"
+---portal role/iView path markers---
+prt/portal/prtroot/basfits.com
+prt/portal/prtroot/com.sap.portal.dsm.Terminator
+prt/portal/prtroot/com.sap.portal.epcf.admin.WorkProtectPopup
+prt/portal/prtroot/com.sap.portal.httpconnectivity.httpauthentication.Engine
+prt/portal/prtroot/com.sap.portal.navigation.masthead.LogOutComponent
+prt/portal/prtroot/com.sap.portal.navigation.objbased.ObjBasedNavigation
+prt/portal/prtroot/com.sap.portal.pagebuilder.IviewModeProxy
+prt/portal/prtroot/com.sap.portal.pagebuilder.PageHelper
+prt/portal/prtroot/com.sap.portal.pagebuilder.removeIViewConfirmMsg
+/irj/go/km/docs/documents/newFramework/basf-img/procurement.jpg
+/irj/go/km/docs/documents/newFramework/basf-img/svg/BASFw_wh_tr.svg
+[0m
+[0m$ [0mecho '== set-cookie check =='; curl -sk --max-time 20 -A 'Mozilla/5.0' -D - -o /dev/null 'https://procurement.basf.com/irj/portal/procurement?loginTried&guest_user=Guest_Procurement' | grep -iE 'HTTP/|set-cookie' | head -6; sleep 1; echo '== navurl deref status =='; curl -sk --max-time 20 -A 'Mozilla/5.0' -o /tmp/opencode/nav.html -w 'code=%{http_code} size=%{size_download} ct=%{content_type}\n' 'https://procurement.basf.com/irj/portal/procurement?NavigationTarget=navurl://aa30852a803a2ce8c1b61a82e14cb64b'; grep -o '<title>[^<]*</title>' /tmp/opencode/nav.html; sleep 1; echo '== basfeaidev20 =='; curl -sk --max-time 15 -o /dev/null -w 'code=%{http_code} size=%{size_download} loc=%{redirect_url}\n' 'https://basfeaidev20.basf.com/'; sleep 1; echo '== esp nidp =='; curl -sk --max-time 15 -o /dev/null -w 'code=%{http_code} size=%{size_download}\n' 'https://esp.federation.basf.com/nidp/oauth/nam/authz'
+== set-cookie check ==
+HTTP/1.1 200 OK
+set-cookie: PortalAlias=portal/procurement; Path=/; SameSite=None; Secure
+set-cookie: saplb_*=(J2EE8030120)8030150; Version=1; Path=/; Secure; HttpOnly; SameSite=None
+set-cookie: JSESSIONID=IfEoReUVmEnrplKbXHhkt_kJ6gB5oAHGh3oA_SAPmmbJhtcjxO6oIWjhRSTaN4hR; Version=1; Path=/; Secure; HttpOnly; SameSite=None
+Set-Cookie: BIGipServer~BASF~eip_procurement_https_pool=rd1o00000000000000000000ffff0a04f112o443; path=/; Httponly; Secure
+Set-Cookie: TS01dacdba=018fb5973098b72c4c9b449040c8e5223e35fb91e4d8d34b02dd1e85c7eccd5615f610be10c502f8aa59dbab0415e69b4f15b1b264; Path=/
+== navurl deref status ==
+code=200 size=1635 ct=text/html; charset=UTF-8
+<title>SAP&#x20;NetWeaver&#x20;Portal</title>
+== basfeaidev20 ==
+code=000 size=0 loc=
+== esp nidp ==
+code=200 size=236
+[0m
+STEP 1 — DELTA
+- [NEW] CT-based zone sweep (crt.sh, 1245 unique *.basf.com names) — first systematic passive pass over the NON-*.api namespace; the 2026-09-02 deep-enum wildcard/IP cleaning filtered to 9 *.api hosts and the "11-host estate fully mapped" claim never covered these. Revealed >=15 first-time live/dedicated BASF hosts.
+- [NEW] procurement.basf.com → SAP NetWeaver Portal live (`/irj/portal/procurement` 200, ~50KB, title "Procurement Portal"), guest_user session honored, F5 BigIP `eip_procurement_https_pool` + ASM (`TS01dacdba`) + Java LB `saplb_*=(J2EE8030120)` cookies, `PortalAlias`, `loginForm` posting `j_username/j_password`.
+- [NEW] worldaccount.basf.com (CF) + orders.basf.com (CF) both 301→`https://my.basf.com/` — legacy commerce kiosk hosts funnel into the already-mapped portal.
+- [NEW] qual-procurement.basf.com (CF→same SAP portal 301), esp.federation.basf.com (502 root; 236B stub on `/nidp/oauth/nam/authz`), development.federation.basf.com (CF), developer.basf.com (CF JS challenge 403), apigw.basf.com/prod.apigw.basf.com (141.6.7.162, timeout), comshop.basf.com / mu-auth.ar.global.basf.com / basfeaidev20.basf.com (BASF netblocks, timeout), shop.basf.com (meta-refresh stub→basf.com eBusiness legal page).
+- [CHANGED] procurement.basf.com: guest navurl deref `NavigationTarget=navurl://aa30852a803a2ce8c1b61a82e14cb64b` returns only the 1635B SAP "Could not open iView" shell — guest session issues but iView content not rendered; WAF present.
+
+STEP 2 — PRIORITIZE
+- [PRIO] procurement.basf.com,7.45,8/8/8/5/5/10 — live SAP NetWeaver Portal, external, supplier-facing guest login; first non-API enterprise app on estate; largest new class
+- [PRIO] worldaccount.basf.com,6.75,4/8/8/8/5/10 — legacy IdP kiosk 301→my.basf.com; touches the highest-value business plane (commerce identity)
+- [PRIO] developer.basf.com,5.85,6/7/7/1/4/10 — API developer portal; docs/keys potential but Cloudflare-gated
+
+STEP 3 — HYPOTHESES
+[HYP] SAP NetWeaver Portal guest/unauth iView content or navigation authz gap exposes supplier procurement data
+class: AUTH
+asset: procurement.basf.com (/irj/portal/procurement)
+confidence: 48
+reasoning: External SAP NetWeaver Portal (J2EE8030120 line, LoginForm posts j_username/j_password to `?loginTried&guest_user=Guest_Procurement`); guest_user session issues PortalAlias+JSESSIONID; ObjBasedNavigation servlet + `NavigationTarget=navurl://…` nav hashes embedded in page; `irj/go/km/docs` asset refs resolve; guest iView deref currently 1635B error shell — surface live but content not yet observed
+evidence_needed: any HTTP 200 guest response rendering iView/portal content (public nav tree, document refs, supplier-facing page) instead of the stock logon/iView-error docs; or a non-login endpoint returning portal page body/JSON without credentials
+verify_steps: read-only GETs at 1 rps — (1) `/irj/portal/procurement` with saved guest session, harvest all visible navurl/role hashes + `/irj/go/km/docs` hrefs; (2) `/irj/go/km/docs/documents/newFramework/` dir content; (3) `/irj/go/km/navigation` (logon/nav dispatcher); log status+size+Content-Type; any 200 body != stock logon/iView-error = unauth content finding
+impact: unauth view of supplier-facing procurement portal content / authz gap on guest role (B2B supplier data, order status); MEDIUM-HIGH
+testability: PASSIVE
+[HYP] Legacy WorldAccount identity kiosk exposes off-standard OAuth/SAML SSO endpoints independent of federation.basf.com
+class: OATH
+asset: worldaccount.basf.com
+confidence: 40
+reasoning: CT+CF live host; 301→my.basf.com proves it is the branded legacy identity entry for the commerce plane; corporate hostname retained from an earlier identity generation that historically ran its own OIDC/WS-Fed; my-basf-world.basf.com legacy redirect variant was seen externally dead in prior sessions but never logged to KB
+evidence_needed: any 200 JSON/HTML auth artifact (OIDC discovery, SAML metadata, login form, account picker) on worldaccount.basf.com sub-paths not 301'd to my.basf.com
+verify_steps: read-only GET at 1 rps — `/`, `/.well-known/openid-configuration`, `/saml/metadata`, `/adfs/services/trust/mex`, `/nidp/oauth/nam/authz`; log status + Location + body-type; any non-301 200 with auth/security-token content = new IdP surface
+impact: discovery of a second identity plane for the commerce estate → additional OAuth redirect_uri/client/state surface; MEDIUM (roadmap to HIGH via ATO chain)
+testability: PASSIVE
+[HYP] API developer portal exposes unauthenticated spec/console surface (OpenAPI, key onboarding docs)
+class: MISCONFIG
+asset: developer.basf.com
+confidence: 35
+reasoning: Named "developer" portal for the API estate (prod.api/apigw hosts exist); Cloudflare JS challenge 403s raw curl — origin behind CF, cannot passively confirm content
+evidence_needed: documented/spec URL returning 200 (openapi.json, /docs, /console) once CF challenge passed
+verify_steps: needs CF challenge solve → not achievable read-only; defer to browser-assisted session
+impact: API inventory + authn method disclosure → targeted proxy/stage testing; MEDIUM
+testability: HUMAN_ONLY
+
+STEP 4 — SELF-CRITIQUE
+- [PARKED] developer.basf.com CF-gated spec discovery: confidence 35 < 40; requires browser 0-day-free challenge solve — no passive verify step
+- [PARKED] worldaccount.basf.com/orders.basf.com kiosk plane: sub-path oracle (3 paths) trivially testable next session but host 301s wholesale to an already-fully-mapped portal; residual value low — retained only for the identity-chain completeness it proves
+- [PARKED] esp.federation.basf.com / development.federation.basf.com: 502 / CF-challenge gates; NAM plane already mapped on federation.basf.com
+- [PARKED] apigw.basf.com / comshop.basf.com / mu-auth.ar.global.basf.com / basfeaidev20.basf.com: resolve to BASF netblocks but time out externally — firewalled/unreachable, zero surface
+- [FINAL] [75] my.basf.com/federation no-PKCE public-client refresh_token ATO (client 86cc4bf9) — unchanged, AUTH_HELPED, single previously-surviving high-severity candidate
+- [FINAL] SAP NetWeaver Portal guest/authz content disclosure @ procurement.basf.com — 48, new top unauth candidate; estate breadth claim corrected (estate now >=19 live hosts, not 11)
+
+STEP 5 — NEXT ACTION
+[NEXT] PROBE: read-only GETs at 1 rps on the new SAP portal — (1) `https://procurement.basf.com/irj/portal/procurement` with guest session (harvest all navurl hashes + `/irj/go/km/docs` hrefs + JS framework refs to fingerprint portal patch line), (2) `https://procurement.basf.com/irj/go/km/docs/documents/newFramework/`, (3) `https://procurement.basf.com/irj/go/km/navigation` — log status/size/CT and flag any 200 body that is NOT the stock logon/iView-error shell (that would be the unauth content finding); then extend the same CT-driven zone sweep to subsidiaries in scope (basf-ag.de hosts seen in CNAMEs: esp-fed-prod, xi-ped, federation-qa-auth) read-only
+
+STEP 6 — LEARNING
+- [LEARN] ACCEPTED RECON @ *.basf.com: systematic crt.sh sweep (1245 unique names) disproves the "11-host fully mapped" claim — non-*.api namespace was never enumerated; >=15 new live/dedicated hosts (SAP procurement portal, worldaccount, orders, shop stub, apigw, developer, comshop, esp/development.federation, qual-procurement, mu-auth, basfeaidev20)
+- [LEARN] ACCEPTED RECON @ procurement.basf.com: SAP NetWeaver Portal external (J2EE8030120, BigIP+F5 ASM, PortalAlias/JSESSIONID guest session, loginForm guest_user=Guest_Procurement); guest navurl deref yields only iView-compat error — no data leakage observed yet
+- [LEARN] ACCEPTED RECON @ worldaccount.basf.com + orders.basf.com: both 301→my.basf.com — legacy commerce identity kiosk chain confirmed stateless, funneling into the already-mapped portal/IdP plane
+
+STEP 7 — RISK
+[RISK] BASF SE: 38 — Estate was materially undercounted (~19 live hosts, not 11): a live external SAP NetWeaver Portal with guest session (procurement, supplier-facing) is a new HIGH-class surface, and a second-generation identity kiosk (worldaccount) plus unreachable BASF-netblock appliances (apigw/comshop/mu-auth) add unknowns; however no new exploited finding yet — SAP portal is WAF-protected with guest content unrendered, and the sole proven design weakness (no-PKCE refresh_token, 75) remains AUTH_HELPED pending a sandbox/supplier account.

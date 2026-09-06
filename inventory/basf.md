@@ -190,3 +190,12 @@ www.basf.com
 - CHANGED federation.basf.com: NAM OIDC/SAML/JWKS surface mapped end-to-end via discovery-advertised paths; all administrative endpoints auth-gated (clients 401, introspect/revoke 405, userinfo 401, end_session
 - CHANGED federation.basf.com: OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims
 - CHANGED federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
+
+## 2026-09-06 23:16:09 UTC
+- CHANGED federation.basf.com: NAM OIDC discovery at /nidp/oauth/nam/.well-known/openid-configuration discloses real registration_endpoint /nidp/oauth/nam/clients (401 auth-required — earlier 404 test hit wrong
+- NEW federation.basf.com/nidp/saml2/metadata -> 200 signed text/xml IdP+SP SAML2 descriptor (21434B): entityID, SSO POST/Redirect /nidp/saml2/sso, SLO /nidp/saml2/slo(+_return), SOAP /nidp/saml2/soap + sps
+- NEW federation.basf.com OIDC discovery content: grant_types incl password(ROPC)+hybrid, code_challenge_methods plain+S256, scopes urn:netiq.com:nam:scope:oauth:registration:full|read, claims incl '/UserAt
+- NEW my.basf.com/.auth/config + /.auth/me → HTTP 200 (204926B) = SPA fallback (title `myBASFWorld`, boot config incl. clientId 86cc4bf9) — NOT App Service EasyAuth; the OAuth redirect_uri callback is a pur
+- CHANGED federation.basf.com discovery reconfirmed unchanged: grant_types still incl. authorization_code/password/hybrid, code_challenge plain+S256, registration_endpoint /nidp/oauth/nam/clients — no provider-
+- NEW my.basf.com/.auth/config + /.auth/me → HTTP 200 (204926B) = SPA fallback (title `myBASFWorld`, boot config incl. clientId 86cc4bf9) — NOT App Service EasyAuth; the OAuth redirect_uri callback is a pur
+- CHANGED federation.basf.com discovery reconfirmed unchanged: grant_types still incl. authorization_code/password/hybrid, code_challenge plain+S256, registration_endpoint /nidp/oauth/nam/clients — no provider-

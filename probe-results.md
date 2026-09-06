@@ -239,3 +239,17 @@ https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86
 https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
 https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
 https://www.basf.com/us/en -> 200 len=639999
+
+## 2026-09-06 23:16:26 UTC
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://www.basf.com/us/en -> 200 len=639996
+https://my.basf.com/ -> 200 len=204926
+https://my.basf.com/saml/metadata -> 200 len=204926
+https://my.basf.com/adfs/.well-known/openid-configuration -> 200 len=204926
+https://my.basf.com/oauth2/authorize?response_type=code&client_id=test&redirect_uri=https://evil.com -> 200 len=204926
+https://prod.api.basf.com -> HTTP 404
+https://federation.basf.com/nidp/oauth/nam/authz -> HTTP 400
+https://my.basf.com/.auth -> 200 len=205013
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-…&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth -> ERR 'ascii' codec can't encode character '\u2026' in p
