@@ -294,3 +294,13 @@ https://procurement.basf.com/irj/servlet/webdav/documents/newFramework/` -> 200 
 https://tm.basf.com/irj/go/km/docs/documents/newFramework/` -> HTTP 404
 https://passage-europe.basf.com/irj/go/km/docs/documents/newFramework/` -> 200 len=235
 https://vss3.basf.com/irj/go/km/docs/documents/newFramework/` -> 200 len=235
+
+## 2026-09-07 21:43:56 UTC
+https://procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/?path=/documents/newFramework -> HTTP 500
+https://procurement.basf.com/irj/servlet/webdav/documents/newFramework/ -> 200 len=236
+https://tm.basf.com/irj/go/km/docs/documents/newFramework/ -> 200 len=?
+https://passage-europe.basf.com/irj/go/km/docs/documents/newFramework/ -> 200 len=?
+https://vss3.basf.com/irj/go/km/docs/documents/newFramework/ -> 200 len=?
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://my.basf.com/.auth -> 200 len=205013

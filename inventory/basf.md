@@ -211,3 +211,5 @@ www.basf.com
 - NEW tm.basf.com (141.6.3.192), passage-europe.basf.com (141.6.3.132), vss3.basf.com (141.6.3.183): all DNS-resolve on same /16 as procurement — **ZERO successful HTTP probes** exist; every prior attempt h
 - NEW procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/ → **HTTP 500** (not 236B WAF block) — SAP KM documents servlet reached J2EE backend and returned server error; this path is
 - CHANGED procurement.basf.com /irj/go/km/* all confirmed 200 len=236 = F5-ASM WAF block page (consistent, no content)
+
+## 2026-09-07 21:43:42 UTC

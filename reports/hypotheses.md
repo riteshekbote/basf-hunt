@@ -626,3 +626,7 @@
 - LEARN: ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clie
 - LEARN: REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint
 - LEARN: ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
+
+## RANKED HYPOTHESES 2026-09-07 21:43:42 UTC
+- [40] procurement.basf.com/irj/servlet/prt/portal/prtroot/: SAP prtroot dispatcher servlet returns guest-visible KM/nav content on procurement (from art/lead_bigpickle.txt)
+- NEXT(hypotheses-bigpickle.txt): PROBE: at 1 rps with procurement guest session (from GET /irj/portal/procurement?guest_user=Guest_Procurement, reuse JSESSIONID+PortalAlias jar), GET the 8 prtr
