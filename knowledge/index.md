@@ -157,3 +157,8 @@
 - 2026-09-07 REJECTED RECON @ worldaccount.basf.com: 301→my.basf.com (CloudFront); no separate identity surface
 - 2026-09-07 REJECTED RECON @ developer.basf.com: 403 Cloudflare JS-challenge blocks passive probing
 - 2026-09-07 ACCEPTED RECON @ procurement.basf.com: info-disclosure — CSP leaks 6 internal basf.net editor/QA hostnames + eipr3.basf.net (none resolve externally); BigIP cookie leaks backend 10.4.241.18; saplb cookie leaks J2EE patch level (informational only)
+- 2026-09-07 NEW RECON @ procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/: HTTP 500 (not 236B block) — SAP KM documents servlet reached J2EE backend, F5-ASM does not intercept this path; 500 = server processing, not rejection; new unfiltered surface
+- 2026-09-07 NEW RECON @ tm/vss3/passage-europe.basf.com: DNS resolves (all 141.6.3.x /16) but ZERO successful HTTP probes due to shell backtick bug in prior curl commands; completely unprobed live surfaces
+- 2026-09-07 REJECTED RECON @ tm.basf.com` + passage-europe.basf.com`: prior "ERR Name or service not known" was caused by backtick appended to hostname in curl, not actual DNS failure
+- 2026-09-07 ACCEPTED RECON @ procurement.basf.com: live external SAP NetWeaver Portal (J2EE8030120/8030153, F5 BigIP+ASM), supplier-facing procurement login shell with guest `Guest_Procurement`; OBN hashes aa30852a/ae0d65de both render "No navigation possible" for guest; KM/admin paths WAF-blocked (Request Rejected)
+- 2026-09-07 ACCEPTED RECON @ tm/passage-europe/vss3.basf.com: 3 additional live SAP supplier portals (TRD/Pass@ge/VSS3), same BigIP+J2EE fingerprint + guest scheme; hosts discovered only via procurement CSP frame-ancestors; all redirect to /irj/portal/*?guest_user=Guest_*

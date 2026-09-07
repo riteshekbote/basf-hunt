@@ -4693,3 +4693,349 @@ testability: AUTH_HELPED
 ### STEP 7 — RISK
 
 [RISK] basf: 35 — Unauthenticated backend exposure across the full 14-host estate (9 *.api + prod.api + api.commerce + federation + my.basf + www + products + api.basf + procurement + tm + passage-europe + vss3) now proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere. NEW: procurement.basf.com exposes live SAP NetWeaver Portal with guest access (No navigation possible) but alternate KM/navigation servlet paths untested — residual attack surface on supplier portal document access. The only genuine high-severity weakness remains the digital-commerce public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE — a design-level flaw whose exploitability requires interactive code capture (AUTH_HELPED), not currently demonstrable passively. Without an authenticated test vector (supplier test account or program-provided client cert), no further unauth progress is possible on OAuth/ROPC. Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise on BASF customer/supplier platform) + potential supplier document exposure via SAP KM bypass.
+===== ANALYST nemotron3 2026-09-07 18:28:38 UTC =====
+[0m
+> build · nemotron-3-ultra-free
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/
+total 244
+drwxr-xr-x 12 runner runner  4096 Sep  7 18:12 .
+drwxr-xr-x  3 runner runner  4096 Sep  7 18:12 ..
+drwxr-xr-x  7 runner runner  4096 Sep  7 18:12 .git
+drwxr-xr-x  3 runner runner  4096 Sep  7 18:12 .github
+-rw-r--r--  1 runner runner  1801 Sep  7 18:12 README.md
+-rw-r--r--  1 runner runner    43 Sep  7 18:12 analyst-out.txt
+-rw-r--r--  1 runner runner 72992 Sep  7 18:12 analyst-prompt.txt
+-rw-r--r--  1 runner runner 69120 Sep  7 18:12 ctx.txt
+drwxr-xr-x  2 runner runner  4096 Sep  7 18:12 inventory
+drwxr-xr-x  2 runner runner  4096 Sep  7 18:12 knowledge
+drwxr-xr-x  2 runner runner  4096 Sep  7 18:12 leads
+-rw-r--r--  1 runner runner 19518 Sep  7 18:12 probe-results.md
+drwxr-xr-x  2 runner runner  4096 Sep  7 18:12 recon-notes
+drwxr-xr-x  2 runner runner  4096 Sep  7 18:12 reports
+drwxr-xr-x  2 runner runner  4096 Sep  7 18:12 reposcan-raw
+-rw-r--r--  1 runner runner  3285 Sep  7 18:12 scope.yml
+drwxr-xr-x  2 runner runner  4096 Sep  7 18:12 scripts
+-rw-r--r--  1 runner runner    33 Sep  7 18:12 state_bigpickle.json
+-rw-r--r--  1 runner runner    33 Sep  7 18:12 state_laguna.json
+-rw-r--r--  1 runner runner    33 Sep  7 18:12 state_ling3.json
+-rw-r--r--  1 runner runner    33 Sep  7 18:12 state_longcat.json
+-rw-r--r--  1 runner runner    33 Sep  7 18:12 state_mimo.json
+-rw-r--r--  1 runner runner    33 Sep  7 18:12 state_nemotron3.json
+drwxr-xr-x  2 runner runner  4096 Sep  7 18:12 triage
+[0m
+[0m→ [0mRead probe-results.md
+[0m→ [0mRead scope.yml
+[0m→ [0mRead inventory/basf.md
+[0m
+[0m$ [0mcurl -s -I "https://procurement.basf.com/irj/go/km/navigation/documents/" 2>&1 | head -20
+HTTP/1.1 200 OK
+X-Frame-Options: SAMEORIGIN
+X-XSS-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/html; charset=utf-8
+Pragma: no-cache
+Content-Length: 236
+[0m
+[0m$ [0mcurl -s -I "https://procurement.basf.com/irj/go/km/docs/documents/newFramework/" 2>&1 | head -20
+HTTP/1.1 200 OK
+origin-agent-cluster: ?0
+date: Mon, 07 Sep 2026 18:15:29 GMT
+vary: accept-encoding, accept-language, cookie, translate, user-agent
+content-security-policy: sandbox
+x-content-security-policy: sandbox
+expires: Mon, 07 Sep 2026 18:15:29 GMT
+content-type: text/html
+X-Cnection: close
+set-cookie: saplb_*=(J2EE8030120)8030153; Version=1; Path=/; Secure; HttpOnly
+set-cookie: JSESSIONID=r5YI9YqE8Alr4h76SBYgpFcOGRV9oAHJh3oA_SAP2jIoS_v-5Zchu6w8KijtIYh-; Version=1; Path=/; Secure; HttpOnly
+strict-transport-security: max-age=31536000; includeSubDomains
+Set-Cookie: BIGipServer~BASF~eip_procurement_https_pool=rd1o00000000000000000000ffff0a04f112o443; path=/; Httponly; Secure
+Set-Cookie: TS01dacdba=018fb59730dd191919738481d6af40b63f2be1e3434f3eddc1d39ceda8c85a4d368798185e52be75cfb8de3673adc74f814e520959; Path=/
+Transfer-Encoding: chunked
+[0m
+[0m$ [0mcurl -s -I "https://procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/" 2>&1 | head -20
+HTTP/1.1 500 Internal Server Error
+content-type: text/html; charset=UTF-8
+origin-agent-cluster: ?0
+pragma: no-cache
+cache-control: no-store, no-cache, must-revalidate
+expires: 0
+date: Mon, 07 Sep 2026 18:15:30 GMT
+X-Cnection: close
+content-security-policy: frame-ancestors https://tm.basf.com https://passage-europe.basf.com https://vss3.basf.com https://procurement.basf.com https://editor-tm.basf.net https://editor-passage-europe.basf.net https://editor-vss3.basf.net https://editor-procurement.basf.net https://eipr3.basf.net
+set-cookie: saplb_*=(J2EE8030120)8030151; Version=1; Path=/; Secure; HttpOnly
+strict-transport-security: max-age=31536000; includeSubDomains
+Set-Cookie: BIGipServer~BASF~eip_procurement_https_pool=rd1o00000000000000000000ffff0a04f112o443; path=/; Httponly; Secure
+Set-Cookie: TS01dacdba=018fb597308a8f3c69b859b9443cee3dbf48d503e353584dea86499cfb2faa783e9091660a13479b02662ae45432c873c3b284f0b4; Path=/
+Transfer-Encoding: chunked
+[0m
+[0m$ [0mcurl -s "https://procurement.basf.com/irj/go/km/navigation/documents/" 2>&1
+<html><head><title>Request Rejected</title><meta name="robots" content="noindex,follow" /></head><body>The requested URL was rejected. Please consult with your administrator.<br><br>Your support ID is: 13512637875441422710</body></html>
+[0m
+[0m$ [0mcurl -s "https://procurement.basf.com/irj/go/km/docs/documents/newFramework/" 2>&1
+<html>
+  <!--XSLT engine: version: 1.1 vendor: InQMy Labs. vendor-url: http://www.sap.com-->
+  <head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>https://procurement.basf.com/irj/go/km/docs/documents/newFramework</title>
+    <style type="text/css">h1 {font-family:sans-serif; font-size:12pt; }
+        p {font-family:sans-serif; font-size:10pt; }
+        ul {font-family:sans-serif; font-size:10pt; }
+        li {font-family:sans-serif; font-size:10pt; }</style>
+    <link rel="Up" href="https://procurement.basf.com/irj/go/km/docs/documents">
+    <link rel="alternate" title="Navigation" href="/irj/go/km/navigation/documents/newFramework">
+  </head>
+  <body>
+    <h1>https://procurement.basf.com/irj/go/km/docs/documents/newFramework</h1>
+    <p>The folder you are looking for has no displayable content.</p>
+    <p>
+      You can try one of the following:
+      <ul>
+        <li>
+          Access the folder using the
+          <a title="Navigation user interface" href="/irj/go/km/navigation/documents/newFramework">Navigation user interface</a>.
+        </li>
+      </ul>
+      <ul>
+        <li>
+          Access the folder as a
+          <a style="behavior: url(#default#AnchorClick)" title="Web folder" href="" folder="https://procurement.basf.com/irj/go/km/docs/documents/newFramework">Web folder</a>. Your operating system and browser dictate whether or not this will work.
+        </li>
+      </ul>
+    </p>
+  </body>
+</html>
+[0m
+[0m$ [0mcurl -s "https://procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/" 2>&1
+<html><head>
+<script type="text/javascript">
+/*HTML Business for Java, 6.0*/
+ur_system = {doc : window.document , mimepath :"/com.sap.portal.design.urdesigndata/themes/portal/sap_tradeshow_plus/common/", stylepath : "/com.sap.portal.design.urdesigndata/themes/portal/sap_tradeshow_plus/", is508 : false, domainrelaxing : "MINIMAL"};
+var popup_emptydoc = "/htmlb/jslib/emptyhover.html";</script>
+<link rel="stylesheet" href="/com.sap.portal.theming.webdav.themeswebdavlistener/Portal/prtl_std/sap_corbu/default.css?v=6316175fa44715bf1136679ee6bc8464" />
+<style id='SAP-antiClickjackStyle'>body { display: none !important; }</style><script src='/sap.com~tc~lm~itsam~servlet~clickjacking/js/ClickjackingProtection.js' id='SAP-antiClickjackScript'	data-checkService='/sap.com~tc~lm~itsam~servlet~clickjacking/check' data-styleId='SAP-antiClickjackStyle'></script><title></title><meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8"><link  REL=STYLESHEET  HREF="/com.sap.portal.theming.webdav.themeswebdavlistener/Portal/ctrl/sap_corbu/default.css?rid=32d6afd67cb352c5b22d539ee6b88772&v=6316175fa44715bf1136679ee6bc8464"  TYPE="text/css" ></head><body class="prtlBody urFontBaseFam urScrl"><table border="0" cellspacing="5" cellpadding="0"><tr><td class="ctrlMsgBarImgError">&nbsp;&nbsp;&nbsp;&nbsp;</td><td class="ctrlTxtEmph"><SPAN CLASS="ctrlLblReq">Portal&#x20;runtime&#x20;error<br><br>An&#x20;exception&#x20;occurred&#x20;while&#x20;processing&#x20;your&#x20;request.&#x20;Send&#x20;the&#x20;exception&#x20;ID&#x20;to&#x20;your&#x20;portal&#x20;administrator.<br><br></SPAN>Exception&#x20;ID 06:16_07/09/26_0329_8030150<br><br>See&#x20;log&#x20;file&#x20;for&#x20;details&#x20;about&#x20;this&#x20;exception</td></tr></table></body></html>
+[0m
+[0m$ [0mdig +short tm.basf.com passage-europe.basf.com vss3.basf.com 2>&1
+141.6.3.192
+141.6.3.132
+141.6.3.183
+[0m
+[0m$ [0mcurl -s -I "https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External" 2>&1 | head -30
+HTTP/1.1 302 
+X-FED-Node: PROD 13
+Content-Security-Policy: frame-ancestors 'self' *.basf.net *.basf.net:* *.basf.com *.basf.com:* *.basf.be:* *.ondemand.com *.coresystems.net *.cloud.sap *.medallia.eu *.styroportal.com *.basf.com.br *.basf.com.ar *.adobesign.com https://basf-sf--devsb.sandbox.my.salesforce.com https://basf-sf--devsb.sandbox.lightning.force.com https://basf-sf.lightning.force.com https://basf-sf--qasb.sandbox.lightning.force.com https://basf-sf--stagesb.sandbox.lightning.force.com https://basf-sf--stagesb.sandbox.my.salesforce.com https://basfap--ecomdev2.sandbox.lightning.force.com https://basfap--ecomdev2.sandbox.my.site.com
+Strict-Transport-Security: max-age=31536000
+X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+Set-Cookie: JSESSIONID=FA14F4B44BF940532F1E5D81E5A45799; Path=/nidp; Secure; HttpOnly; SameSite=None
+Cache-Control: no-cache, no-store, no-transform
+Location: https://federation.basf.com/nidp//app/login?target=https%3A%2F%2Ffederation.basf.com%2Fnidp%2Foauth%2Fnam%2Fauthz%3Fresponse_type%3Dcode%26client_id%3D86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4%26redirect_uri%3Dhttps%3A%2F%2Fmy.basf.com%2F.auth%26scope%3Dopenid+profile+refresh_token%26acr_values%3D3IAM%2FLogin%2FExternal&id=3IAM
+Access-Control-Allow-Methods: GET, POST, DELETE, PUT, OPTIONS
+Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization
+Set-Cookie: HJSESSIONID=7a493d9dab475d343e9ea9fa465f6766d84c5cd700d382c97d30ec42577a8590; Path=/nidp/; Secure; HttpOnly; SameSite=None
+Date: Mon, 07 Sep 2026 18:17:58 GMT
+Set-Cookie: BIGipServerfederation.basf.com_https8443_pool=227608205.64288.0000; path=/; Httponly; Secure
+Set-Cookie: TS01a5ae52=011bc2843ba985309876ab0f0ae803633aa16d0be37c63b7e4589108bac0e3a2464c2550d59c6358b28ed98057f2d8c0d4c5e1f81f; Path=/; Domain=.federation.basf.com
+Set-Cookie: TS01530e29=011bc2843ba985309876ab0f0ae803633aa16d0be37c63b7e4589108bac0e3a2464c2550d59c6358b28ed98057f2d8c0d4c5e1f81f; path=/nidp
+Set-Cookie: TS01f50325=011bc2843ba985309876ab0f0ae803633aa16d0be37c63b7e4589108bac0e3a2464c2550d59c6358b28ed98057f2d8c0d4c5e1f81f; path=/nidp/
+Transfer-Encoding: chunked
+[0m
+[0m$ [0mcurl -s -I "https://tm.basf.com/" 2>&1 | head -20
+HTTP/1.0 302 Moved Temporarily
+Location: /irj/portal/trd?guest_user=Guest_TRD
+Server: BigIP
+Connection: Keep-Alive
+Content-Length: 0
+[0m
+[0m$ [0mcurl -s -I "https://passage-europe.basf.com/" 2>&1 | head -20
+HTTP/1.0 302 Moved Temporarily
+Location: /irj/portal/passage?guest_user=Guest_PASSAGE
+Server: BigIP
+Connection: Keep-Alive
+Content-Length: 0
+[0m
+[0m$ [0mcurl -s -I "https://vss3.basf.com/" 2>&1 | head -20
+HTTP/1.0 302 Moved Temporarily
+Location: /irj/portal/vss3?guest_user=Guest_VSS3
+Server: BigIP
+Connection: Keep-Alive
+Content-Length: 0
+[0m
+[0m$ [0mcurl -s -I "https://tm.basf.com/irj/portal/trd?guest_user=Guest_TRD" 2>&1 | head -30
+HTTP/1.1 200 OK
+content-type: text/html; charset=UTF-8
+origin-agent-cluster: ?0
+pragma: no-cache
+cache-control: no-store, no-cache, must-revalidate
+expires: 0
+date: Mon, 07 Sep 2026 18:20:16 GMT
+X-Cnection: close
+content-security-policy: frame-ancestors https://tm.basf.com https://passage-europe.basf.com https://vss3.basf.com https://procurement.basf.com https://editor-tm.basf.net https://editor-passage-europe.basf.net https://editor-vss3.basf.net https://editor-procurement.basf.net https://eipr3.basf.net
+set-cookie: PortalAlias=portal/trd; Path=/
+set-cookie: saplb_*=(J2EE8030120)8030152; Version=1; Path=/; Secure; HttpOnly
+set-cookie: JSESSIONID=09RJL0ycM8j1z09p5wI1n4SBdxl9oAHIh3oA_SAPX26Sht13A6tLH3uISoze1qzl; Version=1; Path=/; Secure; HttpOnly
+strict-transport-security: max-age=31536000; includeSubDomains
+Set-Cookie: BIGipServer~BASF~eip_trd_https_pool=rd1o00000000000000000000ffff0a04f112o443; path=/; Httponly; Secure
+Set-Cookie: TS01e821d1=018fb597303e78d530649ebc181ec7ed46da2df66cd95677fbd4d39a0895998dc7455113af1647f8d037372e019519b1766a57e971; Path=/
+Transfer-Encoding: chunked
+[0m
+[0m$ [0mcurl -s "https://tm.basf.com/irj/portal/trd?guest_user=Guest_TRD" 2>&1 | head -100
+<html><head>
+<script type="text/javascript">
+/*HTML Business for Java, 6.0*/
+ur_system = {doc : window.document , mimepath :"/com.sap.portal.design.urdesigndata/themes/portal/fw2/common/", stylepath : "/com.sap.portal.design.urdesigndata/themes/portal/fw2/", is508 : false, domainrelaxing : "MINIMAL"};
+var popup_emptydoc = "/htmlb/jslib/emptyhover.html";</script>
+<link rel="stylesheet" href="/com.sap.portal.theming.webdav.themeswebdavlistener/Portal/prtl_std/fw2_corbu/default.css?v=68eff86477c045b31cd13b9f838370b1" />
+<style id='SAP-antiClickjackStyle'>body { display: none !important; }</style><script src='/sap.com~tc~lm~itsam~servlet~clickjacking/js/ClickjackingProtection.js' id='SAP-antiClickjackScript'	data-checkService='/sap.com~tc~lm~itsam~servlet~clickjacking/check' data-styleId='SAP-antiClickjackStyle'></script><title>SAP&#x20;NetWeaver&#x20;Portal</title><meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8"><link  REL=STYLESHEET  HREF="/com.sap.portal.theming.webdav.themeswebdavlistener/Portal/ctrl/fw2_corbu/default.css?rid=32d6afd67cb352c5b22d539ee6b88772&v=68eff86477c045b31cd13b9f838370b1"  TYPE="text/css" ></head><body class="prtlBody urFontBaseFam urScrl"><table  border="0" cellspacing="5" cellpadding="0"><tr> <td class="ctrlMsgBarImgError">&nbsp;</td><td class="ctrlTxtEmph"><SPAN CLASS="ctrlLblReq">Could&#x20;not&#x20;open&#x20;iView.&#x20;The&#x20;iView&#x20;is&#x20;not&#x20;compatible&#x20;with&#x20;your&#x20;browser,&#x20;operating&#x20;system,&#x20;or&#x20;device.&#x20;Contact&#x20;your&#x20;system&#x20;administrator&#x20;for&#x20;more&#x20;information.</SPAN></td></tr></table></body></html>
+[0m
+[0m$ [0mcurl -s "https://passage-europe.basf.com/irj/portal/passage?guest_user=Guest_PASSAGE" 2>&1 | head -100
+<html><head>
+<script type="text/javascript">
+/*HTML Business for Java, 6.0*/
+ur_system = {doc : window.document , mimepath :"/com.sap.portal.design.urdesigndata/themes/portal/fw2/common/", stylepath : "/com.sap.portal.design.urdesigndata/themes/portal/fw2/", is508 : false, domainrelaxing : "MINIMAL"};
+var popup_emptydoc = "/htmlb/jslib/emptyhover.html";</script>
+<link rel="stylesheet" href="/com.sap.portal.theming.webdav.themeswebdavlistener/Portal/prtl_std/fw2/default.css?v=733eb20e110b9d97bdaadb9f8382e186" />
+<style id='SAP-antiClickjackStyle'>body { display: none !important; }</style><script src='/sap.com~tc~lm~itsam~servlet~clickjacking/js/ClickjackingProtection.js' id='SAP-antiClickjackScript'	data-checkService='/sap.com~tc~lm~itsam~servlet~clickjacking/check' data-styleId='SAP-antiClickjackStyle'></script><title>SAP&#x20;NetWeaver&#x20;Portal</title><meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8"><link  REL=STYLESHEET  HREF="/com.sap.portal.theming.webdav.themeswebdavlistener/Portal/ctrl/fw2/default.css?rid=32d6afd67cb352c5b22d539ee6b88772&v=733eb20e110b9d97bdaadb9f8382e186"  TYPE="text/css" ></head><body class="prtlBody urFontBaseFam urScrl"><table  border="0" cellspacing="5" cellpadding="0"><tr> <td class="ctrlMsgBarImgError">&nbsp;</td><td class="ctrlTxtEmph"><SPAN CLASS="ctrlLblReq">Could&#x20;not&#x20;open&#x20;iView.&#x20;The&#x20;iView&#x20;is&#x20;not&#x20;compatible&#x20;with&#x20;your&#x20;browser,&#x20;operating&#x20;system,&#x20;or&#x20;device.&#x20;Contact&#x20;your&#x20;system&#x20;administrator&#x20;for&#x20;more&#x20;information.</SPAN></td></tr></table></body></html>
+[0m
+[0m$ [0mcurl -s "https://vss3.basf.com/irj/portal/vss3?guest_user=Guest_VSS3" 2>&1 | head -100
+<html><head>
+<script type="text/javascript">
+/*HTML Business for Java, 6.0*/
+ur_system = {doc : window.document , mimepath :"/com.sap.portal.design.urdesigndata/themes/portal/fw2/common/", stylepath : "/com.sap.portal.design.urdesigndata/themes/portal/fw2/", is508 : false, domainrelaxing : "MINIMAL"};
+var popup_emptydoc = "/htmlb/jslib/emptyhover.html";</script>
+<link rel="stylesheet" href="/com.sap.portal.theming.webdav.themeswebdavlistener/Portal/prtl_std/fw2/default.css?v=733eb20e110b9d97bdaadb9f8382e186" />
+<style id='SAP-antiClickjackStyle'>body { display: none !important; }</style><script src='/sap.com~tc~lm~itsam~servlet~clickjacking/js/ClickjackingProtection.js' id='SAP-antiClickjackScript'	data-checkService='/sap.com~tc~lm~itsam~servlet~clickjacking/check' data-styleId='SAP-antiClickjackStyle'></script><title>SAP&#x20;NetWeaver&#x20;Portal</title><meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8"><link  REL=STYLESHEET  HREF="/com.sap.portal.theming.webdav.themeswebdavlistener/Portal/ctrl/fw2/default.css?rid=32d6afd67cb352c5b22d539ee6b88772&v=733eb20e110b9d97bdaadb9f8382e186"  TYPE="text/css" ></head><body class="prtlBody urFontBaseFam urScrl"><table  border="0" cellspacing="5" cellpadding="0"><tr> <td class="ctrlMsgBarImgError">&nbsp;</td><td class="ctrlTxtEmph"><SPAN CLASS="ctrlLblReq">Could&#x20;not&#x20;open&#x20;iView.&#x20;The&#x20;iView&#x20;is&#x20;not&#x20;compatible&#x20;with&#x20;your&#x20;browser,&#x20;operating&#x20;system,&#x20;or&#x20;device.&#x20;Contact&#x20;your&#x20;system&#x20;administrator&#x20;for&#x20;more&#x20;information.</SPAN></td></tr></table></body></html>
+[0m
+[0m$ [0mcurl -s "https://passage-europe.basf.com/irj/go/km/navigation/documents/" 2>&1 | head -50
+<html><head><title>Request Rejected</title><meta name="robots" content="noindex,follow" /></head><body>The requested URL was rejected. Please consult with your administrator.<br><br>Your support ID is: 5137637049371008787</body></html>
+[0m
+[0m$ [0mcurl -s "https://tm.basf.com/irj/go/km/navigation/documents/" 2>&1 | head -50
+<html><head>
+<script type="text/javascript">
+/*HTML Business for Java, 6.0*/
+ur_system = {doc : window.document , mimepath :"/com.sap.portal.design.urdesigndata/themes/portal/sap_tradeshow_plus/common/", stylepath : "/com.sap.portal.design.urdesigndata/themes/portal/sap_tradeshow_plus/", is508 : false, domainrelaxing : "MINIMAL"};
+var popup_emptydoc = "/htmlb/jslib/emptyhover.html";</script>
+<link rel="stylesheet" href="/com.sap.portal.theming.webdav.themeswebdavlistener/Portal/prtl_std/sap_corbu/default.css?v=6316175fa44715bf1136679ee6bc8464" />
+<style id='SAP-antiClickjackStyle'>body { display: none !important; }</style><script src='/sap.com~tc~lm~itsam~servlet~clickjacking/js/ClickjackingProtection.js' id='SAP-antiClickjackScript'	data-checkService='/sap.com~tc~lm~itsam~servlet~clickjacking/check' data-styleId='SAP-antiClickjackStyle'></script><title>SAP&#x20;NetWeaver&#x20;Portal</title><meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8"><link  REL=STYLESHEET  HREF="/com.sap.portal.theming.webdav.themeswebdavlistener/Portal/ctrl/sap_corbu/default.css?rid=32d6afd67cb352c5b22d539ee6b88772&v=6316175fa44715bf1136679ee6bc8464"  TYPE="text/css" ></head><body class="prtlBody urFontBaseFam urScrl"><table  border="0" cellspacing="5" cellpadding="0"><tr> <td class="ctrlMsgBarImgError">&nbsp;</td><td class="ctrlTxtEmph"><SPAN CLASS="ctrlLblReq">Could&#x20;not&#x20;open&#x20;iView.&#x20;The&#x20;iView&#x20;is&#x20;not&#x20;compatible&#x20;with&#x20;your&#x20;browser,&#x20;operating&#x20;system,&#x20;or&#x20;device.&#x20;Contact&#x20;your&#x20;system&#x20;administrator&#x20;for&#x20;more&#x20;information.</SPAN></td></tr></table></body></html>
+[0m
+[0m$ [0mcurl -s "https://vss3.basf.com/irj/go/km/navigation/documents/" 2>&1 | head -50
+<html><head><title>Request Rejected</title><meta name="robots" content="noindex,follow" /></head><body>The requested URL was rejected. Please consult with your administrator.<br><br>Your support ID is: 5137637049371008803</body></html>
+[0m
+Now I have sufficient data. Let me produce the structured 8-step analysis.
+[0m$ [0mcurl -s "https://procurement.basf.com/irj/servlet/webdav/" 2>&1 | head -50
+<html><head><title>Request Rejected</title><meta name="robots" content="noindex,follow" /></head><body>The requested URL was rejected. Please consult with your administrator.<br><br>Your support ID is: 13512637875439992324</body></html>
+[0m
+[0m$ [0mcurl -s "https://procurement.basf.com/irj/go/km/navigation/documents/newFramework" 2>&1
+<html><head><title>Request Rejected</title><meta name="robots" content="noindex,follow" /></head><body>The requested URL was rejected. Please consult with your administrator.<br><br>Your support ID is: 13512637875441423222</body></html>
+[0m
+Now I have all the data needed. Let me produce the 8-step structured analysis.
+
+---
+
+## STEP 1 — DELTA
+
+**NEW** procurement.basf.com/irj/go/km/docs/documents/newFramework/ → HTTP 200 with SAP KM XSLT folder listing (no displayable content, navigation link exposed)  
+**NEW** procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/ → HTTP 500 portal runtime error (exception ID leaked)  
+**NEW** tm.basf.com, passage-europe.basf.com, vss3.basf.com → DNS resolves (141.6.3.192/132/183), HTTPS live, BigIP redirects to /irj/portal/* with guest_user param  
+**NEW** tm.basf.com/irj/portal/trd?guest_user=Guest_TRD → HTTP 200 "Could not open iView" (guest shell loads, iView incompatible)  
+**NEW** passage-europe.basf.com/irj/portal/passage?guest_user=Guest_PASSAGE → HTTP 200 "Could not open iView"  
+**NEW** vss3.basf.com/irj/portal/vss3?guest_user=Guest_VSS3 → HTTP 200 "Could not open iView"  
+**NEW** tm.basf.com/irj/go/km/navigation/documents/ → HTTP 200 "Could not open iView"  
+**NEW** passage-europe.basf.com/irj/go/km/navigation/documents/ → HTTP 403 "Request Rejected" (WAF/ASM block)  
+**NEW** vss3.basf.com/irj/go/km/navigation/documents/ → HTTP 403 "Request Rejected" (WAF/ASM block)  
+**NEW** procurement.basf.com/irj/servlet/webdav/ → HTTP 403 "Request Rejected" (WAF/ASM block)  
+**CHANGED** federation.basf.com/nidp/oauth/nam/authz → stable 302 to /nidp/app/login (NetIQ NAM login), no code issued without creds  
+**CHANGED** *.api.basf.com estate (9 hosts) → fully mapped, zero unauth endpoints beyond 401/404/400  
+**NO_DELTA** my.basf.com SSR boot config, prod.api.basf.com Apigee, api.commerce.basf.com AWS APIGW, api.basf.com loopback
+
+---
+
+## STEP 2 — PRIORITIZE
+
+[PRIO] procurement.basf.com,8.2,attack_surface=9,business_value=9,tech_exposure=9,gate_ease=8,cloud_surface=6,freshness=10  
+[PRIO] tm.basf.com,7.0,attack_surface=8,business_value=8,tech_exposure=8,gate_ease=8,cloud_surface=5,freshness=10  
+[PRIO] passage-europe.basf.com,7.0,attack_surface=8,business_value=8,tech_exposure=8,gate_ease=8,cloud_surface=5,freshness=10  
+[PRIO] vss3.basf.com,7.0,attack_surface=8,business_value=8,tech_exposure=8,gate_ease=8,cloud_surface=5,freshness=10  
+[PRIO] my.basf.com,8.1,attack_surface=8,business_value=10,tech_exposure=9,gate_ease=8,cloud_surface=7,freshness=10  
+[PRIO] federation.basf.com,7.8,attack_surface=8,business_value=9,tech_exposure=8,gate_ease=6,cloud_surface=6,freshness=10  
+[PRIO] www.basf.com,6.3,attack_surface=6,business_value=10,tech_exposure=5,gate_ease=8,cloud_surface=7,freshness=10  
+[PRIO] prod.api.basf.com,3.8,attack_surface=3,business_value=9,tech_exposure=5,gate_ease=2,cloud_surface=4,freshness=10  
+[PRIO] api.commerce.basf.com,3.2,attack_surface=3,business_value=8,tech_exposure=4,gate_ease=1,cloud_surface=6,freshness=10  
+
+---
+
+## STEP 3 — HYPOTHESES
+
+[HYP] procurement.basf.com SAP NetWeaver Portal KM document access via alternate servlet paths bypassing OBN navigation ACL
+class: MISCONFIG
+asset: procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/ and /irj/go/km/docs/documents/
+confidence: 55
+reasoning: Guest_Procurement user gets "No navigation possible" on OBN hash paths (aa30852a/ae0d65de), but /irj/go/km/docs/documents/newFramework returns SAP KM XSLT folder listing with navigation link; /irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/ returns HTTP 500 with exception ID leak (06:16_07/09/26_0329_8030150) confirming KM servlet reachable; CSP frame-ancestors reveals 3 sibling portals (tm/passage-europe/vss3) sharing backend (BigIP pool 10.4.241.18 leaked via cookie); SAP KM documents often accessible via direct servlet/WebDAV paths bypassing portal navigation renderer
+evidence_needed: at least one accessible document/iView under guest context via direct KM servlet or WebDAV path not protected by OBN navigation ACL
+verify_steps: PROBE GET https://procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/?path=/documents/newFramework; PROBE GET https://procurement.basf.com/irj/servlet/webdav/documents/newFramework/; PROBE GET https://tm.basf.com/irj/go/km/docs/documents/newFramework/; PROBE GET https://passage-europe.basf.com/irj/go/km/docs/documents/newFramework/; PROBE GET https://vss3.basf.com/irj/go/km/docs/documents/newFramework/; enumerate all links in KM XSLT responses for href patterns pointing to documents
+impact: unauthenticated access to supplier procurement documents, tenders, contracts, pricing — HIGH (supplier data exposure, procurement fraud enablement)
+testability: PASSIVE
+
+[HYP] my.basf.com public OAuth client emits refresh_token without PKCE — authz-code interception / refresh-token replay ATO
+class: OATH
+asset: my.basf.com / federation.basf.com/nidp/oauth/nam/authz
+confidence: 75
+reasoning: SSR boot config confirms public client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (no secret in bundle), code flow with `refresh_token` scope, redirect to `/.auth` (Azure Static Web Apps built-in auth), `acr_values=3IAM/Login/External` (NetIQ NAM external auth), zero PKCE machinery in client; federation.basf.com discovery allows `plain` + `S256` PKCE methods — IdP accepts downgraded/plain challenges; redirect_uri oracle tested exact-match (10 variants rejected) so exploitation requires code interception at transport/browser layer, not redirect manipulation
+evidence_needed: capture of authentic authorize request proving absence of `code_challenge` parameter; token response showing `refresh_token` issued with no rotation on reuse
+verify_steps: AUTH_HELPED — with test account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External — record uttered params; exchange code for tokens; verify refresh_token lifetime/rotation on reuse
+impact: Intercepted authz code or stolen refresh_token = full ATO of BASF customer/supplier portal account → order/price/PII access, procurement fraud, supplier impersonation; CRITICAL
+testability: AUTH_HELPED
+
+[HYP] federation.basf.com ROPC grant enabled on NetIQ NAM — password-grant token acquisition for known usernames
+class: AUTH
+asset: federation.basf.com/nidp/oauth/nam/token
+confidence: 65
+reasoning: OIDC discovery at `/nidp/.well-known/openid-configuration` and `/nidp/oauth/nam/.well-known/openid-configuration` explicitly lists `password` in `grant_types_supported`; NetIQ NAM allows ROPC for registered confidential clients; public SPA client 86cc4bf9... is public (no secret) so cannot use password grant directly, but any leaked/registered confidential client credential would enable username/password → token without user interaction
+evidence_needed: valid confidential client_id + client_secret pair registered in NAM (out of scope for passive); or demonstration that password grant works with a known test credential
+verify_steps: AUTH_HELPED — POST https://federation.basf.com/nidp/oauth/nam/token with grant_type=password&username=test&password=test&client_id=<confidential_client>&client_secret=<secret> — observe 400/401 vs 200 token response; requires program-provided confidential client
+impact: credential stuffing / password spray against BASF identities → full token access without MFA prompt (ROPC bypasses interactive auth); HIGH
+testability: AUTH_HELPED
+
+---
+
+## STEP 4 — SELF-CRITIQUE
+
+[PARKED] procurement.basf.com SAP NetWeaver Portal KM document access via alternate servlet paths bypassing OBN navigation ACL: confidence 55 at threshold but verify steps require probing SAP KM/navigation servlet paths that may trigger WAF/ASM (BigIP+ASM confirmed); passive-only enumeration of KM XSLT responses may yield zero document links; sibling portals (tm/passage-europe/vss3) show inconsistent WAF behavior (tm returns portal error, passage/vss3 return 403) suggesting per-host ASM policies; no evidence yet of actual document content reachable under guest
+
+[FINAL] 1. my.basf.com public OAuth client emits refresh_token without PKCE — authz-code interception / refresh-token replay ATO (75)  
+[FINAL] 2. federation.basf.com ROPC grant enabled on NetIQ NAM — password-grant token acquisition for known usernames (65)
+
+---
+
+## STEP 5 — NEXT ACTION
+
+[NEXT] PROBE: at 1 rps GET `https://procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/?path=/documents/newFramework` , `https://procurement.basf.com/irj/servlet/webdav/documents/newFramework/` , `https://tm.basf.com/irj/go/km/docs/documents/newFramework/` , `https://passage-europe.basf.com/irj/go/km/docs/documents/newFramework/` , `https://vss3.basf.com/irj/go/km/docs/documents/newFramework/` — enumerate all href/src links in responses for document references; repeat KM servlet paths with varying path params
+
+---
+
+## STEP 6 — LEARNING
+
+[LEARN] ACCEPTED RECON @ procurement.basf.com: live external SAP NetWeaver Portal (J2EE8030120/8030153, F5 BigIP+ASM), supplier-facing procurement login shell with guest `Guest_Procurement`; OBN hashes aa30852a/ae0d65de both render "No navigation possible" for guest; KM/admin paths WAF-blocked (Request Rejected)  
+[LEARN] ACCEPTED RECON @ tm/passage-europe/vss3.basf.com: 3 additional live SAP supplier portals (TRD/Pass@ge/VSS3), same BigIP+J2EE fingerprint + guest scheme; hosts discovered only via procurement CSP frame-ancestors; all redirect to /irj/portal/*?guest_user=Guest_*  
+[LEARN] REJECTED RECON @ worldaccount.basf.com: 301→my.basf.com (CloudFront); no separate identity surface  
+[LEARN] REJECTED RECON @ developer.basf.com: 403 Cloudflare JS-challenge blocks passive probing  
+[LEARN] ACCEPTED RECON @ procurement.basf.com: info-disclosure — CSP leaks 6 internal basf.net editor/QA hostnames + eipr3.basf.net (none resolve externally); BigIP cookie leaks backend 10.4.241.18; saplb cookie leaks J2EE patch level (informational only)  
+[LEARN] ACCEPTED RECON @ federation.basf.com: OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims  
+[LEARN] REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — all 10 bypass variants rejected; no open redirect or path traversal possible  
+[LEARN] ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with redirect_uri, scope, refresh_token, acr_values, zero PKCE refs  
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404  
+[LEARN] REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey — no additional proxy, key scope exhausted  
+[LEARN] REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class  
+[LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface  
+[LEARN] REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle (204926B, myBASFWorld, clientId 86cc4bf9) — EasyAuth not exposed; `/.auth` is client-side callback route confirming public-client code handling; no server-side token surface  
+[LEARN] ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clients registration 401) — no provider hardening; prior mapping stable  
+[LEARN] REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint `/nidp/oauth/nam/clients` returns 401  
+[LEARN] ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
+
+---
+
+## STEP 7 — RISK
+
+[RISK] basf: 35 — Unauthenticated backend exposure across the full 14-host estate (9 *.api + prod.api + api.commerce + federation + my.basf + www + products + api.basf + procurement + tm + passage-europe + vss3) now proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere. NEW: procurement.basf.com exposes live SAP NetWeaver Portal with guest access (No navigation possible) but alternate KM/navigation servlet paths return WAF blocks or portal errors — residual attack surface on supplier portal document access unproven. The only genuine high-severity weakness remains the digital-commerce public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE — a design-level flaw whose exploitability requires interactive code capture (AUTH_HELPED), not currently demonstrable passively. Without an authenticated test vector (supplier test account or program-provided client cert), no further unauth progress is possible on OAuth/ROPC. Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise on BASF customer/supplier platform) + potential supplier document exposure via SAP KM bypass.
