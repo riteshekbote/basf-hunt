@@ -213,3 +213,15 @@ www.basf.com
 - CHANGED procurement.basf.com /irj/go/km/* all confirmed 200 len=236 = F5-ASM WAF block page (consistent, no content)
 
 ## 2026-09-07 21:43:42 UTC
+
+## 2026-09-07 23:57:07 UTC
+- NEW my.basf.com/.auth/config + /.auth/me → HTTP 200 (204926B) = SPA fallback (title `myBASFWorld`, boot config incl. clientId 86cc4bf9) — NOT App Service EasyAuth; the OAuth redirect_uri callback is a pur
+- CHANGED federation.basf.com discovery reconfirmed unchanged: grant_types still incl. authorization_code/password/hybrid, code_challenge plain+S256, registration_endpoint /nidp/oauth/nam/clients — no provider-
+- NEW tm.basf.com (141.6.3.192), passage-europe.basf.com (141.6.3.132), vss3.basf.com (141.6.3.183): all DNS-resolve on same /16 as procurement — **ZERO successful HTTP probes** exist; every prior attempt h
+- NEW procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/ → **HTTP 500** (not 236B WAF block) — SAP KM documents servlet reached J2EE backend and returned server error; this path is
+- CHANGED procurement.basf.com /irj/go/km/* all confirmed 200 len=236 = F5-ASM WAF block page (consistent, no content)
+- NEW procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/?path=/documents/newFramework → HTTP 500 (not WAF block) — SAP KM servlet reached J2EE backend, F5-ASM does NOT intercept th
+- NEW tm.basf.com / passage-europe.basf.com / vss3.basf.com — DNS resolves (141.6.3.192/132/183); prior "ERR Name or service not known" was shell backtick bug in curl, NOT DNS failure; all three are LIVE, c
+- CHANGED tm.basf.com/irj/go/km/docs/documents/newFramework/ → HTTP 404 (differs from passage/vss3 which return 200/235 WAF block)
+- CHANGED passage-europe.basf.com/irj/go/km/docs/documents/newFramework/ → 200 len=235 (WAF block)
+- CHANGED vss3.basf.com/irj/go/km/docs/documents/newFramework/ → 200 len=235 (WAF block)

@@ -304,3 +304,17 @@ https://vss3.basf.com/irj/go/km/docs/documents/newFramework/ -> 200 len=?
 https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
 https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
 https://my.basf.com/.auth -> 200 len=205013
+
+## 2026-09-07 23:57:24 UTC
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/?path=/documents/newFramework` -> HTTP 500
+https://procurement.basf.com/irj/servlet/webdav/documents/newFramework/` -> 200 len=236
+https://tm.basf.com/irj/go/km/docs/documents/newFramework/` -> HTTP 404
+https://passage-europe.basf.com/irj/go/km/docs/documents/newFramework/` -> 200 len=235
+https://vss3.basf.com/irj/go/km/docs/documents/newFramework/` -> 200 len=235
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://www.basf.com/us/en -> 200 len=640024
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth -> 200 len=4950
+https://procurement.basf.com/irj/portal/procurement` -> 200 len=236
+https://procurement.basf.com/irj/go/km/docs/documents/newFramework/` -> 200 len=236
