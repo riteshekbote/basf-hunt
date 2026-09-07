@@ -6232,3 +6232,496 @@ STEP 6 — LEARNING
 
 STEP 7 — RISK
 [RISK] BASF SE: 38 — Estate was materially undercounted (~19 live hosts, not 11): a live external SAP NetWeaver Portal with guest session (procurement, supplier-facing) is a new HIGH-class surface, and a second-generation identity kiosk (worldaccount) plus unreachable BASF-netblock appliances (apigw/comshop/mu-auth) add unknowns; however no new exploited finding yet — SAP portal is WAF-protected with guest content unrendered, and the sole proven design weakness (no-PKCE refresh_token, 75) remains AUTH_HELPED pending a sandbox/supplier account.
+===== ANALYST bigpickle 2026-09-07 01:10:29 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m# [0mTodos
+[•] STEP 1 — DELTA: compare inventory+KB+last_leads against current surface
+[ ] STEP 2 — PRIORITIZE: score top assets 0-10
+[ ] STEP 3 — HYPOTHESES: top 3 assets, max 1 hypothesis each
+[ ] STEP 4 — SELF-CRITIQUE: drop low-confidence, park rejected
+[ ] STEP 5 — NEXT ACTION: one concrete probe
+[ ] STEP 6 — LEARNING: log rejected/accepted
+[ ] STEP 7 — RISK: program risk score
+[ ] PROBE: procurement.basf.com SAP portal guest session paths
+[ ] PROBE: worldaccount.basf.com sub-paths for auth artifacts
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}|%{size_download}|%{content_type}|%{redirect_url}" -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" "https://procurement.basf.com/irj/portal/procurement" 2>/dev/null
+200|49579|text/html; charset=UTF-8|
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}|%{size_download}|%{content_type}|%{redirect_url}" -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" "https://worldaccount.basf.com/" 2>/dev/null
+301|0||https://my.basf.com/
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}|%{size_download}|%{content_type}|%{redirect_url}" -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" "https://procurement.basf.com/irj/go/km/docs/documents/newFramework/" 2>/dev/null
+200|1470|text/html|
+[0m
+Let me probe the new assets from last leads first, then complete the 8-step analysis.
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code}|%{size_download}|%{content_type}|%{redirect_url}" -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" "https://procurement.basf.com/irj/go/km/navigation" 2>/dev/null
+200|236|text/html; charset=utf-8|
+[0m
+[0m$ [0mcurl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" "https://procurement.basf.com/irj/portal/procurement" 2>/dev/null | head -200
+<!DOCTYPE  html   >
+<html lang="en"><head>
+<script type="text/javascript">
+/*HTML Business for Java, 6.0*/
+ur_system = {doc : window.document , mimepath :"/com.sap.portal.design.urdesigndata/themes/portal/fw2/common/", stylepath : "/com.sap.portal.design.urdesigndata/themes/portal/fw2/", is508 : false, domainrelaxing : "MINIMAL"};
+var popup_emptydoc = "/htmlb/jslib/emptyhover.html";</script>
+<link rel="stylesheet" href="/com.sap.portal.theming.webdav.themeswebdavlistener/Portal/prtl_std/fw2/sf3.css?v=733eb20e110b9d97bdaadb9f8382e186" />
+
+<!-- EPCF: BOB Core -->
+<meta http-equiv="content-script-type" content="text/javascript"/>
+<script type="text/javascript" src="/com.sap.portal.epcf.loader/script/optimize/js13_epcf.js?rid=877c4301b2f4148b3afee59ee6b3be90"></script>
+<script type="text/javascript">
+<!--
+EPCM.relaxDocumentDomain();
+EPCM.init( {
+Level:1,
+DynamicTop:false, // [service=true nestedWinOnAlias=false]
+UAType:31, // [Safari]
+UAVersion:6.0,
+UAPlatform:1, // [Win]
+UIPMode:"1", // [Default=1, User=0, Personalize=true]
+UIPModeOptions:"",
+UIPWinFeatures:"",
+UIPPortalPath:"https://procurement.basf.com:443/irj/portal/procurement",
+UIPPopupComp:"https://procurement.basf.com:443/irj/servlet/prt/portal/prtroot/com.sap.portal.epcf.admin.WorkProtectPopup",
+UIPPopupCompSize:"dialogWidth:450px; dialogHeight:200px; status:no",
+UIPPopupMsgNN:"Your\x20current\x20page\x20contains\x20unsaved\x20data.\r\nDo\x20you\x20want\x20to\x20continue\x20with\x20navigation\x20and\x20open\x20a\x20new\x20window\x3f",
+UIPPopupMsgND:"Your\x20current\x20page\x20contains\x20unsaved\x20data.\r\nDo\x20you\x20want\x20to\x20discard\x20the\x20changes\x20and\x20open\x20the\x20content\x20in\x20the\x20same\x20window\x3f",
+DBGException:false,
+nervousFingerTimeout:"0",
+DBCookie:false
+} );
+EPCM.DSM.init( {
+TerminatorURL:"/irj/servlet/prt/portal/prtroot/com.sap.portal.dsm.Terminator",
+WinEmptyUrl:"/com.sap.portal.dsm/images/empty.gif",
+NavAcrossSubFramesUrl:"disabled",
+omitTerminationPopup:false,
+twoJavaServersScenario:false,
+useCatalogWindowID:false,
+servletIncludeSupport:true,
+runInIEMode:false,
+prefetchSessionTerminationURLs:true,
+disableSAML2andSPNEGOonLogoff:false,
+omitLogoffPopup:false,
+ForcedUserDebug:false,
+KeepAliveActive:false,
+KeepAliveDelta:840,
+dsmMethodGetKey:"",
+KeepAliveStopAfter:36000
+} );
+function SAPWP_receiveSessInfo( sessInfo, frameRef ){
+  EPCM.DSM.processSession( sessInfo, frameRef );
+}
+//-->
+</script>
+<!-- EPCF: EOB Core -->
+<meta name=viewport content="width=device-width, initial-scale=1"><style id='SAP-antiClickjackStyle'>body { display: none !important; }</style><script src='/sap.com~tc~lm~itsam~servlet~clickjacking/js/ClickjackingProtection.js' id='SAP-antiClickjackScript'	data-checkService='/sap.com~tc~lm~itsam~servlet~clickjacking/check' data-styleId='SAP-antiClickjackStyle'></script><title>Procurement Portal</title><meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8"><script SRC="/com.sap.portal.navigation.helperservice/scripts/HistoryFramework.js?rid=82d0076512c8b7a41378199ee6b711aa" ></script><script SRC="/com.sap.portal.navigation.helperservice/scripts/NavigationFramework.js?rid=82d0076512c8b7a41378199ee6b711aa" ></script><script SRC="/com.sap.portal.navigation.helperservice/scripts/FrameworkSupport.js?rid=82d0076512c8b7a41378199ee6b711aa" ></script><script SRC="/com.sap.portal.navigation.helperservice/scripts/HeaderlessSupport.js?rid=82d0076512c8b7a41378199ee6b711aa" ></script><script SRC="/com.sap.portal.navigation.afp.resources/scripts/lsapi.js?rid=f6b89edddb47b927155a799ee6b8c6fb" ></script><script SRC="/com.sap.portal.navigation.afp.resources/scripts/helpCenterPlugin.js?rid=f6b89edddb47b927155a799ee6b8c6fb" ></script><script SRC="/com.sap.portal.navigation.afp.resources/scripts/JSUtils.js?rid=f6b89edddb47b927155a799ee6b8c6fb" ></script><script SRC="/com.sap.portal.navigation.afp.resources/scripts/sessionPlugin.js?rid=f6b89edddb47b927155a799ee6b8c6fb" ></script><script SRC="/com.sap.portal.navigation.objbased/scripts/OBN.js?rid=dc713197c854b6884352679ee6b870eb" ></script><script SRC="/com.sap.portal.httpconnectivity.httpauthentication/scripts/CAManagerScript.js?rid=c507a2049353e8c36808139ee6b4c606" ></script><script SRC="/com.sap.portal.pagebuilder/scripts/pagesupport.js?rid=3d8f4c4f69ebb30f86d64d9ee6b4d161" ></script><link  REL=STYLESHEET  HREF="/com.sap.portal.theming.webdav.themeswebdavlistener/UR/ur/fw2/sf3.css?rid=32d6afd67cb352c5b22d539ee6b88772&v=733eb20e110b9d97bdaadb9f8382e186"  TYPE="text/css" ><script SRC="/htmlb/jslib/controls_nn6.js" ></script><script SRC="/htmlb/jslib/sapUrMapi_nn6.js" ></script><script SRC="/htmlb/jslib/popup_nn6.js" ></script><script SRC="/htmlb/jslib/languages/urMessageBundle_en.js" ></script></head><body class="prtlBody urFontBaseFam urScrl">
+<!-- EPCF: Component com.sap.portal.navigation.portallauncher.anonymous, fkahbokdkflappeoehknlnkahjgigkal -->
+
+<!-- EPCF: Component com.sap.portal.pagebuilder.pageBuilder, bfemhjllnojobacjhplmnnkahjgigkam -->
+<script>var helpCenterIviewID = "pcd:portal_content/every_user/general/com.sap.portal.helpCenteriView"; </script><script type="text/javascript"> /* <![CDATA[ */frameworkSupport.initChildHtmlPath({childHtmlPath:'/com.sap.portal.navigation.helperservice/html/child.html'});/* ]]> */ </script>
+<script type="text/javascript">
+
+var disableWorkProtectCheck = false;
+
+function popupUnsavedDataBeforeUnload(evt)
+{
+	if(self.pageTitleBar && pageTitleBar.backForwardLink){
+		pageTitleBar.backForwardLink=false;
+	} else {
+		evt=evt||window.event;
+		if(EPCM.getGlobalDirty()&&!disableWorkProtectCheck){
+			if(EPCM.getUAType()==EPCM.MSIE){
+				evt.returnValue='You have unsaved data';
+			} else {
+				evt.preventDefault();
+				evt.stopPropagation();
+				return 'You have unsaved data';
+			}
+		}
+	}
+}
+try {
+	if(EPCM.getUAType()==EPCM.MSIE||EPCM.getUAType()==EPCM.MOZILLA||EPCM.getUAType()==EPCM.SAFARI){
+		if (window==EPCM.getSAPTop()){
+			if (window.attachEvent) {                       
+	   			window.attachEvent("onbeforeunload", popupUnsavedDataBeforeUnload);                 
+	 		}                                                                     
+	 		else if (window.addEventListener) {                                   
+	   			window.addEventListener("beforeunload", popupUnsavedDataBeforeUnload, false);      
+	 		}                                                                     
+       	}   
+     }
+} catch(ex){} 
+</script><script type="text/javascript"> /* <![CDATA[ */frameworkSupport.init({anonymous:true,phase:'framework',navigationMechanism:'null',usedConnectors:'',portal_mode:'full_portal'});/* ]]> */ </script><script type="text/javascript"> /* <![CDATA[ */frameworkSupport.init2({contentAreaURL:'/irj/portal/procurement',portalURL:'https://procurement.basf.com:443/irj/portal/procurement',innerPage:'pcd:portal_content/cic/fw2_procurement/desktops/com.basfits.proc.fw.proc_desktop_2/frameworkPages/com.basfits.proc.fw.proc_frameworkpage/com.sap.portal.innerpage',innerPageFrameURL:'/irj/servlet/prt/portal/prteventname/Navigate/prtroot/pcd!3aportal_content!2fcic!2ffw2_procurement!2fdesktops!2fcom.basfits.proc.fw.proc_desktop_2!2fframeworkPages!2fcom.basfits.proc.fw.proc_frameworkpage!2fcom.sap.portal.innerpage',tlnComp:'/com.sap.portal.navigation.toplevel',serverPath:'https://procurement.basf.com:443',transferedAttr:'obn.resolvedTarget;obn.ResolvingScope;modeling.previewTarget'});/* ]]> */ </script>
+
+
+
+
+
+
+
+
+
+
+	
+
+<span id="divChangeContent" style="position:absolute;height:0;width:0;top:-5000;left:-5000" >
+	<form action="" method="post" id="frmChangeContent" name="frmChangeContent">
+		<input type="hidden" id="NavigationTarget_navForms" name="NavigationTarget" />
+		<input type="hidden" id="RelativeNavBase" name="RelativeNavBase" />
+	</form>
+	<form action="/irj/servlet/prt/portal/prtroot/com.sap.portal.navigation.objbased.ObjBasedNavigation" id="obnNavForm" method="post" target="obnNavIFrame" >
+		<input type="hidden" name="systemAlias" />
+		<input type="hidden" name="businessObjName" />
+		<input type="hidden" name="objValue" />
+		<input type="hidden" name="operation" />
+		<input type="hidden" name="usePost" value="false" />
+		<input type="hidden" name="source" />
+		<input type="hidden" name="resolvingMode" value="Default" />
+	</form>
+</span>
+<iframe src='/com.sap.portal.pagebuilder/html/EmptyDocument.html' style="position:absolute;height:0;visibility:hidden" name="obnNavIFrame" id="obnNavIFrame" title='Wrapper Frame'></iframe>
+<script type="text/javascript"> /* <![CDATA[ */var disablePersonalize=true;/* ]]> */ </script><script type="text/javascript"> /* <![CDATA[ */EPCM.getSAPTop().LSAPI.getSessionPlugin()._private.init('null','false','/irj/servlet/prt/portal/prtroot/com.sap.portal.navigation.masthead.LogOutComponent');EPCM.getSAPTop().LSAPI.getSessionPlugin()._private.setLogoffDelayTimer('0');/* ]]> */ </script><Script>
+var caEngine = new CAManager('/irj/servlet/prt/portal/prtroot/com.sap.portal.httpconnectivity.httpauthentication.Engine','dialogHeight:10;dialogWidth:20;center:1;help:0;status:0');
+caEngine.registerCAEvent('com.sap.portal.httpconnectivity.httpauthentication','Teach',caEngine,'eventCallBack');
+</Script>
+
+<script type="text/javascript">var emptyDocumentUrl = "/com.sap.portal.pagebuilder/html/EmptyDocument.html";</script>
+
+<!-- EPCF: Component basfits.com~fw~header_layout.header_fw_layout, lmpchjglnoiagdopdjanadkahjgigkbc -->
+<!-- USERLANE: py0167rogm :: userLaneID -->
+
+
+
+
+
+<script type="text/javascript">
+basicA = false;
+</script>
+
+
+
+
+<script type="text/javascript">
+var utag_data = { 'page_name':'Procurement Portal - Anonymous Homepage', 'page_language':'en', 'page_identifier':'Procurement Portal - Anonymous Homepage', 'page_type':'Procurement Portal - Anonymous Homepage', 'page_country':'global', 'customer_username':'Guest' };
+</script>
+
+<!-- Loading script asynchronously -->
+<script type="text/javascript">
+(function(a,b,c,d){
+a='https://tags.tiqcdn.com/utag/basf/netweaver/prod/utag.js';
+b=document;c='script';d=b.createElement(c);d.src=a;d.type='text/java'+c;d.async=true;
+a=b.getElementsByTagName(c)[0];a.parentNode.insertBefore(d,a);
+})();
+</script>
+
+
+
+
+
+<script type="text/javascript">if(self.EPCM){EPCM.relaxDocumentDomain();}else{var d=document.domain; if (d.search(/^\d+\.\d+\.\d+\.\d+$/)>=0) {} else { var l=d.indexOf("."); if (l>=0) {d=d.substr(l+1)} } if (document.domain != d) {document.domain = d;}}
+pageSupport.pageHelperUrl = '/irj/servlet/prt/portal/prtroot/com.sap.portal.pagebuilder.PageHelper';
+pageSupport.proxyModesUrl = '/irj/servlet/prt/portal/prtroot/com.sap.portal.pagebuilder.IviewModeProxy';
+pageSupport.addPageId('pcd:portal_content/cic/fw2_procurement/desktops/com.basfits.proc.fw.proc_desktop_2/frameworkPages/com.basfits.proc.fw.proc_frameworkpage','1','local');
+pageSupport._addIvuPageId("pcd\x3aportal_content\x2fcic\x2ffw2_procurement\x2fdesktops\x2fcom.basfits.proc.fw.proc_desktop_2\x2fframeworkPages\x2fcom.basfits.proc.fw.proc_frameworkpage\x2fcom.sap.portal.BrowserDocumentMode","page1ivu0");
+pageSupport._addIViewBank("page1ivu0",new iviewBank("","",pageSupport.EMBEDDED,1,"1","","GET","false"));
+pageSupport._addIvuPageId("pcd\x3aportal_content\x2fcic\x2ffw2_procurement\x2fdesktops\x2fcom.basfits.proc.fw.proc_desktop_2\x2fframeworkPages\x2fcom.basfits.proc.fw.proc_frameworkpage\x2fcom.basfits.portal.contentarea","page1ivu1");
+pageSupport._addIViewBank("page1ivu1",new iviewBank("","",pageSupport.EMBEDDED,1,"1","","GET","false"));
+pageSupport._addIvuPageId("pcd\x3aportal_content\x2fcic\x2ffw2_procurement\x2fdesktops\x2fcom.basfits.proc.fw.proc_desktop_2\x2fframeworkPages\x2fcom.basfits.proc.fw.proc_frameworkpage\x2fcm_startpage_1","page1ivu2");
+pageSupport._addIViewBank("page1ivu2",new iviewBank("/irj/servlet/prt/portal/prttarget/pcd!253aportal_content!252fcic!252ffw2_procurement!252fdesktops!252fcom!252ebasfits!252eproc!252efw!252eproc_desktop_2!252fframeworkPages!252fcom!252ebasfits!252eproc!252efw!252eproc_frameworkpage.cm_startpage_1/prtroot/com.sap.portal.navigation.portallauncher.anonymous","/irj/servlet/prt/portal/prtpos/com!252esap!252eportal!252enavigation!252eportallauncher!252eanonymous.pcd!253aportal!255fcontent!252fcic!252ffw2!255fprocurement!252fdesktops!252fcom!252ebasfits!252eproc!252efw!252eproc!255fdesktop!255f2!252fframeworkPages!252fcom!252ebasfits!252eproc!252efw!252eproc!255fframeworkpage.cm!255fstartpage!255f1!7brefresh!7d--/prttarget/pcd!253aportal_content!252fcic!252ffw2_procurement!252fdesktops!252fcom!252ebasfits!252eproc!252efw!252eproc_desktop_2!252fframeworkPages!252fcom!252ebasfits!252eproc!252efw!252eproc_frameworkpage.cm_startpage_1/prtroot/com.sap.portal.navigation.portallauncher.anonymous",pageSupport.EMBEDDED,1,"1","","GET","false"));
+pageSupport._addIvuPageId("pcd\x3aportal_content\x2fcic\x2ffw2_procurement\x2fdesktops\x2fcom.basfits.proc.fw.proc_desktop_2\x2fframeworkPages\x2fcom.basfits.proc.fw.proc_frameworkpage\x2fcm_startpage","page1ivu3");
+pageSupport._addIViewBank("page1ivu3",new iviewBank("/irj/servlet/prt/portal/prttarget/pcd!253aportal_content!252fcic!252ffw2_procurement!252fdesktops!252fcom!252ebasfits!252eproc!252efw!252eproc_desktop_2!252fframeworkPages!252fcom!252ebasfits!252eproc!252efw!252eproc_frameworkpage.cm_startpage/prtroot/com.sap.portal.navigation.portallauncher.anonymous","/irj/servlet/prt/portal/prtpos/com!252esap!252eportal!252enavigation!252eportallauncher!252eanonymous.pcd!253aportal!255fcontent!252fcic!252ffw2!255fprocurement!252fdesktops!252fcom!252ebasfits!252eproc!252efw!252eproc!255fdesktop!255f2!252fframeworkPages!252fcom!252ebasfits!252eproc!252efw!252eproc!255fframeworkpage.cm!255fstartpage!7brefresh!7d--/prttarget/pcd!253aportal_content!252fcic!252ffw2_procurement!252fdesktops!252fcom!252ebasfits!252eproc!252efw!252eproc_desktop_2!252fframeworkPages!252fcom!252ebasfits!252eproc!252efw!252eproc_frameworkpage.cm_startpage/prtroot/com.sap.portal.navigation.portallauncher.anonymous",pageSupport.EMBEDDED,1,"1","","GET","false"));
+pageSupport._addIvuPageId("pcd\x3aportal_content\x2fcic\x2ffw2_procurement\x2fdesktops\x2fcom.basfits.proc.fw.proc_desktop_2\x2fframeworkPages\x2fcom.basfits.proc.fw.proc_frameworkpage\x2fcm_startpage_2","page1ivu4");
+pageSupport._addIViewBank("page1ivu4",new iviewBank("/irj/servlet/prt/portal/prttarget/pcd!253aportal_content!252fcic!252ffw2_procurement!252fdesktops!252fcom!252ebasfits!252eproc!252efw!252eproc_desktop_2!252fframeworkPages!252fcom!252ebasfits!252eproc!252efw!252eproc_frameworkpage.cm_startpage_2/prtroot/com.sap.portal.navigation.portallauncher.anonymous","/irj/servlet/prt/portal/prtpos/com!252esap!252eportal!252enavigation!252eportallauncher!252eanonymous.pcd!253aportal!255fcontent!252fcic!252ffw2!255fprocurement!252fdesktops!252fcom!252ebasfits!252eproc!252efw!252eproc!255fdesktop!255f2!252fframeworkPages!252fcom!252ebasfits!252eproc!252efw!252eproc!255fframeworkpage.cm!255fstartpage!255f2!7brefresh!7d--/prttarget/pcd!253aportal_content!252fcic!252ffw2_procurement!252fdesktops!252fcom!252ebasfits!252eproc!252efw!252eproc_desktop_2!252fframeworkPages!252fcom!252ebasfits!252eproc!252efw!252eproc_frameworkpage.cm_startpage_2/prtroot/com.sap.portal.navigation.portallauncher.anonymous",pageSupport.EMBEDDED,1,"1","","GET","false"));
+pageSupport._addIvuPageId("pcd\x3aportal_content\x2fcic\x2ffw2_procurement\x2fdesktops\x2fcom.basfits.proc.fw.proc_desktop_2\x2fframeworkPages\x2fcom.basfits.proc.fw.proc_frameworkpage\x2fcm_startpage_0","page1ivu5");
+pageSupport._addIViewBank("page1ivu5",new iviewBank("/irj/servlet/prt/portal/prttarget/pcd!253aportal_content!252fcic!252ffw2_procurement!252fdesktops!252fcom!252ebasfits!252eproc!252efw!252eproc_desktop_2!252fframeworkPages!252fcom!252ebasfits!252eproc!252efw!252eproc_frameworkpage.cm_startpage_0/prtroot/com.sap.portal.navigation.portallauncher.anonymous","/irj/servlet/prt/portal/prtpos/com!252esap!252eportal!252enavigation!252eportallauncher!252eanonymous.pcd!253aportal!255fcontent!252fcic!252ffw2!255fprocurement!252fdesktops!252fcom!252ebasfits!252eproc!252efw!252eproc!255fdesktop!255f2!252fframeworkPages!252fcom!252ebasfits!252eproc!252efw!252eproc!255fframeworkpage.cm!255fstartpage!255f0!7brefresh!7d--/prttarget/pcd!253aportal_content!252fcic!252ffw2_procurement!252fdesktops!252fcom!252ebasfits!252eproc!252efw!252eproc_desktop_2!252fframeworkPages!252fcom!252ebasfits!252eproc!252efw!252eproc_frameworkpage.cm_startpage_0/prtroot/com.sap.portal.navigation.portallauncher.anonymous",pageSupport.EMBEDDED,1,"1","","GET","false"));
+</script>
+<span style="display:none"><script defer language="JavaScript">ur_system.is508=false;ur_language="en";;</script><script defer>sapUrMapi_init();</script><table cellspacing="0" cellpadding="0" width="100%" ><tr><td>
+<span style="display:none" tabindex="-1">
+<span id="pageMsgTimeoutCacheContent" ><div tabindex="0" ti="0" tt="The iView has timed out. It is now displaying expired content from the cache. Click 'Reload' to retrieve updated content. You may need to wait for the cache to retrieve the content from the source. Reload " title="The iView has timed out. It is now displaying expired content from the cache. Click 'Reload' to retrieve updated content. You may need to wait for the cache to retrieve the content from the source. Reload " t="The iView has timed out. It is now displaying expired content from the cache. Click 'Reload' to retrieve updated content. You may need to wait for the cache to retrieve the content from the source. Reload " st="a" class="urMsgBarStdBtm" id="MessageBar64206e1d" ct="MB"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="urTxtStd" valign="top"><img height="14px" width="14px" src="/com.sap.portal.design.urdesigndata/themes/portal/fw2/common/1x1.gif" id="MessageBar64206e1d-img" class="urMsgBarImgOk"></td><td class="urTxtStd"><span id="MessageBar64206e1d-txt">The iView has timed out. It is now displaying expired content from the cache. Click 'Reload' to retrieve updated content. You may need to wait for the cache to retrieve the content from the source.<a href='' onclick='pageSupport.ivuReload(IVU_ID_PLACE_HOLDER);return false;'>Reload</a></span></td></tr></table></div></span>
+
+<span id="pageMsgTimeoutNoCacheContent" ><div tabindex="0" ti="0" tt="iView has timed out; there is no cached content to display. Click Reload to retrieve updated content. You may need to wait for the cache to retrieve the content from the source.  Reload " title="iView has timed out; there is no cached content to display. Click Reload to retrieve updated content. You may need to wait for the cache to retrieve the content from the source.  Reload " t="iView has timed out; there is no cached content to display. Click Reload to retrieve updated content. You may need to wait for the cache to retrieve the content from the source.  Reload " st="b" class="urMsgBarErrBtm" id="MessageBar28a8962f" ct="MB"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="urTxtStd" valign="top"><img height="14px" width="14px" src="/com.sap.portal.design.urdesigndata/themes/portal/fw2/common/1x1.gif" id="MessageBar28a8962f-img" class="urMsgBarImgError"></td><td class="urTxtStd"><span id="MessageBar28a8962f-txt">iView has timed out; there is no cached content to display. Click Reload to retrieve updated content. You may need to wait for the cache to retrieve the content from the source. <a href='' onclick='pageSupport.ivuReload(IVU_ID_PLACE_HOLDER);return false;'>Reload</a></span></td></tr></table></div></span>
+</span>
+</td></tr><tr><td></td></tr></table></span> 
+
+
+	<link rel="stylesheet" href="/basfits.com~fw~header_layout/newFramework/basf-css/master.darkblue.css">
+	
+	<link rel="stylesheet" href="/basfits.com~fw~header_layout/newFramework/basf-css/master-0.1.8.css"><link rel="stylesheet" href="/basfits.com~fw~header_layout/newFramework/bootstrap-4.3.1-dist/css/bootstrap.min.css"><script src="/basfits.com~fw~header_layout/newFramework/jquery-3.6.0/jquery-3.6.0.min.js"></script><script src="/basfits.com~fw~header_layout/newFramework/garand-sticky-1.0.4/jquery.sticky.js"></script><script src="/basfits.com~fw~header_layout/newFramework/bootstrap-4.3.1-dist/js/bootstrap.js"></script>
+	<script>
+	(function($){
+	    $.fn.focusTextToEnd = function(){
+	        this.focus();
+	        var $thisVal = this.val();
+	        this.val('').val($thisVal);
+	        return this;
+	    }
+	}(jQuery));
+	</script>
+[0m
+[0m$ [0mcurl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" "https://procurement.basf.com/irj/go/km/docs/documents/newFramework/" 2>/dev/null
+<html>
+  <!--XSLT engine: version: 1.1 vendor: InQMy Labs. vendor-url: http://www.sap.com-->
+  <head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>https://procurement.basf.com/irj/go/km/docs/documents/newFramework</title>
+    <style type="text/css">h1 {font-family:sans-serif; font-size:12pt; }
+        p {font-family:sans-serif; font-size:10pt; }
+        ul {font-family:sans-serif; font-size:10pt; }
+        li {font-family:sans-serif; font-size:10pt; }</style>
+    <link rel="Up" href="https://procurement.basf.com/irj/go/km/docs/documents">
+    <link rel="alternate" title="Navigation" href="/irj/go/km/navigation/documents/newFramework">
+  </head>
+  <body>
+    <h1>https://procurement.basf.com/irj/go/km/docs/documents/newFramework</h1>
+    <p>The folder you are looking for has no displayable content.</p>
+    <p>
+      You can try one of the following:
+      <ul>
+        <li>
+          Access the folder using the
+          <a title="Navigation user interface" href="/irj/go/km/navigation/documents/newFramework">Navigation user interface</a>.
+        </li>
+      </ul>
+      <ul>
+        <li>
+          Access the folder as a
+          <a style="behavior: url(#default#AnchorClick)" title="Web folder" href="" folder="https://procurement.basf.com/irj/go/km/docs/documents/newFramework">Web folder</a>. Your operating system and browser dictate whether or not this will work.
+        </li>
+      </ul>
+    </p>
+  </body>
+</html>
+[0m
+[0m$ [0mcurl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" "https://procurement.basf.com/irj/go/km/navigation" 2>/dev/null
+<html><head><title>Request Rejected</title><meta name="robots" content="noindex,follow" /></head><body>The requested URL was rejected. Please consult with your administrator.<br><br>Your support ID is: 13512637875441188211</body></html>
+[0m
+Significant: procurement.basf.com returns 200 with 49KB content! Let me dig deeper.
+[0m$ [0mcurl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" -c /tmp/procurement_cookies.txt -D - "https://procurement.basf.com/irj/portal/procurement" 2>/dev/null | head -50
+HTTP/1.1 200 OK
+content-type: text/html; charset=UTF-8
+origin-agent-cluster: ?0
+x-ua-compatible: IE=11
+pragma: no-cache
+cache-control: no-store, no-cache, must-revalidate
+expires: 0
+date: Mon, 07 Sep 2026 01:08:03 GMT
+content-security-policy: frame-ancestors https://tm.basf.com https://passage-europe.basf.com https://vss3.basf.com https://procurement.basf.com https://editor-tm.basf.net https://editor-passage-europe.basf.net https://editor-vss3.basf.net https://editor-procurement.basf.net https://eipr3.basf.net
+set-cookie: PortalAlias=portal/procurement; Path=/; SameSite=None; Secure
+set-cookie: saplb_*=(J2EE8030120)8030152; Version=1; Path=/; Secure; HttpOnly; SameSite=None
+set-cookie: JSESSIONID=JK6aK6t6twb_MR2qXnhWPOYwdGh5oAHIh3oA_SAPrVhYldXnlsFPa18IkPN-6flF; Version=1; Path=/; Secure; HttpOnly; SameSite=None
+strict-transport-security: max-age=31536000; includeSubDomains
+Set-Cookie: BIGipServer~BASF~eip_procurement_https_pool=rd1o00000000000000000000ffff0a04f112o443; path=/; Httponly; Secure
+Set-Cookie: TS01dacdba=018fb597306d60db605d836c8f72e5de4d059a6831e45beb1831a71614e618ca38b373f71360fa76347c88444c3e718daf602c28af; Path=/
+Transfer-Encoding: chunked
+
+<!DOCTYPE  html   >
+<html lang="en"><head>
+<script type="text/javascript">
+/*HTML Business for Java, 6.0*/
+ur_system = {doc : window.document , mimepath :"/com.sap.portal.design.urdesigndata/themes/portal/fw2/common/", stylepath : "/com.sap.portal.design.urdesigndata/themes/portal/fw2/", is508 : false, domainrelaxing : "MINIMAL"};
+var popup_emptydoc = "/htmlb/jslib/emptyhover.html";</script>
+<link rel="stylesheet" href="/com.sap.portal.theming.webdav.themeswebdavlistener/Portal/prtl_std/fw2/sf3.css?v=733eb20e110b9d97bdaadb9f8382e186" />
+
+<!-- EPCF: BOB Core -->
+<meta http-equiv="content-script-type" content="text/javascript"/>
+<script type="text/javascript" src="/com.sap.portal.epcf.loader/script/optimize/js13_epcf.js?rid=877c4301b2f4148b3afee59ee6b3be90"></script>
+<script type="text/javascript">
+<!--
+EPCM.relaxDocumentDomain();
+EPCM.init( {
+Level:1,
+DynamicTop:false, // [service=true nestedWinOnAlias=false]
+UAType:31, // [Safari]
+UAVersion:6.0,
+UAPlatform:1, // [Win]
+UIPMode:"1", // [Default=1, User=0, Personalize=true]
+UIPModeOptions:"",
+UIPWinFeatures:"",
+UIPPortalPath:"https://procurement.basf.com:443/irj/portal/procurement",
+UIPPopupComp:"https://procurement.basf.com:443/irj/servlet/prt/portal/prtroot/com.sap.portal.epcf.admin.WorkProtectPopup",
+UIPPopupCompSize:"dialogWidth:450px; dialogHeight:200px; status:no",
+UIPPopupMsgNN:"Your\x20current\x20page\x20contains\x20unsaved\x20data.\r\nDo\x20you\x20want\x20to\x20continue\x20with\x20navigation\x20and\x20open\x20a\x20new\x20window\x3f",
+UIPPopupMsgND:"Your\x20current\x20page\x20contains\x20unsaved\x20data.\r\nDo\x20you\x20want\x20to\x20discard\x20the\x20changes\x20and\x20open\x20the\x20content\x20in\x20the\x20same\x20window\x3f",
+DBGException:false,
+nervousFingerTimeout:"0",
+DBCookie:false
+} );
+EPCM.DSM.init( {
+[0m
+Portal is fully live with anonymous guest session. Let me save the full body and analyze deeper.
+[0m$ [0mcurl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" -b "PortalAlias=portal/procurement" "https://procurement.basf.com/irj/portal/procurement" -o /tmp/proc_portal.html 2>/dev/null; wc -c /tmp/proc_portal.html
+49579 /tmp/proc_portal.html
+[0m
+[0m$ [0mgrep -oiE '(login|logon|signin|register|create account|guest|password|j_username|j_password)[^"<> ]*' /tmp/proc_portal.html | sort | uniq -c | sort -rn | head -30
+3 login.
+      2 password
+      2 loginTried
+      2 login
+      2 j_username
+      2 j_password
+      2 Password
+      1 signing
+      1 registered
+      1 registerCAEvent('com.sap.portal.httpconnectivity.httpauthentication','Teach',caEngine,'eventCallBack');
+      1 logon
+      1 loginFormStart
+      1 loginForm
+      1 login-inner
+      1 PasswordField').on('keyup',
+      1 PasswordField
+      1 LoginFormStart.submit();
+      1 LoginFormStart.submit();
+      1 LoginFormStart
+      1 LoginForm.submit();
+      1 LoginForm.submit();
+      1 LoginForm
+      1 Guest'
+[0m
+[0m$ [0mgrep -oE 'href="[^"]*"' /tmp/proc_portal.html | grep -viE 'css|js|gif|png|png|ico|jslib|theming' | sort -u
+href="#"
+href="#lock"
+href="#login"
+href="#news-items"
+href="#news-items-s"
+href="#world"
+href="/irj/portal/procurement"
+href="/irj/portal/procurement?NavigationTarget=navurl://aa30852a803a2ce8c1b61a82e14cb64b"
+href="/irj/servlet/prt/portal/prtroot/basfits.com~fw~navigation.MetaNavigation?selected_language=de&currurl=https%3A%2F%2Fprocurement.basf.com%3A443%2Firj%2Fservlet%2Fprt%2Fportal%2Fprtroot%2Fcom.sap.portal.navigation.portallauncher.anonymous"
+href="http://www.basf.com/einkauf"
+href="https://www.basf.com/global/de/who-we-are/organization/suppliers-and-partners/downloadcenter.html"
+href="https://www.basf.com/global/en/legal/contact.html"
+href="https://www.basf.com/global/en/legal/credits.html"
+href="https://www.basf.com/global/en/legal/disclaimer.html"
+[0m
+[0m$ [0mgrep -oiE '<form[^>]*>' /tmp/proc_portal.html; echo "---FORM DETAIL---"; grep -oiE 'action="[^"]*"' /tmp/proc_portal.html; echo "---LOGIN LINK CONTEXT---"; grep -oE '.{200}login\.' /tmp/proc_portal.html | head -5
+<form action="" method="post" id="frmChangeContent" name="frmChangeContent">
+<form action="/irj/servlet/prt/portal/prtroot/com.sap.portal.navigation.objbased.ObjBasedNavigation" id="obnNavForm" method="post" target="obnNavIFrame" >
+<form id="loginForm" name="LoginForm" method="post" action="/irj/portal/procurement?loginTried">
+<form id="loginFormStart" name="LoginFormStart" method="post" action="/irj/portal/procurement?loginTried">
+---FORM DETAIL---
+action=""
+action="/irj/servlet/prt/portal/prtroot/com.sap.portal.navigation.objbased.ObjBasedNavigation"
+action="/irj/portal/procurement?loginTried"
+action="/irj/portal/procurement?loginTried"
+---LOGIN LINK CONTEXT---
+in please click on "SP-Online"&nbsp;in the top navigation to access the respective application! Additionally it is possible to access the applications via the quick access area on the startpage after login.
+ues. Possibly you were logged out because of inactivity or you did the logout manually in another browser window. Please try again to open the menu after the refresh of the page. Maybe you need to re-login.
+ues. Possibly you were logged out because of inactivity or you did the logout manually in another browser window. Please try again to open the menu after the refresh of the page. Maybe you need to re-login.
+[0m
+[0m$ [0mgrep -oE '(news|startpage|contentarea|loginForm)[^" ]*' /tmp/proc_portal.html | sort -u | head -20; echo "---"; grep -oE 'navurl://[a-f0-9]+' /tmp/proc_portal.html | sort -u
+contentarea
+loginForm
+loginFormStart
+news-items
+news-items-s
+startpage
+startpage!255f0!7brefresh!7d--/prttarget/pcd!253aportal_content!252fcic!252ffw2_procurement!252fdesktops!252fcom!252ebasfits!252eproc!252efw!252eproc_desktop_2!252fframeworkPages!252fcom!252ebasfits!252eproc!252efw!252eproc_frameworkpage.cm_startpage_0/prtroot/com.sap.portal.navigation.portallauncher.anonymous
+startpage!255f1!7brefresh!7d--/prttarget/pcd!253aportal_content!252fcic!252ffw2_procurement!252fdesktops!252fcom!252ebasfits!252eproc!252efw!252eproc_desktop_2!252fframeworkPages!252fcom!252ebasfits!252eproc!252efw!252eproc_frameworkpage.cm_startpage_1/prtroot/com.sap.portal.navigation.portallauncher.anonymous
+startpage!255f2!7brefresh!7d--/prttarget/pcd!253aportal_content!252fcic!252ffw2_procurement!252fdesktops!252fcom!252ebasfits!252eproc!252efw!252eproc_desktop_2!252fframeworkPages!252fcom!252ebasfits!252eproc!252efw!252eproc_frameworkpage.cm_startpage_2/prtroot/com.sap.portal.navigation.portallauncher.anonymous
+startpage!7brefresh!7d--/prttarget/pcd!253aportal_content!252fcic!252ffw2_procurement!252fdesktops!252fcom!252ebasfits!252eproc!252efw!252eproc_desktop_2!252fframeworkPages!252fcom!252ebasfits!252eproc!252efw!252eproc_frameworkpage.cm_startpage/prtroot/com.sap.portal.navigation.portallauncher.anonymous
+startpage/prtroot/com.sap.portal.navigation.portallauncher.anonymous
+startpage_0
+startpage_0/prtroot/com.sap.portal.navigation.portallauncher.anonymous
+startpage_1
+startpage_1/prtroot/com.sap.portal.navigation.portallauncher.anonymous
+startpage_2
+startpage_2/prtroot/com.sap.portal.navigation.portallauncher.anonymous
+---
+navurl://aa30852a803a2ce8c1b61a82e14cb64b
+[0m
+[0m$ [0mgrep -oE '.{0,120}(j_username|j_password|guest_user|loginTried).{0,120}' /tmp/proc_portal.html | head -10
+<form id="loginForm" name="LoginForm" method="post" action="/irj/portal/procurement?loginTried">
+											<input type="text" name="j_username" class="txt-usr" placeholder="User name"  /><input type="password" name="j_password" class="txt-pwd" id="idPasswordField" placeholder="Password" />							
+		<form id="loginFormStart" name="LoginFormStart" method="post" action="/irj/portal/procurement?loginTried">
+			<input type="text" name="j_username" id="start-txt-usr" class="txt-usr" placeholder="User name"  /><input type="password" name="j_password" id="start-txt-p
+[0m
+Let me probe the guest navurl target and check the login form details.
+[0m$ [0mcurl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" -b "PortalAlias=portal/procurement; JSESSIONID=JK6aK6t6twb_MR2qXnhWPOYwdGh5oAHIh3oA_SAPrVhYldXnlsFPa18IkPN-6flF" -o /tmp/proc_navurl.html -w "%{http_code}|%{size_download}" "https://procurement.basf.com/irj/portal/procurement?NavigationTarget=navurl://aa30852a803a2ce8c1b61a82e14cb64b" 2>/dev/null; echo; grep -oiE '(title>[^<]*|h1[^>]*>[^<]*)' /tmp/proc_navurl.html 2>/dev/null | head
+200|72194
+title>Procurement Portal
+title>
+h199.6v-166h-22.2V77.6C177.4,34.8,142.6,0,99.8,0S22.2,34.8,22.2,77.6v22.2H0V265.7z M116.4,215.6c0.2,1.6-0.3,3.1-1.4,4.3c-1,1.2-2.5,1.9-4.1,1.9H88.7c-1.6,0-3.1-0.7-4.1-1.9s-1.6-2.8-1.4-4.3l3.5-31.4c-5.7-4.1-9.1-10.7-9.1-17.8c0-12.2,9.9-22.2,22.2-22.2c12.3,0,22.2,9.9,22.2,22.2c0,7.2-3.4,13.7-9.1,17.8L116.4,215.6zM144.1,99.8H55.5V77.6c0-24.5,19.9-44.3,44.3-44.3s44.3,19.9,44.3,44.3V99.8z"/>
+h199.6v-166h-22.2V77.6C177.4,34.8,142.6,0,99.8,0S22.2,34.8,22.2,77.6v22.2H0V265.7z M116.4,215.6c0.2,1.6-0.3,3.1-1.4,4.3c-1,1.2-2.5,1.9-4.1,1.9H88.7c-1.6,0-3.1-0.7-4.1-1.9s-1.6-2.8-1.4-4.3l3.5-31.4c-5.7-4.1-9.1-10.7-9.1-17.8c0-12.2,9.9-22.2,22.2-22.2c12.3,0,22.2,9.9,22.2,22.2c0,7.2-3.4,13.7-9.1,17.8L116.4,215.6zM144.1,99.8H55.5V77.6c0-24.5,19.9-44.3,44.3-44.3s44.3,19.9,44.3,44.3V99.8z"/>
+[0m
+[0m$ [0mgrep -oE '<h[1-6][^>]*>[^<]*' /tmp/proc_navurl.html | sed 's/<[^>]*>//g' | head -20; echo "===TEXT LINKS==="; grep -oE 'href="/irj/[^"]*"' /tmp/proc_navurl.html | sort -u | head -40
+===TEXT LINKS===
+href="/irj/portal/procurement"
+href="/irj/portal/procurement?NavigationTarget=navurl://aa30852a803a2ce8c1b61a82e14cb64b"
+href="/irj/servlet/prt/portal/prtroot/basfits.com~fw~navigation.MetaNavigation?selected_language=de&currurl=https%3A%2F%2Fprocurement.basf.com%3A443%2Firj%2Fservlet%2Fprt%2Fportal%2Fprtroot%2Fcom.sap.portal.navigation.portallauncher.anonymous%3FNavigationTarget%3Dnavurl%3A%2F%2Faa30852a803a2ce8c1b61a82e14cb64b"
+[0m
+[0m$ [0mgrep -oE '(cd_itm|news|News)-?[a-z]*|"title":"[^"]*"|aria-label="[^"]*"' /tmp/proc_navurl.html | sort -u | head -20; echo "===login form in nav page?==="; grep -c 'loginTried' /tmp/proc_navurl.html; echo "===contentarea text==="; grep -oE '>[A-Za-z][A-Za-z .&;]{8,60}<' /tmp/proc_navurl.html | sed 's/^>//;s/<$//' | sort -u | head -40
+news-items
+===login form in nav page?===
+1
+===contentarea text===
+Click here to switch your language to German.
+Company Address
+Cookies for marketing purposes
+Data protection for minors
+Date and time of your visit
+Disclaimer
+Functional cookies
+IP address of your device
+Information about your browser
+Name of the website from which you visit us
+No navigation possible
+Performance cookies
+Privacy Preference Center
+Privacy policy
+Procurement Portal
+Status information such as error messages
+Strictly necessary cookies
+Your current language is set to 
+enable a comfortable use of our website.
+open Privacy Preference Center
+provide you with the requested content
+want to see embedded YouTube videos
+[0m
+[0m$ [0mecho "=== 'No navigation possible' context ==="; grep -oE '.{200}No navigation possible.{200}' /tmp/proc_navurl.html | head -2
+=== 'No navigation possible' context ===
+[0m
+[0m$ [0mfor p in "/.well-known/openid-configuration" "/saml/metadata" "/adfs/services/trust/mex" "/nidp/oauth/nam/authz" "/nidp/app/login"; do echo -n "$p => "; curl -s -o /dev/null -m 10 -w "%{http_code}|%{redirect_url}|%{size_download}" -A "Mozilla/5.0" "https://worldaccount.basf.com$p" 2>/dev/null; echo; sleep 1; done
+/.well-known/openid-configuration => 301|https://my.basf.com/|0
+/saml/metadata => 301|https://my.basf.com/|0
+/adfs/services/trust/mex => 301|https://my.basf.com/|0
+/nidp/oauth/nam/authz => 301|https://my.basf.com/|0
+/nidp/app/login => 301|https://my.basf.com/|0
+[0m
+worldaccount is a pure redirect alias. Let me verify the sibling portal hosts disclosed in the CSP and the portal servlet surface.
+[0m$ [0mfor h in tm.basf.com passage-europe.basf.com vss3.basf.com editor-tm.basf.net editor-passage-europe.basf.net editor-vss3.basf.net editor-procurement.basf.net eipr3.basf.net; do echo -n "$h => "; curl -s -o /dev/null -m 8 -w "%{http_code}|%{redirect_url}" -A "Mozilla/5.0" "https://$h/" 2>/dev/null; echo; sleep 1; done
+tm.basf.com => 302|https://tm.basf.com/irj/portal/trd?guest_user=Guest_TRD
+passage-europe.basf.com => 302|https://passage-europe.basf.com/irj/portal/passage?guest_user=Guest_PASSAGE
+vss3.basf.com => 302|https://vss3.basf.com/irj/portal/vss3?guest_user=Guest_VSS3
+editor-tm.basf.net => 000|
+editor-passage-europe.basf.net => 000|
+editor-vss3.basf.net => 000|
+editor-procurement.basf.net => 000|
+eipr3.basf.net => 000|
+[0m
+[0m$ [0mfor p in "/irj/portal" "/irj/servlet/prt/portal/prtroot/com.sap.portal.pagebuilder.IviewModeProxy" "/irj/go/km/docs/documents/" "/irj/go/km/navigation/documents"; do echo -n "procurement$p => "; curl -s -o /dev/null -m 8 -w "%{http_code}|%{size_download}|%{redirect_url}" -A "Mozilla/5.0" "https://procurement.basf.com$p" 2>/dev/null; echo; sleep 1; done
+procurement/irj/portal => 200|236|
+procurement/irj/servlet/prt/portal/prtroot/com.sap.portal.pagebuilder.IviewModeProxy => 200|1029|
+procurement/irj/go/km/docs/documents/ => 403|881|
+procurement/irj/go/km/navigation/documents => 200|236|
+[0m
+Three more live SAP portal hosts disclosed. Let me verify their guest surfaces.
+[0m$ [0mfor h in "tm.basf.com/irj/portal/trd" "passage-europe.basf.com/irj/portal/passage" "vss3.basf.com/irj/portal/vss3"; do echo -n "$h => "; curl -s -o /tmp/tmp.html -m 10 -w "%{http_code}|%{size_download}|%{content_type}" -A "Mozilla/5.0" "https://$h" 2>/dev/null; echo; grep -oE "customer_username':'[^']*'|page_name':'[^']*'" /tmp/tmp.html | head -2; sleep 1; done
+tm.basf.com/irj/portal/trd => 200|1647|text/html; charset=UTF-8
+passage-europe.basf.com/irj/portal/passage => 200|1635|text/html; charset=UTF-8
+vss3.basf.com/irj/portal/vss3 => 200|1635|text/html; charset=UTF-8
+[0m
+[0m$ [0mcurl -s -m 10 -A "Mozilla/5.0" "https://tm.basf.com/irj/portal/trd" 2>/dev/null | grep -oE '(title>[^<]*|<h[1-6][^>]*>[^<]*|guest[^"<>]*|login[^"<>]*|location[^"<>]*|refresh[^>]*)' | head -10
+title>SAP&#x20;NetWeaver&#x20;Portal
+title>
+[0m
+Let me execute the key iView dereference probe — the actual content-rendering route for the guest session.
+[0m$ [0mcurl -s -m 12 -A "Mozilla/5.0" -o /tmp/ivu1.html -w "%{http_code}|%{size_download}|%{content_type}" "https://procurement.basf.com/irj/servlet/prt/portal/prttarget/pcd!3aportal_content!2fcic!2ffw2_procurement!2fdesktops!2fcom.basfits.proc.fw.proc_desktop_2!2fframeworkPages!2fcom.basfits.proc.fw.proc_frameworkpage.cm_startpage_1/prtroot/com.sap.portal.navigation.portallauncher.anonymous" 2>/dev/null; echo; grep -oE '(cmstart|cm_startpage|news|News|contentarea|customer_username[^,]*|No navigation[^<]*)' /tmp/ivu1.html 2>/dev/null | sort -u | head -10; echo "---h1/text---"; grep -oE '<h[1-6][^>]*>[^<]{1,80}' /tmp/ivu1.html | sed 's/<[^>]*>//g' | head
+200|236|text/html; charset=utf-8
+---h1/text---
+[0m
+[93m[1m! [0mpermission requested: external_directory (/tmp/*); auto-rejecting
+[0m✗ [0mcat /tmp/ivu1.html; echo; echo "===proc /irj/portal 236B==="; curl -s -m 10 -A "Mozilla/5.0" "https://procurement.basf.com/irj/portal" 2>/dev/null failed
+[91m[1mError: [0mThe user rejected permission to use this specific tool call.

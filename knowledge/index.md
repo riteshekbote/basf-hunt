@@ -141,3 +141,14 @@
 - 2026-09-06 REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface
 - 2026-09-06 REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle (204926B, myBASFWorld, clientId 86cc4bf9) — EasyAuth not exposed; `/.auth` is client-side callback route confirming public-client code handling; no server-side token surface
 - 2026-09-06 REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface
+- 2026-09-07 ACCEPTED RECON @ federation.basf.com: OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims
+- 2026-09-07 REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — all 10 bypass variants rejected; no open redirect or path traversal possible
+- 2026-09-07 ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with redirect_uri, scope, refresh_token, acr_values, zero PKCE refs
+- 2026-09-07 ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
+- 2026-09-07 REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey — no additional proxy, key scope exhausted
+- 2026-09-07 REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+- 2026-09-07 REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface
+- 2026-09-07 REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle (204926B, myBASFWorld, clientId 86cc4bf9) — EasyAuth not exposed; `/.auth` is client-side callback route confirming public-client code handling; no server-side token surface
+- 2026-09-07 ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clients registration 401) — no provider hardening; prior mapping stable
+- 2026-09-07 REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint `/nidp/oauth/nam/clients` returns 401
+- 2026-09-07 ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints

@@ -542,3 +542,18 @@
 - LEARN: REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey — no additional proxy,
 - LEARN: REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
 - LEARN: REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface
+
+## RANKED HYPOTHESES 2026-09-07 01:10:29 UTC
+- [75] my.basf.com: my.basf.com public OAuth client emits refresh_token without PKCE — authz-code interception / refresh-token replay ATO (from art/lead_nemotron3.txt)
+- NEXT(hypotheses-nemotron3.txt): HUMAN: Provide supplier test account or program-issued client cert to demonstrate AUTH_HELPED flow for my.basf.com OAuth client (86cc4bf9-cfdf-4215-bd7c-e9fbbbe
+- LEARN: ACCEPTED RECON @ federation.basf.com: OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTP
+- LEARN: REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — all 10 bypass variants rejected; no open redirect or path traversal possible
+- LEARN: ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with redirect_uri, scope, refresh_token
+- LEARN: ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
+- LEARN: REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey — no additional proxy,
+- LEARN: REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+- LEARN: REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface
+- LEARN: REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle (204926B, myBASFWorld, clientId 86cc4bf9) — EasyAuth not exposed
+- LEARN: ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clie
+- LEARN: REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint
+- LEARN: ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints

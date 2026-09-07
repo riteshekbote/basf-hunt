@@ -199,3 +199,6 @@ www.basf.com
 - CHANGED federation.basf.com discovery reconfirmed unchanged: grant_types still incl. authorization_code/password/hybrid, code_challenge plain+S256, registration_endpoint /nidp/oauth/nam/clients — no provider-
 - NEW my.basf.com/.auth/config + /.auth/me → HTTP 200 (204926B) = SPA fallback (title `myBASFWorld`, boot config incl. clientId 86cc4bf9) — NOT App Service EasyAuth; the OAuth redirect_uri callback is a pur
 - CHANGED federation.basf.com discovery reconfirmed unchanged: grant_types still incl. authorization_code/password/hybrid, code_challenge plain+S256, registration_endpoint /nidp/oauth/nam/clients — no provider-
+
+## 2026-09-07 01:10:29 UTC
+- NEW NO_DELTA — latest probe-results (2026-09-06 23:16) match knowledge base: federation.basf.com OIDC/authz stable (200/684, 405 token), my.basf.com SPA fallback on all auth paths (200/204KB), *.api.basf.
