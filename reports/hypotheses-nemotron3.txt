@@ -1,5 +1,4 @@
-## 2026-09-07 01:09:52 UTC [target] (model nemotron3)
-[NEW] NO_DELTA — latest probe-results (2026-09-06 23:16) match knowledge base: federation.basf.com OIDC/authz stable (200/684, 405 token), my.basf.com SPA fallback on all auth paths (200/204KB), *.api.basf.com estate fully gated (401/404), prod.api.basf.com 404 root, api.basf.com loopback
+## 2026-09-07 06:15:44 UTC [target] (model nemotron3)
 [PRIO] my.basf.com,8.5,attack_surface=9,business_value=10,tech_exposure=9,gate_ease=8,cloud_surface=7,freshness=10
 [PRIO] federation.basf.com,7.8,attack_surface=8,business_value=9,tech_exposure=8,gate_ease=6,cloud_surface=6,freshness=10
 [PRIO] www.basf.com,6.8,attack_surface=7,business_value=10,tech_exposure=5,gate_ease=8,cloud_surface=7,freshness=10
@@ -22,10 +21,7 @@ testability: AUTH_HELPED
 class: AUTH
 asset: federation.basf.com/nidp/oauth/nam/token
 confidence: 65
-reasoning: OIDC discovery at `/nidp/.well-known/openid-configuration` and `/nidp/oauth/nam/.well-known/openid-configuration` explicitly lists `password` in `grant_types_supported`; NetIQ NAM allows ROPC for registered confidential clients; public SPA client `86cc4bf9-…` has no secret but other registered clients may be confidential; ROPC + valid credentials = direct access/refresh tokens without user interaction
-evidence_needed: valid username/password for a test account + client_id/client_secret of a confidential registered client; token response showing access_token + refresh_token issued via password grant
-verify_steps: PASSIVE_GET https://federation.basf.com/nidp/.well-known/openid-configuration (already captured, parse grant_types); AUTH_HELPED POST https://federation.basf.com/nidp/oauth/nam/token with grant_type=password&username=<test>&password=<test>&client_id=<confidential_client>&client_secret=<secret> — observe token issuance
-impact: credential-stuffing or leaked creds → full token set (access+refresh) for any user; bypasses MFA/acr_values; CRITICAL if confidential client credentials leak
+reasoning: OIDC discovery at `/nidp/.well-known/openid-configuration` and `/nidp/oauth/nam/.well-known/openid-configuration` explicitly lists `password` in `grant_types_supported`; NetIQ NAM allows ROPC for registered confidential clients; public SPA[0m← [0mWrite analyst-out.txt
 testability: AUTH_HELPED
 [HYP] www.basf.com Magnolia CMS partner/supplier portal entry undiscovered in analyzed HTML
 class: MISCONFIG

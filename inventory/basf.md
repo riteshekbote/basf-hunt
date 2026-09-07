@@ -202,3 +202,5 @@ www.basf.com
 
 ## 2026-09-07 01:10:29 UTC
 - NEW NO_DELTA — latest probe-results (2026-09-06 23:16) match knowledge base: federation.basf.com OIDC/authz stable (200/684, 405 token), my.basf.com SPA fallback on all auth paths (200/204KB), *.api.basf.
+
+## 2026-09-07 06:25:45 UTC

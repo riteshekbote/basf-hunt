@@ -152,3 +152,8 @@
 - 2026-09-07 ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clients registration 401) — no provider hardening; prior mapping stable
 - 2026-09-07 REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint `/nidp/oauth/nam/clients` returns 401
 - 2026-09-07 ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
+- 2026-09-07 ACCEPTED RECON @ procurement.basf.com: live external SAP NetWeaver Portal (J2EE8030120/8030153, F5 BigIP+ASM), supplier-facing procurement login shell with guest `Guest_Procurement`; OBN hashes aa30852a/ae0d65de both render "No navigation possible" for guest; KM/admin paths WAF-blocked
+- 2026-09-07 ACCEPTED RECON @ tm/passage-europe/vss3.basf.com: 3 additional live SAP supplier portals (TRD/Pass@ge/VSS3), same BigIP+J2EE fingerprint + guest scheme; hosts discovered only via procurement CSP frame-ancestors
+- 2026-09-07 REJECTED RECON @ worldaccount.basf.com: 301→my.basf.com (CloudFront); no separate identity surface
+- 2026-09-07 REJECTED RECON @ developer.basf.com: 403 Cloudflare JS-challenge blocks passive probing
+- 2026-09-07 ACCEPTED RECON @ procurement.basf.com: info-disclosure — CSP leaks 6 internal basf.net editor/QA hostnames + eipr3.basf.net (none resolve externally); BigIP cookie leaks backend 10.4.241.18; saplb cookie leaks J2EE patch level (informational only)
