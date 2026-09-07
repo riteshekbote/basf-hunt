@@ -1097,3 +1097,32 @@ testability: AUTH_HELPED
 [LEARN] REJECTED RECON @ developer.basf.com: 403 Cloudflare JS-challenge blocks passive probing
 [LEARN] ACCEPTED RECON @ procurement.basf.com: info-disclosure — CSP leaks 6 internal basf.net editor/QA hostnames + eipr3.basf.net (none resolve externally); BigIP cookie leaks backend 10.4.241.18; saplb cookie leaks J2EE patch level (informational only)
 [RISK] BASF SE: 35 — Estate materially expanded: 4 new live supplier-facing SAP NetWeaver portals (procurement + TRD + Pass@ge + VSS3) surface today, all login-shell-with-guest + fully WAF-gated on KM/admin/nav, plus a Cloudflare-challenged developer portal and a dead worldaccount kiosk. No unauth content access demonstrated — the 200-vs-236B WAF oracle is the live thread. The standing highest-severity item remains the federation NAM plane (ROPC + no-PKCE public client, 65/75 in prior, AUTH_HELPED). Residual risk = supplier portal unauth content/IDOR across the new 4-portal SAP estate if any guest URL-map bypass exists, and the OAuth/refresh-token ATO chain on the commerce plane awaiting interactive proof.
+## 2026-09-07 12:47:51 UTC [target] (model bigpickle)
+[HYP] SAP supplier portal guest iView content reachable via alternate URL maps bypassing "No navigation possible"
+class: AUTH
+asset: procurement.basf.com
+confidence: 52
+reasoning: guest shell renders but certifies no navigation for `Guest_Procurement`; portal is a full SSO estate with OBN nav hashes; KM (Knowledge Mgmt) doc store WAF-blocked on `irj/go/km/*` today but header CSS/JS served from `/irj/go/km/docs/documents/newFramework/`; SAP EP6 fix logs and common portlet paths may 200 where nav chrome 403s — 403-vs-200 on filtered paths is the oracle
+evidence_needed: any 200 body with supplier/doc content (not the 236B WAF block) on `/irj/go/*` , `/irj/servlet/prt/portal/prtroot/*`, `/com.sap.portal.*` paths, or a nav target that renders an iView for guest
+verify_steps: at 1 rps, GET `/irj/go/km/docs/documents/newFramework/` variants (`../`, `?View=Tree`, `/..%2f..%2f`), `/irj/go/km/navigation/documents/`, `/irj/servlet/prt/portal/prtroot/basfits.com~fw~navigation.MetaNavigation?selected_language=en`, and the 2 OBN hashes with `&rememberme=on` cookie — diff 200-content vs 236B block
+impact: unauth supplier-facing procurement content (order status/docs), escalating to BOLA/IDOR on procurement workflows; MEDIUM-HIGH
+testability: PASSIVE
+[HYP] SAP SSO estate shares a single portal system → compromised guest session or portal component authz gap replicates across TRD/Pass@ge/VSS
+class: AUTH
+asset: tm.basf.com / passage-europe.basf.com / vss3.basf.com
+confidence: 44
+reasoning: all four portals present identical BigIP+ASM+J2EE8030120 fingerprint and same `guest_user=` scheme; shared codebase means a URL-map/portal misconfig found on procurement likely exists on tm/passage/vss3; sibling hostnames discovered only via procurement CSP today
+evidence_needed: same portal-content path returning distinct status (200 not 236B block) on any sibling
+verify_steps: at 1 rps across tm/passage/vss3, mirror the procurement probe set (OBN hashes, `/irj/go/km/navigation`, MetaNavigation, portlet servlet paths) and diff status/size
+impact: farm-wide unauth content access on three additional supplier-facing systems if any single bypass exists; MEDIUM
+testability: PASSIVE
+[HYP] federation.basf.com ROPC `password` grant + plain-PKCE policies are a standing ATO vector for any confidential client whose secret leaks
+class: AUTH
+asset: federation.basf.com/nidp/oauth/nam/token
+confidence: 65
+reasoning: discovery continues to list `password`/`hybrid` grants and `plain`+`S256` PKCE (unchanged since 09-06); public SPA client `86cc4bf9-…` emits refresh_token with no code_challenge; any server-side confidential client (SAP portal registration, mobile app) inherits ROPC exposure
+evidence_needed: valid test credential + a confidential client_id/secret; token response via grant_type=password
+verify_steps: AUTH_HELPED — POST /nidp/oauth/nam/token `grant_type=password&username=<sandbox>&password=<sandbox>&client_id=<confidential>&client_secret=<secret>`
+impact: direct access+refresh tokens for any user from leaked creds, bypasses MFA/acr_values; CRITICAL-conditional
+testability: AUTH_HELPED
+[NEXT] PROBE: at 1 rps GET `https://procurement.basf.com/irj/go/km/navigation/documents/` , `…/docs/documents/newFramework/` , `https://procurement.basf.com/irj/go/km` , and `https://procurement.basf.com/irj/servlet/prt/portal/prtroot/basfits.com~fw~navigation.MetaNavigation?selected_language=en` — log status+size; any 200 body ≠ 236B "Request Rejected" is the unauth portal-content finding (differentiate F5-ASM block vs SAP KM rendering); then repeat the same 4 paths on `tm.basf.com/irj/portal/trd` , `passage-europe.basf.com/irj/portal/passage` , `vss3.basf.com/irj/portal/vss3`

@@ -266,3 +266,17 @@ https://www.basf.com/us/en -> 200 len=640014
 https://procurement.basf.com/irj/go/km/navigation/documents/` -> 200 len=236
 https://procurement.basf.com/irj/go/km` -> 200 len=236
 https://procurement.basf.com/irj/servlet/prt/portal/prtroot/basfits.com~fw~navigation.MetaNavigation?selected_language=en` -> ERR <urlopen error [Errno -2] Name or service not know
+
+## 2026-09-07 12:55:56 UTC
+https://procurement.basf.com/irj/go/km/navigation/documents/ -> 200 len=236
+https://procurement.basf.com/irj/go/km/docs/documents/newFramework/ -> 200 len=?
+https://procurement.basf.com/irj/servlet/prt/portal/prtroot/basfits.com~fw~navigation.MetaNavigation?selected_language=en -> ERR <urlopen error [Errno -2] Name or service not know
+https://procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/ -> HTTP 500
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://procurement.basf.com/irj/go/km/navigation/documents/` -> 200 len=236
+https://procurement.basf.com/irj/go/km/docs/documents/newFramework/` -> 200 len=236
+https://procurement.basf.com/irj/servlet/prt/portal/prtroot/basfits.com~fw~navigation.MetaNavigation?selected_language=en` -> ERR <urlopen error [Errno -2] Name or service not know
+https://procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/` -> 200 len=236
+https://tm.basf.com` -> ERR <urlopen error [Errno -2] Name or service not know
+https://passage-europe.basf.com` -> ERR <urlopen error [Errno -2] Name or service not know

@@ -4546,4 +4546,150 @@ testability: PASSIVE
 [LEARN] ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
 
 [STEP 7] RISK
-[RISK] basf: 30 — Unauthenticated backend exposure across the full 11-host estate (9 *.api + prod.api + api.commerce + federation + my.basf + www + products + api.basf) now proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere. The only genuine high-severity weakness is the digital-commerce public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE — a design-level flaw whose exploitability requires interactive code capture (AUTH_HELPED), not currently demonstrable passively. Without an authenticated test vector (supplier test account or program-provided client cert), no further unauth progress is possible. Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise on BASF customer/supplier platform).
+[RISK] basf: 30 — Unauthenticated backend exposure across the full 11-host estate (9 *.api + prod.api + api.commerce + federation + my.basf + www + products + api.basf) now proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere. The only genuine high-severity weakness is the digital-commerce public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE — a design-level flaw whose exploitability requires interactive code capture (AUTH_HELPED), not currently demonstrable passively. Without an authenticated test vector (supplier test account or program-provided client cert), no further unauth progress is possible. Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise on BASF customer/supplier platform).===== ANALYST nemotron3 2026-09-07 12:55:37 UTC =====
+[0m
+> build · nemotron-3-ultra-free
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt
+total 244
+drwxr-xr-x 12 runner runner  4096 Sep  7 12:47 .
+drwxr-xr-x  3 runner runner  4096 Sep  7 12:47 ..
+drwxr-xr-x  7 runner runner  4096 Sep  7 12:47 .git
+drwxr-xr-x  3 runner runner  4096 Sep  7 12:47 .github
+-rw-r--r--  1 runner runner  1801 Sep  7 12:47 README.md
+-rw-r--r--  1 runner runner    43 Sep  7 12:47 analyst-out.txt
+-rw-r--r--  1 runner runner 72373 Sep  7 12:47 analyst-prompt.txt
+-rw-r--r--  1 runner runner 68501 Sep  7 12:47 ctx.txt
+drwxr-xr-x  2 runner runner  4096 Sep  7 12:47 inventory
+drwxr-xr-x  2 runner runner  4096 Sep  7 12:47 knowledge
+drwxr-xr-x  2 runner runner  4096 Sep  7 12:47 leads
+-rw-r--r--  1 runner runner 18147 Sep  7 12:47 probe-results.md
+drwxr-xr-x  2 runner runner  4096 Sep  7 12:47 recon-notes
+drwxr-xr-x  2 runner runner  4096 Sep  7 12:47 reports
+drwxr-xr-x  2 runner runner  4096 Sep  7 12:47 reposcan-raw
+-rw-r--r--  1 runner runner  3285 Sep  7 12:47 scope.yml
+drwxr-xr-x  2 runner runner  4096 Sep  7 12:47 scripts
+-rw-r--r--  1 runner runner    33 Sep  7 12:47 state_bigpickle.json
+-rw-r--r--  1 runner runner    33 Sep  7 12:47 state_laguna.json
+-rw-r--r--  1 runner runner    33 Sep  7 12:47 state_ling3.json
+-rw-r--r--  1 runner runner    33 Sep  7 12:47 state_longcat.json
+-rw-r--r--  1 runner runner    33 Sep  7 12:47 state_mimo.json
+-rw-r--r--  1 runner runner    33 Sep  7 12:47 state_nemotron3.json
+drwxr-xr-x  2 runner runner  4096 Sep  7 12:47 triage
+[0m
+[0m→ [0mRead state_nemotron3.json
+[0m→ [0mRead state_bigpickle.json
+[0m→ [0mRead probe-results.md[90m [limit=100][0m
+[0m→ [0mRead probe-results.md[90m [limit=100, offset=100][0m
+[0m→ [0mRead probe-results.md[90m [offset=200, limit=100][0m
+[0m→ [0mRead scope.yml
+[0m→ [0mRead inventory/basf.md
+Now I have a complete picture. Let me execute the 8-step analysis.
+
+---
+
+### STEP 1 — DELTA
+
+**NEW** procurement.basf.com: live external SAP NetWeaver Portal (J2EE 8030120/8030153, F5 BigIP+ASM), supplier-facing procurement login shell with guest `Guest_Procurement`; `/irj/go/km/navigation/documents/` and `/irj/go/km` return HTTP 200 len=236; OBN hashes aa30852a/ae0d65de both render "No navigation possible" for guest; KM/admin paths WAF-blocked
+
+**NEW** tm.basf.com / passage-europe.basf.com / vss3.basf.com: 3 additional live SAP supplier portals (TRD/Pass@ge/VSS3), same BigIP+J2EE fingerprint + guest scheme; hosts discovered only via procurement CSP frame-ancestors
+
+**NEW** worldaccount.basf.com: 301→my.basf.com (CloudFront); no separate identity surface
+
+**NEW** developer.basf.com: 403 Cloudflare JS-challenge blocks passive probing
+
+**CHANGED** procurement.basf.com CSP leaks 6 internal basf.net editor/QA hostnames + eipr3.basf.net (none resolve externally); BigIP cookie leaks backend 10.4.241.18; saplb cookie leaks J2EE patch level (informational only)
+
+**NO_DELTA** on all other assets: *.api.basf.com estate fully mapped (9 hosts, zero unauth surface), my.basf.com OAuth client stable, federation.basf.com OIDC/SAML stable, prod.api.basf.com Apigee stable, api.commerce.basf.com AWS APIGW stable, api.basf.com dead (127.0.0.1), www.basf.com/products.basf.com Magnolia stable
+
+---
+
+### STEP 2 — PRIORITIZE
+
+[PRIO] procurement.basf.com,8.2,attack_surface=9,business_value=9,tech_exposure=9,gate_ease=8,cloud_surface=6,freshness=10
+[PRIO] my.basf.com,8.1,attack_surface=8,business_value=10,tech_exposure=9,gate_ease=8,cloud_surface=7,freshness=10
+[PRIO] federation.basf.com,7.8,attack_surface=8,business_value=9,tech_exposure=8,gate_ease=6,cloud_surface=6,freshness=10
+[PRIO] tm.basf.com,6.5,attack_surface=7,business_value=8,tech_exposure=7,gate_ease=8,cloud_surface=5,freshness=10
+[PRIO] passage-europe.basf.com,6.5,attack_surface=7,business_value=8,tech_exposure=7,gate_ease=8,cloud_surface=5,freshness=10
+[PRIO] vss3.basf.com,6.5,attack_surface=7,business_value=8,tech_exposure=7,gate_ease=8,cloud_surface=5,freshness=10
+[PRIO] www.basf.com,6.3,attack_surface=6,business_value=10,tech_exposure=5,gate_ease=8,cloud_surface=7,freshness=10
+[PRIO] prod.api.basf.com,3.8,attack_surface=3,business_value=9,tech_exposure=5,gate_ease=2,cloud_surface=4,freshness=10
+[PRIO] api.commerce.basf.com,3.2,attack_surface=3,business_value=8,tech_exposure=4,gate_ease=1,cloud_surface=6,freshness=10
+[PRIO] e-gate.api.basf.com,1.8,attack_surface=1,business_value=8,tech_exposure=1,gate_ease=2,cloud_surface=3,freshness=10
+[PRIO] api.basf.com,1.0,attack_surface=1,business_value=9,tech_exposure=1,gate_ease=1,cloud_surface=1,freshness=10
+
+---
+
+### STEP 3 — HYPOTHESES
+
+[HYP] procurement.basf.com SAP NetWeaver Portal guest iView content reachable via alternate URL maps bypassing "No navigation possible"
+class: MISCONFIG
+asset: procurement.basf.com/irj/go/km/navigation/documents/ and /irj/go/km
+confidence: 55
+reasoning: Two OBN hash paths (aa30852a, ae0d65de) both return "No navigation possible" for Guest_Procurement user; however SAP KM/Navigation iViews often expose content via alternate URL patterns (direct document links, RSS feeds, WebDAV, /irj/servlet/prt/portal/prtroot/... paths) that bypass the portal navigation renderer; CSP frame-ancestors reveals 3 sibling portals (tm/passage-europe/vss3) suggesting shared backend; BigIP cookie leaks internal IP 10.4.241.18 confirming non-internet-facing backend
+evidence_needed: discovery of at least one accessible document/iView under guest context via alternate URL pattern not protected by OBN navigation ACL
+verify_steps: PROBE GET https://procurement.basf.com/irj/go/km/navigation/documents/ (reconfirm 200/236); PROBE GET https://procurement.basf.com/irj/go/km/docs/documents/newFramework/; PROBE GET https://procurement.basf.com/irj/servlet/prt/portal/prtroot/basfits.com~fw~navigation.MetaNavigation?selected_language=en; PROBE GET https://procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/; enumerate all links in 236-byte responses for href patterns; test same paths on tm/passage-europe/vss3.basf.com
+impact: unauthenticated access to supplier procurement documents, tenders, contracts, pricing — HIGH (supplier data exposure, procurement fraud enablement)
+testability: PASSIVE
+
+[HYP] my.basf.com public OAuth client emits refresh_token without PKCE — authz-code interception / refresh-token replay ATO
+class: OATH
+asset: my.basf.com / federation.basf.com/nidp/oauth/nam/authz
+confidence: 75
+reasoning: SSR boot config confirms public client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (no secret in bundle), code flow with `refresh_token` scope, redirect to `/.auth` (Azure Static Web Apps built-in auth), `acr_values=3IAM/Login/External` (NetIQ NAM external auth), zero PKCE machinery in client; federation.basf.com discovery allows `plain` + `S256` PKCE methods — IdP accepts downgraded/plain challenges; redirect_uri oracle tested exact-match (10 variants rejected) so exploitation requires code interception at transport/browser layer, not redirect manipulation
+evidence_needed: capture of authentic authorize request proving absence of `code_challenge` parameter; token response showing `refresh_token` issued with no rotation on reuse
+verify_steps: AUTH_HELPED — with test account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External — record uttered params; exchange code for tokens; verify refresh_token lifetime/rotation on reuse
+impact: Intercepted authz code or stolen refresh_token = full ATO of BASF customer/supplier portal account → order/price/PII access, procurement fraud, supplier impersonation; CRITICAL
+testability: AUTH_HELPED
+
+[HYP] federation.basf.com ROPC grant enabled on NetIQ NAM — password-grant token acquisition for known usernames
+class: AUTH
+asset: federation.basf.com/nidp/oauth/nam/token
+confidence: 65
+reasoning: OIDC discovery at `/nidp/.well-known/openid-configuration` and `/nidp/oauth/nam/.well-known/openid-configuration` explicitly lists `password` in `grant_types_supported`; NetIQ NAM allows ROPC for registered confidential clients; public SPA client 86cc4bf9... is public (no secret) so cannot use password grant directly, but any leaked/registered confidential client credential would enable username/password → token without user interaction
+evidence_needed: valid confidential client_id + client_secret pair registered in NAM (out of scope for passive); or demonstration that password grant works with a known test credential
+verify_steps: AUTH_HELPED — POST https://federation.basf.com/nidp/oauth/nam/token with grant_type=password&username=test&password=test&client_id=<confidential_client>&client_secret=<secret> — observe 400/401 vs 200 token response; requires program-provided confidential client
+impact: credential stuffing / password spray against BASF identities → full token access without MFA prompt (ROPC bypasses interactive auth); HIGH
+testability: AUTH_HELPED
+
+---
+
+### STEP 4 — SELF-CRITIQUE
+
+[PARKED] procurement.basf.com SAP NetWeaver Portal guest iView content reachable via alternate URL maps bypassing "No navigation possible": confidence 55 at threshold but verify steps require probing SAP KM/navigation servlet paths that may trigger WAF/ASM (BigIP+ASM confirmed); passive-only enumeration of 236-byte responses may yield zero links; sibling portals (tm/passage-europe/vss3) unproven to share guest content
+
+[FINAL] 1. my.basf.com public OAuth client emits refresh_token without PKCE — authz-code interception / refresh-token replay ATO (75)
+[FINAL] 2. federation.basf.com ROPC grant enabled on NetIQ NAM — password-grant token acquisition for known usernames (65)
+
+---
+
+### STEP 5 — NEXT ACTION
+
+[NEXT] PROBE: at 1 rps GET `https://procurement.basf.com/irj/go/km/navigation/documents/` , `https://procurement.basf.com/irj/go/km/docs/documents/newFramework/` , `https://procurement.basf.com/irj/servlet/prt/portal/prtroot/basfits.com~fw~navigation.MetaNavigation?selected_language=en` , `https://procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/` — enumerate all href/src links in responses; repeat same 4 paths on `https://tm.basf.com` , `https://passage-europe.basf.com` , `https://vss3.basf.com`
+
+---
+
+### STEP 6 — LEARNING
+
+[LEARN] ACCEPTED RECON @ procurement.basf.com: live external SAP NetWeaver Portal (J2EE8030120/8030153, F5 BigIP+ASM), supplier-facing procurement login shell with guest `Guest_Procurement`; OBN hashes aa30852a/ae0d65de both render "No navigation possible" for guest; KM/admin paths WAF-blocked
+[LEARN] ACCEPTED RECON @ tm/passage-europe/vss3.basf.com: 3 additional live SAP supplier portals (TRD/Pass@ge/VSS3), same BigIP+J2EE fingerprint + guest scheme; hosts discovered only via procurement CSP frame-ancestors
+[LEARN] REJECTED RECON @ worldaccount.basf.com: 301→my.basf.com (CloudFront); no separate identity surface
+[LEARN] REJECTED RECON @ developer.basf.com: 403 Cloudflare JS-challenge blocks passive probing
+[LEARN] ACCEPTED RECON @ procurement.basf.com: info-disclosure — CSP leaks 6 internal basf.net editor/QA hostnames + eipr3.basf.net (none resolve externally); BigIP cookie leaks backend 10.4.241.18; saplb cookie leaks J2EE patch level (informational only)
+[LEARN] ACCEPTED RECON @ federation.basf.com: OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims
+[LEARN] REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — all 10 bypass variants rejected; no open redirect or path traversal possible
+[LEARN] ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with redirect_uri, scope, refresh_token, acr_values, zero PKCE refs
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
+[LEARN] REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey — no additional proxy, key scope exhausted
+[LEARN] REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+[LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface
+[LEARN] REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle (204926B, myBASFWorld, clientId 86cc4bf9) — EasyAuth not exposed; `/.auth` is client-side callback route confirming public-client code handling; no server-side token surface
+[LEARN] ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clients registration 401) — no provider hardening; prior mapping stable
+[LEARN] REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint `/nidp/oauth/nam/clients` returns 401
+[LEARN] ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
+
+---
+
+### STEP 7 — RISK
+
+[RISK] basf: 35 — Unauthenticated backend exposure across the full 14-host estate (9 *.api + prod.api + api.commerce + federation + my.basf + www + products + api.basf + procurement + tm + passage-europe + vss3) now proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere. NEW: procurement.basf.com exposes live SAP NetWeaver Portal with guest access (No navigation possible) but alternate KM/navigation servlet paths untested — residual attack surface on supplier portal document access. The only genuine high-severity weakness remains the digital-commerce public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE — a design-level flaw whose exploitability requires interactive code capture (AUTH_HELPED), not currently demonstrable passively. Without an authenticated test vector (supplier test account or program-provided client cert), no further unauth progress is possible on OAuth/ROPC. Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise on BASF customer/supplier platform) + potential supplier document exposure via SAP KM bypass.
