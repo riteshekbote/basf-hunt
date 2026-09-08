@@ -748,3 +748,32 @@
 - LEARN: ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clie
 - LEARN: REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint
 - LEARN: ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
+
+## RANKED HYPOTHESES 2026-09-08 13:33:46 UTC
+- [65] procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/: SAP KM Servlet Document Access Bypass via Direct Path Traversal (from art/lead_nemotron3.txt)
+- [35] rep.basf.com: rep.basf.com Spring Boot Wicket application path discovery (from art/lead_bigpickle.txt)
+- NEXT(hypotheses-bigpickle.txt): RAG: search passive code/credential sources for the NAM confidential client_id/secret pairing for `fe3ede5d-ce60-4954-a65c-349ddcb75c8b` (rep.basf.com) or `86cc
+- NEXT(hypotheses-nemotron3.txt): PROBE: GET https://procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/?path=/documents/newFramework (passive, read-only, 1 rps, expect 
+- LEARN: REJECTED MISCONFIG @ rep.basf.com/actuator/*: all 16 sensitive actuator endpoints return 404; path traversal (`env..;`, `actuator;/env`, `health/path/../../env`
+- LEARN: REJECTED MISCONFIG @ rep.basf.com: Wicket bookmarkable/resource/page paths all 404; no unauthenticated Wicket component access; application surface fully gated 
+- LEARN: REJECTED BUSLOGIC @ procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/: parameterized requests (`?path=/documents/newFramework`, `?pat
+- LEARN: ACCEPTED RECON @ rep.basf.com: Azure Front Door confirmed via `x-azure-ref` header + `ASLBSA`/`ASLBSACORS` load-balancer cookies; CSP `script-src 'self'` (no un
+- LEARN: ACCEPTED RECON @ rep.basf.com: live "Bestandskundenplattform" (existing customer portal) behind Azure Front Door CDN; Spring Boot + Apache Wicket application; S
+- LEARN: ACCEPTED RECON @ developer.basf.com: behind Cloudflare JS-challenge (403 cf-mitigated:challenge); public documentation describes NAM OAuth flow with client cert
+- LEARN: ACCEPTED RECON @ BASF GitHub org: public repos (basf/rfieldclimate, basf/rweatherlink, basf/rzentra, basf/rarable) use env vars for API keys; no leaked secrets;
+- LEARN: ACCEPTED RECON @ procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/: HTTP 500 (not 236B block) — SAP KM documents servlet reached J2EE
+- LEARN: ACCEPTED RECON @ tm/passage-europe/vss3.basf.com: 3 additional live SAP supplier portals (TRD/Pass@ge/VSS3), same BigIP+J2EE fingerprint + guest scheme; hosts d
+- LEARN: REJECTED RECON @ tm.basf.com` + passage-europe.basf.com`: prior "ERR Name or service not known" was caused by backtick appended to hostname in curl, not actual 
+- LEARN: REJECTED RECON @ worldaccount.basf.com: 301→my.basf.com (CloudFront); no separate identity surface
+- LEARN: REJECTED RECON @ developer.basf.com: 403 Cloudflare JS-challenge blocks passive probing
+- LEARN: ACCEPTED RECON @ procurement.basf.com: info-disclosure — CSP leaks 6 internal basf.net editor/QA hostnames + eipr3.basf.net (none resolve externally); BigIP coo
+- LEARN: REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — all 10 bypass variants rejected; no open redirect or path traversal possible
+- LEARN: ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with redirect_uri, scope, refresh_token
+- LEARN: ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
+- LEARN: REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey — no additional proxy,
+- LEARN: REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+- LEARN: REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface
+- LEARN: REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle (204926B, myBASFWorld, clientId 86cc4bf9) — EasyAuth not exposed
+- LEARN: ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clie
+- LEARN: REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint
+- LEARN: ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints

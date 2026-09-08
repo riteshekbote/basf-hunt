@@ -237,3 +237,10 @@ www.basf.com
 - CHANGED procurement.basf.com/irj/servlet/prt/portal/prtroot (8 dispatcher classes) → HTTP 500 both unauth and with guest session (1711B) — guest role renders zero content via OBN, but KM servlet path unfilter
 - CHANGED federation.basf.com OIDC discovery reconfirmed unchanged — ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims
 - CHANGED *.api.basf.com estate (9 hosts) — full unauth surface mapped end-to-end, zero reachable endpoints beyond auth gates/404 (reconfirmed)
+
+## 2026-09-08 13:33:46 UTC
+- NEW procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/?path=/documents/newFramework → HTTP 500 (1753B SAP runtime error) — specific query parameter triggers J2EE backend processi
+- NEW tm.basf.com (141.6.3.192), passage-europe.basf.com (141.6.3.132), vss3.basf.com (141.6.3.183) — DNS resolves on same /16 as procurement; all LIVE; ZERO successful HTTP probes exist (prior curl backtic
+- CHANGED procurement.basf.com/irj/servlet/prt/portal/prtroot (8 dispatcher classes tested) → HTTP 500 both unauth and with guest session (1711B) — guest role renders zero content via OBN, but KM servlet path u
+- CHANGED rep.basf.com — Spring Boot Actuator exposed at `/actuator` (HAL) and `/actuator/health` (UP); all sensitive endpoints (env, mappings, beans, configprops, threaddump) return 404
+- CHANGED *.api.basf.com estate (9 hosts) — full unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404
