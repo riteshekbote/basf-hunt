@@ -227,3 +227,13 @@ www.basf.com
 - CHANGED vss3.basf.com/irj/go/km/docs/documents/newFramework/ → 200 len=235 (WAF block)
 
 ## 2026-09-08 04:38:26 UTC
+
+## 2026-09-08 09:02:09 UTC
+- NEW rep.basf.com — live "Bestandskundenplattform" (existing customer portal) behind Azure Front Door; Spring Boot + Apache Wicket; Spring Boot Actuator exposed at `/actuator` (HAL) and `/actuator/health` 
+- CHANGED developer.basf.com — confirmed Cloudflare JS-challenge (403 cf-mitigated:challenge); public documentation at developer.basf.com/authentication-and-authorization describes NAM OAuth flow with client_ce
+- CHANGED BASF GitHub org — public repos (basf/rfieldclimate, basf/rweatherlink, basf/rzentra, basf/rarable) use env vars for API keys; no leaked secrets; R packages for agriculture/weather APIs only
+- NEW procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/?path=/documents/newFramework → HTTP 500 (1753B SAP runtime error) — J2EE backend reached PAST F5-ASM; servlet processes req
+- NEW tm.basf.com, passage-europe.basf.com, vss3.basf.com — DNS resolves (141.6.3.192/132/183), all LIVE; ZERO successful HTTP probes exist (prior curl backtick bug)
+- CHANGED procurement.basf.com/irj/servlet/prt/portal/prtroot (8 dispatcher classes) → HTTP 500 both unauth and with guest session (1711B) — guest role renders zero content via OBN, but KM servlet path unfilter
+- CHANGED federation.basf.com OIDC discovery reconfirmed unchanged — ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims
+- CHANGED *.api.basf.com estate (9 hosts) — full unauth surface mapped end-to-end, zero reachable endpoints beyond auth gates/404 (reconfirmed)
