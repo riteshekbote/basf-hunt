@@ -841,3 +841,32 @@
 - LEARN: ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clie
 - LEARN: REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint
 - LEARN: ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
+
+## RANKED HYPOTHESES 2026-09-08 22:50:28 UTC
+- [65] basf.login.apigee.com: Apigee SAML/SSO Portal — Unauthenticated Endpoint Discovery & Auth Bypass (from art/lead_nemotron3.txt)
+- [45] secsys.basf.com: secsys.basf.com Smart ID Self-Service unauth API/JS-bundle config disclosure (from art/lead_bigpickle.txt)
+- NEXT(hypotheses-bigpickle.txt): RAG: search for Technology Nexus "Smart ID Self-Service" v5.3.x REST API path conventions + known unauth endpoints; plus GitHub/web for `secsys.basf.com` deploy
+- NEXT(hypotheses-nemotron3.txt): PROBE: GET https://basf.login.apigee.com/.well-known/openid-configuration (passive, read-only, 1 rps, expect 200 with OIDC discovery JSON if Apigee standard con
+- LEARN: REJECTED AUTH @ prod.api.basf.com/security/internal/v1/oauth2/login: LIVE but Apigee-gated — identical 401 (82B "Service Error -Unauthorized") for doc example c
+- LEARN: RAG: client_id `c653ff6e-a86a-4531-8443-a8a4378dc2fb` appears ONLY in developer.basf.com docs (fabricated example — no secret, no repo/leak hits); zero passive 
+- LEARN: ACCEPTED RECON @ prod.api.basf.com: dev docs confirm authorization_code-only, exact-match redirect_uri, and explicitly "state parameter currently not supported"
+- LEARN: ACCEPTED RECON @ secsys.basf.com: live "Smart ID Self-Service" (Technology Nexus, v5.3.1+) Angular SPA, 200/3179B; sibling `bsh.secsys`, `secsys-visitor`, and q
+- LEARN: REJECTED RECON @ basf.login.apigee.com: standard Apigee Edge SSO identity-zone login (`zonename.login.apigee.com` pattern per Apigee SAML docs) — generic Edge S
+- LEARN: ACCEPTED RECON @ basf.login.apigee.com: new Apigee SAML/SSO login portal discovered; serves "Sign in with SAML" + "Login with basf"; corporate identity surface 
+- LEARN: ACCEPTED RECON @ rep.basf.com: live "Bestandskundenplattform" behind Azure Front Door; Spring Boot + Wicket; Actuator at `/actuator` (HAL) + `/actuator/health` 
+- LEARN: ACCEPTED RECON @ procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/: HTTP 500 (not 236B block) — SAP KM documents servlet reached J2EE
+- LEARN: ACCEPTED RECON @ tm.basf.com/passage-europe.basf.com/vss3.basf.com: 3 additional live SAP supplier portals (TRD/Pass@ge/VSS3), same BigIP+J2EE fingerprint + gue
+- LEARN: REJECTED RECON @ tm.basf.com` + passage-europe.basf.com`: prior "ERR Name or service not known" was caused by backtick appended to hostname in curl, not actual 
+- LEARN: REJECTED RECON @ worldaccount.basf.com: 301→my.basf.com (CloudFront); no separate identity surface
+- LEARN: REJECTED RECON @ developer.basf.com: 403 Cloudflare JS-challenge blocks passive probing
+- LEARN: ACCEPTED RECON @ procurement.basf.com: info-disclosure — CSP leaks 6 internal basf.net editor/QA hostnames + eipr3.basf.net (none resolve externally); BigIP coo
+- LEARN: REJECTED OATH @ federation.basf.com: redirect_uri oracle exact-match — all 10 bypass variants rejected; no open redirect or path traversal possible
+- LEARN: ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with redirect_uri, scope, refresh_token
+- LEARN: ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
+- LEARN: REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey — no additional proxy,
+- LEARN: REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+- LEARN: REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface
+- LEARN: REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle (204926B, myBASFWorld, clientId 86cc4bf9) — EasyAuth not exposed
+- LEARN: ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clie
+- LEARN: REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint
+- LEARN: ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints

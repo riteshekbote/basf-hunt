@@ -1732,3 +1732,32 @@ testability: PASSIVE
 [LEARN] ACCEPTED RECON @ basf.login.apigee.com: full Apigee OAuth identity surface mapped — OIDC discovery (`.well-known/openid-configuration`, 715B) exposes token/userinfo/jwks endpoints with grant_types incl. password(ROPC)+implicit and client_secret_post/basic; SAML metadata (`/saml/metadata`, 6647B signed) exposes SSO/SLO `basf.apigee-saml-login`; `/token_key` 200 RS256; `/oauth/token`+`/userinfo` 401 auth-gated; `/login` is Apigee private SAML SSO (recaptcha + google terms); no unauth token/userinfo/registration surface
 [LEARN] REJECTED RECON @ basf.login.apigee.com: `/register`, `/clients`, `/admin`, `/oauth/clients` — no unauth client registration or admin surface exposed (401/404); only config endpoints (discovery, metadata, jwks) return 200; ROPC/implicit grant is a config-level posture matching federation.basf.com NAM, exploitation requires valid BASF creds (out-of-scope to test)
 [RISK] BASF SE: 24 — No change. basf.login.apigee.com fully mapped as a closed Apigee private SAML/OAuth identity portal. OIDC discovery + SAML metadata + jwks are public config (informational); token and userinfo endpoints are creds-gated (401); SAML SSO login is recaptcha-gated. The ROPC/implicit grant posture is config disclosure only and requires valid corporate credentials to advance — same credential barrier blocking all three surviving AUTH_HELPED hypotheses. No new exploitable unauthenticated surface across the now-13+ host estate.
+## 2026-09-08 22:49:53 UTC [target] (model bigpickle)
+[HYP] secsys.basf.com Smart ID Self-Service unauth API/JS-bundle config disclosure
+class: RECON
+asset: secsys.basf.com
+confidence: 45
+reasoning: root GET=200 (3179B) Angular SPA (data-beasties-container), title "Smart ID Self-Service", version 5.3.1+; Technology Nexus Smart ID products expose REST self-service/admin APIs behind the SPA; no client-side probe beyond root has run; login/enumeration/password-reset classes are out-of-scope but a JS-disclosed apiBaseURL + unauth REST endpoint would be new
+evidence_needed: apiBaseURL in SPA bundle; any /api*|/auth*|/admin* endpoint returning non-login content
+verify_steps: PASSIVE — GET root SPA JS/CSS bundle, extract apiBaseURL + route map; GET that base path; GET `/api/`, `/auth/api/`, `/admin/` (1 rps, GET only)
+impact: info disclosure of identity-service endpoints/config; LOW-MEDIUM
+testability: PASSIVE
+[HYP] prod.api.basf.com OAuth2 authorize proxy bypass of Apigee gate
+class: AUTH
+asset: prod.api.basf.com/security/internal/v1/oauth2/login
+confidence: 20
+reasoning: dev docs describe browser users hitting `/login` for NetIQ auth; live probe returns identical 401 (82B "Service Error -Unauthorized") for doc example client `c653ff6e-…` and null client — proxy-level OAuthV2/VerifyAPIKey gate fires before client_id validation; docs-only flow requires a registered developer client
+evidence_needed: a genuinely registered client_id (doc example is placeholder per RAG) plus API-key-gated bypass — none surfaced passively
+verify_steps: PASSIVE exhausted (401/401/405/200 probed); RAG for real registered client_id only
+impact: token issuance/ATO if reachable; HIGH only if a client is recovered — none exists
+testability: AUTH_HELPED
+[PARKED] prod.api.basf.com oauth2 gate bypass (20 < 40): identical 401 for known-format vs null client = Apigee-gated; proxy requires registered developer API key before OAuth logic; no passive recovery path
+[PARKED] basf.login.apigee.com ROPC (55→40): Apigee docs confirm `zonename.login.apigee.com` is stock Edge SSO identity-zone login; ROPC/implicit listing is default Edge SSO config, not a BASF-custom posture; standard product, exploit needs Edge org creds
+[FINAL] secsys.basf.com Self-Service estate recon (45) — sole fresh unauth surface; all OAuth/identity config elsewhere reconfirmed gated; AUTH_HELPED items (federation NAM ROPC, my.basf.com PKCE-less refresh) unchanged.
+[NEXT] RAG: search for Technology Nexus "Smart ID Self-Service" v5.3.x REST API path conventions + known unauth endpoints; plus GitHub/web for `secsys.basf.com` deployment references — passive-only, to scope the JS-bundle probe for an apiBaseURL.
+[LEARN] REJECTED AUTH @ prod.api.basf.com/security/internal/v1/oauth2/login: LIVE but Apigee-gated — identical 401 (82B "Service Error -Unauthorized") for doc example client `c653ff6e-a86a-4531-8443-a8a4378dc2fb` and null client; `/token` 405 on GET (POST-only per docs); base `/oauth2` 200/0B; vhost `BASF_secure` + proxy `security/internal/v1/oauth2` confirmed via `/security/internal/v1` 404 faultstring; consumer-gated before client_id validation
+[LEARN] RAG: client_id `c653ff6e-a86a-4531-8443-a8a4378dc2fb` appears ONLY in developer.basf.com docs (fabricated example — no secret, no repo/leak hits); zero passive credential material across all identified BASF OAuth clients
+[LEARN] ACCEPTED RECON @ prod.api.basf.com: dev docs confirm authorization_code-only, exact-match redirect_uri, and explicitly "state parameter currently not supported" on the BASF OAuth2 authorize endpoint — design-level OAuth notes, no client to exploit against
+[LEARN] ACCEPTED RECON @ secsys.basf.com: live "Smart ID Self-Service" (Technology Nexus, v5.3.1+) Angular SPA, 200/3179B; sibling `bsh.secsys`, `secsys-visitor`, and qual instances (`secsys-ssp-qual`, `bsh-qual`, `visitor-secsys-ssp-qual`) resolvable; qual hosts Cloudflare-JS-challenged
+[LEARN] REJECTED RECON @ basf.login.apigee.com: standard Apigee Edge SSO identity-zone login (`zonename.login.apigee.com` pattern per Apigee SAML docs) — generic Edge SSO, not a custom BASF OAuth provider; prior ROPC/implicit config is stock Edge SSO
+[RISK] BASF SE: 24 — Newly-discovered doc-confirmed OAuth2 proxy on prod.api.basf.com (`/security/internal/v1/oauth2`) is live but fully Apigee-consumer-gated (401 before client validation, no flow to drive without a registered client). secsys/Smart ID estate is a login-grade identity self-service SPA whose accessible classes (username enumeration, password-recovery policy) are out of scope; primary host open, qual hosts CF-challenged. basf.login.apigee.com downgraded from novel to stock Apigee Edge SSO. No new exploitable unauth surface; three AUTH_HELPED items still credential-blocked.

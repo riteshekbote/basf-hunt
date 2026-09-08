@@ -251,3 +251,13 @@ www.basf.com
 - NEW developer.basf.com docs confirm `prod.api.basf.com/security/internal/v1/oauth2/login` is the authorization endpoint for BASF APIs — authorization_code grant only, functional users use client certifica
 
 ## 2026-09-08 20:22:02 UTC
+
+## 2026-09-08 22:50:28 UTC
+- NEW basf.login.apigee.com — Apigee SAML/SSO corporate identity portal discovered (web search); serves "Sign in with SAML" + "Login with basf"; completely untested surface
+- NEW rep.basf.com — "Bestandskundenplattform" behind Azure Front Door; Spring Boot + Wicket; Actuator at `/actuator` (HAL) + `/actuator/health` (UP); all 16 sensitive endpoints (env, mappings, beans, confi
+- CHANGED procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/?path=/documents/newFramework — HTTP 500 (1753B SAP runtime error) confirmed across 4 portals; J2EE backend reached PAST F5-
+- CHANGED tm.basf.com + passage-europe.basf.com + vss3.basf.com — all 3 sibling portals now confirmed LIVE on 141.6.3.0/16; tm+passage share procurement's J2EE backend (KM servlet → HTTP 500), vss3 WAF-blocks K
+- CHANGED federation.basf.com — OIDC discovery reconfirmed unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims); SAML2 metadata at `/nidp/saml2/metadata`
+- CHANGED *.api.basf.com estate (9 hosts) — full unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404
+- CHANGED prod.api.basf.com — 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys (core/pi/csp/navigator) rejected "Invalid ApiKey"
+- CHANGED api.commerce.basf.com — 8 stage prefixes all `MissingAuthenticationTokenException`; IAM/SigV4 authorizer, x-api-key not a credential class

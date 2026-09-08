@@ -10802,3 +10802,149 @@ STEP 6 — LEARNING:
 
 STEP 7 — RISK:
 [RISK] BASF SE: 24 — No change. basf.login.apigee.com fully mapped as a closed Apigee private SAML/OAuth identity portal. OIDC discovery + SAML metadata + jwks are public config (informational); token and userinfo endpoints are creds-gated (401); SAML SSO login is recaptcha-gated. The ROPC/implicit grant posture is config disclosure only and requires valid corporate credentials to advance — same credential barrier blocking all three surviving AUTH_HELPED hypotheses. No new exploitable unauthenticated surface across the now-13+ host estate.
+===== ANALYST bigpickle 2026-09-08 22:50:28 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la; ls -R art 2>/dev/null | head -50
+total 292
+drwxr-xr-x 12 runner runner  4096 Sep  8 22:47 .
+drwxr-xr-x  3 runner runner  4096 Sep  8 22:47 ..
+drwxr-xr-x  7 runner runner  4096 Sep  8 22:47 .git
+drwxr-xr-x  3 runner runner  4096 Sep  8 22:47 .github
+-rw-r--r--  1 runner runner  1801 Sep  8 22:47 README.md
+-rw-r--r--  1 runner runner    32 Sep  8 22:47 analyst-out.txt
+-rw-r--r--  1 runner runner 93121 Sep  8 22:47 analyst-prompt.txt
+-rw-r--r--  1 runner runner 89249 Sep  8 22:47 ctx.txt
+drwxr-xr-x  2 runner runner  4096 Sep  8 22:47 inventory
+drwxr-xr-x  2 runner runner  4096 Sep  8 22:47 knowledge
+drwxr-xr-x  2 runner runner  4096 Sep  8 22:47 leads
+-rw-r--r--  1 runner runner 27793 Sep  8 22:47 probe-results.md
+drwxr-xr-x  2 runner runner  4096 Sep  8 22:47 recon-notes
+drwxr-xr-x  2 runner runner  4096 Sep  8 22:47 reports
+drwxr-xr-x  2 runner runner  4096 Sep  8 22:47 reposcan-raw
+-rw-r--r--  1 runner runner  3285 Sep  8 22:47 scope.yml
+drwxr-xr-x  2 runner runner  4096 Sep  8 22:47 scripts
+-rw-r--r--  1 runner runner    33 Sep  8 22:47 state_bigpickle.json
+-rw-r--r--  1 runner runner    33 Sep  8 22:47 state_laguna.json
+-rw-r--r--  1 runner runner    33 Sep  8 22:47 state_ling3.json
+-rw-r--r--  1 runner runner    33 Sep  8 22:47 state_longcat.json
+-rw-r--r--  1 runner runner    33 Sep  8 22:47 state_mimo.json
+-rw-r--r--  1 runner runner    33 Sep  8 22:47 state_nemotron3.json
+drwxr-xr-x  2 runner runner  4096 Sep  8 22:47 triage
+[0m
+[0m◈ [0mParallel Web Search ""basf.login.apigee.com" client_id oauth"
+[0m◈ [0mParallel Web Search ""basf.apigee-saml-login" OR "basf.login.apigee.com" apigee"
+Two real deltas surfaced from the docs. Probing the doc-confirmed OAuth endpoints on `prod.api.basf.com` (never in the 66-path enum) and RAG-ing the documented example `client_id`.
+[0m◈ [0mParallel Web Search ""c653ff6e-a86a-4531-8443-a8a4378dc2fb" basf"
+[0m◈ [0mParallel Web Search "basf "secsys.basf.com" self-service"
+[0m
+[0m$ [0mfor u in "https://prod.api.basf.com/security/internal/v1/oauth2/login" "https://prod.api.basf.com/security/internal/v1/oauth2/token" "https://prod.api.basf.com/security/internal/v1/oauth2" "https://prod.api.basf.com/security/internal/v1"; do echo "=== $u ==="; curl -sS -k --max-time 15 -A "Mozilla/5.0 (X11; Linux x86_64)" -o /tmp/resp.txt -w "HTTP %{http_code} | size=%{size_download} | ct=%{content_type} | loc=%{redirect_url}\n" "$u"; head -c 400 /tmp/resp.txt; echo; sleep 1.2; done
+=== https://prod.api.basf.com/security/internal/v1/oauth2/login ===
+HTTP 401 | size=82 | ct=application/json | loc=
+
+			{
+			"code":"Unauthorized",
+			"message":"Service Error -Unauthorized"
+			}
+		
+=== https://prod.api.basf.com/security/internal/v1/oauth2/token ===
+HTTP 405 | size=103 | ct=application/json | loc=
+
+			{
+			"code":"Method Not Allowed",
+			"message":"The method is not supported by the server."
+			}
+		
+=== https://prod.api.basf.com/security/internal/v1/oauth2 ===
+HTTP 200 | size=0 | ct= | loc=
+
+=== https://prod.api.basf.com/security/internal/v1 ===
+HTTP 404 | size=182 | ct=application/json | loc=
+{"fault":{"faultstring":"Unable to identify proxy for host: BASF_secure and url: \/security\/internal\/v1","detail":{"errorcode":"messaging.adaptors.http.flow.ApplicationNotFound"}}}
+[0m
+`/security/internal/v1/oauth2/{login,token}` are LIVE on the `BASF_secure` Apigee vhost — the 401/405 reveal a real OAuth proxy never covered by the 66-path enum. Probing authorize-endpoint behavior with the doc example client_id vs unknown client_id as an oracle.
+[0m$ [0mbase="https://prod.api.basf.com/security/internal/v1/oauth2/login"; echo "=== A) doc client c653ff6e ==="; curl -sS -k --max-time 15 -A "Mozilla/5.0" -o /tmp/r1.txt -D /tmp/h1.txt -w "HTTP %{http_code} | size=%{size_download} | loc=%{redirect_url}\n" "$base?client_id=c653ff6e-a86a-4531-8443-a8a4378dc2fb&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2F&scope=apim"; grep -i -E "^(HTTP|Location|Server|X-|set-cookie)" /tmp/h1.txt | head -15; head -c 300 /tmp/r1.txt; echo; sleep 1.2; echo "=== B) unknown client 00000000 ==="; curl -sS -k --max-time 15 -A "Mozilla/5.0" -o /tmp/r2.txt -D /tmp/h2.txt -w "HTTP %{http_code} | size=%{size_download} | loc=%{redirect_url}\n" "$base?client_id=00000000-0000-0000-0000-000000000000&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2F&scope=apim"; grep -i -E "^(HTTP|Location|Server)" /tmp/h2.txt | head; head -c 300 /tmp/r2.txt; echo
+=== A) doc client c653ff6e ===
+HTTP 401 | size=82 | loc=
+HTTP/1.1 401 Unauthorized
+
+			{
+			"code":"Unauthorized",
+			"message":"Service Error -Unauthorized"
+			}
+		
+=== B) unknown client 00000000 ===
+HTTP 401 | size=82 | loc=
+HTTP/1.1 401 Unauthorized
+
+			{
+			"code":"Unauthorized",
+			"message":"Service Error -Unauthorized"
+			}
+[0m
+OAuth proxy is Apigee-gated before any client_id logic — identical 401 for both known-format and null client. Surface closed. One passive recon probe on the newly-discovered SecSys identity estate, then wrap.
+[0m$ [0mfor u in "https://secsys.basf.com/" "https://secsys-ssp-qual.basf.com/"; do echo "=== $u ==="; curl -sS -k --max-time 15 -o /tmp/s.txt -D /tmp/sh.txt -w "HTTP %{http_code} | size=%{size_download} | ct=%{content_type}\n" "$u"; grep -i -E "^(HTTP|Server|Location|X-Powered)" /tmp/sh.txt | head -5; head -c 200 /tmp/s.txt; echo; sleep 1.2; done
+=== https://secsys.basf.com/ ===
+HTTP 200 | size=3179 | ct=text/html;charset=ISO-8859-1
+HTTP/1.1 200 OK
+<!DOCTYPE html>
+<html lang="en" data-beasties-container>
+  <head>
+    <base href="./">
+    <meta charset="utf-8">
+    <title>Smart ID Self-Service</title>
+    <meta name="viewport" content="width=devi
+=== https://secsys-ssp-qual.basf.com/ ===
+HTTP 403 | size=5372 | ct=text/html; charset=UTF-8
+HTTP/2 403 
+server: cloudflare
+server-timing: chlray;desc="a3818169dbc6ab5c"
+<!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=Edge"><meta nam
+[0m
+## STEP 1 — DELTA
+- NEW `prod.api.basf.com/security/internal/v1/oauth2/{login,token}` — developer.basf.com docs confirm the real BASF OAuth2 authorize+token endpoints; neither was in the prior 66-path enum. LIVE on Apigee vhost `BASF_secure`.
+- NEW secsys.basf.com + `bsh.secsys`, `secsys-visitor`, `secsys-ssp-qual`, `bsh-qual`, `visitor-secsys-ssp-qual` — Technology Nexus "Smart ID Self-Service" (v5.3.1+) identity estate, live; qual instances Cloudflare-challenged.
+
+## STEP 2 — PRIORITIZE
+- [PRIO] prod.api.basf.com/security/internal/v1/oauth2,7.1,attack_surface=6,business_value=9,tech_exposure=9,gate_ease=2,cloud_surface=7,freshness=10
+- [PRIO] secsys.basf.com,5.4,attack_surface=5,business_value=6,tech_exposure=4,gate_ease=6,cloud_surface=2,freshness=9
+- [PRIO] federation.basf.com,5.3,attack_surface=5,business_value=9,tech_exposure=8,gate_ease=3,cloud_surface=5,freshness=3
+
+## STEP 3 — HYPOTHESES
+[HYP] secsys.basf.com Smart ID Self-Service unauth API/JS-bundle config disclosure
+class: RECON
+asset: secsys.basf.com
+confidence: 45
+reasoning: root GET=200 (3179B) Angular SPA (data-beasties-container), title "Smart ID Self-Service", version 5.3.1+; Technology Nexus Smart ID products expose REST self-service/admin APIs behind the SPA; no client-side probe beyond root has run; login/enumeration/password-reset classes are out-of-scope but a JS-disclosed apiBaseURL + unauth REST endpoint would be new
+evidence_needed: apiBaseURL in SPA bundle; any /api*|/auth*|/admin* endpoint returning non-login content
+verify_steps: PASSIVE — GET root SPA JS/CSS bundle, extract apiBaseURL + route map; GET that base path; GET `/api/`, `/auth/api/`, `/admin/` (1 rps, GET only)
+impact: info disclosure of identity-service endpoints/config; LOW-MEDIUM
+testability: PASSIVE
+[HYP] prod.api.basf.com OAuth2 authorize proxy bypass of Apigee gate
+class: AUTH
+asset: prod.api.basf.com/security/internal/v1/oauth2/login
+confidence: 20
+reasoning: dev docs describe browser users hitting `/login` for NetIQ auth; live probe returns identical 401 (82B "Service Error -Unauthorized") for doc example client `c653ff6e-…` and null client — proxy-level OAuthV2/VerifyAPIKey gate fires before client_id validation; docs-only flow requires a registered developer client
+evidence_needed: a genuinely registered client_id (doc example is placeholder per RAG) plus API-key-gated bypass — none surfaced passively
+verify_steps: PASSIVE exhausted (401/401/405/200 probed); RAG for real registered client_id only
+impact: token issuance/ATO if reachable; HIGH only if a client is recovered — none exists
+testability: AUTH_HELPED
+
+## STEP 4 — SELF-CRITIQUE
+[PARKED] prod.api.basf.com oauth2 gate bypass (20 < 40): identical 401 for known-format vs null client = Apigee-gated; proxy requires registered developer API key before OAuth logic; no passive recovery path
+[PARKED] basf.login.apigee.com ROPC (55→40): Apigee docs confirm `zonename.login.apigee.com` is stock Edge SSO identity-zone login; ROPC/implicit listing is default Edge SSO config, not a BASF-custom posture; standard product, exploit needs Edge org creds
+[FINAL] secsys.basf.com Self-Service estate recon (45) — sole fresh unauth surface; all OAuth/identity config elsewhere reconfirmed gated; AUTH_HELPED items (federation NAM ROPC, my.basf.com PKCE-less refresh) unchanged.
+
+## STEP 5 — NEXT ACTION
+[NEXT] RAG: search for Technology Nexus "Smart ID Self-Service" v5.3.x REST API path conventions + known unauth endpoints; plus GitHub/web for `secsys.basf.com` deployment references — passive-only, to scope the JS-bundle probe for an apiBaseURL.
+
+## STEP 6 — LEARNING
+[LEARN] REJECTED AUTH @ prod.api.basf.com/security/internal/v1/oauth2/login: LIVE but Apigee-gated — identical 401 (82B "Service Error -Unauthorized") for doc example client `c653ff6e-a86a-4531-8443-a8a4378dc2fb` and null client; `/token` 405 on GET (POST-only per docs); base `/oauth2` 200/0B; vhost `BASF_secure` + proxy `security/internal/v1/oauth2` confirmed via `/security/internal/v1` 404 faultstring; consumer-gated before client_id validation
+[LEARN] RAG: client_id `c653ff6e-a86a-4531-8443-a8a4378dc2fb` appears ONLY in developer.basf.com docs (fabricated example — no secret, no repo/leak hits); zero passive credential material across all identified BASF OAuth clients
+[LEARN] ACCEPTED RECON @ prod.api.basf.com: dev docs confirm authorization_code-only, exact-match redirect_uri, and explicitly "state parameter currently not supported" on the BASF OAuth2 authorize endpoint — design-level OAuth notes, no client to exploit against
+[LEARN] ACCEPTED RECON @ secsys.basf.com: live "Smart ID Self-Service" (Technology Nexus, v5.3.1+) Angular SPA, 200/3179B; sibling `bsh.secsys`, `secsys-visitor`, and qual instances (`secsys-ssp-qual`, `bsh-qual`, `visitor-secsys-ssp-qual`) resolvable; qual hosts Cloudflare-JS-challenged
+[LEARN] REJECTED RECON @ basf.login.apigee.com: standard Apigee Edge SSO identity-zone login (`zonename.login.apigee.com` pattern per Apigee SAML docs) — generic Edge SSO, not a custom BASF OAuth provider; prior ROPC/implicit config is stock Edge SSO
+
+## STEP 7 — RISK
+[RISK] BASF SE: 24 — Newly-discovered doc-confirmed OAuth2 proxy on prod.api.basf.com (`/security/internal/v1/oauth2`) is live but fully Apigee-consumer-gated (401 before client validation, no flow to drive without a registered client). secsys/Smart ID estate is a login-grade identity self-service SPA whose accessible classes (username enumeration, password-recovery policy) are out of scope; primary host open, qual hosts CF-challenged. basf.login.apigee.com downgraded from novel to stock Apigee Edge SSO. No new exploitable unauth surface; three AUTH_HELPED items still credential-blocked.
