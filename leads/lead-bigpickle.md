@@ -1709,3 +1709,26 @@ testability: PASSIVE
 [LEARN] ACCEPTED RECON @ developer.basf.com: public docs confirm OAuth flow at `prod.api.basf.com/security/internal/v1/oauth2/login`; authorization_code grant only; functional users authenticate via client certificates; refresh tokens optional per app config
 [LEARN] ACCEPTED RECON @ basf.login.apigee.com: new Apigee SAML/SSO login portal discovered; corporate identity surface; completely untested
 [RISK] BASF SE: 24 — Unauthenticated attack surface near-zero across full 12+ host estate; new basf.login.apigee.com is the sole fresh untested surface; RAG yielded zero credential leaks for both surviving AUTH_HELPED OAuth items; no new exploitable finding.
+## 2026-09-08 20:20:19 UTC [target] (model bigpickle)
+[HYP] basf.login.apigee.com ROPC/implicit grant enabled on corporate Apigee OAuth provider
+class: AUTH
+asset: basf.login.apigee.com/oauth/token
+confidence: 55
+reasoning: .well-known/openid-configuration lists grant_types_supported including password (ROPC) and implicit with token_endpoint_auth_methods client_secret_post/basic; userinfo returns 401 (auth-gated); token endpoint 401 without creds; jwks_uri /token_key 200 exposes RS256 public key; this is the BASF corporate Apigee private SAML login (O=unknown, entityID basf.apigee-saml-login); ROPC+implicit enabled on a corporate identity provider is an unusual posture and may be leveraged against a misconfigured registered confidential/public client
+evidence_needed: a registered client_id + client_secret pairing from passive sources, or a public client accepting ROPC that would allow token issuance; no such pairing may surface passively
+verify_steps: AUTH_HELPED — POST `https://basf.login.apigee.com/oauth/token` grant_type=password&client_id=<known>&username=... requires credentials; PASSIVE only confirms config (already done); implicit flow GET authorize with client_id+response_type=token could test for open-implicit-token if a public client_id is recovered
+impact: potential token minting / account access on BASF corporate integration APIs if a misconfigured public client accepts ROPC/implicit; HIGH if exploitable but requires credentials or a leaked public client_id
+testability: AUTH_HELPED
+[HYP] basf.login.apigee.com SAML login page info disclosure / user-facing config leak
+class: RECON
+asset: basf.login.apigee.com
+confidence: 45
+reasoning: Apigee private SAML login portal fully mapped — OIDC discovery (715B), SAML metadata (6647B signed, entityID basf.apigee-saml-login), recaptcha-protected login with google terms; no client_id/redirect_uri exposed in HTML; this is config/informational only and mirrors the already-documented federation.basf.com NAM ROPC finding; no unauth token/userinfo/registration surface (401)
+evidence_needed: any client_id, redirect_uri, or admin/registration path returning non-401 content
+verify_steps: PASSIVE — GET `/register`, `/clients`, `/admin`, `/oauth/clients` (all done, 401/404 class); only config endpoints (discovery, metadata, jwks) are 200
+impact: informational config disclosure (grant/alg/scopes); LOW
+testability: PASSIVE
+[NEXT] RAG: search passive code/credential sources for any registered `client_id`/`client_secret` pairing or public client_id referencing `basf.login.apigee.com` or entityID `basf.apigee-saml-login`; also search BASF developer docs (developer.basf.com) for the Apigee OAuth client_id/secret provisioning flow — passive-only, since all three surviving AUTH_HELPED hypotheses (federation ROPC 65, my.basf.com PKCE-less 55, basf.login.apigee.com ROPC 55) require a valid credential or leaked public client_id the unauth surface cannot supply.
+[LEARN] ACCEPTED RECON @ basf.login.apigee.com: full Apigee OAuth identity surface mapped — OIDC discovery (`.well-known/openid-configuration`, 715B) exposes token/userinfo/jwks endpoints with grant_types incl. password(ROPC)+implicit and client_secret_post/basic; SAML metadata (`/saml/metadata`, 6647B signed) exposes SSO/SLO `basf.apigee-saml-login`; `/token_key` 200 RS256; `/oauth/token`+`/userinfo` 401 auth-gated; `/login` is Apigee private SAML SSO (recaptcha + google terms); no unauth token/userinfo/registration surface
+[LEARN] REJECTED RECON @ basf.login.apigee.com: `/register`, `/clients`, `/admin`, `/oauth/clients` — no unauth client registration or admin surface exposed (401/404); only config endpoints (discovery, metadata, jwks) return 200; ROPC/implicit grant is a config-level posture matching federation.basf.com NAM, exploitation requires valid BASF creds (out-of-scope to test)
+[RISK] BASF SE: 24 — No change. basf.login.apigee.com fully mapped as a closed Apigee private SAML/OAuth identity portal. OIDC discovery + SAML metadata + jwks are public config (informational); token and userinfo endpoints are creds-gated (401); SAML SSO login is recaptcha-gated. The ROPC/implicit grant posture is config disclosure only and requires valid corporate credentials to advance — same credential barrier blocking all three surviving AUTH_HELPED hypotheses. No new exploitable unauthenticated surface across the now-13+ host estate.

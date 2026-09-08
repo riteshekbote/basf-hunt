@@ -249,3 +249,5 @@ www.basf.com
 - NEW basf.login.apigee.com — discovered via web search; serves SAML/SSO login page ("Sign in with SAML" + "Login with basf"); appears to be BASF corporate Apigee identity portal; untested surface
 - NEW basf.login.apigee.com — Apigee SAML/SSO login portal discovered via web search; serves "Sign in with SAML" + "Login with basf" — corporate identity surface untested
 - NEW developer.basf.com docs confirm `prod.api.basf.com/security/internal/v1/oauth2/login` is the authorization endpoint for BASF APIs — authorization_code grant only, functional users use client certifica
+
+## 2026-09-08 20:22:02 UTC

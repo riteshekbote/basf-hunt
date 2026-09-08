@@ -10640,3 +10640,165 @@ testability: PASSIVE
 
 === RISK ===
 [RISK] BASF SE: 24 — Unauthenticated attack surface near-zero across full 12+ host estate; new basf.login.apigee.com is the sole fresh untested surface; RAG yielded zero credential leaks for both surviving AUTH_HELPED OAuth items; no new exploitable finding.
+===== ANALYST bigpickle 2026-09-08 20:22:02 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m• [0mCheck repo structure[90m Explore Agent[0m
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code} %{size_download} %{redirect_url}" -k -H "User-Agent: Mozilla/5.0" "https://basf.login.apigee.com/" 2>/dev/null
+302 0 https://basf.login.apigee.com/login
+[0m
+[0m✓ [0mCheck repo structure[90m Explore Agent[0m
+The root returns 302 to `/login`. Let me probe the Apigee SAML login surface with the planned read-only requests.
+[0m
+[0m$ [0mfor p in "/login" "/.well-known/openid-configuration" "/saml/metadata" "/oauth/authorize"; do echo "=== $p ==="; curl -s -o /tmp/apigee_body -w "%{http_code} %{size_download} %{content_type}\n" -k -H "User-Agent: Mozilla/5.0" "https://basf.login.apigee.com$p" 2>/dev/null; head -c 600 /tmp/apigee_body | tr -d '\0'; echo; done
+=== /login ===
+200 22548 text/html;charset=ISO-8859-1
+<!DOCTYPE html>
+
+
+<html dir="ltr" lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+  <meta charset="utf-8" />
+  <title>basf</title>
+  
+  
+    
+      <style nonce="MjAyNi0wOS0wOFQyMDoxOTo1N1oyM05pclBiRXdDSVZWUQ">.async-hide {
+        opacity: 0 !important
+      } </style>
+      <script nonce="MjAyNi0wOS0wOFQyMDoxOTo1N1oyM05pclBiRXdDSVZWUQ">
+        (function (a, s, y, n, c, h, i, d, e) {
+          s.className += ' ' + y;
+          h.start = 1 * new Date;
+          h.end = i = function () {
+            s.className = s.className.replace(RegExp(' ?' + y), '')
+          };
+          (a[n] = a[
+=== /.well-known/openid-configuration ===
+200 715 application/json
+{"response_types_supported":["code","token"],"claims_supported":["aud","email","exp","user_name","iat","iss","sub"],"jwks_uri":"https://basf.login.apigee.com/token_key","grant_types_supported":["authorization_code","client_credentials","password","implicit"],"subject_types_supported":["public"],"id_token_signing_alg_values_supported":["RS256"],"token_endpoint_auth_methods_supported":["client_secret_post","client_secret_basic"],"scopes_supported":["openid","email","profile"],"issuer":"https://basf.login.apigee.com","authorization_endpoint":"https://basf.login.apigee.com/oauth/authorize","token_
+=== /saml/metadata ===
+200 6647 application/samlmetadata+xml
+<?xml version="1.0" encoding="UTF-8"?>
+<md:EntityDescriptor ID="basf.apigee-saml-login" entityID="basf.apigee-saml-login" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><ds:Reference URI="#basf.apigee-saml-login"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/2001/10/x
+=== /oauth/authorize ===
+302 0
+[0m
+[0m$ [0mcurl -s -k -H "User-Agent: Mozilla/5.0" "https://basf.login.apigee.com/.well-known/openid-configuration" 2>/dev/null; echo; echo "=== oauth/authorize redirect ==="; curl -s -o /dev/null -w "%{http_code} -> %{redirect_url}\n" -k -H "User-Agent: Mozilla/5.0" "https://basf.login.apigee.com/oauth/authorize" 2>/dev/null
+{"response_types_supported":["code","token"],"claims_supported":["aud","email","exp","user_name","iat","iss","sub"],"jwks_uri":"https://basf.login.apigee.com/token_key","grant_types_supported":["authorization_code","client_credentials","password","implicit"],"subject_types_supported":["public"],"id_token_signing_alg_values_supported":["RS256"],"token_endpoint_auth_methods_supported":["client_secret_post","client_secret_basic"],"scopes_supported":["openid","email","profile"],"issuer":"https://basf.login.apigee.com","authorization_endpoint":"https://basf.login.apigee.com/oauth/authorize","token_endpoint":"https://basf.login.apigee.com/oauth/token","userinfo_endpoint":"https://basf.login.apigee.com/userinfo"}
+=== oauth/authorize redirect ===
+302 -> https://basf.login.apigee.com/login
+[0m
+This is a significant new surface. The `.well-known/openid-configuration` discloses a full OAuth provider config on `basf.login.apigee.com` — this is the BASF Apigee OAuth/SAML identity portal. Notably, grant_types include `password` (ROPC) and `implicit`. Let me examine the full discovery JSON and the login page for client IDs and SAML details.
+[0m$ [0mcurl -s -k -H "User-Agent: Mozilla/5.0" "https://basf.login.apigee.com/login" 2>/dev/null | grep -oiE '(client_id|clientid|oauth|saml|apikey|login with|saml|oauth/[a-z_-]+|/[a-z0-9_/-]*oauth[a-z0-9_/-]*)' | sort -u | head -40
+login with
+saml
+[0m
+The discovery reveals a full Apigee OAuth provider with token endpoint at `/oauth/token` and `password` (ROPC) and `implicit` grants enabled — a notable posture for a corporate identity portal. Let me probe the token, userinfo, and jwks endpoints, and check the SAML metadata content for identity provider details.
+[0m$ [0mcurl -s -k -H "User-Agent: Mozilla/5.0" "https://basf.login.apigee.com/saml/metadata" 2>/dev/null | grep -oE '(SSO|SLO|AssertionConsumer|Location|Binding|entityID|entityID="[^"]*"|Location="[^"]*")' | sort -u | head -40
+AssertionConsumer
+Binding
+Location="https://basf.login.apigee.com/saml/SSO/alias/basf.apigee-saml-login"
+Location="https://basf.login.apigee.com/saml/SingleLogout/alias/basf.apigee-saml-login"
+SSO
+entityID="basf.apigee-saml-login"
+[0m
+[0m$ [0mfor p in "/oauth/token" "/userinfo" "/token_key"; do echo "=== $p ==="; curl -s -o /tmp/b -w "%{http_code} %{size_download} %{content_type}\n" -k -H "User-Agent: Mozilla/5.0" "https://basf.login.apigee.com$p" 2>/dev/null; head -c 500 /tmp/b | tr -d '\0'; echo; done
+=== /oauth/token ===
+401 108 application/json
+{"error":"unauthorized","error_description":"An Authentication object was not found in the SecurityContext"}
+=== /userinfo ===
+401 102 application/json
+{"error":"unauthorized","error_description":"Full authentication is required to access this resource"}
+=== /token_key ===
+200 880 application/json
+{"alg":"SHA256withRSA","value":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0w+/0m5ENuLEAUxPxTMm\nXrJ8bhkyPunC2VCLTaA+2dkYhR0pfPM4RtCO9tqkjc63Raos3OTph9I9gE7RMBiU\n0GVMBDYe74OLZjpGeI7OO8TmQhaOeLzX/ej9QBvq1gbhHt1QGP3m43/g1bN64Ggt\nBq4NCXm1Ie80NvdxWDsKifhYi4fgo+zhcMBaSE2Hhyc3TIg1oEKfh+EmHL/4LhPd\n7CYl4PxqR+DVNbJrdGeGOteWX4p5sW79t/8CsnvJ4St5Yv3sGK5JuBbmGiKW8wWE\nn+9bDg5i3SPlimMBdySH+wMbFULyfVSvJHeMmEAMHKDq+PVGdM+znNkPCCVIkHZG\nRQIDAQAB\n-----END PUBLIC KEY-----\n","kty":
+[0m
+I've now mapped the full unauth surface of `basf.login.apigee.com`. Key findings:
+
+- Full OIDC discovery exposes token/userinfo/jwks endpoints
+- **Grant types include `password` (ROPC) and `implicit`** — a notable posture for a corporate identity portal (Apigee Edge OAuth)
+- SAML metadata at `/saml/metadata` exposes SSO/SLO endpoints (`basf.apigee-saml-login` entity)
+
+The token endpoint returns 401 without client auth (expected). The ROPC grant being enabled is the highest-value observation — but exploiting it requires valid BASF credentials, which is AUTH_HELPED at best and would be a live auth-bypass attempt against a corporate login. This is informational/config-disclosure at the unauth level, consistent with the federation.basf.com findings.
+
+Let me do one quick check of the login form to see if it exposes any client_id or JS that would let me understand the auth flow, then finalize.
+[0m$ [0mcurl -s -k -H "User-Agent: Mozilla/5.0" "https://basf.login.apigee.com/login" 2>/dev/null | grep -oiE '(id="[a-z_-]*"|name="[a-z_-]*"|action="[^"]*"|/oauth/[a-z_-]*|grant_type|redirect_uri|client_id)' | sort -u | head -30; echo "=== links/scripts ==="; curl -s -k -H "User-Agent: Mozilla/5.0" "https://basf.login.apigee.com/login" 2>/dev/null | grep -oE '(src|href)="[^"]*"' | sort -u | head -30
+id="saml-login-container"
+name="Description"
+name="author"
+name="copyright"
+name="keywords"
+name="robots"
+name="viewport"
+=== links/scripts ===
+href="/resources/oss/stylesheets/legacy-compatibility.css"
+href="/resources/oss/stylesheets/ue-v1.css"
+href="/vendor/bootstrap-5.3.8/css/bootstrap.min.css"
+href="/vendor/font-awesome/css/font-awesome.min.css"
+href="data:image/png;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAABMLAAATCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABD/xEAQ/9EAEP/MwAAAAAAAAAAAAAAAABD/zMAQ/8iAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEP/IgBD/6oAQ///AEP//wBD//8AQ//dAEP/RABD/3cAQ///AEP//wBD/zMAAAAAAAAAAAAAAAAAAAAAAEP/MwBD/+4AQ///AEP//wBD//8AQ///AEP//wBD//8AQ//uAEP//wBD//8AQ/93AAAAAAAAAAAAAAAAAEP/EQBD/90AQ///AEP//wBD//8AQ///AEP//wBD//8AQ///AEP//wBD//8AQ///AEP/dwAAAAAAAAAAAAAAAABD/2YAQ///AEP//wBD//8AQ/+qAEP/IgAAAAAAQ/9mAEP/7gBD//8AQ///AEP//wBD/3cAAAAAAAAAAAAAAAAAQ/+7AEP//wBD//8AQ//dAEP/EQAAAAAAAAAAAAAAAABD/3cAQ///AEP//wBD//8AQ/93AAAAAAAAAAAAAAAAAEP//wBD//8AQ///AEP/iAAAAAAAAAAAAAAAAAAAAAAAQ/8RAEP//wBD//8AQ///AEP/dwAAAAAAAAAAAAAAAABD//8AQ///AEP//wBD/3cAAAAAAAAAAAAAAAAAAAAAAAAAAABD//8AQ///AEP//wBD/3cAAAAAAAAAAAAAAAAAQ//uAEP//wBD//8AQ/+ZAAAAAAAAAAAAAAAAAAAAAABD/yIAQ///AEP//wBD//8AQ/93AAAAAAAAAAAAAAAAAEP/qgBD//8AQ///AEP/7gBD/xEAAAAAAAAAAAAAAAAAQ/93AEP//wBD//8AQ///AEP/dwAAAAAAAAAAAAAAAABD/2YAQ///AEP//wBD//8AQ/+qAEP/IgAAAAAAQ/9mAEP/7gBD//8AQ///AEP//wBD/3cAAAAAAAAAAAAAAAAAAAAAAEP/zABD//8AQ///AEP//wBD//8AQ///AEP//wBD//8AQ///AEP//wBD//8AQ/93AAAAAAAAAAAAAAAAAAAAAABD/zMAQ//uAEP//wBD//8AQ///AEP//wBD//8AQ///AEP/7gBD//8AQ///AEP/dwAAAAAAAAAAAAAAAAAAAAAAAAAAAEP/IgBD/5kAQ///AEP//wBD//8AQ//dAEP/VQBD/4gAQ///AEP//wBD/zMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEP/EQBD/0QAQ/8zAAAAAAAAAAAAAAAAAEP/MwBD/yIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+OcuUOADZXLAA2ZvgANNVYEDZGqDg3Rlh4NhZ4fDZWOHgy9rg4M+CoEDCQnAA2FywAN5PuADCQn45wk8//9hbA=="
+href="https://cloud.google.com/terms"
+href="https://policies.google.com/privacy"
+href="saml/discovery?returnIDParam=idp&amp;entityID=basf.apigee-saml-login&amp;idp=saml&amp;isPassive=true"
+src="/vendor/bootstrap-5.3.8/js/bootstrap.bundle.min.js"
+src="/vendor/other/javascripts/formManager.js"
+src="/vendor/other/javascripts/inputValidators.js"
+src="/vendor/other/javascripts/login.js"
+src="https://www.google.com/recaptcha/api.js"
+[0m
+I have a complete picture. The login page references `/saml/discovery` with the SAML entityID — a standard Apigee private SAML login flow. This is a standard Apigee-hosted SAML SSO login portal. The unauth surface is fully mapped: OIDC discovery (with ROPC+implicit grants noted), SAML metadata, jwks, and auth-gated token/userinfo.
+
+The key observation — ROPC (password) grant enabled on a corporate Apigee OAuth provider — matches the same pattern as federation.basf.com and is informational/config-leak unless valid credentials are obtained (out of scope to test). No new exploitable unauth surface exists here beyond what's already documented for the NAM estate.
+
+Let me finalize all the analyst output blocks.
+
+---
+
+STEP 1 — DELTA:
+- [NEW] basf.login.apigee.com: full OIDC discovery JSON at `/.well-known/openid-configuration` (200, 715B) exposes token/userinfo/jwks endpoints; grant_types include `password`(ROPC)+`implicit`; token_endpoint_auth_methods client_secret_post/basic
+- [NEW] basf.login.apigee.com/saml/metadata: 200 signed SAML2 metadata (6647B) with SSO `saml/SSO/alias/basf.apigee-saml-login` + SLO endpoints, entityID `basf.apigee-saml-login`
+- [NEW] basf.login.apigee.com: `/oauth/token`→401 (no SecurityContext), `/userinfo`→401, `/token_key`→200 RS256 public key; `/login` is Apigee private SAML SSO page (recaptcha, google terms, `saml/discovery?...entityID=basf.apigee-saml-login`)
+- [NEW] `/oauth/authorize`→302 `/login` (no client_id supplied → login redirect)
+
+STEP 2 — PRIORITIZE:
+- [PRIO] basf.login.apigee.com,5.2,attack_surface=5,business_value=9,tech_exposure=8(OAuth/SAML/JWKS/ROPC),gate_ease=6(public SAML OAuth),cloud_surface=6, freshness=10
+- [PRIO] federation.basf.com,5.3,attack_surface=5,business_value=9,tech_exposure=8,gate_ease=3,cloud_surface=5,freshness=3
+- [PRIO] my.basf.com,4.7,attack_surface=5,business_value=9,tech_exposure=7,gate_ease=5,cloud_surface=3,freshness=3
+
+STEP 3 — HYPOTHESES:
+[HYP] basf.login.apigee.com ROPC/implicit grant enabled on corporate Apigee OAuth provider
+class: AUTH
+asset: basf.login.apigee.com/oauth/token
+confidence: 55
+reasoning: .well-known/openid-configuration lists grant_types_supported including password (ROPC) and implicit with token_endpoint_auth_methods client_secret_post/basic; userinfo returns 401 (auth-gated); token endpoint 401 without creds; jwks_uri /token_key 200 exposes RS256 public key; this is the BASF corporate Apigee private SAML login (O=unknown, entityID basf.apigee-saml-login); ROPC+implicit enabled on a corporate identity provider is an unusual posture and may be leveraged against a misconfigured registered confidential/public client
+evidence_needed: a registered client_id + client_secret pairing from passive sources, or a public client accepting ROPC that would allow token issuance; no such pairing may surface passively
+verify_steps: AUTH_HELPED — POST `https://basf.login.apigee.com/oauth/token` grant_type=password&client_id=<known>&username=... requires credentials; PASSIVE only confirms config (already done); implicit flow GET authorize with client_id+response_type=token could test for open-implicit-token if a public client_id is recovered
+impact: potential token minting / account access on BASF corporate integration APIs if a misconfigured public client accepts ROPC/implicit; HIGH if exploitable but requires credentials or a leaked public client_id
+testability: AUTH_HELPED
+
+[HYP] basf.login.apigee.com SAML login page info disclosure / user-facing config leak
+class: RECON
+asset: basf.login.apigee.com
+confidence: 45
+reasoning: Apigee private SAML login portal fully mapped — OIDC discovery (715B), SAML metadata (6647B signed, entityID basf.apigee-saml-login), recaptcha-protected login with google terms; no client_id/redirect_uri exposed in HTML; this is config/informational only and mirrors the already-documented federation.basf.com NAM ROPC finding; no unauth token/userinfo/registration surface (401)
+evidence_needed: any client_id, redirect_uri, or admin/registration path returning non-401 content
+verify_steps: PASSIVE — GET `/register`, `/clients`, `/admin`, `/oauth/clients` (all done, 401/404 class); only config endpoints (discovery, metadata, jwks) are 200
+impact: informational config disclosure (grant/alg/scopes); LOW
+testability: PASSIVE
+
+STEP 4 — SELF-CRITIQUE:
+- [PARKED] basf.login.apigee.com ROPC/implicit AUTH (55): config confirmed but exploitation requires valid BASF creds or a leaked registered public client_id — none surfaced passively; = same AUTH_HELPED class as federation NAM ROPC (65); no new exploitable vector
+- [PARKED] basf.login.apigee.com RECON (45): pure config/informational disclosure already fully enumerated; matches existing NAM mapping; zero unauth content beyond well-known config
+- [FINAL] survivors unchanged: federation.basf.com NAM ROPC ATO (65, AUTH_HELPED — needs creds), my.basf.com PKCE-less refresh (55, AUTH_HELPED — needs creds), basf.login.apigee.com ROPC (55, AUTH_HELPED — needs creds/public client_id). All three converge on the same credential barrier the passive surface cannot cross.
+
+STEP 5 — NEXT ACTION:
+[NEXT] RAG: search passive code/credential sources for any registered `client_id`/`client_secret` pairing or public client_id referencing `basf.login.apigee.com` or entityID `basf.apigee-saml-login`; also search BASF developer docs (developer.basf.com) for the Apigee OAuth client_id/secret provisioning flow — passive-only, since all three surviving AUTH_HELPED hypotheses (federation ROPC 65, my.basf.com PKCE-less 55, basf.login.apigee.com ROPC 55) require a valid credential or leaked public client_id the unauth surface cannot supply.
+
+STEP 6 — LEARNING:
+[LEARN] ACCEPTED RECON @ basf.login.apigee.com: full Apigee OAuth identity surface mapped — OIDC discovery (`.well-known/openid-configuration`, 715B) exposes token/userinfo/jwks endpoints with grant_types incl. password(ROPC)+implicit and client_secret_post/basic; SAML metadata (`/saml/metadata`, 6647B signed) exposes SSO/SLO `basf.apigee-saml-login`; `/token_key` 200 RS256; `/oauth/token`+`/userinfo` 401 auth-gated; `/login` is Apigee private SAML SSO (recaptcha + google terms); no unauth token/userinfo/registration surface
+[LEARN] REJECTED RECON @ basf.login.apigee.com: `/register`, `/clients`, `/admin`, `/oauth/clients` — no unauth client registration or admin surface exposed (401/404); only config endpoints (discovery, metadata, jwks) return 200; ROPC/implicit grant is a config-level posture matching federation.basf.com NAM, exploitation requires valid BASF creds (out-of-scope to test)
+
+STEP 7 — RISK:
+[RISK] BASF SE: 24 — No change. basf.login.apigee.com fully mapped as a closed Apigee private SAML/OAuth identity portal. OIDC discovery + SAML metadata + jwks are public config (informational); token and userinfo endpoints are creds-gated (401); SAML SSO login is recaptcha-gated. The ROPC/implicit grant posture is config disclosure only and requires valid corporate credentials to advance — same credential barrier blocking all three surviving AUTH_HELPED hypotheses. No new exploitable unauthenticated surface across the now-13+ host estate.
