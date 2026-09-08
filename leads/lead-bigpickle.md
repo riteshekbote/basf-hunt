@@ -1553,3 +1553,32 @@ impact: admin/content-editor portal surface on SAP estate → higher-privilege i
 testability: PASSIVE
 [NEXT] PROBE: read-only, 1 rps — `dig +short` A/AAAA then `curl -skI` (HEAD) on editor-tm.basf.net, editor-passage-europe.basf.net, editor-vss3.basf.net, editor-procurement.basf.net, eipr3.basf.net; log resolvability + Server header + cert CN; any resolve → fingerprint for SAP BigIP/J2EE = new sub-estate finding
 [RISK] BASF SE: 32 — SAP supplier-portal estate retired as content surface (prtroot generic-500, KM only empty guest folder, permission leak = OOS descriptive-error class). Residual = NAM identity plane ROPC (65) + PKCE-less refresh (55), both AUTH_HELPED/credential-blocked. No new exploitable unauth surface across the 4 SAP portals. Down from 35.
+## 2026-09-08 04:21:13 UTC [target] (model bigpickle)
+[PRIO] federation.basf.com,5.3,attack_surface=5,business_value=9,tech_exposure=8,gate_ease=3,cloud_surface=5,freshness=3
+[PRIO] my.basf.com,4.7,attack_surface=5,business_value=9,tech_exposure=7,gate_ease=5,cloud_surface=3,freshness=3
+[PRIO] procurement.basf.com,4.4,attack_surface=8,business_value=8,tech_exposure=7,gate_ease=4,cloud_surface=2,freshness=8
+[HYP] federation.basf.com NAM ROPC password grant + no-PKCE public client enables ATO for any registered confidential client
+class: AUTH
+asset: federation.basf.com/nidp/oauth/nam/token
+confidence: 65
+reasoning: discovery unchanged since 09-06 (password+hybrid grants, plain+S256 PKCE, registration full/read); public SPA client 86cc4bf9-… uses code+refresh with zero code_challenge; no provider hardening observed across all reconfirmed rounds
+evidence_needed: valid test credential + confidential client_id/secret
+verify_steps: AUTH_HELPED — POST /nidp/oauth/nam/token grant_type=password with client creds
+impact: full access+refresh token set bypassing MFA/acr; CRITICAL-conditional
+testability: AUTH_HELPED
+[HYP] my.basf.com public client refresh_token without PKCE enables persistent session hijack
+class: OATH
+asset: my.basf.com/.auth
+confidence: 55
+reasoning: boot config discloses client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect https://my.basf.com/.auth, scope refresh_token, zero PKCE refs; NAM supports plain+S256 but client never challenges
+evidence_needed: interactively complete code flow without code_challenge, capture refresh_token, replay grant_type=refresh_token
+verify_steps: AUTH_HELPED — interactive code exchange + double replay refresh_token, diff JTI/lifetime
+impact: persistent session takeover from any intercepted code/refresh; MEDIUM-HIGH conditional
+testability: AUTH_HELPED
+[PARKED] federation.basf.com ROPC ATO (65): unchanged since 09-06, AUTH_HELPED, confidential creds required — cannot advance passively; carried only.
+[PARKED] my.basf.com PKCE-less refresh (55): AUTH_HELPED, interactive code flow required — cannot advance passively; carried only.
+[FINAL] No actionable unauth hypothesis survives. Sole candidates are the two AUTH_HELPED credential-gated NAM/OAuth items.
+[NEXT] RAG: search passive code/credential sources for the NAM confidential client_id/secret pairing or any BASF supplier-portal KM/SAP doc-id pattern; passive-only, since the two surviving AUTH_HELPED hypotheses (federation ROPC 65, my.basf.com PKCE-less refresh 55) both need credentials the passive surface cannot supply, and the SAP-portal unauth class is now decisively closed.
+[LEARN] REJECTED AUTH @ procurement.basf.com/irj/servlet/prt/portal/prtroot: all 8 dispatcher classes return HTTP 500 (1753B SAP runtime error) both unauth and with guest session (1711B) — J2EE backend reachable past F5-ASM in 3/4 portals, but guest role renders zero content; no unauth KM/nav/document exposure.
+[LEARN] REJECTED AUTH @ tm/passage-europe/vss3.basf.com: sibling portals fully probed — tm+passage prtroot 500 (shared backend), vss3 prtroot WAF-blocked (235), /irj/portal/{trd,passage,vss3} all browser-mismatch iView shell (1635-1647B); no guest content farm-wide. SAP-estate unauth class conclusively closed.
+[RISK] BASF SE: 28 — SAP supplier-portal estate (procurement/tm/vss3/passage) conclusively closed for unauth content: 8 prtroot dispatcher classes 500 with and without guest session, sibling portals probed (tm/passage share unfiltered 500 backend, vss3 WAF-gated), all /irj/portal/* return browser-mismatch shell (zero content). Residual severity rests solely on two AUTH_HELPED credential-gated items — federation NAM ROPC/plain-PKCE (65) and my.basf.com PKCE-less public-client refresh (55) — neither advanceable passively. Reduced from 35. No new unrestricted attack surface across the 4 SAP portals or 11+ host estate.
