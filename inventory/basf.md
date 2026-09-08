@@ -244,3 +244,8 @@ www.basf.com
 - CHANGED procurement.basf.com/irj/servlet/prt/portal/prtroot (8 dispatcher classes tested) → HTTP 500 both unauth and with guest session (1711B) — guest role renders zero content via OBN, but KM servlet path u
 - CHANGED rep.basf.com — Spring Boot Actuator exposed at `/actuator` (HAL) and `/actuator/health` (UP); all sensitive endpoints (env, mappings, beans, configprops, threaddump) return 404
 - CHANGED *.api.basf.com estate (9 hosts) — full unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404
+
+## 2026-09-08 17:39:01 UTC
+- NEW basf.login.apigee.com — discovered via web search; serves SAML/SSO login page ("Sign in with SAML" + "Login with basf"); appears to be BASF corporate Apigee identity portal; untested surface
+- NEW basf.login.apigee.com — Apigee SAML/SSO login portal discovered via web search; serves "Sign in with SAML" + "Login with basf" — corporate identity surface untested
+- NEW developer.basf.com docs confirm `prod.api.basf.com/security/internal/v1/oauth2/login` is the authorization endpoint for BASF APIs — authorization_code grant only, functional users use client certifica

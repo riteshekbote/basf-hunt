@@ -1653,3 +1653,59 @@ testability: PASSIVE
 [LEARN] REJECTED BUSLOGIC @ procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/: parameterized requests (`?path=/documents/newFramework`, `?path=/`, `?action=list`) all return HTTP 500 (SAP runtime error); servlet processes past F5-ASM but guest role renders zero content; SAP-estate unauth class conclusively closed.
 [LEARN] ACCEPTED RECON @ rep.basf.com: Azure Front Door confirmed via `x-azure-ref` header + `ASLBSA`/`ASLBSACORS` load-balancer cookies; CSP `script-src 'self'` (no unsafe-inline); HSTS + XFO DENY + Referrer-Policy no-referrer present; custom error handler returns non-standard status 999.
 [RISK] BASF SE: 24 — Unauthenticated attack surface near-zero across full 12+ host estate. rep.basf.com Actuator properly hardened (16/16 sensitive endpoints 404, path traversal/content-negotiation blocked). All SAP portals (procurement/tm/vss3/passage) conclusively closed for unauth content. Azure Functions fully auth-gated with WAF-blocked SSRF. The two surviving AUTH_HELPED items (federation NAM ROPC at 65, my.basf.com PKCE-less refresh at 55) require credentials or interactive flows that cannot be advanced passively. No new exploitable unauth surface exists. Down from 25.
+## 2026-09-08 17:32:14 UTC [target] (model bigpickle)
+[PRIO] rep.basf.com,5.2,attack_surface=6,business_value=9,tech_exposure=5,gate_ease=4,cloud_surface=5,freshness=9
+[PRIO] federation.basf.com,5.3,attack_surface=5,business_value=9,tech_exposure=8,gate_ease=3,cloud_surface=5,freshness=3
+[PRIO] my.basf.com,4.7,attack_surface=5,business_value=9,tech_exposure=7,gate_ease=5,cloud_surface=3,freshness=3
+[HYP] rep.basf.com Spring Boot Wicket application path discovery
+class: MISCONFIG
+asset: rep.basf.com
+confidence: 35
+reasoning: Spring Boot + Apache Wicket confirmed; actuator fully hardened (16/16 sensitive endpoints 404, path traversal blocked, content-negotiation blocked); Wicket bookmarkable/resource/page paths all 404; `/error` returns custom status 999 with no info leak; CSP strict `script-src 'self'`; Azure Front Door CDN in front; zero Wicket-specific paths resolve without auth; no further unauthenticated surface exists beyond `/actuator` and `/actuator/health`
+evidence_needed: any Wicket page, component, or Spring Boot endpoint returning non-404 content beyond the two known actuator endpoints
+verify_steps: PASSIVE — GET `https://rep.basf.com/wicket/page/1?wicket:interface=:0:IPageBookmarkableListener::`, GET `https://rep.basf.com/swagger-ui/index.html`, GET `https://rep.basf.com/v3/api-docs`, GET `https://rep.basf.com/actuator/health/path/*` (health-path wildcard probe)
+impact: informational leak of API surface or application components; LOW even if found
+testability: PASSIVE
+[HYP] procurement.basf.com SAP KM servlet parameter injection for document access
+class: BUSLOGIC
+asset: procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/
+confidence: 28
+reasoning: KM documents servlet reachable past F5-ASM (returns 500 not 236B WAF block); all 8 prtroot dispatcher classes return 500 both unauth and with guest session; KB REJECTED AUTH for guest role = zero content; `?path=/documents/newFramework` already tested = 500 (1753B SAP runtime error); sibling portals (tm/passage) share unfiltered 500 backend, vss3 WAF-gated; SAP-estate unauth class conclusively closed per 2026-09-08 KB entry
+evidence_needed: any parameter combination on the documents servlet that returns non-500 content (200 with document list, XML, HTML)
+verify_steps: PASSIVE — GET `https://procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/?path=/`, GET with `?action=list`, `?action=open`, `?id=1`, `?DOCUMENT_ID=1` (1 rps)
+impact: unauthorized document access on supplier procurement portal; HIGH if reachable but evidence strongly suggests guest role blocks all content
+testability: PASSIVE
+[PARKED] rep.basf.com Spring Boot Wicket path discovery: confidence 35 < 40 threshold; all sensitive actuator endpoints confirmed 404; Wicket bookmarkable/resource paths all 404; CSP strict script-src 'self'; Azure Front Door CDN in front; no further unauthenticated surface exists beyond /actuator and /actuator/health; low ROI even if additional path found
+[PARKED] procurement.basf.com SAP KM servlet parameter injection: confidence 28 < 40 threshold; KM documents servlet reachable but guest role renders zero content; all 8 prtroot dispatcher classes return 500 both unauth and with guest session; SAP-estate unauth class conclusively closed per 2026-09-08 KB entry
+[FINAL] No actionable unauth hypothesis survives. Sole candidates are the two AUTH_HELPED credential-gated NAM/OAuth items plus one low-confidence informational finding.
+[NEXT] RAG: search passive code/credential sources for the NAM confidential client_id/secret pairing for `fe3ede5d-ce60-4954-a65c-349ddcb75c8b` (rep.basf.com) or `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (my.basf.com); GitHub code search, public paste sites, BASF developer docs — passive-only, since both surviving AUTH_HELPED hypotheses require credentials the passive surface cannot supply, and all unauthenticated surfaces across 12+ hosts are exhausted.
+[LEARN] REJECTED MISCONFIG @ rep.basf.com/actuator/*: all 16 sensitive actuator endpoints return 404; path traversal (`env..`, `actuator;/env`, `health/path/../../env`) blocked by Spring Boot path normalization; content-negotiation (`v3+json`) blocked; only `/actuator` (HAL) and `/actuator/health` (UP) exposed; custom error handler at `/error` returns status 999 with no info leak; Spring Boot Actuator properly locked down.
+[LEARN] REJECTED MISCONFIG @ rep.basf.com: Wicket bookmarkable/resource/page paths all 404; no unauthenticated Wicket component access; application surface fully gated behind authentication.
+[LEARN] REJECTED BUSLOGIC @ procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/: parameterized requests (`?path=/documents/newFramework`, `?path=/`, `?action=list`) all return HTTP 500 (SAP runtime error); servlet processes past F5-ASM but guest role renders zero content; SAP-estate unauth class conclusively closed.
+[LEARN] ACCEPTED RECON @ rep.basf.com: Azure Front Door confirmed via `x-azure-ref` header + `ASLBSA`/`ASLBSACORS` load-balancer cookies; CSP `script-src 'self'` (no unsafe-inline); HSTS + XFO DENY + Referrer-Policy no-referrer present; custom error handler returns non-standard status 999.
+[RISK] BASF SE: 24 — Unauthenticated attack surface near-zero across full 12+ host estate. rep.basf.com Actuator properly hardened (16/16 sensitive endpoints 404, path traversal/content-negotiation blocked). All SAP portals (procurement/tm/vss3/passage) conclusively closed for unauth content. Azure Functions fully auth-gated with WAF-blocked SSRF. The two surviving AUTH_HELPED items (federation NAM ROPC at 65, my.basf.com PKCE-less refresh at 55) require credentials or interactive flows that cannot be advanced passively. No new exploitable unauth surface exists. Down from 25.
+[LEARN] RAG: passive GitHub/paste/web search for `fe3ede5d-ce60-4954-a65c-349ddcb75c8b` (rep.basf.com) and `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (my.basf.com) returned ZERO credential leaks; BASF GitHub org (35 repos, R/Python/Svelte chemistry packages) uses env vars, no hardcoded secrets; no public paste/index references to either client ID
+[NEW] basf.login.apigee.com — discovered via web search; serves SAML/SSO login page ("Sign in with SAML" + "Login with basf"); appears to be BASF corporate Apigee identity portal; untested surface
+[LEARN] ACCEPTED RECON @ developer.basf.com: public documentation confirms OAuth flow at `prod.api.basf.com/security/internal/v1/oauth2/login` + functional users authenticate via client certificates; authorization_code grant only; refresh tokens optional per app config
+[NEW] basf.login.apigee.com — Apigee SAML/SSO login portal discovered via web search; serves "Sign in with SAML" + "Login with basf" — corporate identity surface untested
+[NEW] developer.basf.com docs confirm `prod.api.basf.com/security/internal/v1/oauth2/login` is the authorization endpoint for BASF APIs — authorization_code grant only, functional users use client certificates
+[PRIO] basf.login.apigee.com,5.0,attack_surface=5,business_value=9,tech_exposure=7,gate_ease=6,cloud_surface=6,freshness=10
+[PRIO] federation.basf.com,5.3,attack_surface=5,business_value=9,tech_exposure=8,gate_ease=3,cloud_surface=5,freshness=3
+[PRIO] my.basf.com,4.7,attack_surface=5,business_value=9,tech_exposure=7,gate_ease=5,cloud_surface=3,freshness=3
+[HYP] basf.login.apigee.com Apigee SAML login page information disclosure
+class: RECON
+asset: basf.login.apigee.com
+confidence: 50
+reasoning: newly discovered Apigee-hosted login portal (basf.login.apigee.com) serves SAML SSO login page; Apigee Edge login portals may expose identity provider metadata, SAML endpoints, error messages, or user enumeration via login form behavior; BASF corporate Apigee instance; untested
+evidence_needed: HTTP response from basf.login.apigee.com root; presence of SAML metadata endpoints, error messages, user enumeration, or identity provider configuration
+verify_steps: PASSIVE — GET `https://basf.login.apigee.com/` (root), GET `https://basf.login.apigee.com/.well-known/openid-configuration`, GET `https://basf.login.apigee.com/saml/metadata`, GET `https://basf.login.apigee.com/oauth/authorize` (1 rps)
+impact: information disclosure of identity provider config, SAML metadata, user enumeration; LOW-MEDIUM
+testability: PASSIVE
+[PARKED] rep.basf.com Spring Boot Wicket path discovery (35): all Wicket/bookmarkable paths 404; actuator hardened; below 40 threshold
+[PARKED] procurement.basf.com SAP KM servlet (28): conclusively closed per KB; guest role renders zero content; below 40 threshold
+[FINAL] survivors: basf.login.apigee.com (50) — new untested surface; federation.basf.com ROPC ATO (65, AUTH_HELPED); my.basf.com PKCE-less refresh (55, AUTH_HELPED)
+[NEXT] PROBE: GET `https://basf.login.apigee.com/` + `https://basf.login.apigee.com/.well-known/openid-configuration` + `https://basf.login.apigee.com/saml/metadata` + `https://basf.login.apigee.com/oauth/authorize` (1 rps passive, read-only)
+[LEARN] RAG: passive GitHub/paste/web search for `fe3ede5d-ce60-4954-a65c-349ddcb75c8b` and `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` returned ZERO credential leaks; BASF GitHub org (35 repos, R/Python/Svelte chemistry packages) uses env vars only
+[LEARN] ACCEPTED RECON @ developer.basf.com: public docs confirm OAuth flow at `prod.api.basf.com/security/internal/v1/oauth2/login`; authorization_code grant only; functional users authenticate via client certificates; refresh tokens optional per app config
+[LEARN] ACCEPTED RECON @ basf.login.apigee.com: new Apigee SAML/SSO login portal discovered; corporate identity surface; completely untested
+[RISK] BASF SE: 24 — Unauthenticated attack surface near-zero across full 12+ host estate; new basf.login.apigee.com is the sole fresh untested surface; RAG yielded zero credential leaks for both surviving AUTH_HELPED OAuth items; no new exploitable finding.
