@@ -10948,3 +10948,328 @@ testability: AUTH_HELPED
 
 ## STEP 7 — RISK
 [RISK] BASF SE: 24 — Newly-discovered doc-confirmed OAuth2 proxy on prod.api.basf.com (`/security/internal/v1/oauth2`) is live but fully Apigee-consumer-gated (401 before client validation, no flow to drive without a registered client). secsys/Smart ID estate is a login-grade identity self-service SPA whose accessible classes (username enumeration, password-recovery policy) are out of scope; primary host open, qual hosts CF-challenged. basf.login.apigee.com downgraded from novel to stock Apigee Edge SSO. No new exploitable unauth surface; three AUTH_HELPED items still credential-blocked.
+===== ANALYST bigpickle 2026-09-09 01:30:37 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/ 2>/dev/null && echo "---" && ls /home/runner/work/basf-hunt/basf-hunt/art/ 2>/dev/null
+total 300
+drwxr-xr-x 12 runner runner  4096 Sep  9 01:10 .
+drwxr-xr-x  3 runner runner  4096 Sep  9 01:10 ..
+drwxr-xr-x  7 runner runner  4096 Sep  9 01:10 .git
+drwxr-xr-x  3 runner runner  4096 Sep  9 01:10 .github
+-rw-r--r--  1 runner runner  1801 Sep  9 01:10 README.md
+-rw-r--r--  1 runner runner    32 Sep  9 01:10 analyst-out.txt
+-rw-r--r--  1 runner runner 95185 Sep  9 01:10 analyst-prompt.txt
+-rw-r--r--  1 runner runner 91313 Sep  9 01:10 ctx.txt
+drwxr-xr-x  2 runner runner  4096 Sep  9 01:10 inventory
+drwxr-xr-x  2 runner runner  4096 Sep  9 01:10 knowledge
+drwxr-xr-x  2 runner runner  4096 Sep  9 01:10 leads
+-rw-r--r--  1 runner runner 28637 Sep  9 01:10 probe-results.md
+drwxr-xr-x  2 runner runner  4096 Sep  9 01:10 recon-notes
+drwxr-xr-x  2 runner runner  4096 Sep  9 01:10 reports
+drwxr-xr-x  2 runner runner  4096 Sep  9 01:10 reposcan-raw
+-rw-r--r--  1 runner runner  3285 Sep  9 01:10 scope.yml
+drwxr-xr-x  2 runner runner  4096 Sep  9 01:10 scripts
+-rw-r--r--  1 runner runner    33 Sep  9 01:10 state_bigpickle.json
+-rw-r--r--  1 runner runner    33 Sep  9 01:10 state_laguna.json
+-rw-r--r--  1 runner runner    33 Sep  9 01:10 state_ling3.json
+-rw-r--r--  1 runner runner    33 Sep  9 01:10 state_longcat.json
+-rw-r--r--  1 runner runner    33 Sep  9 01:10 state_mimo.json
+-rw-r--r--  1 runner runner    33 Sep  9 01:10 state_nemotron3.json
+drwxr-xr-x  2 runner runner  4096 Sep  9 01:10 triage
+---
+[0m
+[0m$ [0mls /home/runner/work/basf-hunt/basf-hunt/leads/ /home/runner/work/basf-hunt/basf-hunt/inventory/ /home/runner/work/basf-hunt/basf-hunt/knowledge/ 2>/dev/null
+/home/runner/work/basf-hunt/basf-hunt/inventory/:
+basf.md
+
+/home/runner/work/basf-hunt/basf-hunt/knowledge/:
+index.md
+
+/home/runner/work/basf-hunt/basf-hunt/leads/:
+lead-bigpickle.md
+lead-laguna.md
+lead-ling3.md
+lead-longcat.md
+lead-mimo.md
+lead-nemotron3.md
+reposcan-basf.md
+[0m
+[0m$ [0mcat /home/runner/work/basf-hunt/basf-hunt/state_bigpickle.json 2>/dev/null; echo; cat /home/runner/work/basf-hunt/basf-hunt/analyst-out.txt 2>/dev/null
+{"phase": "POC", "target": "api"}
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/ 2>/dev/null && echo "---" && ls /home/runner/work/basf-hunt/basf-hunt/art/ 2>/dev/null
+total 300
+drwxr-xr-x 12 runner runner  4096 Sep  9 01:10 .
+drwxr-xr-x  3 runner runner  4096 Sep  9 01:10 ..
+drwxr-xr-x  7 runner runner  4096 Sep  9 01:10 .git
+drwxr-xr-x  3 runner runner  4096 Sep  9 01:10 .github
+-rw-r--r--  1 runner runner  1801 Sep  9 01:10 README.md
+-rw-r--r--  1 runner runner    32 Sep  9 01:10 analyst-out.txt
+-rw-r--r--  1 runner runner 95185 Sep  9 01:10 analyst-prompt.txt
+-rw-r--r--  1 runner runner 91313 Sep  9 01:10 ctx.txt
+drwxr-xr-x  2 runner runner  4096 Sep  9 01:10 inventory
+drwxr-xr-x  2 runner runner  4096 Sep  9 01:10 knowledge
+drwxr-xr-x  2 runner runner  4096 Sep  9 01:10 leads
+-rw-r--r--  1 runner runner 28637 Sep  9 01:10 probe-results.md
+drwxr-xr-x  2 runner runner  4096 Sep  9 01:10 recon-notes
+drwxr-xr-x  2 runner runner  4096 Sep  9 01:10 reports
+drwxr-xr-x  2 runner runner  4096 Sep  9 01:10 reposcan-raw
+-rw-r--r--  1 runner runner  3285 Sep  9 01:10 scope.yml
+drwxr-xr-x  2 runner runner  4096 Sep  9 01:10 scripts
+-rw-r--r--  1 runner runner    33 Sep  9 01:10 state_bigpickle.json
+-rw-r--r--  1 runner runner    33 Sep  9 01:10 state_laguna.json
+-rw-r--r--  1 runner runner    33 Sep  9 01:10 state_ling3.json
+-rw-r--r--  1 runner runner    33 Sep  9 01:10 state_longcat.json
+-rw-r--r--  1 runner runner    33 Sep  9 01:10 state_mimo.json
+-rw-r--r--  1 runner runner    33 Sep  9 01:10 state_nemotron3.json
+drwxr-xr-x  2 runner runner  4096 Sep  9 01:10 triage
+---
+[0m
+[0m$ [0mls /home/runner/work/basf-hunt/basf-hunt/leads/ /home/runner/work/basf-hunt/basf-hunt/inventory/ /home/runner/work/basf-hunt/basf-hunt/knowledge/ 2>/dev/null
+/home/runner/work/basf-hunt/basf-hunt/inventory/:
+basf.md
+
+/home/runner/work/basf-hunt/basf-hunt/knowledge/:
+index.md
+
+/home/runner/work/basf-hunt/basf-hunt/leads/:
+lead-bigpickle.md
+lead-laguna.md
+lead-ling3.md
+lead-longcat.md
+lead-mimo.md
+lead-nemotron3.md
+reposcan-basf.md
+[0m
+[0m
+[0m→ [0mRead leads/lead-bigpickle.md
+[0m→ [0mRead leads/lead-nemotron3.md
+[0m
+[0m$ [0mwc -l /home/runner/work/basf-hunt/basf-hunt/leads/lead-bigpickle.md /home/runner/work/basf-hunt/basf-hunt/probe-results.md
+1763 /home/runner/work/basf-hunt/basf-hunt/leads/lead-bigpickle.md
+   388 /home/runner/work/basf-hunt/basf-hunt/probe-results.md
+  2151 total
+[0m
+[0m→ [0mRead leads/lead-bigpickle.md[90m [offset=700][0m
+[0m→ [0mRead leads/lead-bigpickle.md[90m [offset=1500][0m
+I have full context from the leads/knowledge state. Executing the pending passive RAG step on the secsys.basf.com Smart ID self-service estate before emitting the analysis.
+[0m◈ [0mExa Web Search "Nexus Group "Smart ID Self-Service" REST API endpoint paths documentation"
+[0m◈ [0mExa Web Search ""Smart ID Identity Manager" "Self-Service" API swagger endpoints rest"
+[0m◈ [0mExa Web Search "Nexus "Smart ID" "Public Data REST API" endpoint "/v1/prime/" or "/ws/" unauthenticated CVE"
+[0m◈ [0mExa Web Search ""Smart ID" Nexus Identity Manager path traversal OR unauth OR "REST API" vulnerability 2024 2025"
+RAG confirms the actionable surface: Nexus Smart ID exposes a "Public Data REST API" (users/cards/certificates reads) plus `/ws/deploy/*` management endpoints (basic-auth/client-cert gated), and Self-Service discloses its backend via `prime.baseUrl` in the SPA config. Running one read-only probe of the secsys root to extract the JS bundle path for `prime.baseUrl` + API routes.
+[0m
+[0m$ [0mcurl -sk -m 20 -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36" -D - https://secsys.basf.com/ -o /tmp/opencode/secsys_root.html 2>&1 | head -40; echo "==SIZE=="; wc -c /tmp/opencode/secsys_root.html
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Content-Language: en-US
+Content-Length: 3179
+Content-Security-Policy: default-src 'none'; img-src 'self' data: blob: ; connect-src 'self'; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; frame-ancestors 'none'
+Content-Type: text/html;charset=ISO-8859-1
+Date: Wed, 09 Sep 2026 01:11:03 GMT
+Expires: 0
+Last-Modified: Mon, 09 Mar 2026 11:32:04 GMT
+Permissions-Policy: camera=(), display-capture=(), geolocation=(), microphone=(), storage-access=(), web-share=()
+Pragma: no-cache
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000 ; includeSubDomains
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Set-Cookie: BIGipServersecsys.basf.com_https_pool=357566093.47873.0000; path=/; Httponly; Secure
+Set-Cookie: TS016b9aea=011bc2843b04704d086a2450bdace8df9e4a8b287eb5e129ee875293a9edab301473735da976bab78f5902a92db1500fa8653a3e2bb0605a895c80eec7abfd8a3f284765d2; Path=/
+
+==SIZE==
+3179 /tmp/opencode/secsys_root.html
+[0m
+[0m→ [0mRead /tmp/opencode/secsys_root.html
+Root confirmed as stock Nexus Smart ID Self-Service SPA (same F5 BigIP pool type as SAP estate). CSP `connect-src 'self'` → API calls are same-origin. Fetching the main bundle to extract the API base path and route map.
+[0m
+[0m$ [0msleep 1; curl -sk -m 20 -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36" https://secsys.basf.com/main-LO6WTQTE.js -o /tmp/opencode/secsys_main.js; echo "==SIZE=="; wc -c /tmp/opencode/secsys_main.js
+==SIZE==
+159 /tmp/opencode/secsys_main.js
+[0m
+[0m→ [0mRead /tmp/opencode/secsys_main.js
+[0m
+[0m$ [0msleep 1; curl -sk -m 20 -A "Mozilla/5.0" https://secsys.basf.com/chunk-UEKAINBC.js -o /tmp/opencode/secsys_chunk.js; wc -c /tmp/opencode/secsys_chunk.js; sleep 1; curl -sk -m 20 -A "Mozilla/5.0" https://secsys.basf.com/scripts-AUWU7VRE.js -o /tmp/opencode/secsys_scripts.js; wc -c /tmp/opencode/secsys_scripts.js
+682802 /tmp/opencode/secsys_chunk.js
+608779 /tmp/opencode/secsys_scripts.js
+[0m
+[0m$ [0mecho "== urls in chunk =="; grep -oE '"/[a-zA-Z0-9_./-]*"|apiBaseUrl[^,;]{0,80}|baseUrl[^,;]{0,80}|prime[^,;]{0,80}|tenantId[^,;]{0,80}|instanceId[^,;]{0,80}' /tmp/opencode/secsys_chunk.js | sort -u | head -60
+== urls in chunk ==
+"/"
+"//"
+"/login"
+"/mainpage"
+"/mainpage/dashboard"
+[0m
+[0m$ [0mecho "== scripts bundle urls =="; grep -oE '"/[a-zA-Z0-9_./-]{2,}"|apiBaseUrl[^,;]{0,60}|baseUrl[^,;]{0,60}|prime\.[A-Za-z]+[^,;]{0,60}|tenantId[^,;]{0,40}|/api/([a-zA-Z0-9_-]{2,})|/ws/[a-zA-Z0-9_-]{2,}' /tmp/opencode/secsys_scripts.js | sort -u | head -80
+== scripts bundle urls ==
+[0m
+[0m$ [0mfor f in /tmp/opencode/secsys_chunk.js /tmp/opencode/secsys_scripts.js; do echo "== $f =="; grep -oE '(https?://[a-zA-Z0-9._-]+)' "$f" | sort -u | head; grep -oE '("[A-Za-z]*/?)"?' "$f" >/dev/null; grep -oE '[a-zA-Z0-9_./-]*(processes|deploy|selfservice|ssp|prime_explorer|ussp)[a-zA-Z0-9_./-]*' "$f" | sort -u | head -20; done; echo "== data endpoints =="; grep -oE '(/data/[a-zA-Z0-9_-]{2,}|/rest/[a-zA-Z0-9_-]{2,}|/v[0-9]/[a-zA-Z0-9_-]{2,}|/ws/[a-zA-Z0-9_-]{2,}|/api[a-zA-Z0-9_/-]{2,})' /tmp/opencode/secsys_chunk.js /tmp/opencode/secsys_scripts.js | sort -u | head -30
+== /tmp/opencode/secsys_chunk.js ==
+http://momentjs.com
+http://www.w3.org
+https://angular.dev
+https://github.com
+https://npms.io
+== /tmp/opencode/secsys_scripts.js ==
+http://momentjs.com
+https://getbootstrap.com
+https://github.com
+https://popper.js.org
+https://tempusdominus.github.io
+== data endpoints ==
+[0m
+[0m$ [0mfor f in /tmp/opencode/secsys_chunk.js /tmp/opencode/secsys_scripts.js; do echo "== $f =="; grep -oE '(svl/[a-zA-Z0-9_-]{2,}|search[a-zA-Z0-9_/-]{2,}|[a-zA-Z0-9_-]*process[a-zA-Z0-9_/-]{2,}|dit/[a-zA-Z0-9_-]{2,}|external[a-zA-Z0-9_/-]{2,})' "$f" | sort -u | head -25; done
+== /tmp/opencode/secsys_chunk.js ==
+Unprocessable
+UnprocessableEntity
+processChildren
+processId
+processLeaveNode
+processMapId
+processProvider
+processRoutes
+processSegment
+processSegmentAgainstRoute
+processSegmentGroup
+search/core-objects/distinct
+search/loadsearchesfortask
+searchCategories
+searchFilters
+searchParams
+searchRoute
+searches
+== /tmp/opencode/secsys_scripts.js ==
+processData
+[0m
+[0m$ [0mgrep -oE '.{120}core-objects/distinct.{80}' /tmp/opencode/secsys_chunk.js | head -3; echo ====; grep -oE '.{100}loadsearchesfortask.{80}' /tmp/opencode/secsys_chunk.js | head -3; echo ====; grep -oE '.{80}/\$\{[a-zA-Z]+\}/.{60}' /tmp/opencode/secsys_chunk.js | head -10
+ectedCoreObjectDescriptors:i,processMapId:o},{params:a})}distinctCoreObjects(e){return this.httpClient.post("api/search/core-objects/distinct",{coreObjects:e})}loadSearches(e,r,i){let o=this.getLoadSearchesUrl(r),a=this.c
+====
+chesUrl(e){return this.isParameterPresent(e)||this.isCoreObjectEntityReferencePresent()?"api/search/loadsearchesfortask":"api/search"}createQueryParams(e){let i=this.isParameterPresent(e.taskId)?new 
+====
+[0m
+[0m$ [0mgrep -oE '"api/[a-zA-Z0-9_/${}.=-]{2,}' /tmp/opencode/secsys_chunk.js | sort -u | head -50
+"api/auth/certificate/signin
+"api/auth/prelogin/signin
+"api/auth/saml/supported
+"api/auth/signout
+"api/auth/usernamepassword/signin
+"api/authenticated
+"api/search
+"api/search/core-objects/distinct
+"api/search/loadsearchesfortask
+[0m
+SPA bundle discloses the full API surface: `api/auth/*` (signin variants, SAML), `api/authenticated`, `api/search*`. Probing the two lowest-impact read-only config endpoints to confirm reachability + response shape.
+[0m$ [0msleep 1; echo "== /api/authenticated =="; curl -sk -m 15 -A "Mozilla/5.0" -D - https://secsys.basf.com/api/authenticated -o /tmp/opencode/s1.txt | grep -E "HTTP/|Content-Type|Content-Length"; head -c 400 /tmp/opencode/s1.txt; echo; sleep 1; echo "== /api/auth/saml/supported =="; curl -sk -m 15 -A "Mozilla/5.0" -D - https://secsys.basf.com/api/auth/saml/supported -o /tmp/opencode/s2.txt | grep -E "HTTP/|Content-Type|Content-Length"; head -c 400 /tmp/opencode/s2.txt; echo
+== /api/authenticated ==
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+{"fullUsername":null,"preLoginUser":false,"postLoginUser":false,"authenticated":false,"canBeLoggedOut":false,"authProfileName":null}
+== /api/auth/saml/supported ==
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+true
+[0m
+`/api/authenticated` (200 session-state JSON) and `/api/auth/saml/supported` (200 `true`) confirm the Nexus self-service API layer is live and SAML-auth is enabled for this estate. Characterizing the data-plane gate with read-only GETs on the `search` paths.
+[0m$ [0msleep 1; echo "== GET /api/search =="; curl -sk -m 15 -A "Mozilla/5.0" -o /tmp/opencode/s3.txt -w "HTTP %{http_code} | %{size_download}B\n" https://secsys.basf.com/api/search; head -c 300 /tmp/opencode/s3.txt; echo; sleep 1; echo "== GET /api/search/loadsearchesfortask =="; curl -sk -m 15 -A "Mozilla/5.0" -o /tmp/opencode/s4.txt -w "HTTP %{http_code} | %{size_download}B\n" https://secsys.basf.com/api/search/loadsearchesfortask; head -c 300 /tmp/opencode/s4.txt; echo
+== GET /api/search ==
+HTTP 401 | 149B
+{"text":"The access to the requested resource is not authorized.","userLoggedOut":true,"showOnClient":false,"customException":true,"autoClose":false}
+== GET /api/search/loadsearchesfortask ==
+HTTP 401 | 149B
+{"text":"The access to the requested resource is not authorized.","userLoggedOut":true,"showOnClient":false,"customException":true,"autoClose":false}
+[0m
+Data plane is 401-gated — the self-service API is authenticated-only. Before closing, fingerprinting the two never-probed sibling hosts on the estate (bsh.secsys = likely Operator/Admin tier, secsys-visitor = visitor tier) to see if either exposes a different (non-selfservice) surface.
+[0m$ [0mecho "== bsh.secsys.basf.com =="; sleep 1; curl -sk -m 15 -A "Mozilla/5.0" -D - https://bsh.secsys.basf.com/ -o /tmp/opencode/bsh.txt 2>&1 | grep -E "HTTP/|Server:|Content-Type|Content-Length" ; head -c 200 /tmp/opencode/bsh.txt; echo; echo "== secsys-visitor.basf.com =="; sleep 1; curl -sk -m 15 -A "Mozilla/5.0" -D - https://secsys-visitor.basf.com/ -o /tmp/opencode/vis.txt 2>&1 | grep -E "HTTP/|Server:|Content-Type|Content-Length"; head -c 200 /tmp/opencode/vis.txt; echo
+== bsh.secsys.basf.com ==
+HTTP/1.1 200 OK
+Content-Length: 3179
+Content-Type: text/html;charset=ISO-8859-1
+<!DOCTYPE html>
+<html lang="en" data-beasties-container>
+  <head>
+    <base href="./">
+    <meta charset="utf-8">
+    <title>Smart ID Self-Service</title>
+    <meta name="viewport" content="width=devi
+== secsys-visitor.basf.com ==
+HTTP/1.1 200 OK
+Content-Length: 3179
+Content-Type: text/html;charset=ISO-8859-1
+<!DOCTYPE html>
+<html lang="en" data-beasties-container>
+  <head>
+    <base href="./">
+    <meta charset="utf-8">
+    <title>Smart ID Self-Service</title>
+    <meta name="viewport" content="width=devi
+[0m
+All three primary estate hosts serve the identical 3179-byte Self-Service SPA on the same F5 pool — no Operator/Admin UI at root. Estate closes as standard, auth-gated Nexus Smart ID. Emitting the analysis.
+
+---
+STEP 1 — DELTA
+- [NEW] `secsys.basf.com` SPA bundles (main/chunk/scripts) enumerate full same-origin API map: `api/auth/{certificate,prelogin,saml,usernamepassword}/signin`, `api/auth/signout`, `api/auth/saml/supported`, `api/authenticated`, `api/search`, `api/search/core-objects/distinct`, `api/search/loadsearchesfortask` — back-end is the Nexus Smart ID Self-Service REST layer on the F5 BigIP pool
+- [NEW] `secsys.basf.com/api/authenticated` → HTTP 200 `{"fullUsername":null,...,"authenticated":false,"authProfileName":null}` — session-state JSON is reachable unauthenticated (framework observable, no PII)
+- [NEW] `secsys.basf.com/api/auth/saml/supported` → HTTP 200 `true` — SAML sign-in is enabled on this self-service (corroborates the federation.basf.com NAM SAML plane)
+- [NEW] `secsys.basf.com/api/search` + `/api/search/loadsearchesfortask` → HTTP 401 `{"text":"The access to the requested resource is not authorized."...}` — data plane (Public-Data-REST-equivalent search over users/cards) is auth-gated
+- [NEW] `bsh.secsys.basf.com` + `secsys-visitor.basf.com` → HTTP 200, byte-identical 3179B Self-Service SPA root — no separate Operator/Admin/tenant UI exposed at root on the estate
+
+STEP 2 — PRIORITIZE
+- [PRIO] secsys.basf.com estate,4.5,attack_surface=3,business_value=6,tech_exposure=5,gate_ease=2,cloud_surface=2,freshness=10
+- [PRIO] federation.basf.com (NAM ROPC, carried),5.95,attack_surface=5,business_value=9,tech_exposure=8,gate_ease=3,cloud_surface=5,freshness=3
+- [PRIO] my.basf.com (PKCE-less refresh, carried),5.6,attack_surface=5,business_value=9,tech_exposure=7,gate_ease=5,cloud_surface=3,freshness=3
+
+STEP 3 — HYPOTHESES
+[HYP] secsys.basf.com Nexus Smart ID Self-Service API config/session-state disclosure already materially verified but below exploit threshold
+class: MISCONFIG
+asset: secsys.basf.com/api/authenticated + /api/auth/saml/supported
+confidence: 42
+reasoning: verified 200s on both endpoints; SPA bundle yields the full `api/` route map; search/data endpoints (users/cards/certificates) return 401 — the Self-Service front is a login shell over the NAM/BASF identity plane (SAML enabled); vendor docs (doc.nexusgroup.com) confirm Public Data REST API usage requires auth and `prime.baseUrl`→Operator is JWT-gated; `connect-src 'self'` CSP locks all calls to same origin
+evidence_needed: any `api/search/loadsearchesfortask` returning non-401, or a certificate-signin bypass producing preLogin content
+verify_steps: PASSIVE exhausted — data plane 401, signin endpoints are login class (out-of-scope), operator/admin `/ws/deploy/*` documented to be basic-auth-or-client-cert gated, qual hosts Cloudflare-challenged, sibling roots byte-identical SPA
+impact: SAML-enabled flag + session-state observable only; LOW/informational, product-normal behavior
+testability: PASSIVE
+[HYP] federation.basf.com NAM ROPC password grant → ATO for any confidential registered client
+class: AUTH
+asset: federation.basf.com/nidp/oauth/nam/token
+confidence: 65
+reasoning: discovery unchanged since 09-06 (password+hybrid grants, plain+S256 PKCE, registration full/read); public SPA client 86cc4bf9-… does code+refresh with zero code_challenge; secsys SAML=cert=true corroborates BASF heavy reliance on the same NAM plane
+evidence_needed: valid test credential + confidential client_id/secret
+verify_steps: AUTH_HELPED — POST /nidp/oauth/nam/token grant_type=password
+impact: full access+refresh token set bypassing MFA/acr; CRITICAL-conditional
+testability: AUTH_HELPED
+[HYP] my.basf.com public client refresh_token non-rotation without PKCE → persistent session hijack
+class: OATH
+asset: my.basf.com/.auth
+confidence: 55
+reasoning: boot config discloses client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect https://my.basf.com/.auth, scope refresh_token, zero PKCE refs; NAM supports plain+S256 but client never challenges
+evidence_needed: authorize request without code_challenge yielding code; refresh_token that does not rotate on reuse (diff JTI/lifetime)
+verify_steps: AUTH_HELPED — interactive code exchange + double replay refresh_token
+impact: ATO of BASF customer/supplier portal from stolen code/refresh; HIGH conditional
+testability: AUTH_HELPED
+
+STEP 4 — SELF-CRITIQUE
+- [PARKED] secsys.basf.com config-disclosure (42→below exploit threshold): verified materially (SAML enabled, API map, session-state observable) but it is framework-informational only; data plane 401-gated; operator/admin surfaces basic-auth-gated per Nexus docs; signin endpoints = out-of-scope login class; sibling roots identical SPA — no unauth data/identity leak
+- [PARKED] secsys operator/admin (`/ws/deploy/*` deployment APIs, 35): Nexus docs require basic auth or client certificate and the `tenantId` permission perendpoint — gated class; no Public-Data-REST token-bypass evidence (CRED-20587 token is an auth token, not a bypass)
+- [FINAL] federation NAM ROPC (65, AUTH_HELPED) — unchanged, credential-blocked
+- [FINAL] my.basf.com PKCE-less refresh (55, AUTH_HELPED) — unchanged, credential-blocked
+
+STEP 5 — NEXT ACTION
+[NEXT] HUMAN: secsys estate conclusively closed as a standard, auth-gated Nexus Smart ID Self-Service (SPA API map enumerated, data plane 401, SAML/cert/prelogin/userpwd signin surfaces all login-class, operator/admin REST basic-auth-gated per vendor docs, sibling/qual hosts identical front or CF-challenged). Estate-wide unauth surface is exhausted; the only surviving high-severity candidates remain the two AUTH_HELPED NAM/OAuth items — request from program operator a sandbox/supplier test account to run the interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (record whether authorize carries `code_challenge`, whether the refresh_token rotates on reuse) and/or an IDM Operator/Self-Service pre-login credential to retest the secsys search plane, or confirmation to report via bugs.olivermaicher.eu.
+
+STEP 6 — LEARNING
+- [LEARN] ACCEPTED RECON @ secsys.basf.com: SPA bundle enumerates full `api/` surface (`api/auth/{certificate,prelogin,saml,usernamepassword}/signin`, `signout`, `saml/supported`, `authenticated`, `api/search*`); `/api/authenticated` 200 session-state JSON, `/api/auth/saml/supported` 200 `true` — self-service stands on the same SAML/NxNAM identity plane; F5 BigIP pool; `connect-src 'self'` CSP
+- [LEARN] REJECTED MISCONFIG @ secsys.basf.com: data plane (`api/search`, `api/search/loadsearchesfortask`) returns 401 — no unauth users/cards/certificates read; auth endpoints are login class (out-of-scope); `/api/authenticated`+`saml/supported` are informational framework observables only
+- [LEARN] ACCEPTED RAG @ Nexus Smart ID: product REST map from vendor docs — Public Data REST API + `/ws/deploy/{configuration,license,property}` on IDM Admin/Operator are basic-auth-or-client-cert gated; Self-Service→Operator uses `prime.baseUrl` JWT auth; no documented unauthenticated data API
+
+STEP 7 — RISK
+[RISK] BASF SE: 24 — secsys/Smart ID estate (3 primary hosts + qual/visitor/bsh) mapped end-to-end and closed: stock Nexus Self-Service SPA, same `api/` surface everywhere, data plane 401, SAML/cert/prelogin/userpwd signin all login-class, operator/admin deployment APIs basic-auth-gated per vendor documentation. Net addition is informational only (SAML enabled, session-state carryover of the known NAM plane). Unauthenticated exposure across the now-16+ host estate remains effectively zero; the two AUTH_HELPED NAM/OAuth items (ROPC 65, PKCE-less refresh 55) are still the only high-severity candidates and remain credential-blocked. No new exploitable finding.

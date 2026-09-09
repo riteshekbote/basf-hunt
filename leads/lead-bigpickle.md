@@ -1761,3 +1761,33 @@ testability: AUTH_HELPED
 [LEARN] ACCEPTED RECON @ secsys.basf.com: live "Smart ID Self-Service" (Technology Nexus, v5.3.1+) Angular SPA, 200/3179B; sibling `bsh.secsys`, `secsys-visitor`, and qual instances (`secsys-ssp-qual`, `bsh-qual`, `visitor-secsys-ssp-qual`) resolvable; qual hosts Cloudflare-JS-challenged
 [LEARN] REJECTED RECON @ basf.login.apigee.com: standard Apigee Edge SSO identity-zone login (`zonename.login.apigee.com` pattern per Apigee SAML docs) — generic Edge SSO, not a custom BASF OAuth provider; prior ROPC/implicit config is stock Edge SSO
 [RISK] BASF SE: 24 — Newly-discovered doc-confirmed OAuth2 proxy on prod.api.basf.com (`/security/internal/v1/oauth2`) is live but fully Apigee-consumer-gated (401 before client validation, no flow to drive without a registered client). secsys/Smart ID estate is a login-grade identity self-service SPA whose accessible classes (username enumeration, password-recovery policy) are out of scope; primary host open, qual hosts CF-challenged. basf.login.apigee.com downgraded from novel to stock Apigee Edge SSO. No new exploitable unauth surface; three AUTH_HELPED items still credential-blocked.
+## 2026-09-09 01:13:48 UTC [target] (model bigpickle)
+[HYP] secsys.basf.com Nexus Smart ID Self-Service API config/session-state disclosure already materially verified but below exploit threshold
+class: MISCONFIG
+asset: secsys.basf.com/api/authenticated + /api/auth/saml/supported
+confidence: 42
+reasoning: verified 200s on both endpoints; SPA bundle yields the full `api/` route map; search/data endpoints (users/cards/certificates) return 401 — the Self-Service front is a login shell over the NAM/BASF identity plane (SAML enabled); vendor docs (doc.nexusgroup.com) confirm Public Data REST API usage requires auth and `prime.baseUrl`→Operator is JWT-gated; `connect-src 'self'` CSP locks all calls to same origin
+evidence_needed: any `api/search/loadsearchesfortask` returning non-401, or a certificate-signin bypass producing preLogin content
+verify_steps: PASSIVE exhausted — data plane 401, signin endpoints are login class (out-of-scope), operator/admin `/ws/deploy/*` documented to be basic-auth-or-client-cert gated, qual hosts Cloudflare-challenged, sibling roots byte-identical SPA
+impact: SAML-enabled flag + session-state observable only; LOW/informational, product-normal behavior
+testability: PASSIVE
+[HYP] federation.basf.com NAM ROPC password grant → ATO for any confidential registered client
+class: AUTH
+asset: federation.basf.com/nidp/oauth/nam/token
+confidence: 65
+reasoning: discovery unchanged since 09-06 (password+hybrid grants, plain+S256 PKCE, registration full/read); public SPA client 86cc4bf9-… does code+refresh with zero code_challenge; secsys SAML=cert=true corroborates BASF heavy reliance on the same NAM plane
+evidence_needed: valid test credential + confidential client_id/secret
+verify_steps: AUTH_HELPED — POST /nidp/oauth/nam/token grant_type=password
+impact: full access+refresh token set bypassing MFA/acr; CRITICAL-conditional
+testability: AUTH_HELPED
+[HYP] my.basf.com public client refresh_token non-rotation without PKCE → persistent session hijack
+class: OATH
+asset: my.basf.com/.auth
+confidence: 55
+reasoning: boot config discloses client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect https://my.basf.com/.auth, scope refresh_token, zero PKCE refs; NAM supports plain+S256 but client never challenges
+evidence_needed: authorize request without code_challenge yielding code; refresh_token that does not rotate on reuse (diff JTI/lifetime)
+verify_steps: AUTH_HELPED — interactive code exchange + double replay refresh_token
+impact: ATO of BASF customer/supplier portal from stolen code/refresh; HIGH conditional
+testability: AUTH_HELPED
+[NEXT] HUMAN: secsys estate conclusively closed as a standard, auth-gated Nexus Smart ID Self-Service (SPA API map enumerated, data plane 401, SAML/cert/prelogin/userpwd signin surfaces all login-class, operator/admin REST basic-auth-gated per vendor docs, sibling/qual hosts identical front or CF-challenged). Estate-wide unauth surface is exhausted; the only surviving high-severity candidates remain the two AUTH_HELPED NAM/OAuth items — request from program operator a sandbox/supplier test account to run the interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (record whether authorize carries `code_challenge`, whether the refresh_token rotates on reuse) and/or an IDM Operator/Self-Service pre-login credential to retest the secsys search plane, or confirmation to report via bugs.olivermaicher.eu.
+[RISK] BASF SE: 24 — secsys/Smart ID estate (3 primary hosts + qual/visitor/bsh) mapped end-to-end and closed: stock Nexus Self-Service SPA, same `api/` surface everywhere, data plane 401, SAML/cert/prelogin/userpwd signin all login-class, operator/admin deployment APIs basic-auth-gated per vendor documentation. Net addition is informational only (SAML enabled, session-state carryover of the known NAM plane). Unauthenticated exposure across the now-16+ host estate remains effectively zero; the two AUTH_HELPED NAM/OAuth items (ROPC 65, PKCE-less refresh 55) are still the only high-severity candidates and remain credential-blocked. No new exploitable finding.

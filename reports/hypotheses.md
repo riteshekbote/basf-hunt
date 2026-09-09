@@ -870,3 +870,7 @@
 - LEARN: ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clie
 - LEARN: REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint
 - LEARN: ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
+
+## RANKED HYPOTHESES 2026-09-09 01:30:37 UTC
+- [42] secsys.basf.com/api/authenticated: secsys.basf.com Nexus Smart ID Self-Service API config/session-state disclosure already materially verified but below exploit threshold (from art/lead_bigpickle.txt)
+- NEXT(hypotheses-bigpickle.txt): HUMAN: secsys estate conclusively closed as a standard, auth-gated Nexus Smart ID Self-Service (SPA API map enumerated, data plane 401, SAML/cert/prelogin/userp
