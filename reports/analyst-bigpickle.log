@@ -11606,3 +11606,65 @@ Both survivors are blocked on the same gate: no sandbox test credentials. 7 days
 **STEP 7 — RISK**
 
 [RISK] BASF SE: 24 — Unauthenticated exposure across the now 16+ host estate is effectively zero. Two high-severity OAuth design findings (NAM ROPC password grant enabling MFA bypass, public-client refresh_token without PKCE enabling persistent session hijack) are the only actionable candidates but require sandbox credentials to validate and exploit. Program is at decision point: request test creds to advance POC, or close with two informational/high-conditional findings. No unpatched misconfiguration, no exposed admin surface, no data leakage, no SSRF reachable beyond auth/WAF gates, no subdomain takeover. Pipeline infrastructure degraded (3/5 models non-functional, triage stalled) — recommend fixing longcat/ling3/laguna model configs and mimo triager before next rotation.
+===== ANALYST bigpickle 2026-09-09 21:42:25 UTC =====
+[0m
+> build · big-pickle
+[0m
+STEP 1 — DELTA
+- [NEW] secsys.basf.com: only root-level record exists (200/3179B Angular SPA index, Technology Nexus Smart ID Self-Service v5.3.1+); API surface, JS bundle, and auth flow entirely unexplored — deepest remaining unprobed surface in estate (discovered 09-09 18:50).
+- [NO_DELTA] federation.basf.com, my.basf.com, apigee login, rep.basf.com, procurement KM servlet, *.api.basf.com — all reconfirmed stable across 09-09 re-probes.
+
+STEP 2 — PRIORITIZE
+- [PRIO] secsys.basf.com,6.8,attack_surface=7,business_value=8,tech_exposure=7,gate_ease=4,cloud_surface=5,freshness=9
+- [PRIO] my.basf.com/.auth (public client 86cc4bf9),7.2,attack_surface=6,business_value=9,tech_exposure=8,gate_ease=6,cloud_surface=7,freshness=8
+- [PRIO] federation.basf.com/nidp/oauth/nam/token,7.8,attack_surface=7,business_value=10,tech_exposure=9,gate_ease=7,cloud_surface=5,freshness=8
+
+STEP 3 — HYPOTHESES
+[HYP] secsys.basf.com Technology Nexus Smart ID Self-Service unauth management/API surface
+class: AUTH
+asset: secsys.basf.com
+confidence: 45
+reasoning: root returns 200/3179B Angular SPA index identifying Technology Nexus Smart ID Self-Service v5.3.1+ (PKI/card/OTP identity self-service); production siblings bsh.secsys.basf.com + secsys-visitor.basf.com and qual hosts resolvable, qual behind Cloudflare JS-challenge; only root GET ever performed, SPA bundle/backend API/auth flow entirely unmapped; this product class has history of unauthenticated config/cert-management endpoint exposure. Genuinely new, unprobed, high-freshness surface.
+evidence_needed: any bundle-disclosed API path or management endpoint returning 200 JSON (version/config/users/certs) without authentication.
+verify_steps: passive first — GET / (3179B) and extract script src; GET the SPA JS bundle and grep for `/api/`, `rest/`, `/v[0-9]`, `endpoint`, `login` to reconstruct API base; then HEAD/GET catalogued endpoints unauthenticated.
+impact: unauthenticated config disclosure or identity/cert/OTP self-service manipulation on BASF smart-card estate; MEDIUM-HIGH conditional.
+testability: PASSIVE
+[HYP] my.basf.com public client 86cc4bf9 refresh_token non-rotation without PKCE — persistent session hijack
+class: OATH
+asset: my.basf.com/.auth
+confidence: 55
+reasoning: SSR boot config discloses public client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect https://my.basf.com/.auth, scope openid profile refresh_token, acr 3IAM/Login/External, zero code_challenge references (reconfirmed 09-09); NAM supports plain+S256 but this client never challenges; redirect_uri oracle exact-match (10 variants rejected) so only code/refresh interception path.
+evidence_needed: live authorize request showing absent code_challenge; refresh_token that does not rotate on double reuse (same JTI/lifetime).
+verify_steps: AUTH_HELPED — interactive code exchange on client 86cc4bf9-… + double replay of refresh_token.
+impact: ATO of BASF customer/supplier portal from stolen authz code or refresh_token; HIGH conditional.
+testability: AUTH_HELPED
+[HYP] federation.basf.com NAM ROPC password grant — MFA-bypass token issuance for confidential clients
+class: AUTH
+asset: federation.basf.com/nidp/oauth/nam/token
+confidence: 65
+reasoning: OIDC discovery at two NetIQ paths consistently lists `password` in grant_types_supported since 09-06, unchanged across every 09-09 re-probe; provider-level ROPC enabled; combined with public SPA client doing code+refresh and secsys SAML=cert=true, BASF reuses this NAM identity plane; valid creds + confidential client = access+refresh token set bypassing acr 3IAM/Login/External MFA step.
+evidence_needed: valid test credential + confidential client_id/client_secret; token response via password grant.
+verify_steps: AUTH_HELPED — POST /nidp/oauth/nam/token grant_type=password&username=<sandbox>&password=<sandbox>&client_id=<confidential>&client_secret=<secret>; observe token issuance.
+impact: full MFA-bypassed token set for any user if credentials leak; CRITICAL-conditional.
+testability: AUTH_HELPED
+
+STEP 4 — SELF-CRITIQUE
+- [PARKED] procurement KM servlet (42): every ?path=/?action= variant returns HTTP 500, guest renders zero content, vss3 WAF-blocks; 09-08 leadership REJECTED; remaining variants are speculative path-guessing with no oracle — closed.
+- [PARKED] rep.basf.com actuator (dropped): all 16 sensitive endpoints 404, path normalization + content-negotiation blocked, custom 999 error handler — locked down.
+- [PARKED] basf.login.apigee.com (dropped): stock Apigee Edge SSO identity zone; config-only 200s, ROPC/implicit is generic Edge posture, creds-blocked.
+- [FINAL] federation ROPC (65) — AUTH_HELPED, credential-blocked, only surviving CRITICAL-conditional.
+- [FINAL] my.basf.com PKCE-less refresh (55, ranked 80) — AUTH_HELPED, credential/interactive-blocked, HIGH-conditional.
+- [FINAL] secsys.basf.com unauth surface (45) — only PASSIVE-progressable lead this turn; dropped to <50 but sole actionable new frontier.
+
+STEP 5 — NEXT ACTION
+- [NEXT] PROBE: GET https://secsys.basf.com/ (3179B index) → extract `script src` bundle URL → GET the SPA bundle and enumerate `/api/` + management endpoints (2 requests, read-only, passive); then HEAD the catalogued endpoints unauthenticated.
+
+STEP 6 — LEARNING
+- [LEARN] ACCEPTED RECON @ secsys.basf.com: root = Technology Nexus Smart ID Self-Service v5.3.1+ Angular SPA (200/3179B); siblings bsh.secsys + secsys-visitor + qual instances resolvable, qual CF-JS-challenged; bundle/API/auth surface is the only genuinely unprobed estate asset.
+- [LEARN] REJECTED BUSLOGIC @ procurement.basf.com/tm/passage KM servlet: all parameterized variants HTTP 500 (SAP runtime error), guest zero content, vss3 WAF-blocks — SAP-estate unauth doc class conclusively closed.
+- [LEARN] REJECTED MISCONFIG @ rep.basf.com/actuator/*: 16 sensitive endpoints 404, path traversal + content-negotiation blocked, custom 999 handler — properly locked down.
+- [LEARN] REJECTED RECON @ basf.login.apigee.com: standard Apigee Edge SSO identity zone — generic Edge SSO, config-only exposure, ROPC posture stock.
+- [LEARN] ACCEPTED RECON @ my.basf.com/.auth: HTTP 200/205005B SPA fallback re-confirmed — client-side callback route, no server-side token surface.
+
+STEP 7 — RISK
+- [RISK] BASF SE: 23 — Estate now 17+ hosts, unauth exposure effectively zero; only actionable candidates are two credential-blocked OAuth design findings (NAM ROPC enabling MFA bypass; public-client refresh without PKCE) requiring sandbox creds, plus a low-confidence unprobed secsys Smart ID surface. No misconfiguration, admin exposure, data leak, SSRF, or takeover. Pipeline infrastructure degraded (3/5 models non-functional, triage stalled) — fix longcat/ling3/laguna configs and mimo triager to restore rotation throughput; request sandbox creds from program operator to advance or formally close.

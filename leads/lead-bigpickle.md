@@ -1908,3 +1908,31 @@ testability: AUTH_HELPED
 [LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface.
 [LEARN] ACCEPTED RECON @ basf.login.apigee.com: Apigee Edge SSO identity zone — stock config, ROPC/implicit grants are provider-level posture, exploitation requires valid BASF creds.
 [RISK] BASF SE: 24 — Unauthenticated exposure across the now 16+ host estate is effectively zero. Two high-severity OAuth design findings (NAM ROPC password grant enabling MFA bypass, public-client refresh_token without PKCE enabling persistent session hijack) are the only actionable candidates but require sandbox credentials to validate and exploit. Program is at decision point: request test creds to advance POC, or close with two informational/high-conditional findings. No unpatched misconfiguration, no exposed admin surface, no data leakage, no SSRF reachable beyond auth/WAF gates, no subdomain takeover. Pipeline infrastructure degraded (3/5 models non-functional, triage stalled) — recommend fixing longcat/ling3/laguna model configs and mimo triager before next rotation.
+## 2026-09-09 21:38:38 UTC [target] (model bigpickle)
+[HYP] secsys.basf.com Technology Nexus Smart ID Self-Service unauth management/API surface
+class: AUTH
+asset: secsys.basf.com
+confidence: 45
+reasoning: root returns 200/3179B Angular SPA index identifying Technology Nexus Smart ID Self-Service v5.3.1+ (PKI/card/OTP identity self-service); production siblings bsh.secsys.basf.com + secsys-visitor.basf.com and qual hosts resolvable, qual behind Cloudflare JS-challenge; only root GET ever performed, SPA bundle/backend API/auth flow entirely unmapped; this product class has history of unauthenticated config/cert-management endpoint exposure. Genuinely new, unprobed, high-freshness surface.
+evidence_needed: any bundle-disclosed API path or management endpoint returning 200 JSON (version/config/users/certs) without authentication.
+verify_steps: passive first — GET / (3179B) and extract script src; GET the SPA JS bundle and grep for `/api/`, `rest/`, `/v[0-9]`, `endpoint`, `login` to reconstruct API base; then HEAD/GET catalogued endpoints unauthenticated.
+impact: unauthenticated config disclosure or identity/cert/OTP self-service manipulation on BASF smart-card estate; MEDIUM-HIGH conditional.
+testability: PASSIVE
+[HYP] my.basf.com public client 86cc4bf9 refresh_token non-rotation without PKCE — persistent session hijack
+class: OATH
+asset: my.basf.com/.auth
+confidence: 55
+reasoning: SSR boot config discloses public client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect https://my.basf.com/.auth, scope openid profile refresh_token, acr 3IAM/Login/External, zero code_challenge references (reconfirmed 09-09); NAM supports plain+S256 but this client never challenges; redirect_uri oracle exact-match (10 variants rejected) so only code/refresh interception path.
+evidence_needed: live authorize request showing absent code_challenge; refresh_token that does not rotate on double reuse (same JTI/lifetime).
+verify_steps: AUTH_HELPED — interactive code exchange on client 86cc4bf9-… + double replay of refresh_token.
+impact: ATO of BASF customer/supplier portal from stolen authz code or refresh_token; HIGH conditional.
+testability: AUTH_HELPED
+[HYP] federation.basf.com NAM ROPC password grant — MFA-bypass token issuance for confidential clients
+class: AUTH
+asset: federation.basf.com/nidp/oauth/nam/token
+confidence: 65
+reasoning: OIDC discovery at two NetIQ paths consistently lists `password` in grant_types_supported since 09-06, unchanged across every 09-09 re-probe; provider-level ROPC enabled; combined with public SPA client doing code+refresh and secsys SAML=cert=true, BASF reuses this NAM identity plane; valid creds + confidential client = access+refresh token set bypassing acr 3IAM/Login/External MFA step.
+evidence_needed: valid test credential + confidential client_id/client_secret; token response via password grant.
+verify_steps: AUTH_HELPED — POST /nidp/oauth/nam/token grant_type=password&username=<sandbox>&password=<sandbox>&client_id=<confidential>&client_secret=<secret>; observe token issuance.
+impact: full MFA-bypassed token set for any user if credentials leak; CRITICAL-conditional.
+testability: AUTH_HELPED
