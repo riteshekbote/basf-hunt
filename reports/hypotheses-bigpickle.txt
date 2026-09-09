@@ -1,7 +1,6 @@
-## 2026-09-09 15:34:58 UTC [target] (model bigpickle)
+## 2026-09-09 18:47:33 UTC [target] (model bigpickle)
 [PRIO] federation.basf.com/nidp/oauth/nam/token,7.8,attack_surface=7,business_value=10,tech_exposure=9,gate_ease=7,cloud_surface=5,freshness=8
 [PRIO] my.basf.com/.auth (public client 86cc4bf9),7.2,attack_surface=6,business_value=9,tech_exposure=8,gate_ease=6,cloud_surface=7,freshness=8
-[PRIO] procurement.basf.com KM servlet,4.6,attack_surface=5,business_value=7,tech_exposure=5,gate_ease=6,cloud_surface=2,freshness=8
 [HYP] federation.basf.com NAM ROPC password grant — MFA-bypass token issuance for confidential clients
 class: AUTH
 asset: federation.basf.com/nidp/oauth/nam/token
@@ -20,22 +19,13 @@ evidence_needed: capture live authorize request showing absent code_challenge; r
 verify_steps: AUTH_HELPED — interactive code exchange on client 86cc4bf9-… + double replay of refresh_token.
 impact: ATO of BASF customer/supplier portal from stolen authz code or refresh_token; HIGH conditional.
 testability: AUTH_HELPED
-[HYP] procurement.basf.com KM servlet parameterized doc read past F5-ASM
-class: BUSLOGIC
-asset: procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/
-confidence: 42
-reasoning: servlet reaches J2EE backend (HTTP 500, 1753B SAP runtime error, not 236B WAF block) across procurement + tm + passage; vss3 WAF-blocks (235). F5-ASM never intercepts this path. But 09-08 REJECTED BUSLOGIC: guest role renders zero content for every ?path= variant tested, no non-500 document output ever observed.
-evidence_needed: any ?path=/?action= combination returning non-500 document content (e.g. 200/403 with body) rather than SAP runtime error.
-verify_steps: PASSIVE exhausted — all tested variants 500; only NEW paths untested. GET /com.sap.km.cm.documents/collateral/?path= or WCML vfs-style path variants.
-impact: unauthenticated supplier document/pricing disclosure if a path is valid; MEDIUM conditional.
-testability: PASSIVE
-[PARKED] procurement KM servlet (42→drop): 09-08 leadership already classed this REJECTED BUSLOGIC; every ?path= variant returns 500, guest renders zero content; remaining untested path variants are speculative path-guessing (no systematic oracle). Multiple prior runs convergent that this is closed.
+[PARKED] procurement KM servlet (42→drop): 09-08 leadership already classed this REJECTED BUSLOGIC; every `?path=` variant returns 500, guest renders zero content; remaining untested path variants are speculative path-guessing (no systematic oracle). Multiple prior runs convergent that this is closed.
 [FINAL] federation ROPC (65) — AUTH_HELPED, credential-blocked, only surviving CRITICAL-conditional.
 [FINAL] my.basf.com PKCE-less refresh (55) — AUTH_HELPED, credential/interactive-blocked, HIGH-conditional.
 [NEXT] HUMAN: Request from program operator (bugs.olivermaicher.eu) a sandbox supplier/intern test account to (a) drive the interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` recording whether `code_challenge` is absent and whether `refresh_token` rotates on reuse, and (b) retest NAM ROPC `grant_type=password` at `/nidp/oauth/nam/token` with a junk-but-format-valid confidential client from developer.basf.com registration. Without this credential, both findings remain high-conditional, unconfirmed, unreportable.
-[LEARN] REJECTED BUSLOGIC @ procurement.basf.com/tm/passage KM servlet: ?path=/documents/newFramework + variants return HTTP 500 (SAP runtime error) across 3 portals, guest role renders zero content; vss3 WAF-blocks; no non-500 document output ever observed — SAP-estate unauth doc class conclusively closed (09-08 convergence confirmed by 09-09 re-probe).
-[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes) across all 09-09 re-probes — provider config stable, no hardening; ROPC exploitation remains credential-blocked.
-[LEARN] ACCEPTED RECON @ my.basf.com/.auth: HTTP 200/205005B SPA fallback re-confirmed — `/.auth` remains client-side callback, no server-side token surface.
+[LEARN] REJECTED BUSLOGIC @ procurement.basf.com/tm/passage KM servlet: `?path=/documents/newFramework` + variants return HTTP 500 (SAP runtime error) across 3 portals, guest role renders zero content; vss3 WAF-blocks; no non-500 document output ever observed — SAP-estate unauth doc class conclusively closed (09-08 convergence confirmed by 09-09 06:12 nemotron3 re-probe).
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes) across 09-09 re-probe — provider config stable, no hardening; ROPC exploitation remains credential-blocked.
+[LEARN] ACCEPTED RECON @ my.basf.com/.auth: HTTP 200/205005B SPA fallback re-confirmed (09-09 01:30 probe) — `/.auth` remains client-side callback, no server-side token surface.
 [LEARN] REJECTED MISCONFIG @ rep.basf.com/actuator/*: all 16 sensitive actuator endpoints return 404; path traversal and content-negotiation blocked by Spring Boot path normalization; custom error handler returns status 999 — Spring Boot Actuator properly locked down.
 [LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404.
 [LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface.

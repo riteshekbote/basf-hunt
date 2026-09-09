@@ -941,3 +941,29 @@
 - LEARN: ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clie
 - LEARN: REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint
 - LEARN: ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
+
+## RANKED HYPOTHESES 2026-09-09 18:50:44 UTC
+- [80] my.basf.com: Public OAuth Client with Refresh Token, No PKCE — ATO via Code Interception (from art/lead_nemotron3.txt)
+- [65] federation.basf.com/nidp/oauth/nam/token: federation.basf.com NAM ROPC password grant — MFA-bypass token issuance for confidential clients (from art/lead_bigpickle.txt)
+- NEXT(hypotheses-bigpickle.txt): HUMAN: Request from program operator (bugs.olivermaicher.eu) a sandbox supplier/intern test account to (a) drive the interactive OIDC code-exchange on client `8
+- NEXT(hypotheses-nemotron3.txt): HUMAN: Request from program operator (bugs.olivermaicher.eu) a sandbox supplier/intern test account to (a) drive the interactive OIDC code-exchange on client `8
+- LEARN: REJECTED BUSLOGIC @ procurement.basf.com/tm/passage KM servlet: `?path=/documents/newFramework` + variants return HTTP 500 (SAP runtime error) across 3 portals,
+- LEARN: ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes) across 09-09 re-probe — provider c
+- LEARN: ACCEPTED RECON @ my.basf.com/.auth: HTTP 200/205005B SPA fallback re-confirmed (09-09 01:30 probe) — `/.auth` remains client-side callback, no server-side token
+- LEARN: REJECTED MISCONFIG @ rep.basf.com/actuator/*: all 16 sensitive actuator endpoints return 404; path traversal and content-negotiation blocked by Spring Boot path
+- LEARN: ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404.
+- LEARN: REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface.
+- LEARN: ACCEPTED RECON @ basf.login.apigee.com: Apigee Edge SSO identity zone — stock config, ROPC/implicit grants are provider-level posture, exploitation requires val
+- LEARN: ACCEPTED RECON @ basf.login.apigee.com: full Apigee OAuth identity surface mapped via OIDC discovery + SAML metadata; ROPC/implicit grants, token/userinfo/jwks 
+- LEARN: REJECTED RECON @ basf.login.apigee.com: standard Apigee Edge SSO identity-zone login — generic Edge SSO, not a custom BASF OAuth provider; ROPC/implicit config 
+- LEARN: ACCEPTED RECON @ rep.basf.com: live "Bestandskundenplattform" behind Azure Front Door; Spring Boot + Wicket; Actuator at `/actuator` (HAL) + `/actuator/health` 
+- LEARN: REJECTED MISCONFIG @ rep.basf.com/actuator/*: all 16 sensitive actuator endpoints return 404; path traversal and content-negotiation blocked by Spring Boot path
+- LEARN: ACCEPTED RECON @ secsys.basf.com: live "Smart ID Self-Service" (Technology Nexus, v5.3.1+) Angular SPA, 200/3179B; sibling `bsh.secsys`, `secsys-visitor`, and q
+- LEARN: REJECTED BUSLOGIC @ procurement.basf.com/tm/passage KM servlet: all parameterized requests return HTTP 500 (SAP runtime error) across 3 portals, guest role rend
+- LEARN: ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes) across all 09-09 re-probes — provi
+- LEARN: ACCEPTED RECON @ my.basf.com/.auth: HTTP 200/205005B SPA fallback re-confirmed — `/.auth` remains client-side callback, no server-side token surface
+- LEARN: REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle — EasyAuth not exposed; `/.auth` is client-side callback route
+- LEARN: ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404
+- LEARN: REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry
+- LEARN: ACCEPTED RECON @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected "Invalid ApiKey" — key scope exhausted
+- LEARN: REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class

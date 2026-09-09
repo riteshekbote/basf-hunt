@@ -11532,3 +11532,77 @@ testability: PASSIVE
 ---
 
 **Program status summary:** The hunt has exhaustively mapped 16+ hosts across BASF's external attack surface over 7 days. All unauthenticated attack paths are closed. The two surviving high-severity candidates are design-level OAuth issues that require a test credential to advance from "high-conditional" to "reportable." The automated pipeline needs infrastructure repair (3 dead models, stalled triage) before it can resume productive cycles.
+===== ANALYST bigpickle 2026-09-09 18:50:44 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m• [0mCheck workspace for remaining untested targets[90m General Agent[0m
+[0m✓ [0mCheck workspace for remaining untested targets[90m General Agent[0m
+**STEP 1 — DELTA**
+[0m
+[0m$ [0mdate -u '+%Y-%m-%d %H:%M:%S UTC'
+2026-09-09 18:46:59 UTC
+[0m
+## 2026-09-09 18:47:07 UTC [target] (model bigpickle)
+
+[PRIO] federation.basf.com/nidp/oauth/nam/token,7.8,attack_surface=7,business_value=10,tech_exposure=9,gate_ease=7,cloud_surface=5,freshness=8
+[PRIO] my.basf.com/.auth (public client 86cc4bf9),7.2,attack_surface=6,business_value=9,tech_exposure=8,gate_ease=6,cloud_surface=7,freshness=8
+
+**STEP 2 — PRIORITIZATION**
+
+No new surfaces. Both surviving targets unchanged in score. No delta since 2026-09-09 15:35.
+
+**STEP 3 — HYPOTHESES**
+
+[HYP] federation.basf.com NAM ROPC password grant — MFA-bypass token issuance for confidential clients
+class: AUTH
+asset: federation.basf.com/nidp/oauth/nam/token
+confidence: 65
+reasoning: OIDC discovery at two NetIQ paths continuously lists `password` in grant_types_supported since 09-06; unchanged across every re-probe. NetIQ NAM ROPC is enabled provider-side; combined with public SPA client 86cc4bf9-… doing code+refresh and secsys SAML=cert=true, BASF heavily reuses this NAM identity plane. A confidential registered client accepting password grant = direct access+refresh token set bypassing acr 3IAM/Login/External MFA step.
+evidence_needed: valid test credential + confidential client_id/client_secret; token response showing access+refresh via password grant.
+verify_steps: AUTH_HELPED — POST /nidp/oauth/nam/token grant_type=password&username=<sandbox>&password=<sandbox>&client_id=<confidential>&client_secret=<secret>; observe token issuance.
+impact: full MFA-bypassed token set for any user if credentials leak; CRITICAL-conditional.
+testability: AUTH_HELPED
+
+[HYP] my.basf.com public client refresh_token non-rotation without PKCE — persistent session hijack
+class: OATH
+asset: my.basf.com/.auth
+confidence: 55
+reasoning: SSR boot config discloses public client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect https://my.basf.com/.auth, scope openid profile refresh_token, acr 3IAM/Login/External, zero code_challenge references in bundle (reconfirmed 09-09). NAM provider supports plain+S256 but this client never challenges. redirect_uri oracle exact-match (10 variants rejected) so no redirect manipulation — only code/refresh interception.
+evidence_needed: capture live authorize request showing absent code_challenge; refresh_token that does not rotate on double reuse (same JTI/lifetime).
+verify_steps: AUTH_HELPED — interactive code exchange on client 86cc4bf9-… + double replay of refresh_token.
+impact: ATO of BASF customer/supplier portal from stolen authz code or refresh_token; HIGH conditional.
+testability: AUTH_HELPED
+
+**STEP 4 — SELF-CRITIQUE**
+
+[PARKED] procurement KM servlet (42→drop): 09-08 leadership already classed this REJECTED BUSLOGIC; every `?path=` variant returns 500, guest renders zero content; remaining untested path variants are speculative path-guessing (no systematic oracle). Multiple prior runs convergent that this is closed.
+
+[FINAL] federation ROPC (65) — AUTH_HELPED, credential-blocked, only surviving CRITICAL-conditional.
+[FINAL] my.basf.com PKCE-less refresh (55) — AUTH_HELPED, credential/interactive-blocked, HIGH-conditional.
+
+Both survivors are blocked on the same gate: no sandbox test credentials. 7 days of passive enumeration across 16+ hosts has produced zero unauthenticated data/auth/SSRF/misconfig. The program is at a hard decision point.
+
+**STEP 5 — NEXT ACTION**
+
+[NEXT] HUMAN: Request from program operator (bugs.olivermaicher.eu) a sandbox supplier/intern test account to (a) drive the interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` recording whether `code_challenge` is absent and whether `refresh_token` rotates on reuse, and (b) retest NAM ROPC `grant_type=password` at `/nidp/oauth/nam/token` with a junk-but-format-valid confidential client from developer.basf.com registration. Without this credential, both findings remain high-conditional, unconfirmed, unreportable.
+
+**STEP 6 — LEARNING**
+
+[LEARN] REJECTED BUSLOGIC @ procurement.basf.com/tm/passage KM servlet: `?path=/documents/newFramework` + variants return HTTP 500 (SAP runtime error) across 3 portals, guest role renders zero content; vss3 WAF-blocks; no non-500 document output ever observed — SAP-estate unauth doc class conclusively closed (09-08 convergence confirmed by 09-09 06:12 nemotron3 re-probe).
+
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes) across 09-09 re-probe — provider config stable, no hardening; ROPC exploitation remains credential-blocked.
+
+[LEARN] ACCEPTED RECON @ my.basf.com/.auth: HTTP 200/205005B SPA fallback re-confirmed (09-09 01:30 probe) — `/.auth` remains client-side callback, no server-side token surface.
+
+[LEARN] REJECTED MISCONFIG @ rep.basf.com/actuator/*: all 16 sensitive actuator endpoints return 404; path traversal and content-negotiation blocked by Spring Boot path normalization; custom error handler returns status 999 — Spring Boot Actuator properly locked down.
+
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404.
+
+[LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface.
+
+[LEARN] ACCEPTED RECON @ basf.login.apigee.com: Apigee Edge SSO identity zone — stock config, ROPC/implicit grants are provider-level posture, exploitation requires valid BASF creds.
+
+**STEP 7 — RISK**
+
+[RISK] BASF SE: 24 — Unauthenticated exposure across the now 16+ host estate is effectively zero. Two high-severity OAuth design findings (NAM ROPC password grant enabling MFA bypass, public-client refresh_token without PKCE enabling persistent session hijack) are the only actionable candidates but require sandbox credentials to validate and exploit. Program is at decision point: request test creds to advance POC, or close with two informational/high-conditional findings. No unpatched misconfiguration, no exposed admin surface, no data leakage, no SSRF reachable beyond auth/WAF gates, no subdomain takeover. Pipeline infrastructure degraded (3/5 models non-functional, triage stalled) — recommend fixing longcat/ling3/laguna model configs and mimo triager before next rotation.
