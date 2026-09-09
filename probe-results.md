@@ -389,3 +389,11 @@ https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86
 
 ## 2026-09-09 01:30:39 UTC
 https://my.basf.com/.auth -> 200 len=205005
+
+## 2026-09-09 06:12:11 UTC
+https://procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/?path=/documents/newFramework -> HTTP 500
+https://procurement.basf.com/irj/servlet/webdav/documents/newFramework/ -> 200 len=236
+https://tm.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/?path=/documents/newFramework -> HTTP 500
+https://passage-europe.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/?path=/documents/newFramework -> HTTP 500
+https://vss3.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/?path=/documents/newFramework -> 200 len=235
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684

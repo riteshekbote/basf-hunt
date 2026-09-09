@@ -263,3 +263,5 @@ www.basf.com
 - CHANGED api.commerce.basf.com — 8 stage prefixes all `MissingAuthenticationTokenException`; IAM/SigV4 authorizer, x-api-key not a credential class
 
 ## 2026-09-09 01:30:37 UTC
+
+## 2026-09-09 06:12:00 UTC

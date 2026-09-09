@@ -11273,3 +11273,46 @@ STEP 6 — LEARNING
 
 STEP 7 — RISK
 [RISK] BASF SE: 24 — secsys/Smart ID estate (3 primary hosts + qual/visitor/bsh) mapped end-to-end and closed: stock Nexus Self-Service SPA, same `api/` surface everywhere, data plane 401, SAML/cert/prelogin/userpwd signin all login-class, operator/admin deployment APIs basic-auth-gated per vendor documentation. Net addition is informational only (SAML enabled, session-state carryover of the known NAM plane). Unauthenticated exposure across the now-16+ host estate remains effectively zero; the two AUTH_HELPED NAM/OAuth items (ROPC 65, PKCE-less refresh 55) are still the only high-severity candidates and remain credential-blocked. No new exploitable finding.
+===== ANALYST bigpickle 2026-09-09 06:12:00 UTC =====
+[0m
+> build · big-pickle
+[0m
+## STEP 1 — DELTA
+
+NO_DELTA. No new entries in knowledge base since last analysis at 2026-09-09 01:13:48 UTC. Full 16+ host estate mapping unchanged.
+
+## STEP 2 — PRIORITIZE
+
+All remaining assets are either fully exhausted or credential-gated. No new unauthenticated surface to score.
+
+| Asset | Score | Notes |
+|---|---|---|
+| federation.basf.com (NAM ROPC) | 65 | AUTH_HELPED — needs test creds |
+| my.basf.com (PKCE-less refresh) | 55 | AUTH_HELPED — needs interactive browser session |
+| All other 14+ hosts | 0 | Exhausted, 404/auth-gated/stock |
+
+## STEP 3 — HYPOTHESES
+
+No new hypotheses. Two surviving AUTH_HELPED items unchanged:
+
+- [65] federation.basf.com NAM ROPC → full token issuance if valid creds + confidential client exist
+- [55] my.basf.com public client code+refresh without PKCE → persistent session hijack if code/refresh_token recoverable
+
+Both are at ceiling without sandbox credentials or interactive browser session.
+
+## STEP 4 — SELF-CRITIQUE
+
+All items below 40 or REJECTED are dropped. The two AUTH_HELPED items survive but are blocked by credential requirement — no passive or unauthenticated verification path exists.
+
+## STEP 5 — NEXT ACTION
+
+[HUMAN] Request from program operator: (1) a sandbox/supplier test account with known password to run interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` — record whether `authorize` carries `code_challenge`, whether `refresh_token` rotates on reuse; (2) OR confirm to draft report covering the two design-level OAuth findings (NAM ROPC + PKCE-less public client) as informational/high-conditional findings for bugs.olivermaicher.eu submission.
+
+## STEP 6 — LEARNING
+
+- [LEARN] NO_DELTA — estate unchanged since 2026-09-09 01:13; unauthenticated surface across 16+ hosts is zero; two high-severity OAuth candidates remain credential-blocked.
+- [LEARN] ACCEPTED RECON @ secsys.basf.com: Nexus Smart ID Self-Service estate (3 primary + qual/visitor/bsh hosts) conclusively closed — stock SPA, data plane 401, SAML/cert/prelogin/userpwd signin all login-class, qual hosts CF-challenged, sibling roots byte-identical.
+
+## STEP 7 — RISK
+
+[RISK] BASF SE: 24 — Unauthenticated exposure across 16+ host estate is effectively zero. Two high-severity OAuth design findings (NAM ROPC password grant enabling MFA bypass, public-client refresh_token without PKCE enabling persistent session hijack) are the only actionable candidates but require sandbox credentials to validate and exploit. Program is at decision point: request test creds to advance POC, or close with two informational/high-conditional findings. No unpatched misconfiguration, no exposed admin surface, no data leakage, no SSRF reachable beyond auth/WAF gates.

@@ -874,3 +874,18 @@
 ## RANKED HYPOTHESES 2026-09-09 01:30:37 UTC
 - [42] secsys.basf.com/api/authenticated: secsys.basf.com Nexus Smart ID Self-Service API config/session-state disclosure already materially verified but below exploit threshold (from art/lead_bigpickle.txt)
 - NEXT(hypotheses-bigpickle.txt): HUMAN: secsys estate conclusively closed as a standard, auth-gated Nexus Smart ID Self-Service (SPA API map enumerated, data plane 401, SAML/cert/prelogin/userp
+
+## RANKED HYPOTHESES 2026-09-09 06:12:00 UTC
+- [75] procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/;: SAP KM Servlet Unauthenticated Document Access via Direct Path Across Supplier Portal Farm (from art/lead_nemotron3.txt)
+- NEXT(hypotheses-nemotron3.txt): PROBE: GET https://basf.login.apigee.com/.well-known/openid-configuration (passive, read-only, 1 rps, expect 200 with OIDC discovery JSON if Apigee standard con
+- LEARN: ACCEPTED RECON @ procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/: HTTP 500 (not 236B block) — SAP KM documents servlet reached J2EE
+- LEARN: ACCEPTED RECON @ tm.basf.com/passage-europe.basf.com/vss3.basf.com: 3 additional live SAP supplier portals (TRD/Pass@ge/VSS3), same BigIP+J2EE fingerprint + gue
+- LEARN: ACCEPTED RECON @ basf.login.apigee.com: new Apigee SAML/SSO login portal discovered; serves "Sign in with SAML" + "Login with basf"; corporate identity surface 
+- LEARN: ACCEPTED RECON @ rep.basf.com: live "Bestandskundenplattform" behind Azure Front Door; Spring Boot + Wicket; Actuator at `/actuator` (HAL) + `/actuator/health` 
+- LEARN: REJECTED MISCONFIG @ rep.basf.com/actuator/*: all 16 sensitive actuator endpoints return 404; path traversal (`env..`, `actuator;/env`, `health/path/../../env`)
+- LEARN: ACCEPTED RECON @ federation.basf.com: OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTP
+- LEARN: ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with redirect_uri, scope, refresh_token
+- LEARN: ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
+- LEARN: REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey — no additional proxy,
+- LEARN: REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+- LEARN: REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface
