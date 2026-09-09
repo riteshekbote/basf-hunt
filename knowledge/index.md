@@ -234,3 +234,10 @@
 - 2026-09-09 ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clients registration 401) — no provider hardening; prior mapping stable
 - 2026-09-09 REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint `/nidp/oauth/nam/clients` returns 401
 - 2026-09-09 ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
+- 2026-09-09 REJECTED BUSLOGIC @ procurement.basf.com/tm/passage KM servlet: ?path=/documents/newFramework + variants return HTTP 500 (SAP runtime error) across 3 portals, guest role renders zero content; vss3 WAF-blocks; no non-500 document output ever observed — SAP-estate unauth doc class conclusively closed (09-08 convergence confirmed by 09-09 re-probe).
+- 2026-09-09 ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes) across all 09-09 re-probes — provider config stable, no hardening; ROPC exploitation remains credential-blocked.
+- 2026-09-09 ACCEPTED RECON @ my.basf.com/.auth: HTTP 200/205005B SPA fallback re-confirmed — `/.auth` remains client-side callback, no server-side token surface.
+- 2026-09-09 REJECTED MISCONFIG @ rep.basf.com/actuator/*: all 16 sensitive actuator endpoints return 404; path traversal and content-negotiation blocked by Spring Boot path normalization; custom error handler returns status 999 — Spring Boot Actuator properly locked down.
+- 2026-09-09 ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404.
+- 2026-09-09 REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface.
+- 2026-09-09 ACCEPTED RECON @ basf.login.apigee.com: Apigee Edge SSO identity zone — stock config, ROPC/implicit grants are provider-level posture, exploitation requires valid BASF creds.

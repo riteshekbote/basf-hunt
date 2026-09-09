@@ -913,3 +913,31 @@
 - LEARN: ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clie
 - LEARN: REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint
 - LEARN: ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
+
+## RANKED HYPOTHESES 2026-09-09 15:35:46 UTC
+- [75] procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/;: SAP KM Servlet Unauthenticated Document Access via Direct Path Across Supplier Portal Farm (from art/lead_nemotron3.txt)
+- [65] federation.basf.com/nidp/oauth/nam/token: federation.basf.com NAM ROPC password grant — MFA-bypass token issuance for confidential clients (from art/lead_bigpickle.txt)
+- NEXT(hypotheses-bigpickle.txt): HUMAN: Request from program operator (bugs.olivermaicher.eu) a sandbox supplier/intern test account to (a) drive the interactive OIDC code-exchange on client `8
+- NEXT(hypotheses-nemotron3.txt): PROBE: GET https://basf.login.apigee.com/.well-known/openid-configuration (passive, read-only, 1 rps, expect 200 with OIDC discovery JSON if Apigee standard con
+- LEARN: REJECTED BUSLOGIC @ procurement.basf.com/tm/passage KM servlet: ?path=/documents/newFramework + variants return HTTP 500 (SAP runtime error) across 3 portals, g
+- LEARN: ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes) across all 09-09 re-probes — provi
+- LEARN: ACCEPTED RECON @ my.basf.com/.auth: HTTP 200/205005B SPA fallback re-confirmed — `/.auth` remains client-side callback, no server-side token surface.
+- LEARN: REJECTED MISCONFIG @ rep.basf.com/actuator/*: all 16 sensitive actuator endpoints return 404; path traversal and content-negotiation blocked by Spring Boot path
+- LEARN: ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404.
+- LEARN: REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface.
+- LEARN: ACCEPTED RECON @ basf.login.apigee.com: Apigee Edge SSO identity zone — stock config, ROPC/implicit grants are provider-level posture, exploitation requires val
+- LEARN: ACCEPTED RECON @ procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/: HTTP 500 (not 236B block) — SAP KM documents servlet reached J2EE
+- LEARN: ACCEPTED RECON @ tm.basf.com/passage-europe.basf.com/vss3.basf.com: 3 additional live SAP supplier portals (TRD/Pass@ge/VSS3), same BigIP+J2EE fingerprint + gue
+- LEARN: ACCEPTED RECON @ basf.login.apigee.com: new Apigee SAML/SSO login portal discovered; serves "Sign in with SAML" + "Login with basf"; corporate identity surface 
+- LEARN: ACCEPTED RECON @ rep.basf.com: live "Bestandskundenplattform" behind Azure Front Door; Spring Boot + Wicket; Actuator at `/actuator` (HAL) + `/actuator/health` 
+- LEARN: REJECTED MISCONFIG @ rep.basf.com/actuator/*: all 16 sensitive actuator endpoints return 404; path traversal (`env..`, `actuator;/env`, `health/path/../../env`)
+- LEARN: ACCEPTED RECON @ federation.basf.com: OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTP
+- LEARN: ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with redirect_uri, scope, refresh_token
+- LEARN: ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface mapped end-to-end — zero reachable endpoints beyond auth gates/404
+- LEARN: REJECTED MISCONFIG @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected Invalid ApiKey — no additional proxy,
+- LEARN: REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+- LEARN: REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface
+- LEARN: REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle (204926B, myBASFWorld, clientId 86cc4bf9) — EasyAuth not exposed
+- LEARN: ACCEPTED RECON @ federation.basf.com: discovery provider config reconfirmed unchanged (authorization_code/password/hybrid, plain+S256 PKCE, /nidp/oauth/nam/clie
+- LEARN: REJECTED MISCONFIG @ federation.basf.com: dynamic client registration endpoint `/nidp/oauth/nam/discovery/registration` returns 404 — not exposed; real endpoint
+- LEARN: ACCEPTED RECON @ federation.basf.com: SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints

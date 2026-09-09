@@ -276,3 +276,14 @@ www.basf.com
 - CHANGED *.api.basf.com estate (9 hosts) — full unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404
 - CHANGED prod.api.basf.com — 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys (core/pi/csp/navigator) rejected "Invalid ApiKey" — key scope exhausted
 - CHANGED api.commerce.basf.com — 8 stage prefixes all `MissingAuthenticationTokenException`; IAM/SigV4 authorizer, x-api-key not a credential class
+
+## 2026-09-09 15:35:46 UTC
+- CHANGED procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/ — HTTP 500 reconfirmed (not WAF block) across 4 portals; J2EE backend reached PAST F5-ASM, servlet processes parameters
+- CHANGED tm.basf.com/passage-europe.basf.com/vss3.basf.com — all 3 sibling portals LIVE on 141.6.3.0/16; tm+passage share procurement's J2EE backend (KM servlet → 500), vss3 WAF-blocks KM servlet (235B)
+- CHANGED basf.login.apigee.com — full Apigee OAuth identity surface mapped via OIDC discovery + SAML metadata; ROPC/implicit grants, token/userinfo/jwks endpoints, SAML SSO; only config endpoints (discovery, m
+- CHANGED rep.basf.com — Spring Boot + Wicket behind Azure Front Door; Actuator at `/actuator` (HAL) + `/actuator/health` (UP); all 16 sensitive endpoints return 404; custom error handler returns status 999
+- CHANGED federation.basf.com — OIDC discovery reconfirmed unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims); SAML2 metadata at `/nidp/saml2/metadata`
+- CHANGED my.basf.com — SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with redirect_uri=https://my.basf.com/.auth, scope=openid profile refresh_token, acr_values=3IA
+- CHANGED *.api.basf.com estate (9 hosts) — full unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404
+- CHANGED prod.api.basf.com — 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys (core/pi/csp/navigator) rejected "Invalid ApiKey" — key scope exhausted
+- CHANGED api.commerce.basf.com — 8 stage prefixes all `MissingAuthenticationTokenException`; IAM/SigV4 authorizer, x-api-key not a credential class
