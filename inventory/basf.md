@@ -311,3 +311,5 @@ www.basf.com
 - CHANGED *.api.basf.com estate (9 hosts) — full unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404
 - CHANGED prod.api.basf.com — 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys (core/pi/csp/navigator) rejected "Invalid ApiKey" — key scope exhausted
 - CHANGED api.commerce.basf.com — 8 stage prefixes all `MissingAuthenticationTokenException`; IAM/SigV4 authorizer, x-api-key not a credential class
+
+## 2026-09-09 23:35:35 UTC

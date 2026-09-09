@@ -985,3 +985,7 @@
 - LEARN: REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry
 - LEARN: ACCEPTED RECON @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected "Invalid ApiKey" — key scope exhausted
 - LEARN: REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM-gated, x-api-key not credential class
+
+## RANKED HYPOTHESES 2026-09-09 23:35:35 UTC
+- [55] my.basf.com/.auth: my.basf.com public client 86cc4bf9 refresh_token non-rotation without PKCE — persistent session hijack (from art/lead_bigpickle.txt)
+- NEXT(hypotheses-bigpickle.txt): HUMAN: From program operator (bugs.olivermaicher.eu) request a sandbox supplier/intern test account to (a) run the interactive OIDC code-exchange on client `86c
