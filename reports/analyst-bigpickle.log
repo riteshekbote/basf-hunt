@@ -11316,3 +11316,120 @@ All items below 40 or REJECTED are dropped. The two AUTH_HELPED items survive bu
 ## STEP 7 — RISK
 
 [RISK] BASF SE: 24 — Unauthenticated exposure across 16+ host estate is effectively zero. Two high-severity OAuth design findings (NAM ROPC password grant enabling MFA bypass, public-client refresh_token without PKCE enabling persistent session hijack) are the only actionable candidates but require sandbox credentials to validate and exploit. Program is at decision point: request test creds to advance POC, or close with two informational/high-conditional findings. No unpatched misconfiguration, no exposed admin surface, no data leakage, no SSRF reachable beyond auth/WAF gates.
+===== ANALYST bigpickle 2026-09-09 11:47:49 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m# [0mTodos
+[•] Step 1: DELTA - Compare inventory against current surface
+[ ] Step 2: PRIORITIZE - Score top assets 0-10
+[ ] Step 3: HYPOTHESES - Top 3 assets with max 1 hypothesis each
+[ ] Step 4: SELF-CRITIQUE - Drop confidence<40 or REJECTED
+[ ] Step 5: NEXT ACTION - Exactly one PROBE/SCAN/RAG/HUMAN
+[ ] Step 6: LEARNING - REJECTED/ACCEPTED entries
+[ ] Step 7: RISK - Program risk score 0-100
+[0m
+Looking at the current state, I can see you're at a clear decision point. Let me run the analysis:
+[0m• [0mCheck for untested basf subdomains[90m Explore Agent[0m
+## STEP 1 — DELTA
+
+Let me verify the current surface against knowledge base for any new angles.
+[0m✓ [0mCheck for untested basf subdomains[90m Explore Agent[0m
+[0m
+[0m# [0mTodos
+[✓] Step 1: DELTA - Compare inventory against current surface
+[•] Step 2: PRIORITIZE - Score top assets 0-10
+[ ] Step 3: HYPOTHESES - Top 3 assets with max 1 hypothesis each
+[ ] Step 4: SELF-CRITIQUE - Drop confidence<40 or REJECTED
+[ ] Step 5: NEXT ACTION - Exactly one PROBE/SCAN/RAG/HUMAN
+[ ] Step 6: LEARNING - REJECTED/ACCEPTED entries
+[ ] Step 7: RISK - Program risk score 0-100
+[0m
+[0m✱ [0mGlob "art/hypotheses-*.txt"[90m 0 matches[0m
+Let me check the latest hypothesis files from all agents to see if any new angles exist:
+[0m✱ [0mGlob "art/*"[90m 0 matches[0m
+[0m→ [0mRead .
+[0m→ [0mRead leads
+[0m→ [0mRead leads/lead-nemotron3.md
+[0m→ [0mRead leads/lead-nemotron3.md[90m [offset=365][0m
+[0m→ [0mRead leads/lead-nemotron3.md[90m [offset=732][0m
+Let me check the most recent nemotron3 entries and the current probe-results:
+[0m→ [0mRead state_bigpickle.json
+Now let me check the current state files and probe results to understand the latest situation:
+[0m→ [0mRead probe-results.md[90m [limit=100][0m
+[0m→ [0mRead probe-results.md[90m [offset=100][0m
+[0m
+[0m# [0mTodos
+[✓] Step 1: DELTA - Compare inventory against current surface
+[✓] Step 2: PRIORITIZE - Score top assets 0-10
+[✓] Step 3: HYPOTHESES - Top 3 assets with max 1 hypothesis each
+[✓] Step 4: SELF-CRITIQUE - Drop confidence<40 or REJECTED
+[✓] Step 5: NEXT ACTION - Exactly one PROBE/SCAN/RAG/HUMAN
+[✓] Step 6: LEARNING - REJECTED/ACCEPTED entries
+[✓] Step 7: RISK - Program risk score 0-100
+[0m
+Now I have a complete picture of the estate. Let me finalize all 8 steps:
+## STEP 1 — DELTA
+
+- NO_DELTA — Latest probe-results (2026-09-09 06:12) match knowledge base: procurement/tm/passage KM servlet still 500 (vss3 WAF-blocked 235), federation authz 200/684 unchanged, federation token 405, my.basf.com/.auth 200/205005. All prior classes (Azure Functions admin, API gateways, secsys, basf.login.apigee, rep actuator) reconfirmed closed/mapped. Nemotron3's 06:12 `[75] SAP KM servlet` hypothesis reappears — but the parameterized `?path=` probes already return HTTP 500 for every variant (documented in probe-results.md lines 394-399), and 09-08 leadership marked this class REJECTED BUSLOGIC with guest rendering zero content. No new surface introduced.
+
+## STEP 2 — PRIORITIZE
+
+[PRIO] my.basf.com/federation.basf.com,7.8,attack_surface=7,business_value=10,tech_exposure=9,gate_ease=7,cloud_surface=5,freshness=8
+[PRIO] procurement.basf.com KM servlet,4.6,attack_surface=5,business_value=7,tech_exposure=5,gate_ease=6,cloud_surface=2,freshness=8
+[PRIO] prod.api.basf.com oauth2 proxy,3.5,attack_surface=3,business_value=9,tech_exposure=6,gate_ease=1,cloud_surface=6,freshness=5
+
+## STEP 3 — HYPOTHESES
+
+[HYP] federation.basf.com NAM ROPC password grant — MFA-bypass token issuance for confidential clients
+class: AUTH
+asset: federation.basf.com/nidp/oauth/nam/token
+confidence: 65
+reasoning: OIDC discovery at `/nidp/.well-known/openid-configuration` (14920B) and `/nidp/oauth/nam/.well-known/openid-configuration` (2029B) both continuously list `password` in grant_types_supported since 09-06; unchanged across every re-probe. NetIQ NAM ROPC is enabled provider-side; combined with the public SPA client (86cc4bf9-…) doing code+refresh and secsys SAML=cert=true, BASF heavily reuses this NAM identity plane. A confidential registered client accepting password grant = direct access+refresh token set bypassing the acr 3IAM/Login/External MFA step.
+evidence_needed: valid test credential + confidential client_id/client_secret; token response showing access+refresh via password grant.
+verify_steps: AUTH_HELPED — POST /nidp/oauth/nam/token grant_type=password&username=<sandbox>&password=<sandbox>&client_id=<confidential>&client_secret=<secret>; observe token issuance.
+impact: full MFA-bypassed token set for any user if credentials leak; CRITICAL-conditional.
+testability: AUTH_HELPED
+
+[HYP] my.basf.com public client refresh_token non-rotation without PKCE — persistent session hijack
+class: OATH
+asset: my.basf.com/.auth
+confidence: 55
+reasoning: SSR boot config discloses public client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4`, redirect `https://my.basf.com/.auth`, scope `openid profile refresh_token`, acr 3IAM/Login/External, zero code_challenge references in bundle (reconfirmed 09-09). NAM provider supports plain+S256 but this client never challenges. redirect_uri oracle exact-match (10 variants rejected) so no redirect manipulation — only code/refresh interception.
+evidence_needed: capture live authorize request showing absent code_challenge; refresh_token that does not rotate on double reuse (same JTI/lifetime).
+verify_steps: AUTH_HELPED — interactive code exchange on client 86cc4bf9-… + double replay of refresh_token.
+impact: ATO of BASF customer/supplier portal from stolen authz code or refresh_token; HIGH conditional.
+testability: AUTH_HELPED
+
+[HYP] procurement.basf.com KM servlet parameterized doc read past F5-ASM
+class: BUSLOGIC
+asset: procurement.basf.com/irj/servlet/prt/portal/prtroot/com.sap.km.cm.documents/
+confidence: 42
+reasoning: servlet reaches J2EE backend (HTTP 500, 1753B SAP runtime error, not 236B WAF block) across procurement + tm + passage; vss3 WAF-blocks (235). F5-ASM never intercepts this path. But 09-08 REJECTED BUSLOGIC: guest role renders zero content for every `?path=` variant tested, no non-500 document output ever observed.
+evidence_needed: any `?path=`/`?action=` combination returning non-500 document content (e.g. 200/403 with body) rather than SAP runtime error.
+verify_steps: PASSIVE exhausted — all tested variants 500; only NEW paths untested. GET /com.sap.km.cm.documents/collateral/?path= or WCML vfs-style path variants.
+impact: unauthenticated supplier document/pricing disclosure if a path is valid; MEDIUM conditional.
+testability: PASSIVE
+
+## STEP 4 — SELF-CRITIQUE
+
+[PARKED] procurement KM servlet (42→drop): 09-08 leadership already classed this REJECTED BUSLOGIC; every `?path=` variant returns 500, guest renders zero content; remaining untested path variants are speculative path-guessing (no systematic oracle). Multiple prior runs convergent that this is closed.
+
+[FINAL] federation ROPC (65) — AUTH_HELPED, credential-blocked, only surviving CRITICAL-conditional.
+[FINAL] my.basf.com PKCE-less refresh (55) — AUTH_HELPED, credential/interactive-blocked, HIGH-conditional.
+
+Both are the same program-level blocker: no sandbox/test credential exists.
+
+## STEP 5 — NEXT ACTION
+
+[NEXT] HUMAN: Request from program operator (bugs.olivermaicher.eu) a sandbox supplier/intern test account to (a) drive the interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` recording whether `code_challenge` is absent and whether `refresh_token` rotates on reuse, and (b) retest NAM ROPC `grant_type=password` at `/nidp/oauth/nam/token` with a junk-but-format-valid confidential client from developer.basf.com registration. Without this credential, both findings remain high-conditional, unconfirmed, unreportable.
+
+## STEP 6 — LEARNING
+
+[LEARN] REJECTED BUSLOGIC @ procurement.basf.com/tm/passage KM servlet: `?path=/documents/newFramework` + variants return HTTP 500 (SAP runtime error) across 3 portals, guest role renders zero content; vss3 WAF-blocks; no non-500 document output ever observed — SAP-estate unauth doc class conclusively closed (09-08 convergence confirmed by 09-09 06:12 nemotron3 re-probe).
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes) across 09-09 re-probe — provider config stable, no hardening; ROPC exploitation remains credential-blocked.
+[LEARN] ACCEPTED RECON @ my.basf.com/.auth: HTTP 200/205005B SPA fallback re-confirmed (09-09 01:30 probe) — `/.auth` remains client-side callback, no server-side token surface.
+
+## STEP 7 — RISK
+
+[RISK] BASF SE: 24 — Unauthenticated exposure across the now 16+ host estate remains effectively zero: all API gateways (Apigee/AWS/Azure), SAP portals (procurement/tm/passage/vss3), secsys Nexus estate, rep.basf.com actuator, and Apigee Edge SSO surface are mapped and gated. The two surviving high-severity candidates — NAM ROPC password grant (MFA bypass, CRITICAL-conditional) and public-client refresh_token without PKCE (session hijack, HIGH-conditional) — are both design-level and both require sandbox credentials to validate; neither is currently demonstrable or reportable. No unpatched misconfiguration, no exposed admin surface, no data leakage, no reachable SSRF, no subdomain takeover. Program is at a hard decision point: issue a sandbox/test credential to advance POC, or close with two informational/high-conditional OAuth design findings.
