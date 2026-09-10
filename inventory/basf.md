@@ -351,3 +351,15 @@ www.basf.com
 - NEW ncm.basf.com + cloud.basf.com — Cloudflare JS challenge (403, cf-mitigated:challenge); no bypass possible
 - CHANGED secsys.basf.com/api/users/me + /api/devices — HTTP 200 len=246 = WAF block page ("Request Rejected"), NOT API data; WAF returns 200 instead of 403; same across all 3 secsys hosts
 - CHANGED intranet.basf.com redirect_uri — Azure AD shows login for both valid/invalid redirect_uri; validation at token exchange; without auth cannot confirm open redirect
+
+## 2026-09-10 21:46:34 UTC
+- NEW experience.basf.com — AEM CXM Experience Platform login, x-vhost experience, CloudFront, CSP leaks author-prod-aem64 + author-stage-aem64 (dead) + api.das.basf.com (dead)
+- NEW intranet.basf.com — Azure AD (mod_auth_openidc) with tenant ecaa386b-c8df-4ce0-ad01-740cbdb5ba55, client_id f5a39ea7-83db-4af7-b3d1-df80d707650c, redirect_uri /redirect_uri — corporate SSO intranet
+- NEW north-america.intranet.basf.com — Concrete CMS with Azure AD OAuth2, client_id 36f927e6-1b9a-4b2e-a991-8574640f1164, cookie domain .intranet.basf.com shared across intranet instances
+- NEW repfinder.basf.com — AEM Rep Finder (public), x-vhost repfinder, CloudFront, 137KB, .model.json properly blocked by dispatcher
+- NEW das.basf.com — S3-hosted AgSolutions Finder (Ionic PWA), api.das.basf.com dead, S3 bucket NoSuchBucket, 5x AWS API GW endpoints 403 IAM-gated
+- NEW agriculture.basf.com — Magnolia CMS (348KB)
+- NEW artifactory.basf.com — Cloudflare WAF custom block (403, 7KB BASF-branded); no bypass possible
+- NEW ncm.basf.com + cloud.basf.com — Cloudflare JS challenge (403, cf-mitigated:challenge); no bypass possible
+- CHANGED secsys.basf.com/api/users/me + /api/devices — HTTP 200 len=246 = WAF block page ("Request Rejected"), NOT API data; WAF returns 200 instead of 403; same across all 3 secsys hosts
+- CHANGED intranet.basf.com redirect_uri — Azure AD shows login for both valid/invalid redirect_uri; validation at token exchange; without auth cannot confirm open redirect

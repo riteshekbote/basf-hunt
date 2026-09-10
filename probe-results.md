@@ -491,3 +491,17 @@ https://repfinder.basf.com/content/repfinder/en.model.txt -> HTTP 404
 https://repfinder.basf.com/content/repfinder/en.tidy.-1.json -> HTTP 404
 https://repfinder.basf.com/content/repfinder/en.infinity.json -> HTTP 404
 https://repfinder.basf.com/jcr:content.model.json -> HTTP 404
+
+## 2026-09-10 21:46:50 UTC
+https://experience.basf.com/crx/de -> HTTP 404
+https://experience.basf.com/system/console -> HTTP 404
+https://experience.basf.com/libs/granite/ui/content/dumplibs.html -> HTTP 404
+https://experience.basf.com/crx/packmgr -> HTTP 404
+https://experience.basf.com/content -> HTTP 404
+https://experience.basf.com/apps -> HTTP 404
+https://experience.basf.com/etc -> HTTP 404
+https://experience.basf.com/bin/receive -> HTTP 404
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://repfinder.basf.com/content/repfinder/en.model.json -> HTTP 404
+https://repfinder.basf.com/content/repfinder/en.model.txt -> HTTP 404
+https://repfinder.basf.com/content/repfinder/en.tidy.-1.json -> HTTP 404
