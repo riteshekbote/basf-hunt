@@ -6620,3 +6620,79 @@ testability: PASSIVE
 > build · nemotron-3-ultra-free
 [0m
 [91m[1mError: [0mError from provider (Console): Upstream request failed: [404] Provider returned error
+===== ANALYST nemotron3 2026-09-10 01:33:05 UTC =====
+[0m
+> build · nemotron-3-ultra-free
+[0m
+[DELTA]
+[CHANGED] secsys.basf.com — probe completed: live "Smart ID Self-Service" (Technology Nexus, v5.3.1+) Angular SPA confirmed at root (200/3179B); sibling hosts `bsh.secsys`, `secsys-visitor`, `secsys-ssp-qual`, `bsh-qual`, `visitor-secsys-ssp-qual` resolvable; qual instances Cloudflare-JS-challenged
+[CHANGED] basf.login.apigee.com — full Apigee OAuth identity surface mapped via OIDC discovery + SAML metadata; only config endpoints (discovery, metadata, jwks) return 200; `/register`, `/clients`, `/admin`, `/oauth/clients` all 401/404; ROPC/implicit grants are stock Edge SSO config
+[CHANGED] rep.basf.com — Spring Boot + Wicket behind Azure Front Door confirmed; Actuator at `/actuator` (HAL) + `/actuator/health` (UP); all 16 sensitive endpoints return 404; custom error handler returns status 999; Wicket bookmarkable/resource/page paths untested
+[CHANGED] federation.basf.com — NAM OIDC discovery reconfirmed unchanged across all 09-09 re-probes (ROPC/hybrid grants, plain+S256 PKCE, registration scopes); SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
+[CHANGED] my.basf.com/.auth — HTTP 200/205005B SPA fallback re-confirmed; `/.auth` remains client-side callback route (Azure Static Web Apps built-in auth), no server-side token surface
+[CHANGED] *.api.basf.com estate (9 hosts) — full unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404
+[CHANGED] prod.api.basf.com — 66 proxy paths all 404 except `/productinformation` (401 VerifyAPIKey); 4 browser-sourced keys (core/pi/csp/navigator) rejected "Invalid ApiKey" — key scope exhausted
+[CHANGED] api.commerce.basf.com — 8 stage prefixes all `MissingAuthenticationTokenException`; AWS REST API Gateway IAM/SigV4 authorizer, x-api-key not a credential class
+[CHANGED] procurement.basf.com/tm/passage-europe/vss3.basf.com SAP KM servlet — all parameterized requests return HTTP 500 (SAP runtime error) across 4 portals; guest role renders zero content; vss3 WAF-blocks KM servlet (235B); no non-500 document output ever observed
+
+[PRIO]
+my.basf.com/federation.basf.com,8.4,attack_surface=8 business_value=9 tech_exposure=7 gate_ease=10 cloud_surface=6 freshness=10
+procurement.basf.com/tm.basf.com/passage-europe.basf.com/vss3.basf.com,7.6,attack_surface=7 business_value=8 tech_exposure=6 gate_ease=8 cloud_surface=7 freshness=10
+rep.basf.com,7.1,attack_surface=5 business_value=8 tech_exposure=4 gate_ease=10 cloud_surface=7 freshness=10
+basf.login.apigee.com,7.2,attack_surface=6 business_value=7 tech_exposure=5 gate_ease=10 cloud_surface=7 freshness=10
+secsys.basf.com,6.7,attack_surface=6 business_value=7 tech_exposure=6 gate_ease=7 cloud_surface=6 freshness=9
+federation.basf.com (ROPC),6.7,attack_surface=6 business_value=8 tech_exposure=6 gate_ease=5 cloud_surface=7 freshness=8
+
+[HYP] Public OAuth Client with Refresh Token, No PKCE — ATO via Code Interception
+class: OATH
+asset: my.basf.com / federation.basf.com/nidp/oauth/nam/authz
+confidence: 80
+reasoning: SSR boot config confirms public client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (no secret in bundle), code flow with `refresh_token` scope, redirect to `/.auth` (Azure Static Web Apps built-in auth), `acr_values=3IAM/Login/External` (NetIQ NAM external auth), zero PKCE machinery in client; federation.basf.com discovery allows `plain` + `S256` PKCE methods — IdP accepts downgraded/plain challenges; redirect_uri oracle tested exact-match (10 variants rejected) so exploitation requires code interception at transport/browser layer, not redirect manipulation
+evidence_needed: capture of authentic authorize request proving absence of `code_challenge` parameter; token response showing `refresh_token` issued with no rotation on reuse
+verify_steps: AUTH_HELPED — with test account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External — record uttered params; exchange code for tokens; verify refresh_token lifetime/rotation on reuse
+impact: Intercepted authz code or stolen refresh_token = full ATO of BASF customer/supplier portal account → order/price/PII access, procurement fraud, supplier impersonation; CRITICAL
+testability: AUTH_HELPED
+
+[HYP] Wicket Bookmarkable Page Access Bypass on Customer Portal
+class: IDOR
+asset: rep.basf.com
+confidence: 55
+reasoning: Spring Boot + Apache Wicket application behind Azure Front Door; Actuator properly locked down (404 on all 16 sensitive endpoints, custom error handler status 999); Wicket bookmarkable/resource/page paths not fully enumerated — only `/wicket/bookmarkable/org.apache.wicket.Application` tested (404); Wicket mounts pages at predictable paths (`/app/`, `/wicket/bookmarkable/<pageclass>`, `/wicket/resource/...`); CSP allows `'unsafe-inline'` script-src; Azure Front Door (`x-azure-ref` header) may not normalize Wicket paths before WAF
+evidence_needed: at least one Wicket bookmarkable page or resource mount returning 200/302 without authentication exposing customer data (orders, pricing, PII)
+verify_steps: PROBE GET https://rep.basf.com/wicket/bookmarkable/ (directory listing); PROBE GET https://rep.basf.com/app/ (common Wicket mount); PROBE GET https://rep.basf.com/wicket/resource/ (resource mount); PROBE GET https://rep.basf.com/wicket/bookmarkable/com.basf.rep.pages.CustomerDashboard (guess common page classes); PROBE GET https://rep.basf.com/wicket/bookmarkable/com.basf.rep.pages.OrderHistory; enumerate all HTML/JS for Wicket `wicket:bookmarkable` or `wicket:link` href patterns
+impact: Unauthenticated access to existing customer portal data (orders, contracts, pricing, PII) — HIGH
+testability: PASSIVE
+
+[HYP] Smart ID Self-Service Angular SPA — IDOR/BOLA on Identity Management Endpoints
+class: IDOR
+asset: secsys.basf.com
+confidence: 50
+reasoning: Live "Smart ID Self-Service" (Technology Nexus, v5.3.1+) Angular SPA at root (200/3179B); sibling hosts `bsh.secsys`, `secsys-visitor`, `secsys-ssp-qual`, `bsh-qual`, `visitor-secsys-ssp-qual` resolvable; qual instances Cloudflare-JS-challenged; identity management portals typically expose REST APIs under `/api/`, `/services/`, `/rest/` for user/device/certificate management; Angular SPA boot config may leak API base paths; no deep enumeration performed beyond root
+evidence_needed: at least one API endpoint accepting user/device/certificate identifiers (id, uid, serial, email) returning 200 with foreign data or 403 (not 401/404) indicating authorization check present but bypassable
+verify_steps: PROBE GET https://secsys.basf.com/ (capture full HTML/JS for API base paths, endpoint patterns); PROBE GET https://secsys.basf.com/api/users/me; PROBE GET https://secsys.basf.com/api/devices; PROBE GET https://secsys.basf.com/services/; PROBE GET https://secsys.basf.com/rest/; PROBE GET https://bsh.secsys.basf.com/; PROBE GET https://secsys-visitor.basf.com/; passive enumeration of JS bundles for endpoint patterns
+impact: Unauthenticated/horizontal access to smart ID certificates, device enrollments, user PII — HIGH (identity theft, certificate misuse)
+testability: PASSIVE
+
+[PARKED] SAP KM Servlet Unauthenticated Document Access via Direct Path Across Supplier Portal Farm: REJECTED BUSLOGIC confirmed across 09-08/09 — all parameterized requests return HTTP 500 (SAP runtime error), guest role renders zero content, vss3 WAF-blocks; no non-500 document output ever observed; 500 = server error not document access
+[PARKED] Apigee SAML/SSO Portal — Unauthenticated Endpoint Discovery & Auth Bypass: REJECTED RECON — `/register`, `/clients`, `/admin`, `/oauth/clients` all 401/404; only config endpoints (discovery, metadata, jwks) return 200; ROPC/implicit grant is stock Edge SSO config, exploitation requires valid BASF creds (out-of-scope)
+[FINAL] 1. Public OAuth Client with Refresh Token, No PKCE — ATO via Code Interception (confidence 80, AUTH_HELPED)
+[FINAL] 2. Wicket Bookmarkable Page Access Bypass on Customer Portal (confidence 55, PASSIVE)
+[FINAL] 3. Smart ID Self-Service Angular SPA — IDOR/BOLA on Identity Management Endpoints (confidence 50, PASSIVE)
+
+[NEXT] PROBE: GET https://secsys.basf.com/api/users/me, GET https://secsys.basf.com/api/devices, GET https://secsys.basf.com/services/, GET https://secsys.basf.com/rest/ (1 rps, read-only) — enumerate identity management API surface after root Angular SPA confirmed
+
+[LEARN] ACCEPTED RECON @ secsys.basf.com: live "Smart ID Self-Service" (Technology Nexus, v5.3.1+) Angular SPA, 200/3179B; sibling hosts resolvable; qual instances Cloudflare-JS-challenged
+[LEARN] ACCEPTED RECON @ basf.login.apigee.com: full Apigee OAuth identity surface mapped via OIDC discovery + SAML metadata; only config endpoints return 200; ROPC/implicit grants are stock Edge SSO config
+[LEARN] REJECTED RECON @ basf.login.apigee.com: standard Apigee Edge SSO identity-zone login — not a custom BASF OAuth provider; exploitation requires valid BASF creds
+[LEARN] ACCEPTED RECON @ rep.basf.com: live "Bestandskundenplattform" behind Azure Front Door; Spring Boot + Wicket; Actuator at `/actuator` (HAL) + `/actuator/health` (UP); all 16 sensitive endpoints return 404; custom error handler status 999
+[LEARN] REJECTED MISCONFIG @ rep.basf.com/actuator/*: all 16 sensitive actuator endpoints return 404; path traversal and content-negotiation blocked by Spring Boot path normalization; custom error handler returns status 999
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes) across all 09-09 re-probes; SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B)
+[LEARN] ACCEPTED RECON @ my.basf.com/.auth: HTTP 200/205005B SPA fallback re-confirmed — `/.auth` remains client-side callback, no server-side token surface
+[LEARN] REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle — EasyAuth not exposed; `/.auth` is client-side callback route
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404
+[LEARN] REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry
+[LEARN] ACCEPTED RECON @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected "Invalid ApiKey" — key scope exhausted
+[LEARN] REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM/SigV4 authorizer, x-api-key not credential class
+[LEARN] REJECTED BUSLOGIC @ procurement.basf.com/tm/passage KM servlet: all parameterized requests return HTTP 500 (SAP runtime error) across 4 portals, guest role renders zero content; vss3 WAF-blocks; no non-500 document output ever observed — SAP-estate unauth doc class conclusively closed
+
+[RISK] basf: 58 — Unauthenticated backend exposure across 20+ host estate (9 *.api + prod.api + api.commerce + federation + my.basf + www + products + api.basf + procurement + tm + passage-europe + vss3 + rep.basf + basf.login.apigee.com + secsys.basf.com + developer.basf.com + worldaccount.basf.com) now proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere, Spring Boot Actuator properly locked down (404 on all sensitive, status 999 error handler), SAP KM servlet returns 500 (server error, not document access), Apigee SSO portal is stock Edge SSO. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE remains a design-level flaw requiring interactive code capture (AUTH_HELPED). The SAP supplier portal farm (4 portals) shares J2EE backend infrastructure reachable past F5-ASM (HTTP 500 on KM servlet) but guest role renders zero content — unauthenticated document access class closed. Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise) requiring test account. New attack surface: secsys.basf.com identity management SPA (zero deep enum beyond root) and rep.basf.com Wicket app (bookmarkable pages untested). No other exploitable surface remains in unauthenticated context.

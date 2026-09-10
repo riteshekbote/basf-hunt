@@ -313,3 +313,14 @@ www.basf.com
 - CHANGED api.commerce.basf.com — 8 stage prefixes all `MissingAuthenticationTokenException`; IAM/SigV4 authorizer, x-api-key not a credential class
 
 ## 2026-09-09 23:35:35 UTC
+
+## 2026-09-10 01:33:05 UTC
+- CHANGED secsys.basf.com — probe completed: live "Smart ID Self-Service" (Technology Nexus, v5.3.1+) Angular SPA confirmed at root (200/3179B); sibling hosts `bsh.secsys`, `secsys-visitor`, `secsys-ssp-qual`, 
+- CHANGED basf.login.apigee.com — full Apigee OAuth identity surface mapped via OIDC discovery + SAML metadata; only config endpoints (discovery, metadata, jwks) return 200; `/register`, `/clients`, `/admin`, `
+- CHANGED rep.basf.com — Spring Boot + Wicket behind Azure Front Door confirmed; Actuator at `/actuator` (HAL) + `/actuator/health` (UP); all 16 sensitive endpoints return 404; custom error handler returns stat
+- CHANGED federation.basf.com — NAM OIDC discovery reconfirmed unchanged across all 09-09 re-probes (ROPC/hybrid grants, plain+S256 PKCE, registration scopes); SAML2 metadata at `/nidp/saml2/metadata` returns 2
+- CHANGED my.basf.com/.auth — HTTP 200/205005B SPA fallback re-confirmed; `/.auth` remains client-side callback route (Azure Static Web Apps built-in auth), no server-side token surface
+- CHANGED *.api.basf.com estate (9 hosts) — full unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404
+- CHANGED prod.api.basf.com — 66 proxy paths all 404 except `/productinformation` (401 VerifyAPIKey); 4 browser-sourced keys (core/pi/csp/navigator) rejected "Invalid ApiKey" — key scope exhausted
+- CHANGED api.commerce.basf.com — 8 stage prefixes all `MissingAuthenticationTokenException`; AWS REST API Gateway IAM/SigV4 authorizer, x-api-key not a credential class
+- CHANGED procurement.basf.com/tm/passage-europe/vss3.basf.com SAP KM servlet — all parameterized requests return HTTP 500 (SAP runtime error) across 4 portals; guest role renders zero content; vss3 WAF-blocks 

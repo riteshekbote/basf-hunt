@@ -443,3 +443,17 @@ https://bsh.secsys.basf.com/ -> 200 len=3179
 
 ## 2026-09-09 23:35:37 UTC
 https://my.basf.com/.auth -> 200 len=205005
+
+## 2026-09-10 01:33:25 UTC
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://rep.basf.com/wicket/bookmarkable/ -> HTTP 404
+https://rep.basf.com/app/ -> HTTP 404
+https://rep.basf.com/wicket/resource/ -> HTTP 404
+https://rep.basf.com/wicket/bookmarkable/com.basf.rep.pages.CustomerDashboard -> HTTP 404
+https://rep.basf.com/wicket/bookmarkable/com.basf.rep.pages.OrderHistory -> HTTP 404
+https://secsys.basf.com/ -> 200 len=3179
+https://secsys.basf.com/api/users/me -> 200 len=246
+https://secsys.basf.com/api/devices -> 200 len=246
+https://secsys.basf.com/services/ -> HTTP 404
+https://secsys.basf.com/rest/ -> HTTP 404
+https://bsh.secsys.basf.com/ -> 200 len=3179
