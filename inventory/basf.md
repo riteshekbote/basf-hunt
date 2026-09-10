@@ -337,3 +337,5 @@ www.basf.com
 - CHANGED procurement.basf.com/tm/passage-europe/vss3.basf.com SAP KM servlet — all parameterized requests return HTTP 500 (SAP runtime error) across 4 portals; guest role renders zero content; vss3 WAF-blocks 
 
 ## 2026-09-10 12:07:13 UTC
+
+## 2026-09-10 16:37:10 UTC

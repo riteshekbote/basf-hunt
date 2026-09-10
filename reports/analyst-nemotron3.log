@@ -6887,3 +6887,66 @@ drwxr-xr-x  2 runner runner   4096 Sep 10 11:54 triage
 [0m→ [0mRead probe-results.md[90m [limit=100, offset=1][0m
 [0m→ [0mRead probe-results.md[90m [limit=100, offset=373][0m
 [91m[1mError: [0mError from provider (Console): Upstream request failed: [404] Provider returned error
+===== ANALYST nemotron3 2026-09-10 16:37:10 UTC =====
+[0m
+> build · nemotron-3-ultra-free
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/
+total 348
+drwxr-xr-x 12 runner runner   4096 Sep 10 16:16 .
+drwxr-xr-x  3 runner runner   4096 Sep 10 16:16 ..
+drwxr-xr-x  7 runner runner   4096 Sep 10 16:16 .git
+drwxr-xr-x  3 runner runner   4096 Sep 10 16:16 .github
+-rw-r--r--  1 runner runner   1801 Sep 10 16:16 README.md
+-rw-r--r--  1 runner runner     43 Sep 10 16:17 analyst-out.txt
+-rw-r--r--  1 runner runner 118141 Sep 10 16:16 analyst-prompt.txt
+-rw-r--r--  1 runner runner 114269 Sep 10 16:16 ctx.txt
+drwxr-xr-x  2 runner runner   4096 Sep 10 16:16 inventory
+drwxr-xr-x  2 runner runner   4096 Sep 10 16:16 knowledge
+drwxr-xr-x  2 runner runner   4096 Sep 10 16:16 leads
+-rw-r--r--  1 runner runner  35022 Sep 10 16:16 probe-results.md
+drwxr-xr-x  2 runner runner   4096 Sep 10 16:16 recon-notes
+drwxr-xr-x  2 runner runner   4096 Sep 10 16:16 reports
+drwxr-xr-x  2 runner runner   4096 Sep 10 16:16 reposcan-raw
+-rw-r--r--  1 runner runner   3285 Sep 10 16:16 scope.yml
+drwxr-xr-x  2 runner runner   4096 Sep 10 16:16 scripts
+-rw-r--r--  1 runner runner     33 Sep 10 16:16 state_bigpickle.json
+-rw-r--r--  1 runner runner     33 Sep 10 16:16 state_laguna.json
+-rw-r--r--  1 runner runner     33 Sep 10 16:16 state_ling3.json
+-rw-r--r--  1 runner runner     33 Sep 10 16:16 state_longcat.json
+-rw-r--r--  1 runner runner     33 Sep 10 16:16 state_mimo.json
+-rw-r--r--  1 runner runner     33 Sep 10 16:16 state_nemotron3.json
+drwxr-xr-x  2 runner runner   4096 Sep 10 16:16 triage
+[0m
+[0m→ [0mRead probe-results.md[90m [offset=1, limit=200][0m
+[0m→ [0mRead scope.yml
+[0m→ [0mRead inventory/basf.md
+[0m→ [0mRead probe-results.md[90m [offset=200, limit=200][0m
+[0m→ [0mRead probe-results.md[90m [limit=100, offset=400][0m
+[0m✱ [0mGlob "**/leads/*.txt"[90m 0 matches[0m
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/leads/
+total 764
+drwxr-xr-x  2 runner runner   4096 Sep 10 16:16 .
+drwxr-xr-x 12 runner runner   4096 Sep 10 16:16 ..
+-rw-r--r--  1 runner runner 320402 Sep 10 16:16 lead-bigpickle.md
+-rw-r--r--  1 runner runner   2448 Sep 10 16:16 lead-laguna.md
+-rw-r--r--  1 runner runner   2400 Sep 10 16:16 lead-ling3.md
+-rw-r--r--  1 runner runner   2496 Sep 10 16:16 lead-longcat.md
+-rw-r--r--  1 runner runner     18 Sep 10 16:16 lead-mimo.md
+-rw-r--r--  1 runner runner 422897 Sep 10 16:16 lead-nemotron3.md
+-rw-r--r--  1 runner runner   5047 Sep 10 16:16 reposcan-basf.md
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/art/ 2>/dev/null || echo "art directory not found"
+art directory not found
+[0m
+[0m→ [0mRead leads/lead-bigpickle.md[90m [limit=200][0m
+[0m→ [0mRead leads/lead-nemotron3.md[90m [limit=200][0m
+[0m→ [0mRead leads/lead-nemotron3.md[90m [limit=200, offset=2000][0m
+[0m→ [0mRead state_nemotron3.json
+[0m→ [0mRead leads/lead-nemotron3.md[90m [offset=2200, limit=250][0m
+[0m
+[0m$ [0mcurl -s -o /dev/null -w "%{http_code} %{content_length}" -H "Accept: application/json" "https://secsys.basf.com/api/users/me" 2>&1 || echo "curl failed"
+curl: unknown --write-out variable: 'content_length'
+200
+[0m

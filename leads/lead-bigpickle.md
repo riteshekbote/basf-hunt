@@ -2021,3 +2021,28 @@ testability: PASSIVE
 [LEARN] ACCEPTED RECON @ prod.api.basf.com: 66 proxy paths all 404 except /productinformation (401); 4 browser keys rejected "Invalid ApiKey" — key scope exhausted.
 [LEARN] REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM/SigV4 authorizer, x-api-key not credential class.
 [RISK] BASF SE: 22 — Surface fully mapped across 20+ hosts spanning Azure Functions, Apigee proxies, AWS API Gateway, SAP NetWeaver portals, Spring Boot apps, NetIQ NAM identity, and Nexus Smart ID. Zero unauthenticated exploitable findings after 8 days. Two high-severity OAuth design findings (NAM ROPC MFA-bypass, my.basf.com refresh-without-PKCE) remain confirmed-but-unprovable without sandbox credentials. Program at decision point — request test creds or close with two informational/high-conditional findings. Pipeline stable (5 models available per scope.yml).
+## 2026-09-10 16:25:43 UTC [target] (model bigpickle)
+[HYP] experience.basf.com AEM content path traversal via dispatcher rewrite bypass
+class: MISCONFIG
+asset: experience.basf.com
+confidence: 18
+reasoning: AEM dispatcher rewrites /content/basf/cxm/* to root-relative paths; /content/basf/cxm/agriculture/us/en/rep-finder.model.json → 301 to /rep-finder.model.json (404); dispatcher properly strips content prefix; all tested AEM content paths return 404; CSP leaks author-prod-aem64.basf.com (dead); no unauth content exposure observed.
+evidence_needed: any .model.json or .infinity.json returning 200 JSON from AEM content tree.
+verify_steps: PASSIVE — GET /content/basf/cxm/us/en.model.json, /etc.clientlibs/basf/salesx/clientlibs/config.json (done, all 404)
+impact: unauth AEM content disclosure; LOW.
+testability: PASSIVE
+[PARKED] experience.basf.com AEM content path traversal: confidence 18 < 40 threshold; dispatcher properly configured; all content paths return 404.
+[FINAL] Survivors ranked:
+[PARKED] experience.basf.com AEM content path traversal: confidence 18 — AEM dispatcher properly configured; all content JSON paths return 404; no evidence of content exposure.
+[NEXT] HUMAN: From program operator (bugs.olivermaicher.eu) request a sandbox supplier/intern test account to (a) run the interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` recording presence/absence of `code_challenge` and whether `refresh_token` rotates on double reuse, and (b) retest NAM ROPC `grant_type=password` at `/nidp/oauth/nam/token` with a junk-but-format-valid confidential client. Without this credential both surviving findings stay unconfirmed and unreportable; new surface (intranet, experience, repfinder, das, ncm, cloud, artifactory) fully probed and auth-gated or WAF-blocked — no further unauthenticated probe advances POC.
+[LEARN] ACCEPTED RECON @ intranet.basf.com: Azure AD (mod_auth_openidc) with tenant ecaa386b-c8df-4ce0-ad01-740cbdb5ba55, client_id f5a39ea7-83db-4af7-b3d1-df80d707650c, redirect_uri /redirect_uri — corporate SSO intranet
+[LEARN] ACCEPTED RECON @ north-america.intranet.basf.com: Concrete CMS with Azure AD OAuth2, client_id 36f927e6-1b9a-4b2e-a991-8574640f1164, cookie domain .intranet.basf.com shared across intranet instances, then= parameter not reflected in OAuth flow
+[LEARN] ACCEPTED RECON @ experience.basf.com: AEM CXM Experience Platform login, x-vhost experience, CloudFront, CSP leaks author-prod-aem64 + author-stage-aem64 (dead) + api.das.basf.com (dead)
+[LEARN] ACCEPTED RECON @ repfinder.basf.com: AEM Rep Finder (public), x-vhost repfinder, CloudFront, 137KB, .model.json properly blocked by dispatcher
+[LEARN] ACCEPTED RECON @ das.basf.com: S3-hosted AgSolutions Finder (Ionic PWA), api.das.basf.com dead, S3 bucket NoSuchBucket, 5x AWS API GW endpoints 403 IAM-gated
+[LEARN] ACCEPTED RECON @ agriculture.basf.com: Magnolia CMS (348KB)
+[LEARN] REJECTED MISCONFIG @ artifactory.basf.com: Cloudflare WAF custom block (403, 7KB BASF-branded); no bypass possible
+[LEARN] REJECTED MISCONFIG @ ncm.basf.com + cloud.basf.com: Cloudflare JS challenge (403, cf-mitigated:challenge); no bypass possible
+[LEARN] REJECTED MISCONFIG @ secsys.basf.com/api/users/me + /api/devices: HTTP 200 len=246 = WAF block page ("Request Rejected"), NOT API data; WAF returns 200 instead of 403; same across all 3 secsys hosts
+[LEARN] REJECTED MISCONFIG @ intranet.basf.com redirect_uri: Azure AD shows login for both valid/invalid redirect_uri; validation at token exchange; without auth cannot confirm open redirect
+[RISK] BASF SE: 22 — New surface additions (intranet, experience, repfinder, das, agriculture, ncm, cloud, artifactory) all fully mapped and auth-gated/WAF-blocked. Zero new exploitable findings after 8 days of intensive testing across 25+ hosts. Two high-severity OAuth design findings (NAM ROPC MFA-bypass, my.basf.com refresh-without-PKCE) remain confirmed-but-unprovable without sandbox credentials. Program at decision point — request test creds or close with two informational/high-conditional findings.
