@@ -1026,3 +1026,14 @@
 - LEARN: ACCEPTED RECON @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected "Invalid ApiKey" — key scope exhausted
 - LEARN: REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM/SigV4 authorizer, x-api-key not credential class
 - LEARN: REJECTED BUSLOGIC @ procurement.basf.com/tm/passage KM servlet: all parameterized requests return HTTP 500 (SAP runtime error) across 4 portals, guest role rend
+
+## RANKED HYPOTHESES 2026-09-10 12:07:13 UTC
+- [55] my.basf.com/.auth: my.basf.com public client 86cc4bf9 refresh_token non-rotation without PKCE — persistent session hijack (from art/lead_bigpickle.txt)
+- LEARN: REJECTED AUTH @ secsys.basf.com/api/processes/preLoginProcesses: all /api/* endpoints return 401 JSON with userLoggedOut; pre-auth workflow bypass speculative; 
+- LEARN: ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404.
+- LEARN: REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface.
+- LEARN: ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery reconfirmed unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes); SAML2 metadata at /ni
+- LEARN: ACCEPTED RECON @ my.basf.com/.auth: HTTP 200/205005B SPA fallback re-confirmed — /.auth remains client-side callback, no server-side token surface.
+- LEARN: REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle — EasyAuth not exposed; /.auth is client-side callback route.
+- LEARN: ACCEPTED RECON @ prod.api.basf.com: 66 proxy paths all 404 except /productinformation (401); 4 browser keys rejected "Invalid ApiKey" — key scope exhausted.
+- LEARN: REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM/SigV4 authorizer, x-api-key not credential class.

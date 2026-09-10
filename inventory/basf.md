@@ -335,3 +335,5 @@ www.basf.com
 - CHANGED prod.api.basf.com — 66 proxy paths all 404 except `/productinformation` (401 VerifyAPIKey); 4 browser-sourced keys (core/pi/csp/navigator) rejected "Invalid ApiKey" — key scope exhausted
 - CHANGED api.commerce.basf.com — 8 stage prefixes all `MissingAuthenticationTokenException`; AWS REST API Gateway IAM/SigV4 authorizer, x-api-key not a credential class
 - CHANGED procurement.basf.com/tm/passage-europe/vss3.basf.com SAP KM servlet — all parameterized requests return HTTP 500 (SAP runtime error) across 4 portals; guest role renders zero content; vss3 WAF-blocks 
+
+## 2026-09-10 12:07:13 UTC

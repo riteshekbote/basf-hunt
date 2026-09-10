@@ -261,3 +261,10 @@
 - 2026-09-10 REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM/SigV4 authorizer, x-api-key not credential class
 - 2026-09-10 REJECTED BUSLOGIC @ procurement.basf.com/tm/passage KM servlet: all parameterized requests return HTTP 500 (SAP runtime error) across 4 portals, guest role renders zero content; vss3 WAF-blocks; no non-500 document output ever observed — SAP-estate unauth doc class conclusively closed
 - 2026-09-10 REJECTED AUTH @ secsys.basf.com/api/processes/preLoginProcesses: all /api/* endpoints return 401 JSON with userLoggedOut; pre-auth workflow bypass speculative; SAML-only authentication confirmed; no evidence of unauthenticated access.
+- 2026-09-10 ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404.
+- 2026-09-10 REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry, zero external attack surface.
+- 2026-09-10 ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery reconfirmed unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes); SAML2 metadata at /nidp/saml2/metadata returns 200 signed descriptor (21434B).
+- 2026-09-10 ACCEPTED RECON @ my.basf.com/.auth: HTTP 200/205005B SPA fallback re-confirmed — /.auth remains client-side callback, no server-side token surface.
+- 2026-09-10 REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle — EasyAuth not exposed; /.auth is client-side callback route.
+- 2026-09-10 ACCEPTED RECON @ prod.api.basf.com: 66 proxy paths all 404 except /productinformation (401); 4 browser keys rejected "Invalid ApiKey" — key scope exhausted.
+- 2026-09-10 REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM/SigV4 authorizer, x-api-key not credential class.

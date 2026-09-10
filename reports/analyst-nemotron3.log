@@ -6850,3 +6850,40 @@ testability: PASSIVE
 ## STEP 7 — RISK
 
 [RISK] basf: 58 — Unauthenticated backend exposure across 20+ host estate (9 *.api + prod.api + api.commerce + federation + my.basf + www + products + api.basf + procurement + tm + passage-europe + vss3 + rep.basf + basf.login.apigee.com + secsys.basf.com + developer.basf.com + worldaccount.basf.com) now proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere, Spring Boot Actuator properly locked down (404 on all sensitive, status 999 error handler), SAP KM servlet returns 500 (server error, not document access), Apigee SSO portal is stock Edge SSO. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE remains a design-level flaw requiring interactive code capture (AUTH_HELPED). The SAP supplier portal farm (4 portals) shares J2EE backend infrastructure reachable past F5-ASM (HTTP 500 on KM servlet) but guest role renders zero content — unauthenticated document access class closed. Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise) requiring test account. New attack surface: secsys.basf.com identity management SPA (zero deep enum beyond root) and rep.basf.com Wicket app (bookmarkable pages untested). No other exploitable surface remains in unauthenticated context.
+===== ANALYST nemotron3 2026-09-10 12:07:13 UTC =====
+[0m
+> build · nemotron-3-ultra-free
+[0m
+[0m$ [0mdate -u +"%Y-%m-%d %H:%M:%S UTC"
+2026-09-10 11:58:39 UTC
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/
+total 348
+drwxr-xr-x 12 runner runner   4096 Sep 10 11:54 .
+drwxr-xr-x  3 runner runner   4096 Sep 10 11:54 ..
+drwxr-xr-x  7 runner runner   4096 Sep 10 11:54 .git
+drwxr-xr-x  3 runner runner   4096 Sep 10 11:54 .github
+-rw-r--r--  1 runner runner   1801 Sep 10 11:54 README.md
+-rw-r--r--  1 runner runner    115 Sep 10 11:58 analyst-out.txt
+-rw-r--r--  1 runner runner 117037 Sep 10 11:54 analyst-prompt.txt
+-rw-r--r--  1 runner runner 113165 Sep 10 11:54 ctx.txt
+drwxr-xr-x  2 runner runner   4096 Sep 10 11:54 inventory
+drwxr-xr-x  2 runner runner   4096 Sep 10 11:54 knowledge
+drwxr-xr-x  2 runner runner   4096 Sep 10 11:54 leads
+-rw-r--r--  1 runner runner  34950 Sep 10 11:54 probe-results.md
+drwxr-xr-x  2 runner runner   4096 Sep 10 11:54 recon-notes
+drwxr-xr-x  2 runner runner   4096 Sep 10 11:54 reports
+drwxr-xr-x  2 runner runner   4096 Sep 10 11:54 reposcan-raw
+-rw-r--r--  1 runner runner   3285 Sep 10 11:54 scope.yml
+drwxr-xr-x  2 runner runner   4096 Sep 10 11:54 scripts
+-rw-r--r--  1 runner runner     33 Sep 10 11:54 state_bigpickle.json
+-rw-r--r--  1 runner runner     33 Sep 10 11:54 state_laguna.json
+-rw-r--r--  1 runner runner     33 Sep 10 11:54 state_ling3.json
+-rw-r--r--  1 runner runner     33 Sep 10 11:54 state_longcat.json
+-rw-r--r--  1 runner runner     33 Sep 10 11:54 state_mimo.json
+-rw-r--r--  1 runner runner     33 Sep 10 11:54 state_nemotron3.json
+drwxr-xr-x  2 runner runner   4096 Sep 10 11:54 triage
+[0m
+[0m→ [0mRead probe-results.md[90m [limit=100, offset=1][0m
+[0m→ [0mRead probe-results.md[90m [limit=100, offset=373][0m
+[91m[1mError: [0mError from provider (Console): Upstream request failed: [404] Provider returned error
