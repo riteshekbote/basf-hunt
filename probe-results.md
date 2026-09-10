@@ -477,3 +477,17 @@ https://my.basf.com/.auth -> 200 len=204983
 
 ## 2026-09-10 16:37:10 UTC
 
+
+## 2026-09-10 19:14:33 UTC
+https://experience.basf.com/crx/de -> HTTP 404
+https://experience.basf.com/system/console -> HTTP 404
+https://experience.basf.com/libs/granite/ui/content/dumplibs.html -> HTTP 404
+https://experience.basf.com/content -> HTTP 404
+https://experience.basf.com/apps -> HTTP 404
+https://experience.basf.com/etc -> HTTP 404
+https://experience.basf.com/bin/receive -> HTTP 404
+https://repfinder.basf.com/content/repfinder/en.model.json -> HTTP 404
+https://repfinder.basf.com/content/repfinder/en.model.txt -> HTTP 404
+https://repfinder.basf.com/content/repfinder/en.tidy.-1.json -> HTTP 404
+https://repfinder.basf.com/content/repfinder/en.infinity.json -> HTTP 404
+https://repfinder.basf.com/jcr:content.model.json -> HTTP 404
