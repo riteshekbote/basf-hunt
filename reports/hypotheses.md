@@ -1006,3 +1006,23 @@
 - LEARN: ACCEPTED RECON @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected "Invalid ApiKey" — key scope exhausted
 - LEARN: REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM/SigV4 authorizer, x-api-key not credential class
 - LEARN: REJECTED BUSLOGIC @ procurement.basf.com/tm/passage KM servlet: all parameterized requests return HTTP 500 (SAP runtime error) across 4 portals, guest role rend
+
+## RANKED HYPOTHESES 2026-09-10 06:45:35 UTC
+- [80] my.basf.com: Public OAuth Client with Refresh Token, No PKCE — ATO via Code Interception (from art/lead_nemotron3.txt)
+- [42] secsys.basf.com/api/processes/preLoginProcesses: secsys.basf.com pre-auth process initiation endpoint bypass via workflow state manipulation (from art/lead_bigpickle.txt)
+- NEXT(hypotheses-bigpickle.txt): HUMAN: From program operator (bugs.olivermaicher.eu) request a sandbox supplier/intern test account to (a) run the interactive OIDC code-exchange on client `86c
+- NEXT(hypotheses-nemotron3.txt): PROBE: GET https://secsys.basf.com/ — capture full HTML/JS (Angular bundles, inline config, API base paths) for endpoint enumeration; then GET https://secsys.ba
+- LEARN: REJECTED AUTH @ secsys.basf.com/api/processes/preLoginProcesses: all /api/* endpoints return 401 JSON with userLoggedOut; pre-auth workflow bypass speculative; 
+- LEARN: ACCEPTED RECON @ secsys.basf.com: live "Smart ID Self-Service" (Technology Nexus, v5.3.1+) Angular SPA, 200/3179B; sibling hosts resolvable; qual instances Clou
+- LEARN: ACCEPTED RECON @ basf.login.apigee.com: full Apigee OAuth identity surface mapped via OIDC discovery + SAML metadata; only config endpoints return 200; ROPC/imp
+- LEARN: REJECTED RECON @ basf.login.apigee.com: standard Apigee Edge SSO identity-zone login — not a custom BASF OAuth provider; exploitation requires valid BASF creds
+- LEARN: ACCEPTED RECON @ rep.basf.com: live "Bestandskundenplattform" behind Azure Front Door; Spring Boot + Wicket; Actuator at `/actuator` (HAL) + `/actuator/health` 
+- LEARN: REJECTED MISCONFIG @ rep.basf.com/actuator/*: all 16 sensitive actuator endpoints return 404; path traversal and content-negotiation blocked by Spring Boot path
+- LEARN: ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes) across all 09-09 re-probes; SAML2 
+- LEARN: ACCEPTED RECON @ my.basf.com/.auth: HTTP 200/205005B SPA fallback re-confirmed — `/.auth` remains client-side callback, no server-side token surface
+- LEARN: REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle — EasyAuth not exposed; `/.auth` is client-side callback route
+- LEARN: ACCEPTED RECON @ *.api.basf.com estate: full 9-host unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404
+- LEARN: REJECTED MISCONFIG @ api.basf.com: resolves to 127.0.0.1 (loopback); connection refused — dead/internal-only DNS entry
+- LEARN: ACCEPTED RECON @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected "Invalid ApiKey" — key scope exhausted
+- LEARN: REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM/SigV4 authorizer, x-api-key not credential class
+- LEARN: REJECTED BUSLOGIC @ procurement.basf.com/tm/passage KM servlet: all parameterized requests return HTTP 500 (SAP runtime error) across 4 portals, guest role rend

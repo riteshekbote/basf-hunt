@@ -1,14 +1,19 @@
-## 2026-09-10 01:32:56 UTC [target] (model nemotron3)
-[CHANGED] secsys.basf.com — probe completed: live "Smart ID Self-Service" (Technology Nexus, v5.3.1+) Angular SPA confirmed at root (200/3179B); sibling hosts `bsh.secsys`, `secsys-visitor`, `secsys-ssp-qual`, `bsh-qual`, `visitor-secsys-ssp-qual` resolvable; qual instances Cloudflare-JS-challenged
-[CHANGED] basf.login.apigee.com — full Apigee OAuth identity surface mapped via OIDC discovery + SAML metadata; only config endpoints (discovery, metadata, jwks) return 200; `/register`, `/clients`, `/admin`, `/oauth/clients` all 401/404; ROPC/implicit grants are stock Edge SSO config
-[CHANGED] rep.basf.com — Spring Boot + Wicket behind Azure Front Door confirmed; Actuator at `/actuator` (HAL) + `/actuator/health` (UP); all 16 sensitive endpoints return 404; custom error handler returns status 999; Wicket bookmarkable/resource/page paths untested
+## 2026-09-10 06:45:25 UTC [target] (model nemotron3)
+[NEW] secsys.basf.com — Angular SPA root confirmed (200/3179B, Technology Nexus v5.3.1+), sibling hosts `bsh.secsys`, `secsys-visitor`, `secsys-ssp-qual`, `bsh-qual`, `visitor-secsys-ssp-qual` resolvable; qual instances Cloudflare-JS-challenged; zero deep enum beyond root
+[NEW] basf.login.apigee.com — full Apigee OAuth identity surface mapped via OIDC discovery + SAML metadata; only config endpoints (discovery, metadata, jwks) return 200; `/register`, `/clients`, `/admin`, `/oauth/clients` all 401/404; ROPC/implicit grants are stock Edge SSO config
+[NEW] rep.basf.com — Spring Boot + Wicket behind Azure Front Door confirmed; Actuator at `/actuator` (HAL) + `/actuator/health` (UP); all 16 sensitive endpoints return 404; custom error handler returns status 999; Wicket bookmarkable/resource/page paths untested
 [CHANGED] federation.basf.com — NAM OIDC discovery reconfirmed unchanged across all 09-09 re-probes (ROPC/hybrid grants, plain+S256 PKCE, registration scopes); SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434B) with SSO/SLO/SOAP endpoints
 [CHANGED] my.basf.com/.auth — HTTP 200/205005B SPA fallback re-confirmed; `/.auth` remains client-side callback route (Azure Static Web Apps built-in auth), no server-side token surface
 [CHANGED] *.api.basf.com estate (9 hosts) — full unauth surface reconfirmed end-to-end, zero reachable endpoints beyond auth gates/404
 [CHANGED] prod.api.basf.com — 66 proxy paths all 404 except `/productinformation` (401 VerifyAPIKey); 4 browser-sourced keys (core/pi/csp/navigator) rejected "Invalid ApiKey" — key scope exhausted
 [CHANGED] api.commerce.basf.com — 8 stage prefixes all `MissingAuthenticationTokenException`; AWS REST API Gateway IAM/SigV4 authorizer, x-api-key not a credential class
 [CHANGED] procurement.basf.com/tm/passage-europe/vss3.basf.com SAP KM servlet — all parameterized requests return HTTP 500 (SAP runtime error) across 4 portals; guest role renders zero content; vss3 WAF-blocks KM servlet (235B); no non-500 document output ever observed
-[PRIO]
+[PRIO] my.basf.com, 8.5, attack_surface=9 business_value=9 tech_exposure=8 gate_ease=10 cloud_surface=7 freshness=8
+[PRIO] secsys.basf.com, 7.8, attack_surface=8 business_value=8 tech_exposure=7 gate_ease=10 cloud_surface=6 freshness=9
+[PRIO] rep.basf.com, 7.2, attack_surface=7 business_value=8 tech_exposure=6 gate_ease=10 cloud_surface=7 freshness=8
+[PRIO] federation.basf.com, 6.5, attack_surface=6 business_value=7 tech_exposure=8 gate_ease=5 cloud_surface=7 freshness=6
+[PRIO] basf.login.apigee.com, 5.8, attack_surface=6 business_value=6 tech_exposure=7 gate_ease=5 cloud_surface=8 freshness=8
+[PRIO] procurement.basf.com, 5.2, attack_surface=5 business_value=7 tech_exposure=5 gate_ease=3 cloud_surface=6 freshness=6
 [HYP] Public OAuth Client with Refresh Token, No PKCE — ATO via Code Interception
 class: OATH
 asset: my.basf.com / federation.basf.com/nidp/oauth/nam/authz
@@ -41,7 +46,7 @@ testability: PASSIVE
 [FINAL] 1. Public OAuth Client with Refresh Token, No PKCE — ATO via Code Interception (confidence 80, AUTH_HELPED)
 [FINAL] 2. Wicket Bookmarkable Page Access Bypass on Customer Portal (confidence 55, PASSIVE)
 [FINAL] 3. Smart ID Self-Service Angular SPA — IDOR/BOLA on Identity Management Endpoints (confidence 50, PASSIVE)
-[NEXT] PROBE: GET https://secsys.basf.com/api/users/me, GET https://secsys.basf.com/api/devices, GET https://secsys.basf.com/services/, GET https://secsys.basf.com/rest/ (1 rps, read-only) — enumerate identity management API surface after root Angular SPA confirmed
+[NEXT] PROBE: GET https://secsys.basf.com/ — capture full HTML/JS (Angular bundles, inline config, API base paths) for endpoint enumeration; then GET https://secsys.basf.com/api/users/me, GET https://secsys.basf.com/api/devices, GET https://secsys.basf.com/services/, GET https://secsys.basf.com/rest/ (1 rps, read-only) — enumerate identity management API surface after root Angular SPA confirmed
 [LEARN] ACCEPTED RECON @ secsys.basf.com: live "Smart ID Self-Service" (Technology Nexus, v5.3.1+) Angular SPA, 200/3179B; sibling hosts resolvable; qual instances Cloudflare-JS-challenged
 [LEARN] ACCEPTED RECON @ basf.login.apigee.com: full Apigee OAuth identity surface mapped via OIDC discovery + SAML metadata; only config endpoints return 200; ROPC/implicit grants are stock Edge SSO config
 [LEARN] REJECTED RECON @ basf.login.apigee.com: standard Apigee Edge SSO identity-zone login — not a custom BASF OAuth provider; exploitation requires valid BASF creds

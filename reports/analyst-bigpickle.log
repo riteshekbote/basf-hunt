@@ -12127,3 +12127,41 @@ status=200 size=3179 ct=text/html;charset=ISO-8859-1
 [93m[1m! [0mpermission requested: external_directory (/tmp/*); auto-rejecting
 [0m✗ [0mcat /tmp/secsys_root.html | grep -oiP '(api|rest|v[0-9]|endpoint|login|config|token|auth|saml|oauth)' | sort -u failed
 [91m[1mError: [0mThe user rejected permission to use this specific tool call.
+===== ANALYST bigpickle 2026-09-10 06:45:35 UTC =====
+[0m
+> build · big-pickle
+[0m
+STEP 1 — DELTA
+- NO_DELTA: All 19+ hosts reconfirmed; secsys.basf.com now fully mapped (SPA index + /api/* all 401 JSON authenticated); remaining hypotheses require sandbox credentials; no new unauthenticated exposure discovered.
+
+STEP 2 — PRIORITIZE
+- [PRIO] secsys.basf.com, 28/100, attack_surface=4, business_value=5, tech_exposure=3, gate_ease=2, cloud_surface=0, freshness=4
+- [PRIO] my.basf.com, 55/100, attack_surface=4, business_value=8, tech_exposure=7, gate_ease=2, cloud_surface=2, freshness=4 (requires AUTH_HELPED)
+- [PRIO] federation.basf.com, 65/100, attack_surface=5, business_value=9, tech_exposure=8, gate_ease=1, cloud_surface=0, freshness=5 (requires AUTH_HELPED)
+
+STEP 3 — HYPOTHESES
+[HYP] secsys.basf.com pre-auth process initiation endpoint bypass via workflow state manipulation
+class: AUTH
+asset: secsys.basf.com/api/processes/preLoginProcesses
+confidence: 42
+reasoning: Angular SPA at root (200/3179B) identifies Technology Nexus Smart ID Self-Service v5.3.1+; reverse-engineered client bundles show /api/* endpoints (forms, processes, fillinformation) gated by accessToken cookie Path=/api; preLoginProcesses endpoint designed for unauthenticated workflow initiation but returns 401 JSON with userLoggedOut message; login configuration shows clientCert and clientPassword disabled, SAML-only; product class has history of pre-auth workflow bypass in similar deployments.
+evidence_needed: any /api/* endpoint returning 200 JSON (config/processes/forms) without accessToken cookie; preLoginProcesses accepting workflow parameters without authentication.
+verify_steps: PASSIVE — GET /api/processes/preLoginProcesses (done, 401); POST /api/processes/initiate with JSON body {workflowType: "activation"} (expected 401); OPTIONS /api base; GET /api/forms?entityReference=test.
+impact: unauthenticated workflow initiation on BASF smart-card identity system; MEDIUM conditional.
+testability: PASSIVE
+
+STEP 4 — SELF-CRITIQUE
+[PARKED] secsys.basf.com pre-auth process initiation: confidence 42 < 40 threshold; all /api/* endpoints confirmed 401 authenticated; no bypass vector identified; product documentation confirms SAML-only authentication; hypothesis remains speculative without evidence of pre-auth workflow exposure.
+
+[FINAL] Survivors ranked:
+1. [55] my.basf.com: Public OAuth Client with Refresh Token, No PKCE — ATO via Code Interception (AUTH_HELPED)
+2. [65] federation.basf.com: NAM ROPC password grant — MFA-bypass token issuance (AUTH_HELPED)
+
+STEP 5 — NEXT ACTION
+[NEXT] HUMAN: From program operator (bugs.olivermaicher.eu) request a sandbox supplier/intern test account to (a) run the interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` recording presence/absence of `code_challenge` and whether `refresh_token` rotates on double reuse, and (b) retest NAM ROPC `grant_type=password` at `/nidp/oauth/nam/token` with a junk-but-format-valid confidential client. Without this credential both surviving findings stay unconfirmed and unreportable; secsys is now also closed — no further unauthenticated probe advances POC.
+
+STEP 6 — LEARNING
+[LEARN] REJECTED AUTH @ secsys.basf.com/api/processes/preLoginProcesses: all /api/* endpoints return 401 JSON with userLoggedOut; pre-auth workflow bypass speculative; SAML-only authentication confirmed; no evidence of unauthenticated access.
+
+STEP 7 — RISK
+[RISK] BASF SE: 22 — Rotation adds secsys estate (now 19+ hosts) fully mapped and auth-gated like everything else; zero new exploitable exposure. Surviving findings remain the two credential-blocked OAuth design issues (NAM ROPC MFA-bypass, my.basf.com refresh-without-PKCE): high-severity but unprovable without sandbox access. Program sat at decision point — request test creds or close with two informational/high-conditional findings. Pipeline degraded (3/5 models down) per prior rotation.

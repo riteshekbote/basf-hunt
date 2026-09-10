@@ -260,3 +260,4 @@
 - 2026-09-10 ACCEPTED RECON @ prod.api.basf.com: 66 proxy paths all 404 except `/productinformation` (401); 4 browser keys rejected "Invalid ApiKey" — key scope exhausted
 - 2026-09-10 REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM/SigV4 authorizer, x-api-key not credential class
 - 2026-09-10 REJECTED BUSLOGIC @ procurement.basf.com/tm/passage KM servlet: all parameterized requests return HTTP 500 (SAP runtime error) across 4 portals, guest role renders zero content; vss3 WAF-blocks; no non-500 document output ever observed — SAP-estate unauth doc class conclusively closed
+- 2026-09-10 REJECTED AUTH @ secsys.basf.com/api/processes/preLoginProcesses: all /api/* endpoints return 401 JSON with userLoggedOut; pre-auth workflow bypass speculative; SAML-only authentication confirmed; no evidence of unauthenticated access.
