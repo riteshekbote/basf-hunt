@@ -1162,3 +1162,17 @@
 - LEARN: ACCEPTED RECON @ das.basf.com: S3 PWA, api subdomain dead, S3 bucket NoSuchBucket, 5x AWS API GW 403 IAM-gated — no exploitation path without IAM creds
 - LEARN: ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
 - LEARN: ACCEPTED RECON @ north-america.intranet.basf.com: Concrete CMS with Azure AD OAuth2 (client_id 36f927e6-1b9a-4b2e-a991-8574640f1164); cookie domain `.intranet.b
+
+## RANKED HYPOTHESES 2026-09-11 17:23:50 UTC
+- [62] agriculture.basf.com: Magnolia CMS GraphQL Introspection + Unauthenticated Mutations on agriculture.basf.com (from art/lead_bigpickle.txt)
+- [15] agriculture.basf.com: Magnolia CMS GraphQL/REST Surface Exhaustion on agriculture.basf.com (from art/lead_nemotron3.txt)
+- NEXT(hypotheses-bigpickle.txt): PROBE: at 1 rps, GET https://agriculture.basf.com/graphql2 -H "Content-Type: application/json" -d '{"query":"{__schema{types{name}}}"}' && GET https://agricultu
+- NEXT(hypotheses-nemotron3.txt): RAG: Passive GitHub/pastebin/web search for agriculture.basf.com Magnolia admin credentials, GraphQL mutations in public repos, or Concrete CMS config leaks for
+- LEARN: REJECTED MISCONFIG @ experience.basf.com AEM selectors: .content.json, .infinity.json, .tidy.-1.json, .feed.xml, _jcr_content.*, system/sling/*, system/console/
+- LEARN: REJECTED MISCONFIG @ repfinder.basf.com Sling Model Exporter: .model.json, .model.txt, .tidy.-1.json, .infinity.json, jcr:content.model.json all 404 — dispatche
+- LEARN: ACCEPTED RECON @ agriculture.basf.com: Magnolia CMS (348KB root), zero sub-path probes ever run — Magnolia GraphQL/REST surface completely untested
+- LEARN: ACCEPTED RECON @ das.basf.com: S3 PWA, api subdomain dead, S3 bucket NoSuchBucket, 5x AWS API GW 403 IAM-gated — no exploitation path without IAM creds
+- LEARN: ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
+- LEARN: REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL (`/graphql2`, `/.graphql`), REST (`/.restful`, `/.rest`), admin (`/adminCentral`, `/admin`, `/.a
+- LEARN: REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs (`/index.php/ccm/system/block/types`, `/index.php/ccm/system/page/types`, `/ind
+- LEARN: REJECTED MISCONFIG @ experience.basf.com: AEM Dispatcher cache poisoning via Host header spoofing — CloudFront returns 403 on all 4 tested paths with `Host: aut

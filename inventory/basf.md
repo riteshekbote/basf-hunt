@@ -393,3 +393,5 @@ www.basf.com
 - CHANGED secsys.basf.com: /api/* endpoints return HTTP 200 len=246 = WAF "Request Rejected" page (NOT API data) across all 3 hosts (secsys, bsh.secsys, secsys-visitor); WAF returns 200 instead of 403
 - CHANGED das.basf.com: S3-hosted Ionic PWA; api.das.basf.com dead (NXDOMAIN); S3 bucket NoSuchBucket; 5x AWS API GW endpoints 403 IAM-gated — no exploitation path without IAM creds
 - CHANGED north-america.intranet.basf.com: Concrete CMS with Azure AD OAuth2 (client_id 36f927e6-1b9a-4b2e-a991-8574640f1164); cookie domain `.intranet.basf.com` shared; Concrete known unauth info-disclosure ve
+
+## 2026-09-11 17:23:50 UTC
