@@ -375,3 +375,5 @@ www.basf.com
 - NEW ncm.basf.com + cloud.basf.com — Cloudflare JS challenge (403, cf-mitigated:challenge); no bypass possible
 - CHANGED secsys.basf.com/api/users/me + /api/devices — HTTP 200 len=246 = WAF block page ("Request Rejected"), NOT API data; WAF returns 200 instead of 403; same across all 3 secsys hosts
 - CHANGED intranet.basf.com redirect_uri — Azure AD shows login for both valid/invalid redirect_uri; validation at token exchange; without auth cannot confirm open redirect
+
+## 2026-09-11 04:32:31 UTC

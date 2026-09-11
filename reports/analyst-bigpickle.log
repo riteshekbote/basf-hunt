@@ -14063,3 +14063,211 @@ STEP 6 — LEARNING
 
 STEP 7 — RISK
 [RISK] BASF SE: 28 — Unauthenticated exploitable surface re-verified zero across 25+ hosts this cycle (AEM author class now closed on NXDOMAIN 15/15 variant sweep; all prior auth-gates/WAF/mTLS confirmations stable). Residual risk is entirely conditional-high OAuth on the corporate identity plane: NAM provider-level ROPC grant, my.basf.com public client issuing refresh_token with zero PKCE, plus the newly-targeted missing-`state` login-CSRF chain. Each is provable only with one sandbox credential; without it all three remain unreportable design/posture findings. Program at decision point — grant test creds or close with informational/high-conditional OAuth items.
+===== ANALYST bigpickle 2026-09-11 04:32:31 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la && ls -la art/ 2>/dev/null; ls -la inventory/ 2>/dev/null; ls -la *.md 2>/dev/null
+total 368
+drwxr-xr-x 12 runner runner   4096 Sep 11 04:27 .
+drwxr-xr-x  3 runner runner   4096 Sep 11 04:27 ..
+drwxr-xr-x  7 runner runner   4096 Sep 11 04:27 .git
+drwxr-xr-x  3 runner runner   4096 Sep 11 04:27 .github
+-rw-r--r--  1 runner runner   1801 Sep 11 04:27 README.md
+-rw-r--r--  1 runner runner     32 Sep 11 04:27 analyst-out.txt
+-rw-r--r--  1 runner runner 123039 Sep 11 04:27 analyst-prompt.txt
+-rw-r--r--  1 runner runner 119167 Sep 11 04:27 ctx.txt
+drwxr-xr-x  2 runner runner   4096 Sep 11 04:27 inventory
+drwxr-xr-x  2 runner runner   4096 Sep 11 04:27 knowledge
+drwxr-xr-x  2 runner runner   4096 Sep 11 04:27 leads
+-rw-r--r--  1 runner runner  37594 Sep 11 04:27 probe-results.md
+drwxr-xr-x  2 runner runner   4096 Sep 11 04:27 recon-notes
+drwxr-xr-x  2 runner runner   4096 Sep 11 04:27 reports
+drwxr-xr-x  2 runner runner   4096 Sep 11 04:27 reposcan-raw
+-rw-r--r--  1 runner runner   3285 Sep 11 04:27 scope.yml
+drwxr-xr-x  2 runner runner   4096 Sep 11 04:27 scripts
+-rw-r--r--  1 runner runner     33 Sep 11 04:27 state_bigpickle.json
+-rw-r--r--  1 runner runner     33 Sep 11 04:27 state_laguna.json
+-rw-r--r--  1 runner runner     33 Sep 11 04:27 state_ling3.json
+-rw-r--r--  1 runner runner     33 Sep 11 04:27 state_longcat.json
+-rw-r--r--  1 runner runner     33 Sep 11 04:27 state_mimo.json
+-rw-r--r--  1 runner runner     33 Sep 11 04:27 state_nemotron3.json
+drwxr-xr-x  2 runner runner   4096 Sep 11 04:27 triage
+total 52
+drwxr-xr-x  2 runner runner  4096 Sep 11 04:27 .
+drwxr-xr-x 12 runner runner  4096 Sep 11 04:27 ..
+-rw-r--r--  1 runner runner 44373 Sep 11 04:27 basf.md
+-rw-r--r-- 1 runner runner  1801 Sep 11 04:27 README.md
+-rw-r--r-- 1 runner runner 37594 Sep 11 04:27 probe-results.md
+[0m
+[0m→ [0mRead probe-results.md
+[0m
+[0m$ [0mls -la leads/ knowledge/ recon-notes/ triage/ reports/ scripts/ reposcan-raw/ .github/workflows/ 2>/dev/null
+.github/workflows/:
+total 44
+drwxr-xr-x 2 runner runner  4096 Sep 11 04:27 .
+drwxr-xr-x 3 runner runner  4096 Sep 11 04:27 ..
+-rw-r--r-- 1 runner runner 14328 Sep 11 04:27 hunt.yml
+-rw-r--r-- 1 runner runner  5367 Sep 11 04:27 reposcan.yml
+-rw-r--r-- 1 runner runner  1018 Sep 11 04:27 sync-issues.yml
+-rw-r--r-- 1 runner runner  6490 Sep 11 04:27 triage.yml
+
+knowledge/:
+total 68
+drwxr-xr-x  2 runner runner  4096 Sep 11 04:27 .
+drwxr-xr-x 12 runner runner  4096 Sep 11 04:27 ..
+-rw-r--r--  1 runner runner 58306 Sep 11 04:27 index.md
+
+leads/:
+total 824
+drwxr-xr-x  2 runner runner   4096 Sep 11 04:27 .
+drwxr-xr-x 12 runner runner   4096 Sep 11 04:27 ..
+-rw-r--r--  1 runner runner 350046 Sep 11 04:27 lead-bigpickle.md
+-rw-r--r--  1 runner runner   2652 Sep 11 04:27 lead-laguna.md
+-rw-r--r--  1 runner runner   2600 Sep 11 04:27 lead-ling3.md
+-rw-r--r--  1 runner runner   2704 Sep 11 04:27 lead-longcat.md
+-rw-r--r--  1 runner runner     18 Sep 11 04:27 lead-mimo.md
+-rw-r--r--  1 runner runner 457350 Sep 11 04:27 lead-nemotron3.md
+-rw-r--r--  1 runner runner   5459 Sep 11 04:27 reposcan-basf.md
+
+recon-notes/:
+total 20
+drwxr-xr-x  2 runner runner 4096 Sep 11 04:27 .
+drwxr-xr-x 12 runner runner 4096 Sep 11 04:27 ..
+-rw-r--r--  1 runner runner 1005 Sep 11 04:27 DEDICATED-DEEP.md
+-rw-r--r--  1 runner runner 7833 Sep 11 04:27 DEEPER-FINDINGS.md
+
+reports/:
+total 2344
+drwxr-xr-x  2 runner runner    4096 Sep 11 04:27 .
+drwxr-xr-x 12 runner runner    4096 Sep 11 04:27 ..
+-rw-r--r--  1 runner runner 1275920 Sep 11 04:27 analyst-bigpickle.log
+-rw-r--r--  1 runner runner   11284 Sep 11 04:27 analyst-laguna.log
+-rw-r--r--  1 runner runner   11232 Sep 11 04:27 analyst-ling3.log
+-rw-r--r--  1 runner runner   11336 Sep 11 04:27 analyst-longcat.log
+-rw-r--r--  1 runner runner  887884 Sep 11 04:27 analyst-nemotron3.log
+-rw-r--r--  1 runner runner    4313 Sep 11 04:27 hypotheses-bigpickle.txt
+-rw-r--r--  1 runner runner      51 Sep 11 04:27 hypotheses-laguna.txt
+-rw-r--r--  1 runner runner      50 Sep 11 04:27 hypotheses-ling3.txt
+-rw-r--r--  1 runner runner      52 Sep 11 04:27 hypotheses-longcat.txt
+-rw-r--r--  1 runner runner   11683 Sep 11 04:27 hypotheses-nemotron3.txt
+-rw-r--r--  1 runner runner  167912 Sep 11 04:27 hypotheses.md
+-rw-r--r--  1 runner runner     249 Sep 11 04:27 valid-bugs.md
+
+reposcan-raw/:
+total 12
+drwxr-xr-x  2 runner runner 4096 Sep 11 04:27 .
+drwxr-xr-x 12 runner runner 4096 Sep 11 04:27 ..
+-rw-r--r--  1 runner runner   67 Sep 11 04:27 summary.txt
+
+scripts/:
+total 28
+drwxr-xr-x  2 runner runner  4096 Sep 11 04:27 .
+drwxr-xr-x 12 runner runner  4096 Sep 11 04:27 ..
+-rw-r--r--  1 runner runner 16987 Sep 11 04:27 sync-issues.py
+
+triage/:
+total 260
+drwxr-xr-x  2 runner runner  4096 Sep 11 04:27 .
+drwxr-xr-x 12 runner runner  4096 Sep 11 04:27 ..
+-rw-r--r--  1 runner runner     0 Sep 11 04:27 .gitkeep
+-rw-r--r--  1 runner runner   171 Sep 11 04:27 run-2026-09-03-11-40.md
+-rw-r--r--  1 runner runner   170 Sep 11 04:27 run-2026-09-03-15-10.md
+-rw-r--r--  1 runner runner  5769 Sep 11 04:27 run-2026-09-03-18-42.md
+-rw-r--r--  1 runner runner   189 Sep 11 04:27 run-2026-09-03-21-29.md
+-rw-r--r--  1 runner runner   186 Sep 11 04:27 run-2026-09-03-23-30.md
+-rw-r--r--  1 runner runner   221 Sep 11 04:27 run-2026-09-04-01-18.md
+-rw-r--r--  1 runner runner   196 Sep 11 04:27 run-2026-09-04-05-59.md
+-rw-r--r--  1 runner runner   254 Sep 11 04:27 run-2026-09-04-10-40.md
+-rw-r--r--  1 runner runner   293 Sep 11 04:27 run-2026-09-04-14-32.md
+-rw-r--r--  1 runner runner   211 Sep 11 04:27 run-2026-09-04-17-45.md
+-rw-r--r--  1 runner runner   228 Sep 11 04:27 run-2026-09-04-20-00.md
+-rw-r--r--  1 runner runner   253 Sep 11 04:27 run-2026-09-04-22-10.md
+-rw-r--r--  1 runner runner   166 Sep 11 04:27 run-2026-09-05-00-07.md
+-rw-r--r--  1 runner runner   162 Sep 11 04:27 run-2026-09-05-04-31.md
+-rw-r--r--  1 runner runner   192 Sep 11 04:27 run-2026-09-05-08-33.md
+-rw-r--r--  1 runner runner  4975 Sep 11 04:27 run-2026-09-05-12-01.md
+-rw-r--r--  1 runner runner   189 Sep 11 04:27 run-2026-09-05-14-46.md
+-rw-r--r--  1 runner runner   234 Sep 11 04:27 run-2026-09-05-16-59.md
+-rw-r--r--  1 runner runner   237 Sep 11 04:27 run-2026-09-05-18-48.md
+-rw-r--r--  1 runner runner   352 Sep 11 04:27 run-2026-09-05-20-48.md
+-rw-r--r--  1 runner runner   181 Sep 11 04:27 run-2026-09-05-22-26.md
+-rw-r--r--  1 runner runner 12567 Sep 11 04:27 run-2026-09-06-00-12.md
+-rw-r--r--  1 runner runner   781 Sep 11 04:27 run-2026-09-06-04-41.md
+-rw-r--r--  1 runner runner   161 Sep 11 04:27 run-2026-09-06-09-06.md
+-rw-r--r--  1 runner runner  2126 Sep 11 04:27 run-2026-09-06-12-54.md
+-rw-r--r--  1 runner runner   262 Sep 11 04:27 run-2026-09-06-15-52.md
+-rw-r--r--  1 runner runner   571 Sep 11 04:27 run-2026-09-06-17-51.md
+-rw-r--r--  1 runner runner   161 Sep 11 04:27 run-2026-09-06-19-42.md
+-rw-r--r--  1 runner runner   143 Sep 11 04:27 run-2026-09-06-21-49.md
+-rw-r--r--  1 runner runner   261 Sep 11 04:27 run-2026-09-06-23-19.md
+-rw-r--r--  1 runner runner   163 Sep 11 04:27 run-2026-09-07-01-05.md
+-rw-r--r--  1 runner runner   152 Sep 11 04:27 run-2026-09-07-06-07.md
+-rw-r--r--  1 runner runner   209 Sep 11 04:27 run-2026-09-07-12-35.md
+-rw-r--r--  1 runner runner   847 Sep 11 04:27 run-2026-09-07-17-53.md
+-rw-r--r--  1 runner runner   190 Sep 11 04:27 run-2026-09-07-20-53.md
+-rw-r--r--  1 runner runner   207 Sep 11 04:27 run-2026-09-07-23-07.md
+-rw-r--r--  1 runner runner   300 Sep 11 04:27 run-2026-09-08-01-13.md
+-rw-r--r--  1 runner runner   268 Sep 11 04:27 run-2026-09-08-05-59.md
+-rw-r--r--  1 runner runner   150 Sep 11 04:27 run-2026-09-08-10-37.md
+-rw-r--r--  1 runner runner   148 Sep 11 04:27 run-2026-09-08-14-45.md
+-rw-r--r--  1 runner runner   254 Sep 11 04:27 run-2026-09-08-18-10.md
+-rw-r--r--  1 runner runner   188 Sep 11 04:27 run-2026-09-08-21-10.md
+-rw-r--r--  1 runner runner   228 Sep 11 04:27 run-2026-09-08-23-24.md
+-rw-r--r--  1 runner runner   242 Sep 11 04:27 run-2026-09-09-01-29.md
+-rw-r--r--  1 runner runner   156 Sep 11 04:27 run-2026-09-09-06-37.md
+-rw-r--r--  1 runner runner   268 Sep 11 04:27 run-2026-09-09-11-48.md
+-rw-r--r--  1 runner runner   224 Sep 11 04:27 run-2026-09-09-15-29.md
+-rw-r--r--  1 runner runner   248 Sep 11 04:27 run-2026-09-09-18-49.md
+-rw-r--r--  1 runner runner   240 Sep 11 04:27 run-2026-09-09-21-21.md
+-rw-r--r--  1 runner runner   260 Sep 11 04:27 run-2026-09-09-23-28.md
+-rw-r--r--  1 runner runner   192 Sep 11 04:27 run-2026-09-10-01-24.md
+-rw-r--r--  1 runner runner   251 Sep 11 04:27 run-2026-09-10-06-36.md
+-rw-r--r--  1 runner runner   221 Sep 11 04:27 run-2026-09-10-11-46.md
+-rw-r--r--  1 runner runner   724 Sep 11 04:27 run-2026-09-10-15-25.md
+-rw-r--r--  1 runner runner   228 Sep 11 04:27 run-2026-09-10-18-39.md
+-rw-r--r--  1 runner runner   194 Sep 11 04:27 run-2026-09-10-21-11.md
+-rw-r--r--  1 runner runner   181 Sep 11 04:27 run-2026-09-10-23-11.md
+-rw-r--r--  1 runner runner   207 Sep 11 04:27 run-2026-09-11-01-06.md
+[0m
+[0m→ [0mRead triage/run-2026-09-11-01-06.md
+[0m→ [0mRead reports/hypotheses-bigpickle.txt
+[0m→ [0mRead reports/hypotheses-nemotron3.txt
+[0m→ [0mRead recon-notes/DEEPER-FINDINGS.md
+[0m
+[0m$ [0mtimeout 15 curl -s -o /dev/null -w "%{http_code} %{time_total}\n" https://experience.basf.com/ 2>&1; echo "---"; timeout 15 curl -sI https://repfinder.basf.com/ 2>&1 | head -20
+200 0.277435
+---
+HTTP/2 200 
+server: CloudFront
+content-type: text/html;charset=utf-8
+content-length: 137935
+date: Fri, 11 Sep 2026 04:28:43 GMT
+x-vhost: repfinder
+strict-transport-security: max-age=31536000
+x-content-type-options: nosniff
+last-modified: Thu, 10 Sep 2026 20:34:49 GMT
+etag: "21acf-65b26e63523e2"
+accept-ranges: bytes
+x-dispatcher: dispatcher2useast1-21425334
+vary: Accept-Encoding
+x-cache: Miss from cloudfront
+via: 1.1 97da9ca778c0e982c2aa8390c798ac9c.cloudfront.net (CloudFront)
+x-amz-cf-pop: DFW59-P7
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: S3pgXGiG6bado-bRTHGtsejPa1BdXbe6WyJLdfTNb8uZBGbzEeK8TA==
+content-security-policy: frame-ancestors 'self'; object-src 'none'; upgrade-insecure-requests; script-src 'self' rum.hlx.page assets.adobedtm.com code.jquery.com maxcdn.bootstrapcdn.com player.vzaar.com cdnjs.cloudflare.com repfinder.basf.com maps.googleapis.com tags.tiqcdn.com tag.aticdn.net www.youtube.com cdn.cookielaw.org pixel.byspotify.com www.googletagmanager.com secure.quantserve.com js.adsrvr.org connect.facebook.net rules.quantcount.com googleads.g.doubleclick.net cloud.us-ag.basf.com www.youtube-nocookie.com www.google.com unpkg.com ajax.googleapis.com connect.farmjournal.net www.recaptcha.net www.gstatic.com cdn.jsdelivr.net api.mapbox.com cdn.datatables.net 'unsafe-inline' 'unsafe-eval';worker-src 'self' blob:;
+[0m
+[0m$ [0mtimeout 20 curl -s https://experience.basf.com/ -o /tmp/experience.html -w "exp:%{http_code} %{size_download}\n"; timeout 20 curl -s https://repfinder.basf.com/ -o /tmp/repfinder.html -w "rep:%{http_code} %{size_download}\n"; timeout 15 curl -s https://cloud.us-ag.basf.com/ -o /tmp/cloudusag.html -w "cloudus:%{http_code} %{size_download}\n" -D /tmp/cloudus_h.txt 2>&1; echo "---DNS---"; for h in cloud.us-ag.basf.com rum.hlx.page author-prod-aem64.basf.com author-stage-aem64.basf.com; do timeout 5 getent ahosts "$h" | head -2 | sed "s/^/[$h] /"; done
+exp:200 11445
+rep:200 137935
+cloudus:404 9
+---DNS---
+[cloud.us-ag.basf.com] 161.71.95.165   STREAM tl68vj46s3p01yd9c3crrkz8n7x8.cp-sap.sfmc-content.com
+[cloud.us-ag.basf.com] 161.71.95.165   DGRAM  
+[rum.hlx.page] 151.101.161.91  STREAM n.sni.global.fastly.net
+[rum.hlx.page] 151.101.161.91  DGRAM
+[0m
+[93m[1m! [0mpermission requested: external_directory (/tmp/*); auto-rejecting
+[0m✗ [0mRead /tmp/experience.html failed
+[91m[1mError: [0mThe user rejected permission to use this specific tool call.

@@ -519,3 +519,17 @@ https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86
 https://repfinder.basf.com/content/repfinder/en.model.json -> HTTP 404
 https://repfinder.basf.com/content/repfinder/en.model.txt -> HTTP 404
 https://repfinder.basf.com/content/repfinder/en.tidy.-1.json -> HTTP 404
+
+## 2026-09-11 04:32:46 UTC
+https://experience.basf.com/content.json -> HTTP 404
+https://experience.basf.com/content.infinity.json -> HTTP 404
+https://experience.basf.com/content.tidy.-1.json -> HTTP 404
+https://experience.basf.com/content.feed.xml -> HTTP 404
+https://experience.basf.com/jcr:content.feed.xml -> HTTP 404
+https://experience.basf.com/_jcr_content.html -> HTTP 404
+https://experience.basf.com/_jcr_content.json -> HTTP 404
+https://experience.basf.com/_jcr_content.xml -> HTTP 404
+https://experience.basf.com/libs/granite/ui/content/dumplibs.html -> HTTP 404
+https://experience.basf.com/system/sling/monitoring -> HTTP 404
+https://experience.basf.com/system/console/bundles -> HTTP 404
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
