@@ -377,3 +377,11 @@ www.basf.com
 - CHANGED intranet.basf.com redirect_uri — Azure AD shows login for both valid/invalid redirect_uri; validation at token exchange; without auth cannot confirm open redirect
 
 ## 2026-09-11 04:32:31 UTC
+
+## 2026-09-11 09:29:18 UTC
+- CHANGED experience.basf.com AEM non-standard selectors (.content.json, .infinity.json, .tidy.-1.json, .feed.xml, _jcr_content.*, system/sling/*, system/console/bundles) → all HTTP 404 (confirmed 09-11 04:32);
+- CHANGED repfinder.basf.com Sling Model Exporter (.model.json, .model.txt, .tidy.-1.json, .infinity.json, jcr:content.model.json) → all HTTP 404 (confirmed 09-10/09-11); dispatcher blocking standard AEM conten
+- NEW agriculture.basf.com — Magnolia CMS (348KB root, confirmed 09-10) — **ZERO sub-path probes** ever run; Magnolia has distinct endpoint surface from AEM (/graphql2, /.restful, /adminCentral, /.cache, /d
+- NEW das.basf.com — S3-hosted Ionic PWA; api.das.basf.com dead (NXDOMAIN via dfman.info); S3 bucket gives NoSuchBucket; 5x AWS API GW endpoints (REST, 403 IAM-gated); zero exploitation possible without IAM
+- NEW north-america.intranet.basf.com — Concrete CMS with Azure AD OAuth2 (client_id 36f927e6-1b9a-4b2e-a991-8574640f1164); cookie domain `.intranet.basf.com` shared across instances; Concrete has known una
+- NEW secsys.basf.com — Angular SPA (3179B) + Technology Nexus v5.3.1+; /api/* endpoints return 200/246B = WAF "Request Rejected" page (NOT data); sibling hosts bsh.secsys, secsys-visitor, qual instances al

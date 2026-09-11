@@ -2188,3 +2188,52 @@ testability: PASSIVE
 [NEXT] HUMAN: from bugs.olivermaicher.eu request one sandbox supplier/intern account; on first credentialed login instrument the my.basf.com→federation redirect to record (a) presence/absence of `state` and `code_challenge` in the authorize URL and callback validation, (b) refresh_token behavior on double replay, and (c) POST grant_type=password to /nidp/oauth/nam/token with a junk-but-format-valid confidential client to classify 401-invalid_client vs 400-invalid_grant. All unauthenticated avenues (incl. the AEM author-naming sweep closed NXDOMAIN 15/15) are exhausted.
 [RISK] BASF SE: 28 — Unauthenticated exploitable surface re-verified zero across 25+ hosts this cycle (AEM author class now closed on NXDOMAIN 15/15 variant sweep; all prior auth-gates/WAF/mTLS confirmations stable). Residual risk is entirely conditional-high OAuth on the corporate identity plane: NAM provider-level ROPC grant, my.basf.com public client issuing refresh_token with zero PKCE, plus the newly-targeted missing-`state` login-CSRF chain. Each is provable only with one sandbox credential; without it all three remain unreportable design/posture findings. Program at decision point — grant test creds or close with informational/high-conditional OAuth items.
 ## 2026-09-11 04:28:59 UTC [target] (model bigpickle)
+## 2026-09-11 09:12:50 UTC [target] (model bigpickle)
+[CHANGED] experience.basf.com AEM non-standard selectors (.content.json, .infinity.json, .tidy.-1.json, .feed.xml, _jcr_content.*, system/sling/*, system/console/bundles) → all HTTP 404 (confirmed 09-11 04:32); AEM publish tier fully locked down — selector-by-selector bypass class closed
+[CHANGED] repfinder.basf.com Sling Model Exporter (.model.json, .model.txt, .tidy.-1.json, .infinity.json, jcr:content.model.json) → all HTTP 404 (confirmed 09-10/09-11); dispatcher blocking standard AEM content negotiation selectors
+[NEW] agriculture.basf.com — Magnolia CMS (348KB root, confirmed 09-10) — **ZERO sub-path probes** ever run; Magnolia has distinct endpoint surface from AEM (/graphql2, /.restful, /adminCentral, /.cache, /docurl/)
+[NEW] das.basf.com — S3-hosted Ionic PWA; api.das.basf.com dead (NXDOMAIN via dfman.info); S3 bucket gives NoSuchBucket; 5x AWS API GW endpoints (REST, 403 IAM-gated); zero exploitation possible without IAM creds
+[NEW] north-america.intranet.basf.com — Concrete CMS with Azure AD OAuth2 (client_id 36f927e6-1b9a-4b2e-a991-8574640f1164); cookie domain `.intranet.basf.com` shared across instances; Concrete has known unauth surfaces (/dashboard, /index.php/login, /index.php/sitemap, /index.php/tools)
+[NEW] secsys.basf.com — Angular SPA (3179B) + Technology Nexus v5.3.1+; /api/* endpoints return 200/246B = WAF "Request Rejected" page (NOT data); sibling hosts bsh.secsys, secsys-visitor, qual instances all resolved
+[PRIO] agriculture.basf.com,7.2,attack_surface=8,business_value=7,tech_exposure=8,gate_ease=7,cloud_surface=3,freshness=10
+[PRIO] repfinder.basf.com,6.8,attack_surface=7,business_value=6,tech_exposure=7,gate_ease=8,cloud_surface=2,freshness=9
+[PRIO] north-america.intranet.basf.com,6.5,attack_surface=6,business_value=8,tech_exposure=7,gate_ease=3,cloud_surface=4,freshness=9
+[PRIO] das.basf.com,4.0,attack_surface=3,business_value=5,tech_exposure=4,gate_ease=2,cloud_surface=5,freshness=10
+[PRIO] secsys.basf.com,3.8,attack_surface=3,business_value=6,tech_exposure=4,gate_ease=1,cloud_surface=3,freshness=8
+[HYP] Magnolia CMS GraphQL introspection + REST API exposed unauthenticated on agriculture.basf.com
+class: MISCONFIG
+asset: agriculture.basf.com
+confidence: 62
+reasoning: Magnolia CMS 348KB root confirmed; zero sub-path probes ever run; Magnolia ships `/graphql2` endpoint (Content App GraphQL) enabled by default on fresh installs and often left open; also exposes `/.restful` (REST API v1) and `/docurl/` (URL-to-asset resolver); dispatcher rules vary per deployment — repfinder's AEM dispatcher blocks `.model.json` but agriculture uses Magnolia (different stack, different rules); Magnolia GraphQL introspection returns full content type tree exposing all workspace paths (contacts, products, orders) including non-referenced content apps
+evidence_needed: HTTP 200 JSON from `/graphql2` with `__schema` introspection result, or HTTP 200 from `/.restful` listing endpoints
+verify_steps: PASSIVE — GET https://agriculture.basf.com/graphql2 -H "Content-Type: application/json" -d '{"query":"{ __schema { types { name fields { name } } } }"}' and GET https://agriculture.basf.com/.restful and GET https://agriculture.basf.com/docurl/ at 1 rps; log status + Content-Type + first 2KB
+impact: full content type tree + workspace paths disclosure → targeted IDOR/ID enumeration on product/contact/order content; MEDIUM-HIGH (roadmap to HIGH if writable endpoints found)
+testability: PASSIVE
+[HYP] AEM Rep Finder exposes unauthenticated search servlet at /bin/* or through non-standard JSON selector
+class: MISCONFIG
+asset: repfinder.basf.com
+confidence: 55
+reasoning: public Rep Finder SPA (137KB) must resolve searches via a backend endpoint; .model.json dispatcher-blocked but AEM also serves search via /bin/* servlets (e.g., /bin/repfinder/search, /bin/querybuilder, /bin/search) and custom selector paths (e.g., /content/repfinder/en.search.json, /content/repfinder/en.find.json); the 137KB JS bundle may contain the exact servlet path; dispatcher rules often block /content/*.model.json but miss /bin/* servlets or custom selectors since they serve different content types
+evidence_needed: HTTP 200 JSON from any /bin/* or *.search.json path; JS bundle analysis showing the servlet endpoint
+verify_steps: PASSIVE — parse JS bundle refs from saved 137KB body for `servlet`, `/bin/`, `fetch`, `XMLHttpRequest`, `endpoint`, `url:` patterns; then GET any candidate paths (e.g., /bin/repfinder.json, /bin/repfinder/search.json, /content/repfinder/en.search.json, /bin/querybuilder.json) at 1 rps
+impact: unauth search over rep-finder database → partner/supplier contact data beyond UI-visible fields; LOW-MEDIUM
+testability: PASSIVE
+[HYP] Concrete CMS on north-america.intranet.basf.com exposes unauthenticated admin dashboard or API endpoints behind shared cookie domain
+class: MISCONFIG
+asset: north-america.intranet.basf.com
+confidence: 48
+reasoning: Concrete CMS confirmed via HTTP 200 root; Azure AD OAuth2 with client_id 36f927e6-1b9a-4b2e-a991-8574640f1164; cookie domain `.intranet.basf.com` shared across instances (cross-subdomain session potential); Concrete CMS serves known unauth paths: `/index.php/login` (login form), `/index.php/dashboard` (may redirect or show pre-auth dashboard), `/index.php/tools/activated_packages`, `/index.php/sitemap`, `/index.php/api` (REST API v1 endpoints sometimes unauthenticated); the `then=` parameter in URL (noted in KB) may be a redirect-after-login vector if validation is lax
+evidence_needed: HTTP 200 JSON from `/index.php/api` listing endpoints, or `/index.php/tools/activated_packages` listing packages, or login form leaking internal user list
+verify_steps: PASSIVE — GET https://north-america.intranet.basf.com/index.php/login, /index.php/api, /index.php/tools/activated_packages, /index.php/sitemap, /dashboard at 1 rps; log status + body-type + size; any 200 JSON = API endpoint finding
+impact: package/plugin enumeration + potential API data leak → internal content/user enumeration; MEDIUM
+testability: PASSIVE
+[PARKED] das.basf.com S3 bucket enumeration: S3 gives NoSuchBucket; api subdomain dead; 5x API GW endpoints 403 IAM-gated; zero passive vector remains. Closed.
+[PARKED] secsys.basf.com /api/*: all return 200/246B = WAF "Request Rejected" page; Technology Nexus platform behind F5-ASM WAF; no bypass without auth. Closed.
+[FINAL] survivors ranked:
+[NEXT] PROBE: at 1 rps, GET https://agriculture.basf.com/graphql2 -H "Content-Type: application/json" -d '{"query":"{__schema{types{name}}}"}' && GET https://agriculture.basf.com/.restful && GET https://agriculture.basf.com/docurl/ && GET https://repfinder.basf.com/bin/repfinder.json && GET https://repfinder.basf.com/content/repfinder/en.search.json && GET https://north-america.intranet.basf.com/index.php/api && GET https://north-america.intranet.basf.com/index.php/tools/activated_packages — log status + size + Content-Type for each; flag any 200 JSON responses
+[LEARN] REJECTED MISCONFIG @ experience.basf.com AEM selectors: .content.json, .infinity.json, .tidy.-1.json, .feed.xml, _jcr_content.*, system/sling/*, system/console/bundles all 404; AEM publish fully locked down — selector bypass class closed
+[LEARN] REJECTED MISCONFIG @ repfinder.basf.com Sling Model Exporter: .model.json, .model.txt, .tidy.-1.json, .infinity.json, jcr:content.model.json all 404 — dispatcher blocking standard AEM content negotiation
+[LEARN] ACCEPTED RECON @ agriculture.basf.com: Magnolia CMS (348KB root), zero sub-path probes ever run — Magnolia GraphQL/REST surface completely untested
+[LEARN] ACCEPTED RECON @ das.basf.com: S3 PWA, api subdomain dead, S3 bucket NoSuchBucket, 5x AWS API GW 403 IAM-gated — no exploitation path without IAM creds
+[LEARN] ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403, same pattern across secsys ecosystem
+[RISK] BASF SE: 32 — Unauthenticated surface on 25+ host estate remains almost entirely gated (Apigee VerifyAPIKey, AWS IAM, NAM OIDC exact-match redirect_uri, Azure Functions 401/404, F5-ASM WAF blocks, Cloudflare JS challenge). Two new untested surfaces identified this cycle: agriculture.basf.com Magnolia CMS (GraphQL/REST default-open endpoints, 62) and repfinder.basf.com AEM search servlet (55). The standing highest-severity item (no-PKCE refresh_token ATO, 75) remains AUTH_HELPED. New Magnolia/repfinder probes could surface MEDIUM-HIGH content disclosure if default endpoints are open, or close the class if not.

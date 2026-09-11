@@ -2694,3 +2694,14 @@ testability: AUTH_HELPED
 [LEARN] REJECTED MISCONFIG @ experience.basf.com AEM author paths: crx/de, system/console, libs/granite/ui/content/dumplibs.html, crx/packmgr, content, apps, etc, bin/receive all HTTP 404 — dispatcher blocking standard author paths
 [LEARN] REJECTED MISCONFIG @ repfinder.basf.com Sling Model Exporter: .model.json, .model.txt, .tidy.-1.json, .infinity.json, jcr:content.model.json all HTTP 404 — dispatcher blocking standard selectors
 [RISK] basf: 65 — Unauthenticated backend exposure across 30+ host estate proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere, Spring Boot Actuator properly locked down (404 on all sensitive, status 999 error handler), SAP KM servlet returns 500 (server error, not document access), Apigee SSO portal is stock Edge SSO, AEM dispatchers blocking standard author paths and .model.json, Cloudflare WAF on artifact/cloud/infra hosts. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE remains a design-level flaw requiring interactive code capture (AUTH_HELPED). NEW: experience.basf.com AEM publish tier with leaked author hostnames in CSP — potential dispatcher rewrite bypass via obscure selectors (CRITICAL if bypass works). Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise) requiring test account + AEM author bypass via CSP-leaked hostnames. No other exploitable surface remains in unauthenticated context.
+## 2026-09-11 09:29:09 UTC [target] (model nemotron3)
+[PRIO] my.basf.com,8.70,attack_surface=9 business_value=9 tech_exposure=8 gate_ease=10 cloud_surface=7 freshness=8
+[PRIO] federation.basf.com,7.95,attack_surface=8 business_value=8 tech_exposure=7 gate_ease=10 cloud_surface=6 freshness=8
+[PRIO] rep.basf.com,7.25,attack_surface=6 business_value=8 tech_exposure=5 gate_ease=10 cloud_surface=7 freshness=8
+[PRIO] secsys.basf.com,7.15,attack_surface=6 business_value=8 tech_exposure=5 gate_ease=10 cloud_surface=5 freshness=9
+[PRIO] intranet.basf.com,7.10,attack_surface=7 business_value=9 tech_exposure=6 gate_ease=4 cloud_surface=6 freshness=10
+[PRIO] repfinder.basf.com,6.95,attack_surface=7 business_value=6 tech_exposure=6 gate_ease=8 cloud_surface=7 freshness=9
+[PRIO] experience.basf.com,6.95,attack_surface=5 business_value=9 tech_exposure=5 gate_ease=6 cloud_surface=8 freshness=10
+[PRIO] north-america.intranet.basf.com,6.35,attack_surface=6 business_value=7 tech_exposure=5 gate_ease=5 cloud_surface=6 freshness=10
+[PRIO] das.basf.com,5.90,attack_surface=5 business_value=5 tech_exposure=5 gate_ease=7 cloud_surface=8 freshness=8
+[PRIO] agriculture.basf.com,5.40,attack_surface=4 business_value=5 tech_exposure=4 gate_ease=8 cloud_surface=6 freshness=7

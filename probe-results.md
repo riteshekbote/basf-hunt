@@ -533,3 +533,13 @@ https://experience.basf.com/libs/granite/ui/content/dumplibs.html -> HTTP 404
 https://experience.basf.com/system/sling/monitoring -> HTTP 404
 https://experience.basf.com/system/console/bundles -> HTTP 404
 https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+
+## 2026-09-11 09:29:29 UTC
+https://agriculture.basf.com/graphql2 -> 200 len=348114
+https://agriculture.basf.com/.restful -> 200 len=348114
+https://agriculture.basf.com/docurl/ -> 200 len=404917
+https://north-america.intranet.basf.com/index.php/login -> 200 len=?
+https://repfinder.basf.com/bin/repfinder.json -> HTTP 404
+https://repfinder.basf.com/content/repfinder/en.search.json -> HTTP 404
+https://north-america.intranet.basf.com/index.php/api -> 200 len=43206
+https://north-america.intranet.basf.com/index.php/tools/activated_packages -> 200 len=43173

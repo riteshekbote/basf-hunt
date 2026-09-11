@@ -290,3 +290,8 @@
 - 2026-09-11 ACCEPTED RECON @ agriculture.basf.com: Magnolia CMS (348KB)
 - 2026-09-11 REJECTED MISCONFIG @ experience.basf.com AEM author paths: crx/de, system/console, libs/granite/ui/content/dumplibs.html, crx/packmgr, content, apps, etc, bin/receive all HTTP 404 — dispatcher blocking standard author paths
 - 2026-09-11 REJECTED MISCONFIG @ repfinder.basf.com Sling Model Exporter: .model.json, .model.txt, .tidy.-1.json, .infinity.json, jcr:content.model.json all HTTP 404 — dispatcher blocking standard selectors
+- 2026-09-11 REJECTED MISCONFIG @ experience.basf.com AEM selectors: .content.json, .infinity.json, .tidy.-1.json, .feed.xml, _jcr_content.*, system/sling/*, system/console/bundles all 404; AEM publish fully locked down — selector bypass class closed
+- 2026-09-11 REJECTED MISCONFIG @ repfinder.basf.com Sling Model Exporter: .model.json, .model.txt, .tidy.-1.json, .infinity.json, jcr:content.model.json all 404 — dispatcher blocking standard AEM content negotiation
+- 2026-09-11 ACCEPTED RECON @ agriculture.basf.com: Magnolia CMS (348KB root), zero sub-path probes ever run — Magnolia GraphQL/REST surface completely untested
+- 2026-09-11 ACCEPTED RECON @ das.basf.com: S3 PWA, api subdomain dead, S3 bucket NoSuchBucket, 5x AWS API GW 403 IAM-gated — no exploitation path without IAM creds
+- 2026-09-11 ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403, same pattern across secsys ecosystem

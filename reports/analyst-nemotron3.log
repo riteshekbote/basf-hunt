@@ -7461,3 +7461,81 @@ testability: AUTH_HELPED
 ### STEP 7 — RISK
 
 [RISK] basf: 65 — Unauthenticated backend exposure across 30+ host estate proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere, Spring Boot Actuator properly locked down (404 on all sensitive, status 999 error handler), SAP KM servlet returns 500 (server error, not document access), Apigee SSO portal is stock Edge SSO, AEM dispatchers blocking standard author paths and .model.json, Cloudflare WAF on artifact/cloud/infra hosts. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE remains a design-level flaw requiring interactive code capture (AUTH_HELPED). NEW: experience.basf.com AEM publish tier with leaked author hostnames in CSP — potential dispatcher rewrite bypass via obscure selectors (CRITICAL if bypass works). Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise) requiring test account + AEM author bypass via CSP-leaked hostnames. No other exploitable surface remains in unauthenticated context.
+===== ANALYST nemotron3 2026-09-11 09:29:18 UTC =====
+[0m
+> build · nemotron-3-ultra-free
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/
+total 376
+drwxr-xr-x 12 runner runner   4096 Sep 11 09:09 .
+drwxr-xr-x  3 runner runner   4096 Sep 11 09:08 ..
+drwxr-xr-x  7 runner runner   4096 Sep 11 09:09 .git
+drwxr-xr-x  3 runner runner   4096 Sep 11 09:09 .github
+-rw-r--r--  1 runner runner   1801 Sep 11 09:09 README.md
+-rw-r--r--  1 runner runner     43 Sep 11 09:09 analyst-out.txt
+-rw-r--r--  1 runner runner 127164 Sep 11 09:09 analyst-prompt.txt
+-rw-r--r--  1 runner runner 123292 Sep 11 09:09 ctx.txt
+drwxr-xr-x  2 runner runner   4096 Sep 11 09:09 inventory
+drwxr-xr-x  2 runner runner   4096 Sep 11 09:09 knowledge
+drwxr-xr-x  2 runner runner   4096 Sep 11 09:09 leads
+-rw-r--r--  1 runner runner  38529 Sep 11 09:09 probe-results.md
+drwxr-xr-x  2 runner runner   4096 Sep 11 09:09 recon-notes
+drwxr-xr-x  2 runner runner   4096 Sep 11 09:09 reports
+drwxr-xr-x  2 runner runner   4096 Sep 11 09:09 reposcan-raw
+-rw-r--r--  1 runner runner   3285 Sep 11 09:09 scope.yml
+drwxr-xr-x  2 runner runner   4096 Sep 11 09:09 scripts
+-rw-r--r--  1 runner runner     33 Sep 11 09:09 state_bigpickle.json
+-rw-r--r--  1 runner runner     33 Sep 11 09:09 state_laguna.json
+-rw-r--r--  1 runner runner     33 Sep 11 09:09 state_ling3.json
+-rw-r--r--  1 runner runner     33 Sep 11 09:09 state_longcat.json
+-rw-r--r--  1 runner runner     33 Sep 11 09:09 state_mimo.json
+-rw-r--r--  1 runner runner     33 Sep 11 09:09 state_nemotron3.json
+drwxr-xr-x  2 runner runner   4096 Sep 11 09:09 triage
+[0m
+[0m→ [0mRead probe-results.md
+[0m→ [0mRead scope.yml
+[0m→ [0mRead inventory/basf.md
+[0m
+[0m# [0mTodos
+[•] STEP 1: DELTA - Compare inventory+knowledge+last leads against current surface
+[ ] STEP 2: PRIORITIZE - Score top assets on attack surface, business value, tech exposure, gate ease, cloud surface, freshness
+[ ] STEP 3: HYPOTHESES - Top 3 assets, max 1 hypothesis each with strict schema
+[ ] STEP 4: SELF-CRITIQUE - Drop confidence<40 or REJECTED-class, emit PARKED/FINAL
+[ ] STEP 5: NEXT ACTION - Exactly one PROBE/SCAN/RAG/HUMAN with exact endpoint
+[ ] STEP 6: LEARNING - REJECTED/ACCEPTED class @ asset with reason
+[ ] STEP 7: RISK - Program risk score 0-100 with reason
+[0m
+Now I have full context. Let me execute the 8-step analysis.
+[0m# [0mTodos
+[✓] STEP 1: DELTA - Compare inventory+knowledge+last leads against current surface
+[•] STEP 2: PRIORITIZE - Score top assets on attack surface, business value, tech exposure, gate ease, cloud surface, freshness
+[ ] STEP 3: HYPOTHESES - Top 3 assets, max 1 hypothesis each with strict schema
+[ ] STEP 4: SELF-CRITIQUE - Drop confidence<40 or REJECTED-class, emit PARKED/FINAL
+[ ] STEP 5: NEXT ACTION - Exactly one PROBE/SCAN/RAG/HUMAN with exact endpoint
+[ ] STEP 6: LEARNING - REJECTED/ACCEPTED class @ asset with reason
+[ ] STEP 7: RISK - Program risk score 0-100 with reason
+[0m
+**STEP 1 — DELTA**
+- NEW: `experience.basf.com` obscure AEM selectors (`/content.infinity.json`, `/content.tidy.-1.json`, `/content.feed.xml`, `/jcr:content.feed.xml`, `/_jcr_content.html`, `/_jcr_content.json`, `/_jcr_content.xml`, `/system/sling/monitoring`, `/system/console/bundles`) all return HTTP 404 — dispatcher blocks even non-standard Sling selectors/suffixes
+- CHANGED: AEM dispatcher on `experience.basf.com` publish tier appears comprehensively configured — standard author paths + obscure selectors all 404; CSP-leaked author hostnames (`author-prod-aem64.basf.com`, `author-stage-aem64.basf.com`) remain only theoretical bypass vector
+- NO_DELTA: `federation.basf.com` OIDC discovery stable (ROPC/hybrid grants, plain+S256 PKCE, registration scopes); `my.basf.com/.auth` SPA fallback stable (200/205KB, clientId 86cc4bf9); `*.api.basf.com` 9-host estate fully mapped zero reachable endpoints; `prod.api.basf.com` 66 proxy paths 404 except `/productinformation` 401; `api.commerce.basf.com` 8 stage prefixes all MissingAuthenticationTokenException; SAP procurement KM servlet HTTP 500 across 4 portals (backend reachable past F5-ASM but guest role zero content); `secsys.basf.com` /api/* returns WAF block page (200 len=246); `intranet.basf.com` redirect_uri validation at token exchange not authorize
+[0m# [0mTodos
+[✓] STEP 1: DELTA - Compare inventory+knowledge+last leads against current surface
+[✓] STEP 2: PRIORITIZE - Score top assets on attack surface, business value, tech exposure, gate ease, cloud surface, freshness
+[•] STEP 3: HYPOTHESES - Top 3 assets, max 1 hypothesis each with strict schema
+[ ] STEP 4: SELF-CRITIQUE - Drop confidence<40 or REJECTED-class, emit PARKED/FINAL
+[ ] STEP 5: NEXT ACTION - Exactly one PROBE/SCAN/RAG/HUMAN with exact endpoint
+[ ] STEP 6: LEARNING - REJECTED/ACCEPTED class @ asset with reason
+[ ] STEP 7: RISK - Program risk score 0-100 with reason
+[0m
+**STEP 2 — PRIORITIZE**
+[PRIO] my.basf.com,8.70,attack_surface=9 business_value=9 tech_exposure=8 gate_ease=10 cloud_surface=7 freshness=8
+[PRIO] federation.basf.com,7.95,attack_surface=8 business_value=8 tech_exposure=7 gate_ease=10 cloud_surface=6 freshness=8
+[PRIO] rep.basf.com,7.25,attack_surface=6 business_value=8 tech_exposure=5 gate_ease=10 cloud_surface=7 freshness=8
+[PRIO] secsys.basf.com,7.15,attack_surface=6 business_value=8 tech_exposure=5 gate_ease=10 cloud_surface=5 freshness=9
+[PRIO] intranet.basf.com,7.10,attack_surface=7 business_value=9 tech_exposure=6 gate_ease=4 cloud_surface=6 freshness=10
+[PRIO] repfinder.basf.com,6.95,attack_surface=7 business_value=6 tech_exposure=6 gate_ease=8 cloud_surface=7 freshness=9
+[PRIO] experience.basf.com,6.95,attack_surface=5 business_value=9 tech_exposure=5 gate_ease=6 cloud_surface=8 freshness=10
+[PRIO] north-america.intranet.basf.com,6.35,attack_surface=6 business_value=7 tech_exposure=5 gate_ease=5 cloud_surface=6 freshness=10
+[PRIO] das.basf.com,5.90,attack_surface=5 business_value=5 tech_exposure=5 gate_ease=7 cloud_surface=8 freshness=8
+[PRIO] agriculture.basf.com,5.40,attack_surface=4 business_value=5 tech_exposure=4 gate_ease=8 cloud_surface=6 freshness=7
