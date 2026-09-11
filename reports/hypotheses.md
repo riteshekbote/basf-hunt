@@ -1152,3 +1152,13 @@
 - LEARN: ACCEPTED RECON @ agriculture.basf.com: Magnolia CMS (348KB root), zero sub-path probes ever run — Magnolia GraphQL/REST surface completely untested
 - LEARN: ACCEPTED RECON @ das.basf.com: S3 PWA, api subdomain dead, S3 bucket NoSuchBucket, 5x AWS API GW 403 IAM-gated — no exploitation path without IAM creds
 - LEARN: ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403, same pat
+
+## RANKED HYPOTHESES 2026-09-11 13:42:48 UTC
+- [70] agriculture.basf.com: Magnolia CMS GraphQL Introspection + Unauthenticated Mutations on agriculture.basf.com (from art/lead_nemotron3.txt)
+- NEXT(hypotheses-nemotron3.txt): PROBE: GET https://agriculture.basf.com/graphql2 -H "Content-Type: application/json" -d '{"query":"{__schema{types{name}}}"}' (HEAD first) → then /.restful/cont
+- LEARN: REJECTED MISCONFIG @ experience.basf.com AEM selectors: .content.json, .infinity.json, .tidy.-1.json, .feed.xml, _jcr_content.*, system/sling/*, system/console/
+- LEARN: REJECTED MISCONFIG @ repfinder.basf.com Sling Model Exporter: .model.json, .model.txt, .tidy.-1.json, .infinity.json, jcr:content.model.json all HTTP 404 — disp
+- LEARN: ACCEPTED RECON @ agriculture.basf.com: Magnolia CMS (348KB root), zero sub-path probes ever run — Magnolia GraphQL/REST surface completely untested
+- LEARN: ACCEPTED RECON @ das.basf.com: S3 PWA, api subdomain dead, S3 bucket NoSuchBucket, 5x AWS API GW 403 IAM-gated — no exploitation path without IAM creds
+- LEARN: ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
+- LEARN: ACCEPTED RECON @ north-america.intranet.basf.com: Concrete CMS with Azure AD OAuth2 (client_id 36f927e6-1b9a-4b2e-a991-8574640f1164); cookie domain `.intranet.b

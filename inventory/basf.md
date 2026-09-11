@@ -385,3 +385,11 @@ www.basf.com
 - NEW das.basf.com — S3-hosted Ionic PWA; api.das.basf.com dead (NXDOMAIN via dfman.info); S3 bucket gives NoSuchBucket; 5x AWS API GW endpoints (REST, 403 IAM-gated); zero exploitation possible without IAM
 - NEW north-america.intranet.basf.com — Concrete CMS with Azure AD OAuth2 (client_id 36f927e6-1b9a-4b2e-a991-8574640f1164); cookie domain `.intranet.basf.com` shared across instances; Concrete has known una
 - NEW secsys.basf.com — Angular SPA (3179B) + Technology Nexus v5.3.1+; /api/* endpoints return 200/246B = WAF "Request Rejected" page (NOT data); sibling hosts bsh.secsys, secsys-visitor, qual instances al
+
+## 2026-09-11 13:42:48 UTC
+- NEW agriculture.basf.com: Magnolia CMS (348KB root) — **ZERO sub-path probes ever run**; Magnolia GraphQL (`/graphql2`, `/.graphql`), REST (`/.restful`, `/.rest`), admin (`/adminCentral`, `/.admin`), cach
+- CHANGED experience.basf.com: AEM non-standard selectors (.content.json, .infinity.json, .tidy.-1.json, .feed.xml, _jcr_content.*, system/sling/*, system/console/bundles) → all HTTP 404 confirmed 09-11 04:32; 
+- CHANGED repfinder.basf.com: Sling Model Exporter (.model.json, .model.txt, .tidy.-1.json, .infinity.json, jcr:content.model.json) → all HTTP 404 confirmed; dispatcher blocking standard AEM content negotiation
+- CHANGED secsys.basf.com: /api/* endpoints return HTTP 200 len=246 = WAF "Request Rejected" page (NOT API data) across all 3 hosts (secsys, bsh.secsys, secsys-visitor); WAF returns 200 instead of 403
+- CHANGED das.basf.com: S3-hosted Ionic PWA; api.das.basf.com dead (NXDOMAIN); S3 bucket NoSuchBucket; 5x AWS API GW endpoints 403 IAM-gated — no exploitation path without IAM creds
+- CHANGED north-america.intranet.basf.com: Concrete CMS with Azure AD OAuth2 (client_id 36f927e6-1b9a-4b2e-a991-8574640f1164); cookie domain `.intranet.basf.com` shared; Concrete known unauth info-disclosure ve

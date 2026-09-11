@@ -543,3 +543,17 @@ https://repfinder.basf.com/bin/repfinder.json -> HTTP 404
 https://repfinder.basf.com/content/repfinder/en.search.json -> HTTP 404
 https://north-america.intranet.basf.com/index.php/api -> 200 len=43206
 https://north-america.intranet.basf.com/index.php/tools/activated_packages -> 200 len=43173
+
+## 2026-09-11 13:43:06 UTC
+https://agriculture.basf.com/graphql2 -> 200 len=335626
+https://agriculture.basf.com/.restful/content -> HTTP 404
+https://agriculture.basf.com/.rest/content -> HTTP 404
+https://agriculture.basf.com/adminCentral -> 200 len=335626
+https://agriculture.basf.com/.cache -> 200 len=335626
+https://agriculture.basf.com/.imaging -> 200 len=335626
+https://agriculture.basf.com/dam -> 200 len=335626
+https://north-america.intranet.basf.com/index.php/ccm/system/block/types -> 200 len=43173
+https://north-america.intranet.basf.com/index.php/ccm/system/page/types -> 200 len=43176
+https://north-america.intranet.basf.com/index.php/dashboard -> 200 len=43206
+https://north-america.intranet.basf.com/ccm/system/block/types -> 200 len=43191
+https://north-america.intranet.basf.com/api/blocks -> 200 len=43203

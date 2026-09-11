@@ -14385,3 +14385,97 @@ testability: PASSIVE
 
 ### STEP 7 — RISK
 [RISK] BASF SE: 32 — Unauthenticated surface on 25+ host estate remains almost entirely gated (Apigee VerifyAPIKey, AWS IAM, NAM OIDC exact-match redirect_uri, Azure Functions 401/404, F5-ASM WAF blocks, Cloudflare JS challenge). Two new untested surfaces identified this cycle: agriculture.basf.com Magnolia CMS (GraphQL/REST default-open endpoints, 62) and repfinder.basf.com AEM search servlet (55). The standing highest-severity item (no-PKCE refresh_token ATO, 75) remains AUTH_HELPED. New Magnolia/repfinder probes could surface MEDIUM-HIGH content disclosure if default endpoints are open, or close the class if not.
+===== ANALYST bigpickle 2026-09-11 13:42:48 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m✗ [0mRead art failed
+[91m[1mError: [0mFile not found: /home/runner/work/basf-hunt/basf-hunt/art
+[0m
+[0m$ [0mcurl -sk -o /tmp/probe_agri_graphql2 -w '%{http_code} %{size_download} %{content_type}' -H "Content-Type: application/json" -d '{"query":"{__schema{types{name}}}"}' --max-time 15 --connect-timeout 10 'https://agriculture.basf.com/graphql2' 2>&1
+403 1053 text/html
+[0m
+[0m$ [0mcurl -sk -o /tmp/probe_agri_restful -w '%{http_code} %{size_download} %{content_type}' --max-time 15 --connect-timeout 10 'https://agriculture.basf.com/.restful' 2>&1
+308 69 text/plain; charset=utf-8
+[0m
+[0m$ [0mcurl -sk -o /tmp/probe_agri_docurl -w '%{http_code} %{size_download} %{content_type}' --max-time 15 --connect-timeout 10 'https://agriculture.basf.com/docurl/' 2>&1
+308 73 text/plain; charset=utf-8
+[0m
+[0m$ [0mcurl -sk -o /tmp/probe_repfinder_bin -w '%{http_code} %{size_download} %{content_type}' --max-time 15 --connect-timeout 10 'https://repfinder.basf.com/bin/repfinder.json' 2>&1
+404 196 text/html; charset=iso-8859-1
+[0m
+[0m$ [0mcurl -sk -o /tmp/probe_repfinder_search -w '%{http_code} %{size_download} %{content_type}' --max-time 15 --connect-timeout 10 'https://repfinder.basf.com/content/repfinder/en.search.json' 2>&1
+404 196 text/html; charset=iso-8859-1
+[0m
+[0m$ [0mcurl -sk -o /tmp/probe_na_api -w '%{http_code} %{size_download} %{content_type}' --max-time 15 --connect-timeout 10 'https://north-america.intranet.basf.com/index.php/api' 2>&1
+307 882 text/html; charset=UTF-8
+[0m
+Executing the planned probe suite against the three live targets: agriculture.basf.com (Magnolia GraphQL/REST), repfinder.basf.com (AEM search servlets), and north-america.intranet.basf.com (Concrete CMS API).
+[0m$ [0mcurl -sk -o /tmp/probe_na_packages -w '%{http_code} %{size_download} %{content_type}' --max-time 15 --connect-timeout 10 'https://north-america.intranet.basf.com/index.php/tools/activated_packages' 2>&1
+307 974 text/html; charset=UTF-8
+[0m
+[0m$ [0mcurl -sk -o /tmp/probe_agri_restful_f -w '%{http_code} %{size_download} %{content_type}' -L --max-time 15 --connect-timeout 10 'https://agriculture.basf.com/.restful' 2>&1 && echo "---" && head -c 1000 /tmp/probe_agri_restful_f
+200 348144 text/html; charset=utf-8---
+<!DOCTYPE html><html lang="en-US" data-beasties-container><head>
+    <meta charset="utf-8">
+    <title>BASF – Agriculture</title>
+    <base href="/">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link href="/assets/favicons.v1/basf.svg" rel="icon" sizes="any" type="image/svg+xml">
+    <link color="#21a0d2" href="/assets/favicons.v1/basf.svg" rel="mask-icon">
+    <link href="/assets/favicons.v1/apple-touch-icon-180x180.png" rel="apple-touch-icon" sizes="180x180">
+    <meta content="/assets/favicons.v1/browserconfig.xml" name="msapplication-config">
+    <script type="text/javascript">
+      function OptanonWrapper() {}
+    </script>
+  <style>.wxp-grid-container{position:relative}
+</style><link rel="stylesheet" href="styles-5K4PNMF5.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="styles-5K4PNMF5.css"></noscript><style>@-webkit-keyframes fa-spin{0%{-webkit-transform:rotate(0deg);transform:rotate(0)}to{-webkit-transform:r
+[0m
+[0m$ [0mcurl -sk -o /tmp/probe_agri_docurl_f -w '%{http_code} %{size_download} %{content_type}' -L --max-time 15 --connect-timeout 10 'https://agriculture.basf.com/docurl/' 2>&1 && echo "---" && head -c 1000 /tmp/probe_agri_docurl_f
+200 404927 text/html; charset=utf-8---
+<!DOCTYPE html><html lang="en-US" data-beasties-container><head>
+    <meta charset="utf-8">
+    <title>BASF Agricultural Solutions | Global</title>
+    <base href="/">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link href="/assets/favicons.v1/basf.svg" rel="icon" sizes="any" type="image/svg+xml">
+    <link color="#21a0d2" href="/assets/favicons.v1/basf.svg" rel="mask-icon">
+    <link href="/assets/favicons.v1/apple-touch-icon-180x180.png" rel="apple-touch-icon" sizes="180x180">
+    <meta content="/assets/favicons.v1/browserconfig.xml" name="msapplication-config">
+    <script type="text/javascript">
+      function OptanonWrapper() {}
+    </script>
+  <style>.wxp-grid-container{position:relative}
+</style><link rel="stylesheet" href="styles-5K4PNMF5.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="styles-5K4PNMF5.css"></noscript><style>@-webkit-keyframes fa-spin{0%{-webkit-transform:rotate(0deg);transform:rotate(0)}to{-we
+[0m
+[93m[1m! [0mpermission requested: external_directory (/tmp/*); auto-rejecting
+[0m✗ [0mcurl -sk -D /tmp/probe_na_api_headers -o /tmp/probe_na_api_f -w '%{http_code} %{size_download} %{content_type}' --max-time 15 --connect-timeout 10 'https://north-america.intranet.basf.com/index.php/api' 2>&1 && cat /tmp/probe_na_api_headers failed
+[91m[1mError: [0mThe user rejected permission to use this specific tool call.
+[93m[1m! [0mpermission requested: external_directory (/tmp/*); auto-rejecting
+[0m✗ [0mcurl -sk -D /tmp/probe_na_pkg_headers -o /tmp/probe_na_pkg_f -w '%{http_code} %{size_download} %{content_type}' --max-time 15 --connect-timeout 10 'https://north-america.intranet.basf.com/index.php/tools/activated_packages' 2>&1 && cat /tmp/probe_na_pkg_headers failed
+[91m[1mError: [0mThe user rejected permission to use this specific tool call.
+Follow redirects and check bodies for key responses:
+[0m
+[0m$ [0mcurl -sk -o /tmp/probe_agri_graphql2_body -w '%{http_code} %{size_download}' -H "Content-Type: application/json" -d '{"query":"{__schema{types{name}}}"}' --max-time 15 --connect-timeout 10 'https://agriculture.basf.com/graphql2' 2>&1 && echo "---" && head -c 1053 /tmp/probe_agri_graphql2_body
+403 1053---
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML><HEAD><META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<TITLE>ERROR: The request could not be satisfied</TITLE>
+</HEAD><BODY>
+<H1>403 ERROR</H1>
+<H2>The request could not be satisfied.</H2>
+<HR noshade size="1px">
+This distribution is not configured to allow the HTTP request method that was used for this request. The distribution supports only cachable requests.
+We can't connect to the server for this app or website at this time. There might be too much traffic or a configuration error. Try again later, or contact the app or website owner.
+<BR clear="all">
+If you provide content to customers through CloudFront, you can find steps to troubleshoot and help prevent this error by reviewing the CloudFront documentation.
+<BR clear="all">
+<HR noshade size="1px">
+<PRE>
+Generated by cloudfront (CloudFront)
+Request ID: EeVDUkmmFWbOqXXOtCA14u11DDOFbGorReHS42gAdhodJZs7XjfKsw==
+</PRE>
+<ADDRESS>
+</ADDRESS>
+</BODY></HTML>
+[0m

@@ -2705,3 +2705,53 @@ testability: AUTH_HELPED
 [PRIO] north-america.intranet.basf.com,6.35,attack_surface=6 business_value=7 tech_exposure=5 gate_ease=5 cloud_surface=6 freshness=10
 [PRIO] das.basf.com,5.90,attack_surface=5 business_value=5 tech_exposure=5 gate_ease=7 cloud_surface=8 freshness=8
 [PRIO] agriculture.basf.com,5.40,attack_surface=4 business_value=5 tech_exposure=4 gate_ease=8 cloud_surface=6 freshness=7
+## 2026-09-11 13:42:21 UTC [target] (model nemotron3)
+[NEW] agriculture.basf.com: Magnolia CMS (348KB root) — **ZERO sub-path probes ever run**; Magnolia GraphQL (`/graphql2`, `/.graphql`), REST (`/.restful`, `/.rest`), admin (`/adminCentral`, `/.admin`), cache (`/.cache`), dam (`/.imaging`, `/dam`) surfaces completely untested
+[CHANGED] experience.basf.com: AEM non-standard selectors (.content.json, .infinity.json, .tidy.-1.json, .feed.xml, _jcr_content.*, system/sling/*, system/console/bundles) → all HTTP 404 confirmed 09-11 04:32; dispatcher blocking comprehensive
+[CHANGED] repfinder.basf.com: Sling Model Exporter (.model.json, .model.txt, .tidy.-1.json, .infinity.json, jcr:content.model.json) → all HTTP 404 confirmed; dispatcher blocking standard AEM content negotiation
+[CHANGED] secsys.basf.com: /api/* endpoints return HTTP 200 len=246 = WAF "Request Rejected" page (NOT API data) across all 3 hosts (secsys, bsh.secsys, secsys-visitor); WAF returns 200 instead of 403
+[CHANGED] das.basf.com: S3-hosted Ionic PWA; api.das.basf.com dead (NXDOMAIN); S3 bucket NoSuchBucket; 5x AWS API GW endpoints 403 IAM-gated — no exploitation path without IAM creds
+[CHANGED] north-america.intranet.basf.com: Concrete CMS with Azure AD OAuth2 (client_id 36f927e6-1b9a-4b2e-a991-8574640f1164); cookie domain `.intranet.basf.com` shared; Concrete known unauth info-disclosure vectors (block info, page types) untested
+[PRIO] agriculture.basf.com,6.85,attack_surface=8 business_value=6 tech_exposure=7 gate_ease=10 cloud_surface=6 freshness=9
+[PRIO] experience.basf.com,5.80,attack_surface=4 business_value=9 tech_exposure=3 gate_ease=6 cloud_surface=8 freshness=7
+[PRIO] north-america.intranet.basf.com,5.65,attack_surface=6 business_value=7 tech_exposure=5 gate_ease=5 cloud_surface=6 freshness=8
+[PRIO] das.basf.com,4.90,attack_surface=4 business_value=5 tech_exposure=4 gate_ease=7 cloud_surface=8 freshness=6
+[PRIO] secsys.basf.com,4.75,attack_surface=3 business_value=8 tech_exposure=3 gate_ease=10 cloud_surface=5 freshness=9
+[HYP] Magnolia CMS GraphQL Introspection + Unauthenticated Mutations on agriculture.basf.com
+class: MISCONFIG
+asset: agriculture.basf.com
+confidence: 70
+reasoning: Magnolia CMS 348KB root response confirms live instance; zero sub-path probes executed; Magnolia defaults expose `/graphql2` (GraphQL endpoint), `/.restful`/`.rest` (REST API), `/adminCentral` (admin UI), `/.cache` (cache info), `/.imaging`/(`/dam`) (DAM assets); GraphQL introspection often enabled in non-prod; REST endpoints may allow unauth CRUD on content nodes
+evidence_needed: at least one Magnolia endpoint returning 200/401/403 (not 404) with GraphQL schema or REST JSON response
+verify_steps: PROBE GET https://agriculture.basf.com/graphql2 -H "Content-Type: application/json" -d '{"query":"{__schema{types{name}}}"}' (HEAD first); PROBE GET https://agriculture.basf.com/.restful/content (HEAD); PROBE GET https://agriculture.basf.com/.rest/content (HEAD); PROBE GET https://agriculture.basf.com/adminCentral (HEAD); PROBE GET https://agriculture.basf.com/.cache (HEAD); PROBE GET https://agriculture.basf.com/.imaging (HEAD); PROBE GET https://agriculture.basf.com/dam (HEAD) — all read-only, 1 rps
+impact: Unauthenticated GraphQL introspection → full schema leak → content mutation (pages, components, assets) → defacement, malicious redirect injection, supplier/customer data exposure; CRITICAL
+testability: PASSIVE
+[HYP] Concrete CMS Unauthenticated Block/Page Info Disclosure on north-america.intranet.basf.com
+class: MISCONFIG
+asset: north-america.intranet.basf.com
+confidence: 50
+reasoning: Concrete CMS detected via headers/body; Azure AD OAuth2 with client_id exposed in HTML; shared cookie domain `.intranet.basf.com` with intranet.basf.com; Concrete defaults expose block types, page types, dashboard widgets via `/index.php/ccm/system/block/types`, `/index.php/ccm/system/page/types`, `/index.php/dashboard` without auth in misconfigured instances; Azure AD integration may not gate Concrete's internal API endpoints
+evidence_needed: Concrete internal API endpoint returning 200 with JSON block/page metadata (not login redirect)
+verify_steps: PROBE GET https://north-america.intranet.basf.com/index.php/ccm/system/block/types (HEAD); PROBE GET https://north-america.intranet.basf.com/index.php/ccm/system/page/types (HEAD); PROBE GET https://north-america.intranet.basf.com/index.php/dashboard (HEAD); PROBE GET https://north-america.intranet.basf.com/ccm/system/block/types (HEAD, alt path); PROBE GET https://north-america.intranet.basf.com/api/blocks (HEAD) — all read-only, 1 rps
+impact: Internal CMS structure leak → page/block enumeration → targeted auth bypass or content injection; MEDIUM
+testability: PASSIVE
+[HYP] AEM Dispatcher Cache Poisoning via Host Header on experience.basf.com
+class: MISCONFIG
+asset: experience.basf.com
+confidence: 40
+reasoning: AEM publish tier on CloudFront (x-vhost experience); CSP leaks author hostnames (author-prod-aem64.basf.com, author-stage-aem64.basf.com); standard author paths and selectors all 404 (dispatcher hardened); however CloudFront → dispatcher → AEM chain may mishandle Host header forwarding; cache poisoning via `Host: author-prod-aem64.basf.com` on publish tier could serve author-instance responses if dispatcher config trusts Host header
+evidence_needed: response with author-instance content (crx/de, system/console, .infinity.json with author-only paths) when sending spoofed Host header to publish tier
+verify_steps: PROBE GET https://experience.basf.com/ -H "Host: author-prod-aem64.basf.com" (HEAD); PROBE GET https://experience.basf.com/content.infinity.json -H "Host: author-prod-aem64.basf.com" (HEAD); PROBE GET https://experience.basf.com/system/console -H "Host: author-prod-aem64.basf.com" (HEAD); PROBE GET https://experience.basf.com/crx/de -H "Host: author-prod-aem64.basf.com" (HEAD) — all read-only, 1 rps
+impact: Cache poisoning serving author console on publish → RCE via script console, package manager, JCR manipulation; CRITICAL
+testability: PASSIVE
+[PARKED] AEM Dispatcher Cache Poisoning via Host Header on experience.basf.com: confidence 40 — speculative; CloudFront typically normalizes Host header to origin; no evidence dispatcher uses Host for vhost routing; standard author paths already 404 on publish tier
+[FINAL] 1. Magnolia CMS GraphQL Introspection + Unauthenticated Mutations on agriculture.basf.com (confidence 70, PASSIVE)
+[FINAL] 2. Concrete CMS Unauthenticated Block/Page Info Disclosure on north-america.intranet.basf.com (confidence 50, PASSIVE)
+[NEXT] PROBE: GET https://agriculture.basf.com/graphql2 -H "Content-Type: application/json" -d '{"query":"{__schema{types{name}}}"}' (HEAD first) → then /.restful/content, /.rest/content, /adminCentral, /.cache, /.imaging, /dam (all HEAD, 1 rps) — test Magnolia default endpoints for unauthenticated GraphQL/REST exposure
+[LEARN] REJECTED MISCONFIG @ experience.basf.com AEM selectors: .content.json, .infinity.json, .tidy.-1.json, .feed.xml, _jcr_content.*, system/sling/*, system/console/bundles all HTTP 404 — dispatcher blocking comprehensive
+[LEARN] REJECTED MISCONFIG @ repfinder.basf.com Sling Model Exporter: .model.json, .model.txt, .tidy.-1.json, .infinity.json, jcr:content.model.json all HTTP 404 — dispatcher blocking standard AEM content negotiation
+[LEARN] ACCEPTED RECON @ agriculture.basf.com: Magnolia CMS (348KB root), zero sub-path probes ever run — Magnolia GraphQL/REST surface completely untested
+[LEARN] ACCEPTED RECON @ das.basf.com: S3 PWA, api subdomain dead, S3 bucket NoSuchBucket, 5x AWS API GW 403 IAM-gated — no exploitation path without IAM creds
+[LEARN] ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
+[LEARN] ACCEPTED RECON @ north-america.intranet.basf.com: Concrete CMS with Azure AD OAuth2 (client_id 36f927e6-1b9a-4b2e-a991-8574640f1164); cookie domain `.intranet.basf.com` shared across instances
+[RISK] basf: 55 — Unauthenticated backend exposure across 30+ host estate proven gated: Apigee VerifyAPIKey (all browser keys rejected), AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, Spring Boot Actuator locked down (404 sensitive, status 999 error handler), SAP KM servlet returns 500, AEM dispatchers blocking author paths/selectors, Cloudflare WAF on artifact/cloud/infra. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE (design flaw, AUTH_HELPED). NEW: agriculture.basf.com Magnolia CMS completely untested GraphQL/REST surface (PASSIVE, high yield if exposed). Residual risk = portal ATO chain (OAuth code interception → refresh_token replay) + potential CMS compromise via untested Magnolia endpoints. No other exploitable surface remains in unauthenticated context.
