@@ -2157,3 +2157,33 @@ testability: AUTH_HELPED
 [FINAL] Survivors ranked:
 [NEXT] HUMAN: from operator (bugs.olivermaicher.eu) request one sandbox supplier/intern account to (a) capture the authorize request on client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 proving absent code_challenge and replay the refresh_token twice to observe rotation, and (b) POST grant_type=password to /nidp/oauth/nam/token with a junk confidential client to confirm ROPC issuance-vs-client-oracle. Unauthenticated live surface is now exhausted (AEM class closed: all author paths + selectors 404, author hostnames NXDOMAIN; S3 dangling-CNAME latent only).
 [RISK] BASF SE: 30 — Unauthenticated exploitable surface now effectively zero across 25+ hosts: AEM class closed this cycle (dispatcher 404s + author hostnames NXDOMAIN), Apigee/AWS IAM/NAM auth gates, WAF blocks, mTLS/TLS gates all previously confirmed. Residual risk is entirely conditional-high OAuth design (NAM ROPC enabled at provider level; public SPA client emits refresh_token with zero PKCE) — both require a sandbox credential to prove and are unreportable without it. Program decision: grant/request test creds or close with two informational/high-conditional OAuth findings.
+## 2026-09-10 23:59:17 UTC [target] (model bigpickle)
+[HYP] my.basf.com authorize request likely omits `state` — login-CSRF angle on the no-PKCE public client
+class: OATH
+asset: my.basf.com OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 / federation.basf.com/nidp/oauth/nam/authz
+confidence: 45
+reasoning: 09-10 SPA bundle analysis proved ZERO PKCE machinery but never evaluated `state` generation; NAM authorize enforces exact-match redirect_uri (10 bypass variants rejected 09-06, reconfirmed 09-10) so redirect tampering is closed and the only remaining client-side control gap is a missing/static `state`; netiq-oauth SPA kits commonly omit state when they omit PKCE.
+evidence_needed: outgoing authorize URL lacks `state` (or callback never validates attacker-supplied vs legit `state`); capture during a real login hop.
+verify_steps: AUTH_HELPED — with sandbox account, instrument my.basf.com redirect to GET federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External; log whether `state=` present and whether callback rejects an attacker-predicted value; double-replay refresh_token afterwards.
+impact: login-CSRF (victim session bound to attacker account + code-side effects) alone LOW; only meaningful when chained into the existing refresh-without-PKCE ATO — strengthens top finding to a provable chain. HIGH-conditional.
+testability: AUTH_HELPED
+[HYP] Rep Finder search servlet returns wider JSON than the public UI renders
+class: MISCONFIG
+asset: repfinder.basf.com
+confidence: 35
+reasoning: public AEM rep-finder must resolve its search via an unauth JSON servlet/selector since `.model.json` is dispatcher-blocked; such servlets often pass raw query params (zip, region, repId) and can expose fields the form hides; none of this surface is logged in KB.
+evidence_needed: HTTP 200 JSON containing fields not present in UI (internal rep metadata, ids).
+verify_steps: PASSIVE — parse repfinder.basf.com JS for the search endpoint, then read-only GET each candidate with a benign param (e.g. /bin/repfinder.json?zip=00000) at 1 rps.
+impact: intended public data at worst (fields beyond UI); LOW.
+testability: PASSIVE
+[HYP] AEM author tier reachable via un-leaked hostname variant
+class: MISCONFIG
+asset: experience.basf.com (author tier)
+confidence: 15
+reasoning: 09-10 alone tested the two CSP-leaked names (NXDOMAIN); this cycle extended to 15 naming variants (author/aem/cxm/editor/design) — all NXDOMAIN; no AEM author inventory hint remains in public surface.
+evidence_needed: any resolving basf.com name under author/aem/cxm labels serving HTTP.
+verify_steps: PASSIVE — DNS sweep (done: NXDOMAIN 15/15); CT-log SAN re-scan of *.basf.com for author/aem/cxm labels; read-only HEAD https://<hit>/libs/granite/core/content/login.html if any hit exists (none currently).
+impact: unauth AEM author/manager console = full content takeover; CRITICAL-conditional.
+testability: PASSIVE
+[NEXT] HUMAN: from bugs.olivermaicher.eu request one sandbox supplier/intern account; on first credentialed login instrument the my.basf.com→federation redirect to record (a) presence/absence of `state` and `code_challenge` in the authorize URL and callback validation, (b) refresh_token behavior on double replay, and (c) POST grant_type=password to /nidp/oauth/nam/token with a junk-but-format-valid confidential client to classify 401-invalid_client vs 400-invalid_grant. All unauthenticated avenues (incl. the AEM author-naming sweep closed NXDOMAIN 15/15) are exhausted.
+[RISK] BASF SE: 28 — Unauthenticated exploitable surface re-verified zero across 25+ hosts this cycle (AEM author class now closed on NXDOMAIN 15/15 variant sweep; all prior auth-gates/WAF/mTLS confirmations stable). Residual risk is entirely conditional-high OAuth on the corporate identity plane: NAM provider-level ROPC grant, my.basf.com public client issuing refresh_token with zero PKCE, plus the newly-targeted missing-`state` login-CSRF chain. Each is provable only with one sandbox credential; without it all three remain unreportable design/posture findings. Program at decision point — grant test creds or close with informational/high-conditional OAuth items.

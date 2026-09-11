@@ -1,110 +1,30 @@
-## 2026-09-10 21:45:31 UTC [target] (model bigpickle)
-[PRIO] das.basf.com, 5.8, attack_surface=5 business_value=5 tech_exposure=5 gate_ease=7 cloud_surface=8 freshness=8
-[PRIO] agriculture.basf.com, 5.5, attack_surface=5 business_value=5 tech_exposure=5 gate_ease=8 cloud_surface=6 freshness=7
-[HYP] AEM Dispatcher Rewrite Bypass to Author Instance via Leaked Hostnames
-class: IDOR
-asset: experience.basf.com
-confidence: 65
-reasoning: AEM CXM on CloudFront; CSP script-src leaks author-prod-aem64.basf.com + author-stage-aem64.basf.com (both dead/resolve to private) + api.das.basf.com (dead); dispatcher typically blocks /content, /apps, /libs, /etc but misconfigured rewrite rules or missing filter patterns can expose author-only paths (crx/de, /system/console, /crx/packmgr) on publish; CloudFront edge may not normalize paths before dispatcher
-evidence_needed: at least one author-only path (/crx/de, /system/console, /libs/granite/ui/content/dumplibs.html, /crx/packmgr) returning 200/302/401 (not 404/403) on experience.basf.com publish tier
-verify_steps: PROBE GET https://experience.basf.com/crx/de (HEAD); PROBE GET https://experience.basf.com/system/console (HEAD); PROBE GET https://experience.basf.com/libs/granite/ui/content/dumplibs.html (HEAD); PROBE GET https://experience.basf.com/content (HEAD); PROBE GET https://experience.basf.com/apps (HEAD); PROBE GET https://experience.basf.com/etc (HEAD); PROBE GET https://experience.basf.com/bin/receive (HEAD) — all read-only, 1 rps
-impact: Unauthenticated access to AEM author console → code execution, content manipulation, credential theft, full CMS compromise — CRITICAL
-testability: PASSIVE
-[HYP] AEM Rep Finder Public .model.json / Sling Model Exporter Bypass
-class: IDOR
-asset: repfinder.basf.com
-confidence: 55
-reasoning: Public AEM Rep Finder on CloudFront (x-vhost repfinder); .model.json properly blocked by dispatcher per probe; but Sling Model Exporter has multiple selectors (.model.json, .model.txt, .model.xml, .infinity.json, .tidy.-1.json) and suffix patterns (/content/.../jcr:content.model.json) that dispatcher configs often miss; CSP allows 'unsafe-inline' scripts
-evidence_needed: at least one Sling Model Exporter selector/suffix returning 200 with structured content (not dispatcher 404/403) exposing internal JCR paths, component data, or resource metadata
-verify_steps: PROBE GET https://repfinder.basf.com/content/repfinder/en.model.json (HEAD); PROBE GET https://repfinder.basf.com/content/repfinder/en.model.txt (HEAD); PROBE GET https://repfinder.basf.com/content/repfinder/en.tidy.-1.json (HEAD); PROBE GET https://repfinder.basf.com/content/repfinder/en.infinity.json (HEAD); PROBE GET https://repfinder.basf.com/jcr:content.model.json (HEAD); enumerate all HTML for data-path or resourceType hints — 1 rps, read-only
-impact: Unauthenticated exposure of internal AEM content structure, component configs, resource paths — MEDIUM (recon enabler for author bypass)
-testability: PASSIVE
-[HYP] Public OAuth Client with Refresh Token, No PKCE — ATO via Code Interception
+## 2026-09-10 23:59:17 UTC [target] (model bigpickle)
+[HYP] my.basf.com authorize request likely omits `state` — login-CSRF angle on the no-PKCE public client
 class: OATH
-asset: my.basf.com / federation.basf.com/nidp/oauth/nam/authz
-confidence: 80
-reasoning: SSR boot config confirms public client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` (no secret in bundle), code flow with `refresh_token` scope, redirect to `/.auth` (Azure Static Web Apps built-in auth), `acr_values=3IAM/Login/External` (NetIQ NAM external auth), zero PKCE machinery in client; federation.basf.com discovery allows `plain` + `S256` PKCE methods — IdP accepts downgraded/plain challenges; redirect_uri oracle tested exact-match (10 variants rejected) so exploitation requires code interception at transport/browser layer, not redirect manipulation
-evidence_needed: capture of authentic authorize request proving absence of `code_challenge` parameter; token response showing `refresh_token` issued with no rotation on reuse
-verify_steps: AUTH_HELPED — with test account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External — record uttered params; exchange code for tokens; verify refresh_token lifetime/rotation on reuse
-impact: Intercepted authz code or stolen refresh_token = full ATO of BASF customer/supplier portal account → order/price/PII access, procurement fraud, supplier impersonation; CRITICAL
+asset: my.basf.com OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 / federation.basf.com/nidp/oauth/nam/authz
+confidence: 45
+reasoning: 09-10 SPA bundle analysis proved ZERO PKCE machinery but never evaluated `state` generation; NAM authorize enforces exact-match redirect_uri (10 bypass variants rejected 09-06, reconfirmed 09-10) so redirect tampering is closed and the only remaining client-side control gap is a missing/static `state`; netiq-oauth SPA kits commonly omit state when they omit PKCE.
+evidence_needed: outgoing authorize URL lacks `state` (or callback never validates attacker-supplied vs legit `state`); capture during a real login hop.
+verify_steps: AUTH_HELPED — with sandbox account, instrument my.basf.com redirect to GET federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External; log whether `state=` present and whether callback rejects an attacker-predicted value; double-replay refresh_token afterwards.
+impact: login-CSRF (victim session bound to attacker account + code-side effects) alone LOW; only meaningful when chained into the existing refresh-without-PKCE ATO — strengthens top finding to a provable chain. HIGH-conditional.
 testability: AUTH_HELPED
-[PARKED] Wicket Bookmarkable Page Access Bypass on Customer Portal: confidence 55 but verify_steps require guessing page class names without enumeration evidence; no Wicket mount paths discovered in passive HTML/JS — PASSIVE verify steps not concrete enough
-[PARKED] Smart ID Self-Service Angular SPA — IDOR/BOLA on Identity Management Endpoints: confidence 50 but verify_steps list generic /api/users/me etc. which already returned WAF block page (200 len=246 "Request Rejected") not API surface; no Angular bundle analysis yet to find real endpoints — PASSIVE verify steps not grounded in observed endpoints
-[FINAL] 1. Public OAuth Client with Refresh Token, No PKCE — ATO via Code Interception (confidence 80, AUTH_HELPED)
-[FINAL] 2. AEM Dispatcher Rewrite Bypass to Author Instance via Leaked Hostnames (confidence 65, PASSIVE)
-[FINAL] 3. AEM Rep Finder Public .model.json / Sling Model Exporter Bypass (confidence 55, PASSIVE)
-[NEXT] PROBE: GET https://experience.basf.com/crx/de (HEAD) → then /system/console, /libs/granite/ui/content/dumplibs.html, /crx/packmgr, /content, /apps, /etc, /bin/receive (all HEAD, 1 rps) — test AEM author-instance exposure on publish tier via leaked author hostnames in CSP
-[LEARN] ACCEPTED RECON @ experience.basf.com: AEM CXM Experience Platform login, x-vhost experience, CloudFront, CSP leaks author-prod-aem64 + author-stage-aem64 (dead) + api.das.basf.com (dead)
-[LEARN] ACCEPTED RECON @ intranet.basf.com: Azure AD (mod_auth_openidc) with tenant ecaa386b-c8df-4ce0-ad01-740cbdb5ba55, client_id f5a39ea7-83db-4af7-b3d1-df80d707650c, redirect_uri /redirect_uri — corporate SSO intranet
-[LEARN] ACCEPTED RECON @ north-america.intranet.basf.com: Concrete CMS with Azure AD OAuth2, client_id 36f927e6-1b9a-4b2e-a991-8574640f1164, cookie domain .intranet.basf.com shared across intranet instances
-[LEARN] ACCEPTED RECON @ repfinder.basf.com: AEM Rep Finder (public), x-vhost repfinder, CloudFront, 137KB, .model.json properly blocked by dispatcher
-[LEARN] ACCEPTED RECON @ das.basf.com: S3-hosted AgSolutions Finder (Ionic PWA), api.das.basf.com dead, S3 bucket NoSuchBucket, 5x AWS API GW endpoints 403 IAM-gated
-[LEARN] ACCEPTED RECON @ agriculture.basf.com: Magnolia CMS (348KB)
-[LEARN] REJECTED MISCONFIG @ artifactory.basf.com: Cloudflare WAF custom block (403, 7KB BASF-branded); no bypass possible
-[LEARN] REJECTED MISCONFIG @ ncm.basf.com + cloud.basf.com: Cloudflare JS challenge (403, cf-mitigated:challenge); no bypass possible
-[LEARN] REJECTED MISCONFIG @ secsys.basf.com/api/users/me + /api/devices: HTTP 200 len=246 = WAF block page ("Request Rejected"), NOT API data; WAF returns 200 instead of 403; same across all 3 secsys hosts
-[LEARN] REJECTED MISCONFIG @ intranet.basf.com redirect_uri: Azure AD shows login for both valid/invalid redirect_uri; validation at token exchange; without auth cannot confirm open redirect
-[RISK] basf: 58 — Unauthenticated backend exposure across 20+ host estate (9 *.api + prod.api + api.commerce + federation + my.basf + www + products + api.basf + procurement + tm + passage-europe + vss3 + rep.basf + basf.login.apigee.com + secsys.basf.com + developer.basf.com + worldaccount.basf.com + experience.basf.com + intranet.basf.com + north-america.intranet.basf.com + repfinder.basf.com + das.basf.com + agriculture.basf.com + artifactory.basf.com + ncm.basf.com + cloud.basf.com) now proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere, Spring Boot Actuator properly locked down (404 on all sensitive, status 999 error handler), SAP KM servlet returns 500 (server error, not document access), Apigee SSO portal is stock Edge SSO, AEM dispatchers blocking .model.json, Cloudflare WAF on artifact/cloud/infra hosts. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE remains a design-level flaw requiring interactive code capture (AUTH_HELPED). NEW: experience.basf.com AEM publish tier with leaked author hostnames in CSP — potential dispatcher rewrite bypass to author console (CRITICAL if bypass works). Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise) requiring test account + AEM author bypass via CSP-leaked hostnames. No other exploitable surface remains in unauthenticated context.
-[LEARN] REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM/SigV4 authorizer, x-api-key not credential class.
-[RISK] BASF SE: 22 — Surface fully mapped across 20+ hosts spanning Azure Functions, Apigee proxies, AWS API Gateway, SAP NetWeaver portals, Spring Boot apps, NetIQ NAM identity, and Nexus Smart ID. Zero unauthenticated exploitable findings after 8 days. Two high-severity OAuth design findings (NAM ROPC MFA-bypass, my.basf.com refresh-without-PKCE) remain confirmed-but-unprovable without sandbox credentials. Program at decision point — request test creds or close with two informational/high-conditional findings. Pipeline stable (5 models available per scope.yml).
-[HYP] experience.basf.com AEM content path traversal via dispatcher rewrite bypass
+[HYP] Rep Finder search servlet returns wider JSON than the public UI renders
 class: MISCONFIG
-asset: experience.basf.com
-confidence: 18
-reasoning: AEM dispatcher rewrites /content/basf/cxm/* to root-relative paths; /content/basf/cxm/agriculture/us/en/rep-finder.model.json → 301 to /rep-finder.model.json (404); dispatcher properly strips content prefix; all tested AEM content paths return 404; CSP leaks author-prod-aem64.basf.com (dead); no unauth content exposure observed.
-evidence_needed: any .model.json or .infinity.json returning 200 JSON from AEM content tree.
-verify_steps: PASSIVE — GET /content/basf/cxm/us/en.model.json, /etc.clientlibs/basf/salesx/clientlibs/config.json (done, all 404)
-impact: unauth AEM content disclosure; LOW.
+asset: repfinder.basf.com
+confidence: 35
+reasoning: public AEM rep-finder must resolve its search via an unauth JSON servlet/selector since `.model.json` is dispatcher-blocked; such servlets often pass raw query params (zip, region, repId) and can expose fields the form hides; none of this surface is logged in KB.
+evidence_needed: HTTP 200 JSON containing fields not present in UI (internal rep metadata, ids).
+verify_steps: PASSIVE — parse repfinder.basf.com JS for the search endpoint, then read-only GET each candidate with a benign param (e.g. /bin/repfinder.json?zip=00000) at 1 rps.
+impact: intended public data at worst (fields beyond UI); LOW.
 testability: PASSIVE
-[PARKED] experience.basf.com AEM content path traversal: confidence 18 < 40 threshold; dispatcher properly configured; all content paths return 404.
-[FINAL] Survivors ranked:
-[PARKED] experience.basf.com AEM content path traversal: confidence 18 — AEM dispatcher properly configured; all content JSON paths return 404; no evidence of content exposure.
-[NEXT] HUMAN: From program operator (bugs.olivermaicher.eu) request a sandbox supplier/intern test account to (a) run the interactive OIDC code-exchange on client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` recording presence/absence of `code_challenge` and whether `refresh_token` rotates on double reuse, and (b) retest NAM ROPC `grant_type=password` at `/nidp/oauth/nam/token` with a junk-but-format-valid confidential client. Without this credential both surviving findings stay unconfirmed and unreportable; new surface (intranet, experience, repfinder, das, ncm, cloud, artifactory) fully probed and auth-gated or WAF-blocked — no further unauthenticated probe advances POC.
-[LEARN] ACCEPTED RECON @ intranet.basf.com: Azure AD (mod_auth_openidc) with tenant ecaa386b-c8df-4ce0-ad01-740cbdb5ba55, client_id f5a39ea7-83db-4af7-b3d1-df80d707650c, redirect_uri /redirect_uri — corporate SSO intranet
-[LEARN] ACCEPTED RECON @ north-america.intranet.basf.com: Concrete CMS with Azure AD OAuth2, client_id 36f927e6-1b9a-4b2e-a991-8574640f1164, cookie domain .intranet.basf.com shared across intranet instances, then= parameter not reflected in OAuth flow
-[LEARN] ACCEPTED RECON @ experience.basf.com: AEM CXM Experience Platform login, x-vhost experience, CloudFront, CSP leaks author-prod-aem64 + author-stage-aem64 (dead) + api.das.basf.com (dead)
-[LEARN] ACCEPTED RECON @ repfinder.basf.com: AEM Rep Finder (public), x-vhost repfinder, CloudFront, 137KB, .model.json properly blocked by dispatcher
-[LEARN] ACCEPTED RECON @ das.basf.com: S3-hosted AgSolutions Finder (Ionic PWA), api.das.basf.com dead, S3 bucket NoSuchBucket, 5x AWS API GW endpoints 403 IAM-gated
-[LEARN] ACCEPTED RECON @ agriculture.basf.com: Magnolia CMS (348KB)
-[LEARN] REJECTED MISCONFIG @ artifactory.basf.com: Cloudflare WAF custom block (403, 7KB BASF-branded); no bypass possible
-[LEARN] REJECTED MISCONFIG @ ncm.basf.com + cloud.basf.com: Cloudflare JS challenge (403, cf-mitigated:challenge); no bypass possible
-[LEARN] REJECTED MISCONFIG @ secsys.basf.com/api/users/me + /api/devices: HTTP 200 len=246 = WAF block page ("Request Rejected"), NOT API data; WAF returns 200 instead of 403; same across all 3 secsys hosts
-[LEARN] REJECTED MISCONFIG @ intranet.basf.com redirect_uri: Azure AD shows login for both valid/invalid redirect_uri; validation at token exchange; without auth cannot confirm open redirect
-[RISK] BASF SE: 22 — New surface additions (intranet, experience, repfinder, das, agriculture, ncm, cloud, artifactory) all fully mapped and auth-gated/WAF-blocked. Zero new exploitable findings after 8 days of intensive testing across 25+ hosts. Two high-severity OAuth design findings (NAM ROPC MFA-bypass, my.basf.com refresh-without-PKCE) remain confirmed-but-unprovable without sandbox credentials. Program at decision point — request test creds or close with two informational/high-conditional findings.
-[FINAL] 1. Public OAuth Client with Refresh Token, No PKCE — ATO via Code Interception (confidence 80, AUTH_HELPED)
-[FINAL] 2. AEM Dispatcher Rewrite Bypass to Author Instance via Leaked Hostnames (confidence 65, PASSIVE)
-[FINAL] 3. AEM Rep Finder Public .model.json / Sling Model Exporter Bypass (confidence 55, PASSIVE)
-[NEXT] PROBE: GET https://experience.basf.com/crx/de (HEAD) → then /system/console, /libs/granite/ui/content/dumplibs.html, /crx/packmgr, /content, /apps, /etc, /bin/receive (all HEAD, 1 rps) — test AEM author-instance exposure on publish tier via leaked author hostnames in CSP
-[LEARN] ACCEPTED RECON @ experience.basf.com: AEM CXM Experience Platform login, x-vhost experience, CloudFront, CSP leaks author-prod-aem64 + author-stage-aem64 (dead) + api.das.basf.com (dead)
-[LEARN] ACCEPTED RECON @ intranet.basf.com: Azure AD (mod_auth_openidc) with tenant ecaa386b-c8df-4ce0-ad01-740cbdb5ba55, client_id f5a39ea7-83db-4af7-b3d1-df80d707650c, redirect_uri /redirect_uri — corporate SSO intranet
-[LEARN] ACCEPTED RECON @ north-america.intranet.basf.com: Concrete CMS with Azure AD OAuth2, client_id 36f927e6-1b9a-4b2e-a991-8574640f1164, cookie domain .intranet.basf.com shared across intranet instances
-[LEARN] ACCEPTED RECON @ repfinder.basf.com: AEM Rep Finder (public), x-vhost repfinder, CloudFront, 137KB, .model.json properly blocked by dispatcher
-[LEARN] ACCEPTED RECON @ das.basf.com: S3-hosted AgSolutions Finder (Ionic PWA), api.das.basf.com dead, S3 bucket NoSuchBucket, 5x AWS API GW endpoints 403 IAM-gated
-[LEARN] ACCEPTED RECON @ agriculture.basf.com: Magnolia CMS (348KB)
-[LEARN] REJECTED MISCONFIG @ artifactory.basf.com: Cloudflare WAF custom block (403, 7KB BASF-branded); no bypass possible
-[LEARN] REJECTED MISCONFIG @ ncm.basf.com + cloud.basf.com: Cloudflare JS challenge (403, cf-mitigated:challenge); no bypass possible
-[LEARN] REJECTED MISCONFIG @ secsys.basf.com/api/users/me + /api/devices: HTTP 200 len=246 = WAF block page ("Request Rejected"), NOT API data; WAF returns 200 instead of 403; same across all 3 secsys hosts
-[LEARN] REJECTED MISCONFIG @ intranet.basf.com redirect_uri: Azure AD shows login for both valid/invalid redirect_uri; validation at token exchange; without auth cannot confirm open redirect
-[RISK] basf: 58 — Unauthenticated backend exposure across 20+ host estate (9 *.api + prod.api + api.commerce + federation + my.basf + www + products + api.basf + procurement + tm + passage-europe + vss3 + rep.basf + basf.login.apigee.com + secsys.basf.com + developer.basf.com + worldaccount.basf.com + experience.basf.com + intranet.basf.com + north-america.intranet.basf.com + repfinder.basf.com + das.basf.com + agriculture.basf.com + artifactory.basf.com + ncm.basf.com + cloud.basf.com) now proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere, Spring Boot Actuator properly locked down (404 on all sensitive, status 999 error handler), SAP KM servlet returns 500 (server error, not document access), Apigee SSO portal is stock Edge SSO, AEM dispatchers blocking .model.json, Cloudflare WAF on artifact/cloud/infra hosts. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE remains a design-level flaw requiring interactive code capture (AUTH_HELPED). NEW: experience.basf.com AEM publish tier with leaked author hostnames in CSP — potential dispatcher rewrite bypass to author console (CRITICAL if bypass works). Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise) requiring test account + AEM author bypass via CSP-leaked hostnames. No other exploitable surface remains in unauthenticated context.
-[HYP] NAM ROPC password grant — MFA-bypass token issuance on corporate identity plane
-class: AUTH
-asset: federation.basf.com/nidp/oauth/nam/token
-confidence: 65
-reasoning: OIDC discovery at /nidp/oauth/nam/.well-known/openid-configuration lists grant_types incl password(ROPC) unchanged across all 09-06→09-10 probes; combined with my.basf.com bundle (09-10) showing client 86cc4bf9 does code+refresh_token with acr 3IAM/Login/External and zero PKCE strings, the NAM plane serves public + confidential clients that accept plain-text grants; provider never hardened.
-evidence_needed: token response via grant_type=password for a confidential client (junk-but-format-valid) proving ROPC reachable at token endpoint, or 400 invalid_grant vs 401 invalid_client to distinguish client-existence oracle.
-verify_steps: AUTH_HELPED — POST /nidp/oauth/nam/token grant_type=password&username=<sandbox>&password=<sandbox>&client_id=<conf>&client_secret=<secret>; observe token set or error class.
-impact: full MFA-bypassed access+refresh token set for any user whose creds leak; CRITICAL-conditional.
-testability: AUTH_HELPED
-[HYP] Public client 86cc4bf9 refresh_token non-rotation without PKCE — persistent portal ATO
-class: OATH
-asset: my.basf.com / federation.basf.com/nidp/oauth/nam/authz
-confidence: 55
-reasoning: 09-10 bundle grep confirms ZERO PKCE machinery (no code_verifier/challenge_method in 204906B) while IdP advertises plain+S256 support; redirect_uri oracle exact-match (10 variants rejected) so entry is code/refresh interception only; NAM refresh token reuse rotation policy unverified.
-evidence_needed: live authorize request without code_challenge; refresh_token surviving double replay (same JTI/lifetime).
-verify_steps: AUTH_HELPED — GET federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External on sandbox account; exchange; replay refresh_token twice.
-impact: stolen code or refresh_token = permanent ATO of BASF customer/supplier portal; HIGH-conditional.
-testability: AUTH_HELPED
-[PARKED] das.basf.com dangling second-hop CNAME (api.das→api.das.dfman.info NXDOMAIN): confidence 30 < 40 — controlling zone dfman.info is live and serves the apex site; resource not currently registrable; latent dependency only.
-[FINAL] Survivors ranked:
-[NEXT] HUMAN: from operator (bugs.olivermaicher.eu) request one sandbox supplier/intern account to (a) capture the authorize request on client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 proving absent code_challenge and replay the refresh_token twice to observe rotation, and (b) POST grant_type=password to /nidp/oauth/nam/token with a junk confidential client to confirm ROPC issuance-vs-client-oracle. Unauthenticated live surface is now exhausted (AEM class closed: all author paths + selectors 404, author hostnames NXDOMAIN; S3 dangling-CNAME latent only).
-[RISK] BASF SE: 30 — Unauthenticated exploitable surface now effectively zero across 25+ hosts: AEM class closed this cycle (dispatcher 404s + author hostnames NXDOMAIN), Apigee/AWS IAM/NAM auth gates, WAF blocks, mTLS/TLS gates all previously confirmed. Residual risk is entirely conditional-high OAuth design (NAM ROPC enabled at provider level; public SPA client emits refresh_token with zero PKCE) — both require a sandbox credential to prove and are unreportable without it. Program decision: grant/request test creds or close with two informational/high-conditional OAuth findings.
+[HYP] AEM author tier reachable via un-leaked hostname variant
+class: MISCONFIG
+asset: experience.basf.com (author tier)
+confidence: 15
+reasoning: 09-10 alone tested the two CSP-leaked names (NXDOMAIN); this cycle extended to 15 naming variants (author/aem/cxm/editor/design) — all NXDOMAIN; no AEM author inventory hint remains in public surface.
+evidence_needed: any resolving basf.com name under author/aem/cxm labels serving HTTP.
+verify_steps: PASSIVE — DNS sweep (done: NXDOMAIN 15/15); CT-log SAN re-scan of *.basf.com for author/aem/cxm labels; read-only HEAD https://<hit>/libs/granite/core/content/login.html if any hit exists (none currently).
+impact: unauth AEM author/manager console = full content takeover; CRITICAL-conditional.
+testability: PASSIVE
+[NEXT] HUMAN: from bugs.olivermaicher.eu request one sandbox supplier/intern account; on first credentialed login instrument the my.basf.com→federation redirect to record (a) presence/absence of `state` and `code_challenge` in the authorize URL and callback validation, (b) refresh_token behavior on double replay, and (c) POST grant_type=password to /nidp/oauth/nam/token with a junk-but-format-valid confidential client to classify 401-invalid_client vs 400-invalid_grant. All unauthenticated avenues (incl. the AEM author-naming sweep closed NXDOMAIN 15/15) are exhausted.
+[RISK] BASF SE: 28 — Unauthenticated exploitable surface re-verified zero across 25+ hosts this cycle (AEM author class now closed on NXDOMAIN 15/15 variant sweep; all prior auth-gates/WAF/mTLS confirmations stable). Residual risk is entirely conditional-high OAuth on the corporate identity plane: NAM provider-level ROPC grant, my.basf.com public client issuing refresh_token with zero PKCE, plus the newly-targeted missing-`state` login-CSRF chain. Each is provable only with one sandbox credential; without it all three remain unreportable design/posture findings. Program at decision point — grant test creds or close with informational/high-conditional OAuth items.

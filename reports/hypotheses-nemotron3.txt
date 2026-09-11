@@ -1,4 +1,4 @@
-## 2026-09-10 21:46:25 UTC [target] (model nemotron3)
+## 2026-09-10 23:59:36 UTC [target] (model nemotron3)
 [NEW] experience.basf.com — AEM CXM Experience Platform login, x-vhost experience, CloudFront, CSP leaks author-prod-aem64 + author-stage-aem64 (dead) + api.das.basf.com (dead)
 [NEW] intranet.basf.com — Azure AD (mod_auth_openidc) with tenant ecaa386b-c8df-4ce0-ad01-740cbdb5ba55, client_id f5a39ea7-83db-4af7-b3d1-df80d707650c, redirect_uri /redirect_uri — corporate SSO intranet
 [NEW] north-america.intranet.basf.com — Concrete CMS with Azure AD OAuth2, client_id 36f927e6-1b9a-4b2e-a991-8574640f1164, cookie domain .intranet.basf.com shared across intranet instances
@@ -9,21 +9,21 @@
 [NEW] ncm.basf.com + cloud.basf.com — Cloudflare JS challenge (403, cf-mitigated:challenge); no bypass possible
 [CHANGED] secsys.basf.com/api/users/me + /api/devices — HTTP 200 len=246 = WAF block page ("Request Rejected"), NOT API data; WAF returns 200 instead of 403; same across all 3 secsys hosts
 [CHANGED] intranet.basf.com redirect_uri — Azure AD shows login for both valid/invalid redirect_uri; validation at token exchange; without auth cannot confirm open redirect
-[PRIO] experience.basf.com, 7.8, attack_surface=8 business_value=8 tech_exposure=8 gate_ease=5 cloud_surface=8 freshness=10
+[PRIO] experience.basf.com, 8.2, attack_surface=9 business_value=9 tech_exposure=9 gate_ease=6 cloud_surface=8 freshness=10
 [PRIO] my.basf.com, 8.3, attack_surface=9 business_value=9 tech_exposure=8 gate_ease=10 cloud_surface=7 freshness=8
 [PRIO] federation.basf.com, 7.5, attack_surface=8 business_value=8 tech_exposure=7 gate_ease=10 cloud_surface=6 freshness=8
+[PRIO] intranet.basf.com, 6.8, attack_surface=7 business_value=9 tech_exposure=6 gate_ease=4 cloud_surface=6 freshness=10
 [PRIO] repfinder.basf.com, 6.8, attack_surface=7 business_value=6 tech_exposure=6 gate_ease=8 cloud_surface=7 freshness=9
-[PRIO] secsys.basf.com, 6.5, attack_surface=7 business_value=8 tech_exposure=6 gate_ease=10 cloud_surface=5 freshness=9
+[PRIO] secsys.basf.com, 6.0, attack_surface=6 business_value=8 tech_exposure=5 gate_ease=10 cloud_surface=5 freshness=9
 [PRIO] rep.basf.com, 6.2, attack_surface=6 business_value=8 tech_exposure=5 gate_ease=10 cloud_surface=7 freshness=8
-[PRIO] intranet.basf.com, 5.8, attack_surface=5 business_value=9 tech_exposure=5 gate_ease=3 cloud_surface=6 freshness=8
+[PRIO] north-america.intranet.basf.com, 5.8, attack_surface=6 business_value=7 tech_exposure=5 gate_ease=5 cloud_surface=6 freshness=10
 [PRIO] das.basf.com, 5.3, attack_surface=5 business_value=5 tech_exposure=5 gate_ease=7 cloud_surface=8 freshness=8
-[PRIO] north-america.intranet.basf.com, 5.2, attack_surface=5 business_value=7 tech_exposure=5 gate_ease=4 cloud_surface=6 freshness=8
 [PRIO] agriculture.basf.com, 4.8, attack_surface=4 business_value=5 tech_exposure=4 gate_ease=8 cloud_surface=6 freshness=7
 [HYP] AEM Dispatcher Rewrite Bypass to Author Instance via Leaked Hostnames
 class: IDOR
 asset: experience.basf.com
-confidence: 65
-reasoning: AEM CXM on CloudFront; CSP script-src leaks author-prod-aem64.basf.com + author-stage-aem64.basf.com (both dead/resolve to private) + api.das.basf.com (dead); dispatcher typically blocks /content, /apps, /libs, /etc but misconfigured rewrite rules or missing filter patterns can expose author-only paths (crx/de, /system/console, /crx/packmgr) on publish; CloudFront edge may not normalize paths before dispatcher
+confidence: 70
+reasoning: AEM CXM on CloudFront; CSP script-src leaks author-prod-aem64.basf.com + author-stage-aem64.basf.com (both resolve to private IPs) + api.das.basf.com (dead); dispatcher typically blocks /content, /apps, /libs, /etc but misconfigured rewrite rules or missing filter patterns can expose author-only paths (crx/de, /system/console, /crx/packmgr) on publish; CloudFront edge may not normalize paths before dispatcher
 evidence_needed: at least one author-only path (/crx/de, /system/console, /libs/granite/ui/content/dumplibs.html, /crx/packmgr) returning 200/302/401 (not 404/403) on experience.basf.com publish tier
 verify_steps: PROBE GET https://experience.basf.com/crx/de (HEAD); PROBE GET https://experience.basf.com/system/console (HEAD); PROBE GET https://experience.basf.com/libs/granite/ui/content/dumplibs.html (HEAD); PROBE GET https://experience.basf.com/crx/packmgr (HEAD); PROBE GET https://experience.basf.com/content (HEAD); PROBE GET https://experience.basf.com/apps (HEAD); PROBE GET https://experience.basf.com/etc (HEAD); PROBE GET https://experience.basf.com/bin/receive (HEAD) — all read-only, 1 rps
 impact: Unauthenticated access to AEM author console → code execution, content manipulation, credential theft, full CMS compromise — CRITICAL
@@ -37,7 +37,7 @@ evidence_needed: capture of authentic authorize request proving absence of `code
 verify_steps: AUTH_HELPED — with test account: GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External — record uttered params; exchange code for tokens; verify refresh_token lifetime/rotation on reuse
 impact: Intercepted authz code or stolen refresh_token = full ATO of BASF customer/supplier portal account → order/price/PII access, procurement fraud, supplier impersonation; CRITICAL
 testability: AUTH_HELPED
-[HYP] AEM Rep Finder Public .model.json / Sling Model Exporter Bypass
+[HYP] AEM Rep Finder Sling Model Exporter Selector Bypass
 class: IDOR
 asset: repfinder.basf.com
 confidence: 55
@@ -46,11 +46,13 @@ evidence_needed: at least one Sling Model Exporter selector/suffix returning 200
 verify_steps: PROBE GET https://repfinder.basf.com/content/repfinder/en.model.json (HEAD); PROBE GET https://repfinder.basf.com/content/repfinder/en.model.txt (HEAD); PROBE GET https://repfinder.basf.com/content/repfinder/en.tidy.-1.json (HEAD); PROBE GET https://repfinder.basf.com/content/repfinder/en.infinity.json (HEAD); PROBE GET https://repfinder.basf.com/jcr:content.model.json (HEAD); enumerate all HTML for data-path or resourceType hints — 1 rps, read-only
 impact: Unauthenticated exposure of internal AEM content structure, component configs, resource paths — MEDIUM (recon enabler for author bypass)
 testability: PASSIVE
-[PARKED] Wicket Bookmarkable Page Access Bypass on Customer Portal: confidence 55 but verify_steps require guessing page class names without enumeration evidence; no Wicket mount paths discovered in passive HTML/JS — PASSIVE verify steps not concrete enough
-[PARKED] Smart ID Self-Service Angular SPA — IDOR/BOLA on Identity Management Endpoints: confidence 50 but verify_steps list generic /api/users/me etc. which already returned WAF block page (200 len=246 "Request Rejected") not API surface; no Angular bundle analysis yet to find real endpoints — PASSIVE verify steps not grounded in observed endpoints
+[PARKED] Azure AD mod_auth_openidc Redirect URI Validation Bypass on intranet.basf.com: confidence 35 — redirect_uri shows login for both valid/invalid values; validation occurs at token exchange not authorize endpoint; without valid credentials cannot confirm open redirect or token leakage; verify steps require authenticated session — AUTH_HELPED not feasible without corp creds
+[PARKED] Concrete CMS Azure AD OAuth2 on north-america.intranet.basf.com: confidence 30 — client_id exposed in HTML but standard authorization_code flow; shared cookie domain .intranet.basf.com could enable session sharing but requires valid auth on one subdomain first; no unauthenticated verify steps
+[PARKED] Wicket Bookmarkable Page Access on rep.basf.com: confidence 40 — Actuator locked down (404 on sensitive), Wicket mount paths not discovered in passive HTML; guessing page class names without enumeration evidence — verify steps not concrete enough
+[PARKED] Smart ID Self-Service Angular SPA on secsys.basf.com: confidence 35 — /api/* endpoints return WAF block page (200 len=246 "Request Rejected") not API surface; no Angular bundle analysis yet to find real endpoints — verify steps not grounded in observed endpoints
 [FINAL] 1. Public OAuth Client with Refresh Token, No PKCE — ATO via Code Interception (confidence 80, AUTH_HELPED)
-[FINAL] 2. AEM Dispatcher Rewrite Bypass to Author Instance via Leaked Hostnames (confidence 65, PASSIVE)
-[FINAL] 3. AEM Rep Finder Public .model.json / Sling Model Exporter Bypass (confidence 55, PASSIVE)
+[FINAL] 2. AEM Dispatcher Rewrite Bypass to Author Instance via Leaked Hostnames (confidence 70, PASSIVE)
+[FINAL] 3. AEM Rep Finder Sling Model Exporter Selector Bypass (confidence 55, PASSIVE)
 [NEXT] PROBE: GET https://experience.basf.com/crx/de (HEAD) → then /system/console, /libs/granite/ui/content/dumplibs.html, /crx/packmgr, /content, /apps, /etc, /bin/receive (all HEAD, 1 rps) — test AEM author-instance exposure on publish tier via leaked author hostnames in CSP
 [LEARN] ACCEPTED RECON @ experience.basf.com: AEM CXM Experience Platform login, x-vhost experience, CloudFront, CSP leaks author-prod-aem64 + author-stage-aem64 (dead) + api.das.basf.com (dead)
 [LEARN] ACCEPTED RECON @ intranet.basf.com: Azure AD (mod_auth_openidc) with tenant ecaa386b-c8df-4ce0-ad01-740cbdb5ba55, client_id f5a39ea7-83db-4af7-b3d1-df80d707650c, redirect_uri /redirect_uri — corporate SSO intranet
@@ -62,4 +64,4 @@ testability: PASSIVE
 [LEARN] REJECTED MISCONFIG @ ncm.basf.com + cloud.basf.com: Cloudflare JS challenge (403, cf-mitigated:challenge); no bypass possible
 [LEARN] REJECTED MISCONFIG @ secsys.basf.com/api/users/me + /api/devices: HTTP 200 len=246 = WAF block page ("Request Rejected"), NOT API data; WAF returns 200 instead of 403; same across all 3 secsys hosts
 [LEARN] REJECTED MISCONFIG @ intranet.basf.com redirect_uri: Azure AD shows login for both valid/invalid redirect_uri; validation at token exchange; without auth cannot confirm open redirect
-[RISK] basf: 62 — Unauthenticated backend exposure across 30+ host estate (9 *.api + prod.api + api.commerce + federation + my.basf + www + products + api.basf + procurement + tm + passage-europe + vss3 + rep.basf + basf.login.apigee.com + secsys.basf.com + developer.basf.com + worldaccount.basf.com + experience.basf.com + intranet.basf.com + north-america.intranet.basf.com + repfinder.basf.com + das.basf.com + agriculture.basf.com + artifactory.basf.com + ncm.basf.com + cloud.basf.com) now proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere, Spring Boot Actuator properly locked down (404 on all sensitive, status 999 error handler), SAP KM servlet returns 500 (server error, not document access), Apigee SSO portal is stock Edge SSO, AEM dispatchers blocking .model.json, Cloudflare WAF on artifact/cloud/infra hosts. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE remains a design-level flaw requiring interactive code capture (AUTH_HELPED). NEW: experience.basf.com AEM publish tier with leaked author hostnames in CSP — potential dispatcher rewrite bypass to author console (CRITICAL if bypass works). Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise) requiring test account + AEM author bypass via CSP-leaked hostnames. No other exploitable surface remains in unauthenticated context.
+[RISK] basf: 65 — Unauthenticated backend exposure across 30+ host estate proven gated: Apigee VerifyAPIKey with all browser keys rejected, AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, e-gate 404 everywhere, Spring Boot Actuator properly locked down (404 on all sensitive, status 999 error handler), SAP KM servlet returns 500 (server error, not document access), Apigee SSO portal is stock Edge SSO, AEM dispatchers blocking .model.json, Cloudflare WAF on artifact/cloud/infra hosts. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE remains a design-level flaw requiring interactive code capture (AUTH_HELPED). NEW: experience.basf.com AEM publish tier with leaked author hostnames in CSP — potential dispatcher rewrite bypass to author console (CRITICAL if bypass works). Residual risk = portal ATO chain (OAuth code interception → refresh_token replay → full account compromise) requiring test account + AEM author bypass via CSP-leaked hostnames. No other exploitable surface remains in unauthenticated context.
