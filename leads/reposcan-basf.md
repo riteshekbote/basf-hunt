@@ -150,3 +150,5 @@ reasoning: The `ng-state` JSON embedded in the BASF commerce client reveals impe
 impact: LOW — The URLs themselves are not secrets, but they reveal the existence of impersonation APIs that may have weaker access controls than the main APIs. This is informational only.
 verify_steps: Passively view source of `www.basf.com/us/en` and search for `impersonateBaseApiUrl` in the embedded JSON.
 TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-11 15:12:13 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
