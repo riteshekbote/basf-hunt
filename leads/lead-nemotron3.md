@@ -2797,3 +2797,68 @@ testability: PASSIVE
 [LEARN] REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs (`/index.php/ccm/system/block/types`, `/index.php/ccm/system/page/types`, `/index.php/dashboard`, `/ccm/system/block/types`, `/api/blocks`) all 307 redirect to Azure AD OAuth2 — fully auth-gated
 [LEARN] REJECTED MISCONFIG @ experience.basf.com: AEM Dispatcher cache poisoning via Host header spoofing — CloudFront returns 403 on all 4 tested paths with `Host: author-prod-aem64.basf.com`; edge blocks spoofed Host headers
 [RISK] basf: 45 — Unauthenticated backend exposure across 35+ host estate proven gated: Apigee VerifyAPIKey (all browser keys rejected), AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, Spring Boot Actuator locked down (404 sensitive, status 999 error handler), SAP KM servlet returns 500, AEM dispatchers blocking author paths/selectors, Cloudflare WAF on artifact/cloud/infra, Magnolia CMS endpoints redirected/404, Concrete CMS Azure AD-gated. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE (design flaw, AUTH_HELPED). Residual risk = portal ATO chain (OAuth code interception → refresh_token replay). No other exploitable unauthenticated surface remains.
+## 2026-09-11 19:55:03 UTC [target] (model nemotron3)
+[CHANGED] agriculture.basf.com: All 7 standard Magnolia endpoints (/graphql2, /.graphql, /.restful, /.rest, /adminCentral, /admin, /.admin, /.cache, /.imaging, /dam) now confirmed 308 redirect or 404 — zero unauthenticated GraphQL/REST surface remains
+[CHANGED] north-america.intranet.basf.com: All 5 Concrete internal API endpoints (/index.php/ccm/system/block/types, /index.php/ccm/system/page/types, /index.php/dashboard, /ccm/system/block/types, /api/blocks) return 307 redirect to Azure AD OAuth2 — fully auth-gated
+[CHANGED] experience.basf.com: AEM Dispatcher cache poisoning via Host header spoofing (author-prod-aem64.basf.com) returns 403 from CloudFront on all 4 tested paths — edge blocks spoofed Host headers conclusively
+[CHANGED] secsys.basf.com: /api/* endpoints return HTTP 200 len=246 = WAF "Request Rejected" page (NOT API data) across all 3 hosts (secsys, bsh.secsys, secsys-visitor); WAF returns 200 instead of 403
+[CHANGED] procurement.basf.com/tm/passage-europe/vss3.basf.com: KM servlet parameterized requests (?path=/documents/newFramework) return HTTP 500 (SAP runtime error) across 4 portals; guest role renders zero content; vss3 WAF-blocks (235B) — SAP-estate unauth doc class conclusively closed
+[CHANGED] basf.login.apigee.com: Full Apigee OAuth identity surface mapped via OIDC discovery + SAML metadata; only config endpoints (discovery, metadata, jwks) return 200; ROPC/implicit grants are stock Edge SSO config; exploitation requires valid BASF creds
+[CHANGED] rep.basf.com: Spring Boot Actuator at /actuator (HAL) + /actuator/health (UP); all 16 sensitive endpoints return 404; path traversal and content-negotiation blocked by Spring Boot path normalization; custom error handler returns status 999
+[CHANGED] *.api.basf.com estate (9 hosts): Full unauth surface reconfirmed end-to-end — zero reachable endpoints beyond auth gates/404
+[CHANGED] prod.api.basf.com: 66 proxy paths all 404 except /productinformation (401); 4 browser keys (core/pi/csp/navigator) rejected "Invalid ApiKey" — key scope exhausted
+[CHANGED] api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM/SigV4 authorizer, x-api-key not a credential class
+[CHANGED] my.basf.com/.auth: HTTP 200/205KB SPA fallback re-confirmed — /.auth remains client-side callback, no server-side token surface
+[CHANGED] federation.basf.com: NAM OIDC discovery reconfirmed unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes); SAML2 metadata at /nidp/saml2/metadata returns 200 signed descriptor (21434B)
+[PRIO] my.basf.com,5.50,attack_surface=3 business_value=8 tech_exposure=4 gate_ease=10 cloud_surface=6 freshness=7
+[PRIO] federation.basf.com,5.25,attack_surface=4 business_value=7 tech_exposure=5 gate_ease=10 cloud_surface=5 freshness=6
+[PRIO] secsys.basf.com,4.80,attack_surface=3 business_value=6 tech_exposure=4 gate_ease=10 cloud_surface=5 freshness=6
+[PRIO] procurement.basf.com,4.50,attack_surface=3 business_value=7 tech_exposure=3 gate_ease=6 cloud_surface=6 freshness=5
+[PRIO] rep.basf.com,4.25,attack_surface=3 business_value=7 tech_exposure=2 gate_ease=10 cloud_surface=7 freshness=4
+[PRIO] basf.login.apigee.com,3.90,attack_surface=2 business_value=6 tech_exposure=3 gate_ease=10 cloud_surface=8 freshness=4
+[PRIO] experience.basf.com,3.60,attack_surface=2 business_value=8 tech_exposure=2 gate_ease=4 cloud_surface=8 freshness=5
+[PRIO] agriculture.basf.com,3.10,attack_surface=2 business_value=5 tech_exposure=1 gate_ease=10 cloud_surface=6 freshness=4
+[PRIO] north-america.intranet.basf.com,3.00,attack_surface=2 business_value=6 tech_exposure=1 gate_ease=4 cloud_surface=5 freshness=4
+[PRIO] das.basf.com,2.80,attack_surface=1 business_value=4 tech_exposure=2 gate_ease=7 cloud_surface=8 freshness=4
+[HYP] Public OAuth Client with Refresh Token No PKCE Enables ATO Chain
+class: AUTH
+asset: my.basf.com
+confidence: 65
+reasoning: SSR boot config discloses public client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect_uri=https://my.basf.com/.auth, scope=openid profile refresh_token, acr_values=3IAM/Login/External, zero PKCE references; authorization_code flow + long-lived refresh_token = code interception → token exchange → persistent access
+evidence_needed: Successful OAuth authorization_code flow with intercepted code + refresh_token replay yielding valid access_token without PKCE challenge
+verify_steps: PROBE GET https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid%20profile%20refresh_token&acr_values=3IAM%2FLogin%2FExternal (HEAD, observe redirect to login); RAG: search for open redirect on my.basf.com/.auth or federation.basf.com to steal code via referrer/logs
+impact: Full account takeover via stolen authorization code → refresh_token replay; persistent access until token rotation; CRITICAL
+testability: AUTH_HELPED
+[HYP] ROPC (Password Grant) + Hybrid Grants Enabled in NAM OIDC Provider Config
+class: OATH
+asset: federation.basf.com
+confidence: 55
+reasoning: OIDC discovery at /nidp/.well-known/openid-configuration and /nidp/oauth/nam/.well-known/openid-configuration exposes grant_types including password (ROPC) and hybrid; code_challenge_methods plain+S256; registration_endpoint /nidp/oauth/nam/clients returns 401; provider-level config permits credential-based token acquisition
+evidence_needed: Valid BASF credentials (username/password) exchanging for tokens via /nidp/oauth/nam/token with grant_type=password — out of scope to test; confirmation that no client policy restricts ROPC to confidential clients only
+verify_steps: PROBE POST https://federation.basf.com/nidp/oauth/nam/token -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=password&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&username=test&password=test" (HEAD, expect 400/401 invalid_grant not 400 unsupported_grant_type); RAG: check NetIQ NAM docs for default ROPC client restrictions
+impact: Credential stuffing / password spray against BASF identities if ROPC not restricted to confidential clients; HIGH
+testability: AUTH_HELPED
+[HYP] WAF Returns HTTP 200 for Blocked Requests Across secsys Ecosystem
+class: MISCONFIG
+asset: secsys.basf.com
+confidence: 45
+reasoning: /api/users/me and /api/devices return HTTP 200 len=246 with "Request Rejected" HTML page (not JSON) across secsys.basf.com, bsh.secsys, secsys-visitor, and qual instances; WAF returns 200 instead of 403 — potential for response parsing confusion, caching anomalies, or WAF rule bypass via encoding
+evidence_needed: Variation in WAF response (status code, body, headers) when probing with encoded payloads, HTTP smuggling precursors, or header manipulation that yields non-200 or non-block-page response
+verify_steps: PROBE GET https://secsys.basf.com/api/users/me -H "X-Forwarded-For: 127.0.0.1" (HEAD); PROBE GET https://secsys.basf.com/api/users/me -H "X-Original-URL: /api/users/me" (HEAD); PROBE GET https://secsys.basf.com/api/users/me%00 (HEAD); PROBE GET https://bsh.secsys/api/users/me (HEAD); PROBE GET https://secsys-visitor/api/users/me (HEAD) — all read-only, 1 rps
+impact: WAF misconfiguration enabling bypass or cache poisoning; info disclosure via error pages; MEDIUM
+testability: PASSIVE
+[PARKED] Public OAuth Client with Refresh Token No PKCE Enables ATO Chain: confidence 65 but AUTH_HELPED — requires valid BASF credentials or open redirect to steal code; no unauthenticated exploit path; design-level finding only
+[PARKED] ROPC (Password Grant) + Hybrid Grants Enabled in NAM OIDC Provider Config: confidence 55 but AUTH_HELPED — exploitation requires valid BASF credentials (password grant); provider config posture matches basf.login.apigee.com stock Edge SSO; no misconfiguration without credentialed test
+[PARKED] WAF Returns HTTP 200 for Blocked Requests Across secsys Ecosystem: confidence 45 — WAF returning 200 for blocks is common (Akamai/Imperva/F5-ASM behavior); no evidence of bypass, caching issue, or parsing confusion; speculative without anomalous response
+[FINAL] No surviving hypotheses above confidence 40 with PASSIVE verify steps — all attack vectors on tested assets exhausted, blocked at edge/auth, or require credentials (AUTH_HELPED)
+[NEXT] RAG: Passive GitHub/pastebin/web search for any BASF OAuth client_secrets, refresh_tokens, or SAML metadata private keys associated with known client_ids (86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, fe3ede5d-ce60-4954-a65c-349ddcb75c8b, f5a39ea7-83db-4af7-b3d1-df80d707650c, 36f927e6-1b9a-4b2e-a991-8574640f1164, c653ff6e-a86a-4531-8443-a8a4378dc2fb) — zero hits to date but final sweep before closure
+[LEARN] REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL (/graphql2, /.graphql), REST (/restful, /.rest), admin (/adminCentral, /admin, /.admin), cache (/.cache), DAM (/.imaging, /dam) all return 308 redirect or 404 — zero unauthenticated API surface
+[LEARN] REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs (/index.php/ccm/system/block/types, /index.php/ccm/system/page/types, /index.php/dashboard, /ccm/system/block/types, /api/blocks) all 307 redirect to Azure AD OAuth2 — fully auth-gated
+[LEARN] REJECTED MISCONFIG @ experience.basf.com: AEM Dispatcher cache poisoning via Host header spoofing — CloudFront returns 403 on all 4 tested paths with Host: author-prod-aem64.basf.com; edge blocks spoofed Host headers
+[LEARN] REJECTED MISCONFIG @ rep.basf.com/actuator/*: All 16 sensitive actuator endpoints return 404; path traversal (env.., actuator;/env, health/path/../../env) and content-negotiation (v3+json) blocked by Spring Boot path normalization; custom error handler returns status 999
+[LEARN] REJECTED BUSLOGIC @ procurement.basf.com/tm/passage-europe/vss3.basf.com KM servlet: All parameterized requests return HTTP 500 (SAP runtime error) across 4 portals; guest role renders zero content; vss3 WAF-blocks — SAP-estate unauth doc class conclusively closed
+[LEARN] REJECTED MISCONFIG @ basf.login.apigee.com: Standard Apigee Edge SSO identity-zone login — generic Edge SSO, not custom BASF OAuth provider; ROPC/implicit config is stock Edge SSO; exploitation requires valid BASF creds
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: Full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+[LEARN] ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect_uri, scope, refresh_token, acr_values, zero PKCE refs — design flaw (AUTH_HELPED)
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims — provider config stable, no hardening
+[RISK] basf: 45 — Unauthenticated backend exposure across 35+ host estate proven gated: Apigee VerifyAPIKey (all browser keys rejected), AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, Spring Boot Actuator locked down (404 sensitive, status 999 error handler), SAP KM servlet returns 500 guest-zero-content, AEM dispatchers blocking author paths/selectors, Cloudflare WAF on artifact/cloud/infra, Magnolia CMS endpoints redirected/404, Concrete CMS Azure AD-gated. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE (design flaw, AUTH_HELPED). Residual risk = portal ATO chain (OAuth code interception → refresh_token replay). No other exploitable unauthenticated surface remains.

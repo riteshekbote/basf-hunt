@@ -14556,3 +14556,199 @@ testability: PASSIVE
 ```
 [RISK] BASF SE: 32 — Unauthenticated surface on 25+ host estate remains almost entirely gated (Apigee VerifyAPIKey, AWS IAM, NAM OIDC exact-match redirect_uri, Azure Functions 401/404, F5-ASM WAF blocks, Cloudflare JS challenge). Two new untested surfaces identified this cycle: agriculture.basf.com Magnolia CMS (GraphQL/REST default-open endpoints, 62) and repfinder.basf.com AEM search servlet (55). The standing highest-severity item (no-PKCE refresh_token ATO, 75) remains AUTH_HELPED. New Magnolia/repfinder probes could surface MEDIUM-HIGH content disclosure if default endpoints are open, or close the class if not.
 ```
+===== ANALYST bigpickle 2026-09-11 19:55:13 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la; ls art/ 2>/dev/null | tail -20; ls *.md 2>/dev/null
+total 376
+drwxr-xr-x 12 runner runner   4096 Sep 11 19:52 .
+drwxr-xr-x  3 runner runner   4096 Sep 11 19:52 ..
+drwxr-xr-x  7 runner runner   4096 Sep 11 19:52 .git
+drwxr-xr-x  3 runner runner   4096 Sep 11 19:52 .github
+-rw-r--r--  1 runner runner   1801 Sep 11 19:52 README.md
+-rw-r--r--  1 runner runner     32 Sep 11 19:52 analyst-out.txt
+-rw-r--r--  1 runner runner 129231 Sep 11 19:52 analyst-prompt.txt
+-rw-r--r--  1 runner runner 125359 Sep 11 19:52 ctx.txt
+drwxr-xr-x  2 runner runner   4096 Sep 11 19:52 inventory
+drwxr-xr-x  2 runner runner   4096 Sep 11 19:52 knowledge
+drwxr-xr-x  2 runner runner   4096 Sep 11 19:52 leads
+-rw-r--r--  1 runner runner  40708 Sep 11 19:52 probe-results.md
+drwxr-xr-x  2 runner runner   4096 Sep 11 19:52 recon-notes
+drwxr-xr-x  2 runner runner   4096 Sep 11 19:52 reports
+drwxr-xr-x  2 runner runner   4096 Sep 11 19:52 reposcan-raw
+-rw-r--r--  1 runner runner   3285 Sep 11 19:52 scope.yml
+drwxr-xr-x  2 runner runner   4096 Sep 11 19:52 scripts
+-rw-r--r--  1 runner runner     33 Sep 11 19:52 state_bigpickle.json
+-rw-r--r--  1 runner runner     33 Sep 11 19:52 state_laguna.json
+-rw-r--r--  1 runner runner     33 Sep 11 19:52 state_ling3.json
+-rw-r--r--  1 runner runner     33 Sep 11 19:52 state_longcat.json
+-rw-r--r--  1 runner runner     33 Sep 11 19:52 state_mimo.json
+-rw-r--r--  1 runner runner     33 Sep 11 19:52 state_nemotron3.json
+drwxr-xr-x  2 runner runner   4096 Sep 11 19:52 triage
+README.md
+probe-results.md
+[0m
+[0m$ [0mls -la leads/ knowledge/; ls -la leads/*.txt 2>/dev/null | tail; wc -l probe-results.md
+knowledge/:
+total 72
+drwxr-xr-x  2 runner runner  4096 Sep 11 19:52 .
+drwxr-xr-x 12 runner runner  4096 Sep 11 19:52 ..
+-rw-r--r--  1 runner runner 62958 Sep 11 19:52 index.md
+
+leads/:
+total 872
+drwxr-xr-x  2 runner runner   4096 Sep 11 19:52 .
+drwxr-xr-x 12 runner runner   4096 Sep 11 19:52 ..
+-rw-r--r--  1 runner runner 364259 Sep 11 19:52 lead-bigpickle.md
+-rw-r--r--  1 runner runner   2856 Sep 11 19:52 lead-laguna.md
+-rw-r--r--  1 runner runner   2800 Sep 11 19:52 lead-ling3.md
+-rw-r--r--  1 runner runner   2912 Sep 11 19:52 lead-longcat.md
+-rw-r--r--  1 runner runner     18 Sep 11 19:52 lead-mimo.md
+-rw-r--r--  1 runner runner 484428 Sep 11 19:52 lead-nemotron3.md
+-rw-r--r--  1 runner runner  12661 Sep 11 19:52 reposcan-basf.md
+573 probe-results.md
+[0m
+[0m$ [0mtail -60 probe-results.md
+https://experience.basf.com/content -> HTTP 404
+https://experience.basf.com/apps -> HTTP 404
+https://experience.basf.com/etc -> HTTP 404
+https://experience.basf.com/bin/receive -> HTTP 404
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+https://repfinder.basf.com/content/repfinder/en.model.json -> HTTP 404
+https://repfinder.basf.com/content/repfinder/en.model.txt -> HTTP 404
+https://repfinder.basf.com/content/repfinder/en.tidy.-1.json -> HTTP 404
+
+## 2026-09-11 04:32:46 UTC
+https://experience.basf.com/content.json -> HTTP 404
+https://experience.basf.com/content.infinity.json -> HTTP 404
+https://experience.basf.com/content.tidy.-1.json -> HTTP 404
+https://experience.basf.com/content.feed.xml -> HTTP 404
+https://experience.basf.com/jcr:content.feed.xml -> HTTP 404
+https://experience.basf.com/_jcr_content.html -> HTTP 404
+https://experience.basf.com/_jcr_content.json -> HTTP 404
+https://experience.basf.com/_jcr_content.xml -> HTTP 404
+https://experience.basf.com/libs/granite/ui/content/dumplibs.html -> HTTP 404
+https://experience.basf.com/system/sling/monitoring -> HTTP 404
+https://experience.basf.com/system/console/bundles -> HTTP 404
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External -> 200 len=684
+
+## 2026-09-11 09:29:29 UTC
+https://agriculture.basf.com/graphql2 -> 200 len=348114
+https://agriculture.basf.com/.restful -> 200 len=348114
+https://agriculture.basf.com/docurl/ -> 200 len=404917
+https://north-america.intranet.basf.com/index.php/login -> 200 len=?
+https://repfinder.basf.com/bin/repfinder.json -> HTTP 404
+https://repfinder.basf.com/content/repfinder/en.search.json -> HTTP 404
+https://north-america.intranet.basf.com/index.php/api -> 200 len=43206
+https://north-america.intranet.basf.com/index.php/tools/activated_packages -> 200 len=43173
+
+## 2026-09-11 13:43:06 UTC
+https://agriculture.basf.com/graphql2 -> 200 len=335626
+https://agriculture.basf.com/.restful/content -> HTTP 404
+https://agriculture.basf.com/.rest/content -> HTTP 404
+https://agriculture.basf.com/adminCentral -> 200 len=335626
+https://agriculture.basf.com/.cache -> 200 len=335626
+https://agriculture.basf.com/.imaging -> 200 len=335626
+https://agriculture.basf.com/dam -> 200 len=335626
+https://north-america.intranet.basf.com/index.php/ccm/system/block/types -> 200 len=43173
+https://north-america.intranet.basf.com/index.php/ccm/system/page/types -> 200 len=43176
+https://north-america.intranet.basf.com/index.php/dashboard -> 200 len=43206
+https://north-america.intranet.basf.com/ccm/system/block/types -> 200 len=43191
+https://north-america.intranet.basf.com/api/blocks -> 200 len=43203
+
+## 2026-09-11 17:24:07 UTC
+https://agriculture.basf.com/.graphql -> 200 len=348163
+https://agriculture.basf.com/admin -> 200 len=348163
+https://agriculture.basf.com/.admin -> 200 len=348163
+https://north-america.intranet.basf.com/ccm/system/block/types -> 200 len=43277
+https://agriculture.basf.com/graphql2 -> 200 len=348163
+https://agriculture.basf.com/.restful -> 200 len=348163
+https://agriculture.basf.com/docurl/ -> 200 len=404935
+https://north-america.intranet.basf.com/index.php/login -> 200 len=?
+https://repfinder.basf.com/bin/repfinder.json -> HTTP 404
+https://repfinder.basf.com/content/repfinder/en.search.json -> HTTP 404
+https://north-america.intranet.basf.com/index.php/api -> 200 len=43206
+https://north-america.intranet.basf.com/index.php/tools/activated_packages -> 200 len=43280
+[0m
+[0m$ [0mfor p in /index.php/api /index.php/tools/activated_packages /ccm/system/block/types /index.php/login; do
+  curl -s -o /tmp/na.bin -w "%{http_code} %{content_type} %{size_download} redirect=%{redirect_url}\n" "https://north-america.intranet.basf.com$p"
+  head -c 300 /tmp/na.bin | tr -d '\0' | head -c 300; echo; echo "---"
+  sleep 1
+done
+307 text/html; charset=UTF-8 882 redirect=https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Findex.php%2Fapi
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="refresh" content="0;url='https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Findex.php%2Fapi'" />
+
+        <title>R
+---
+307 text/html; charset=UTF-8 974 redirect=https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Findex.php%2Ftools%2Factivated_packages
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="refresh" content="0;url='https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Findex.php%2Ftools%2Factivated_packages
+---
+307 text/html; charset=UTF-8 934 redirect=https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Fccm%2Fsystem%2Fblock%2Ftypes
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="refresh" content="0;url='https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Fccm%2Fsystem%2Fblock%2Ftypes'" />
+
+   
+---
+200 text/html; charset=UTF-8 4592 redirect=
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="/concrete/themes/concrete/main.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<title>Login :: BASF North America Intranet</title>
+
+<meta http-equiv="content-type" content="tex
+---
+[0m
+[0m$ [0mfor p in / /graphql2 /www.basf.com/x/.restful /docurl/; do
+  curl -s -o /tmp/ag.bin -w "%{http_code} %{content_type} %{size_download}\n" "https://agriculture.basf.com$p"
+  head -c 120 /tmp/ag.bin | tr -d '\0'; echo " <= $p"; sleep 1
+done
+308 text/plain; charset=utf-8 69
+Permanent Redirect. Redirecting to https://agriculture.basf.com/us/en <= /
+308 text/plain; charset=utf-8 69
+Permanent Redirect. Redirecting to https://agriculture.basf.com/us/en <= /graphql2
+404 text/html; charset=utf-8 344557
+<!DOCTYPE html><html lang="en-US" data-beasties-container><head>
+    <meta charset="utf-8">
+    <title>Not Found</title> <= /www.basf.com/x/.restful
+308 text/plain; charset=utf-8 73
+Permanent Redirect. Redirecting to https://agriculture.basf.com/global/en <= /docurl/
+[0m
+[0m$ [0mcurl -s -o /tmp/rf.html -w "%{http_code} %{content_type} %{size_download}\n" "https://repfinder.basf.com/"
+grep -oE 'src="[^"]+\.js[^"]*"' /tmp/rf.html | head -20
+grep -oE 'href="[^"]+\.(js|json)[^"]*"' /tmp/rf.html | head -20
+200 text/html;charset=utf-8 137935
+src="https://rum.hlx.page/.rum/@adobe/helix-rum-js@%5E2/dist/rum-standalone.js"
+src="https://code.jquery.com/jquery-3.3.1.min.js"
+src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+src="https://player.vzaar.com/libs/flashtakt/client.js"
+src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"
+src="/etc.clientlibs/basf/showcase/clientlibs/show-vendors~publish.lc-5c3c20d6249e3d8860f6bbd0905946ef-lc.min.js"
+src="/etc.clientlibs/basf/cxm/clientlibs/sites/basf-lt-green.min.js"
+src="/etc.clientlibs/core/wcm/components/image/v2/image/clientlibs/site.min.js"
+[0m
+[93m[1m! [0mpermission requested: external_directory (/tmp/*); auto-rejecting
+[0m✗ [0mgrep -oE 'src="[^"]+"' /tmp/rf.html | sed 's/src="//;s/"$//' | grep -iE '\.js' | grep -v jquery | grep -v rum | grep -v cdn | grep -v bootstrap | grep -v vzaar | grep -v cdnjs > /tmp/rf_js.txt
+cat /tmp/rf_js.txt
+echo "=== fetch bundles ==="
+for u in $(cat /tmp/rf_js.txt); do
+  fn=$(basename "$u" | cut -c1-40)
+  curl -s -o "/tmp/rf_$fn" -w "%{http_code} %{size_download} $u\n" "https://repfinder.basf.com$u"
+  sleep 1
+done failed
+[91m[1mError: [0mThe user rejected permission to use this specific tool call.

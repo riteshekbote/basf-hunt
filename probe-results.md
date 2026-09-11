@@ -571,3 +571,10 @@ https://repfinder.basf.com/bin/repfinder.json -> HTTP 404
 https://repfinder.basf.com/content/repfinder/en.search.json -> HTTP 404
 https://north-america.intranet.basf.com/index.php/api -> 200 len=43206
 https://north-america.intranet.basf.com/index.php/tools/activated_packages -> 200 len=43280
+
+## 2026-09-11 19:55:22 UTC
+https://my.basf.com/.auth -> 200 len=204991
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid%20profile%20refresh_token&acr_values=3IAM%2FLogin%2FExternal -> 200 len=684
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://secsys.basf.com/api/users/me -> 200 len=246
+https://secsys.basf.com/api/users/me%00 -> 200 len=246
