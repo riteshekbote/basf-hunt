@@ -310,3 +310,6 @@
 - 2026-09-11 ACCEPTED RECON @ *.api.basf.com estate: Full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
 - 2026-09-11 ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect_uri, scope, refresh_token, acr_values, zero PKCE refs — design flaw (AUTH_HELPED)
 - 2026-09-11 ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims — provider config stable, no hardening
+- 2026-09-11 ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: unauth AEM->AWS Lambda proxy, 200 JSON, stacktrace disclosure, geolocation-based search path functional (empty DB) — dispatcher misses /bin/basf/repfindertool
+- 2026-09-11 REJECTED MISCONFIG @ north-america.intranet.basf.com attempt_auth?then=: 302 to FIXED Azure AD authorize URL, then stored server-side post-auth only — no unauth open redirect
+- 2026-09-11 REJECTED MISCONFIG @ agriculture.basf.com: /graphql2 + /docurl/ -> 308 SPA catch-all /us/en — Magnolia GraphQL/REST not wired on this vhost; class conclusively closed

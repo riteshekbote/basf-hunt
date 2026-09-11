@@ -1189,3 +1189,26 @@
 - LEARN: ACCEPTED RECON @ *.api.basf.com estate: Full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/4
 - LEARN: ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect_uri, scope, refresh_token, 
 - LEARN: ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/bas
+
+## RANKED HYPOTHESES 2026-09-11 22:30:03 UTC
+- [62] agriculture.basf.com: Magnolia CMS GraphQL Introspection + Unauthenticated Mutations on agriculture.basf.com (from art/lead_bigpickle.txt)
+- [50] secsys.basf.com: WAF 200-OK Block Page Enables Cache Poisoning / Response Confusion (from art/lead_nemotron3.txt)
+- NEXT(hypotheses-bigpickle.txt): PROBE: at 1 rps, GET https://agriculture.basf.com/graphql2 -H "Content-Type: application/json" -d '{"query":"{__schema{types{name}}}"}' && GET https://agricultu
+- NEXT(hypotheses-nemotron3.txt): PROBE: GET https://secsys.basf.com/api/users/me -H "Cache-Control: no-cache" (HEAD) — verify if WAF block page persists with 200 under cache-busting headers; th
+- LEARN: REJECTED MISCONFIG @ experience.basf.com AEM selectors: .content.json, .infinity.json, .tidy.-1.json, .feed.xml, _jcr_content.*, system/sling/*, system/console/
+- LEARN: REJECTED MISCONFIG @ repfinder.basf.com Sling Model Exporter: .model.json, .model.txt, .tidy.-1.json, .infinity.json, jcr:content.model.json all 404 — dispatche
+- LEARN: ACCEPTED RECON @ agriculture.basf.com: Magnolia CMS (348KB root), zero sub-path probes ever run — Magnolia GraphQL/REST surface completely untested
+- LEARN: ACCEPTED RECON @ das.basf.com: S3 PWA, api subdomain dead, S3 bucket NoSuchBucket, 5x AWS API GW 403 IAM-gated — no exploitation path without IAM creds
+- LEARN: ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
+- LEARN: ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: unauth AEM->AWS Lambda proxy, 200 JSON, stacktrace disclosure, geolocation-based search path functio
+- LEARN: REJECTED MISCONFIG @ north-america.intranet.basf.com attempt_auth?then=: 302 to FIXED Azure AD authorize URL, then stored server-side post-auth only — no unauth
+- LEARN: REJECTED MISCONFIG @ agriculture.basf.com: /graphql2 + /docurl/ -> 308 SPA catch-all /us/en — Magnolia GraphQL/REST not wired on this vhost; class conclusively 
+- LEARN: REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL (/graphql2, /.graphql), REST (/restful, /.rest), admin (/adminCentral, /admin, /.admin), cache (
+- LEARN: REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs (/index.php/ccm/system/block/types, /index.php/ccm/system/page/types, /index.ph
+- LEARN: REJECTED MISCONFIG @ experience.basf.com: AEM Dispatcher cache poisoning via Host header spoofing — CloudFront returns 403 on all 4 tested paths with Host: auth
+- LEARN: REJECTED MISCONFIG @ rep.basf.com/actuator/*: All 16 sensitive actuator endpoints return 404; path traversal (env.., actuator;/env, health/path/../../env) and c
+- LEARN: REJECTED BUSLOGIC @ procurement.basf.com/tm/passage-europe/vss3.basf.com KM servlet: All parameterized requests return HTTP 500 (SAP runtime error) across 4 por
+- LEARN: REJECTED MISCONFIG @ basf.login.apigee.com: Standard Apigee Edge SSO identity-zone login — generic Edge SSO, not custom BASF OAuth provider; ROPC/implicit confi
+- LEARN: ACCEPTED RECON @ *.api.basf.com estate: Full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/4
+- LEARN: ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect_uri, scope, refresh_token, 
+- LEARN: ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/bas

@@ -409,3 +409,16 @@ www.basf.com
 - CHANGED api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM/SigV4 authorizer, x-api-key not a credential class
 - CHANGED my.basf.com/.auth: HTTP 200/205KB SPA fallback re-confirmed — /.auth remains client-side callback, no server-side token surface
 - CHANGED federation.basf.com: NAM OIDC discovery reconfirmed unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes); SAML2 metadata at /nidp/saml2/metadata returns 200 signed descriptor (21434B)
+
+## 2026-09-11 22:30:03 UTC
+- CHANGED agriculture.basf.com: All 7 standard Magnolia endpoints (/graphql2, /.graphql, /.restful, /.rest, /adminCentral, /admin, /.admin, /.cache, /.imaging, /dam) now confirmed 308 redirect or 404 — zero una
+- CHANGED north-america.intranet.basf.com: All 5 Concrete internal API endpoints (/index.php/ccm/system/block/types, /index.php/ccm/system/page/types, /index.php/dashboard, /ccm/system/block/types, /api/blocks)
+- CHANGED experience.basf.com: AEM Dispatcher cache poisoning via Host header spoofing (author-prod-aem64.basf.com) returns 403 from CloudFront on all 4 tested paths — edge blocks spoofed Host headers conclusiv
+- CHANGED secsys.basf.com: /api/* endpoints return HTTP 200 len=246 = WAF "Request Rejected" page (NOT API data) across all 3 hosts (secsys, bsh.secsys, secsys-visitor); WAF returns 200 instead of 403
+- CHANGED basf.login.apigee.com: Full Apigee OAuth identity surface mapped via OIDC discovery + SAML metadata; only config endpoints (discovery, metadata, jwks) return 200; ROPC/implicit grants are stock Edge S
+- CHANGED rep.basf.com: Spring Boot Actuator at /actuator (HAL) + /actuator/health (UP); all 16 sensitive endpoints return 404; path traversal and content-negotiation blocked by Spring Boot path normalization; 
+- CHANGED *.api.basf.com estate (9 hosts): Full unauth surface reconfirmed end-to-end — zero reachable endpoints beyond auth gates/404
+- CHANGED prod.api.basf.com: 66 proxy paths all 404 except /productinformation (401); 4 browser keys (core/pi/csp/navigator) rejected "Invalid ApiKey" — key scope exhausted
+- CHANGED api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM/SigV4 authorizer, x-api-key not a credential class
+- CHANGED my.basf.com/.auth: HTTP 200/205KB SPA fallback re-confirmed — /.auth remains client-side callback, no server-side token surface
+- CHANGED federation.basf.com: NAM OIDC discovery reconfirmed unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes); SAML2 metadata at /nidp/saml2/metadata returns 200 signed descriptor (21434B)
