@@ -16362,3 +16362,148 @@ testability: PASSIVE (rejected)
 
 **STEP 7 — RISK**
 [RISK] BASF SE: 34 — Full 9-host *.api.basf.com estate + SAP KM + 7-host CMS estate unauth classes conclusively closed end-to-end. Only reachable unauth surface = repfinder /bin/basf/repfindertool Lambda proxy (stacktrace/architecture disclosure with empty rep/retailer DB). Top potential remains repfinder DB read when populated (MEDIUM-HIGH) and no-PKCE refresh_token ATO on my.basf.com (HIGH, needs test account). Remaining leads require auth creds (out-of-scope class) — stable residual, no escalation.
+===== ANALYST bigpickle 2026-09-12 09:31:04 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mfor p in /index.php/api /index.php/tools/activated_packages /index.php/ccm/system/block/types /ccm/system/block/types /api/blocks /index.php/dashboard; do echo "== $p"; curl -s -o /tmp/nia_body -D /tmp/nia_hdr --max-time 20 "https://north-america.intranet.basf.com$p"; head -1 /tmp/nia_hdr; grep -iE '^(location|content-type|content-length|server|x-.*):' /tmp/nia_hdr; echo "body bytes: $(wc -c < /tmp/nia_body)"; grep -o '<title>[^<]*' /tmp/nia_body | head -1; sleep 1; done
+== /index.php/api
+HTTP/2 307 
+content-type: text/html; charset=UTF-8
+location: https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Findex.php%2Fapi
+x-frame-options: sameorigin
+server: nginx
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+x-cache: Miss from cloudfront
+x-amz-cf-pop: ORD58-P12
+x-amz-cf-id: 2xrsJdCI2-bBpMcieSZqLjoICGiNZ3yBJrz4oYQATgsfh6L-kO6otA==
+body bytes: 882
+<title>Redirecting to https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Findex.php%2Fapi
+== /index.php/tools/activated_packages
+HTTP/2 307 
+content-type: text/html; charset=UTF-8
+location: https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Findex.php%2Ftools%2Factivated_packages
+x-frame-options: sameorigin
+server: nginx
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+x-cache: Miss from cloudfront
+x-amz-cf-pop: ORD58-P12
+x-amz-cf-id: U4vxgs-D-g9nKTcynBNcEmwcyztZaljGh3u11pl-xlcNEIGH6q-LPw==
+body bytes: 974
+<title>Redirecting to https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Findex.php%2Ftools%2Factivated_packages
+== /index.php/ccm/system/block/types
+HTTP/2 307 
+content-type: text/html; charset=UTF-8
+location: https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Findex.php%2Fccm%2Fsystem%2Fblock%2Ftypes
+x-frame-options: sameorigin
+server: nginx
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+x-cache: Miss from cloudfront
+x-amz-cf-pop: ORD58-P12
+x-amz-cf-id: QSSG_jSt3HYe2KMGcFVDEZqKkg7TPFLVwpHW8Uv6EEtCXxhMV_PuNQ==
+body bytes: 982
+<title>Redirecting to https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Findex.php%2Fccm%2Fsystem%2Fblock%2Ftypes
+== /ccm/system/block/types
+HTTP/2 307 
+content-type: text/html; charset=UTF-8
+location: https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Fccm%2Fsystem%2Fblock%2Ftypes
+x-frame-options: sameorigin
+server: nginx
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+x-cache: Miss from cloudfront
+x-amz-cf-pop: ORD58-P12
+x-amz-cf-id: fldwx7WsdYazcKAgp-9txJ2QOwuTvS5hBH6duoJ3c0W7j36b569b8A==
+body bytes: 934
+<title>Redirecting to https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Fccm%2Fsystem%2Fblock%2Ftypes
+== /api/blocks
+HTTP/2 307 
+content-type: text/html; charset=UTF-8
+location: https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Fapi%2Fblocks
+x-frame-options: sameorigin
+server: nginx
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+x-cache: Miss from cloudfront
+x-amz-cf-pop: ORD58-P12
+x-amz-cf-id: bE6SJ48uN8UOQILFQFbLLFrJ2jTk0x5quVQLuSOXuA227tFkzhSCnA==
+body bytes: 870
+<title>Redirecting to https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Fapi%2Fblocks
+== /index.php/dashboard
+HTTP/2 307 
+content-type: text/html; charset=UTF-8
+location: https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Findex.php%2Fdashboard
+x-frame-options: sameorigin
+server: nginx
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+x-cache: Miss from cloudfront
+x-amz-cf-pop: ORD58-P12
+x-amz-cf-id: wdQawNOT4ImxHxSHPC6kD5crqDvJzEoaiwAVw0megSVJk1XWG_n2dw==
+body bytes: 906
+<title>Redirecting to https://north-america.intranet.basf.com/ccm/system/authentication/oauth2/basf/attempt_auth?then=https%3A%2F%2Fnorth-america.intranet.basf.com%2Findex.php%2Fdashboard
+[0m
+[0m$ [0msleep 1; curl -s -o /tmp/rf_body -D /tmp/rf_hdr --max-time 20 "https://repfinder.basf.com/bin/basf/retailfindertool.json?country=DE&lat=49.45&lon=8.39&distance=50&limitResults=5"; head -1 /tmp/rf_hdr; echo "bytes: $(wc -c < /tmp/rf_body)"; head -c 300 /tmp/rf_body; echo; sleep 1; curl -s -o /tmp/rf2_body -D /tmp/rf2_hdr --max-time 20 "https://repfinder.basf.com/bin/basf/repfindertool?country=DE&productServiceId=2&lat=49.45&lon=8.39&distance=50&limitResults=5&repType=BR"; head -1 /tmp/rf2_hdr; echo "bytes: $(wc -c < /tmp/rf2_body)"; head -c 400 /tmp/rf2_body
+HTTP/2 404 
+bytes: 1
+
+
+HTTP/2 200 
+bytes: 815
+{"errorMessage":"Cannot invoke \"java.util.List.iterator()\" because \"results\" is null","errorType":"java.lang.NullPointerException","stackTrace":["com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.getFinalResult(RetailFinderDatabaseService.java:143)","com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.searchDatabase(RetailFinderDatabaseService.java:110)","com.basf.aws.cxm.s
+[0m
+STEP 1 — DELTA
+[CHANGED] north-america.intranet.basf.com Concrete APIs: raw response is HTTP 307→`/ccm/system/authentication/oauth2/basf/attempt_auth?then=<full-url>` on ALL 6 paths (index.php/api, tools/activated_packages, ccm/system/block/types ×2, api/blocks, dashboard) — prior "NEW 200/43KB" rows were `curl -L` artifacts (OAuth/AAD landing); contradiction resolved, still fully auth-gated
+[CHANGED] repfinder.basf.com/bin/basf/repfindertool: `repType=BR&productServiceId=2&country=DE` now returns HTTP 200 JSON with NPE stacktrace (`RetailFinderDatabaseService.getFinalResult:143` / `searchDatabase:110`, `results` null) — new param-dependent error path, NOT graceful `hits=0/results=[]`; sibling `retailfindertool.json` confirmed 404/1B
+
+STEP 2 — PRIORITIZE
+[PRIO] repfinder.basf.com,7.6,AS=8 BV=8 TE=8 GE=10 CS=8 FR=1
+[PRIO] north-america.intranet.basf.com,1.1,AS=1 BV=4 TE=3 GE=0 CS=1 FR=1
+[PRIO] my.basf.com,5.7,AS=4 BV=8 TE=3 GE=8 CS=5 FR=7
+
+STEP 3 — HYPOTHESES
+[HYP] Unauth AEM→Lambda servlet proxies to TWO service classes with param-driven routing, error path leaks Java internals
+class: MISCONFIG
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 82
+reasoning: repType=BR+psid=2 → 200 JSON NPE naming `com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService` (getFinalResult:143, searchDatabase:110); earlier graceful probes (DE/US, psid 1/2, repType=SA%2CBR) returned hits=0/results=[]; sibling `/bin/basf/retailfindertool`(.json) 404 — rep vs retail routing likely decided inside the same servlet by repType/country; dispatcher gap confirmed to miss `/bin/basf/*`
+evidence_needed: a param set that yields non-empty results[] (data read) or a sibling selector that proxies RetailFinderDatabaseService
+verify_steps: PASSIVE — 1 rps GET with per-repType variants (SA/BR/DE/US, with/without repType) capturing full JSON body; ~6 requests
+impact: unauth DB query to rep/retailer PII if results ever non-empty; current stacktrace+pkg/line disclosure (info-class, low-med); MEDIUM-HIGH once data populated
+testability: PASSIVE
+[HYP] Public OAuth client 86cc4bf9 lacks PKCE → refresh_token ATO
+class: OATH
+asset: my.basf.com/.auth
+confidence: 65
+reasoning: SSR boot config discloses client_id, redirect_uri=/.auth, scope incl refresh_token, acr_values, zero PKCE refs; public client + refresh_token = long-lived bearer if code/refresh intercepted
+evidence_needed: valid test account to exercise code/refresh flow and measure refresh lifetime/reuse
+verify_steps: PASSIVE — AUTH_HELPED (blocked on test account)
+impact: ATO of myBASFWorld account; HIGH but credential-blocked
+testability: AUTH_HELPED
+[HYP] Concrete CMS unauth API surface on north-america.intranet.basf.com
+class: MISCONFIG
+asset: north-america.intranet.basf.com
+confidence: 10
+reasoning: all 6 Concrete API/auth-derivative paths return 307 to OAuth2 attempt_auth; prior 200 rows were curl -L artifacts; fully gated
+evidence_needed: none — class closed
+testability: PASSIVE (rejected)
+
+STEP 4 — SELF-CRITIQUE
+[PARKED] north-america.intranet.basf.com Concrete surface: 307 on all 6 paths, both spellings (index.php/+bare), -L artifact now explained; no unauth surface.
+[PARKED] secsys WAF 200-OK block-page: no data leak, response-code anomaly only; no POC.
+[FINAL] repfinder unauth Lambda proxy → param-dependent dual-service routing + NPE stacktrace disclosure; confirmed actionable, PASSIVE.
+[FINAL] my.basf.com no-PKCE refresh_token ATO — highest impact, blocked on test account.
+
+STEP 5 — NEXT ACTION
+[NEXT] PROBE: 1 rps, GET `https://repfinder.basf.com/bin/basf/retailfindertool?country=US&productServiceId=1&lat=41.8781&lon=-87.6298&distance=250&limitResults=10&repType=SA%2CBR` — capture full JSON body (no .json selector) to test if a retail servlet exists behind the same dispatcher gap; then one repfinder re-probe with repType=BR minus play/id to isolate the NPE trigger
+
+STEP 6 — LEARNING
+[LEARN] REJECTED MISCONFIG @ north-america.intranet.basf.com: contradiction resolved — raw 307 to `/ccm/system/authentication/oauth2/basf/attempt_auth?then=<url>` on all 6 Concrete paths; earlier 200/43KB rows were curl -L auth-chain artifacts; no unauth Concrete API surface; class closed
+[LEARN] ACCEPTED MISCONFIG @ repfinder.basf.com/bin/basf/repfindertool: new param-dependent error path — `repType=BR&productServiceId=2` yields HTTP 200 wrapper around JSON NPE (`RetailFinderDatabaseService.java:143/:110`, results null), leaking Java service internals + confirming rep-vs-retail routing inside single servlet; sibling retailfindertool(.json) 404 — NPE path distinct from earlier graceful empty results, still empty-DB
+[LEARN] ACCEPTED RECON @ my.basf.com + federation.basf.com: OAuth client 86cc4bf9 + NAM discovery reconfirmed unchanged — no PKCE hardening; ATO remains blocked pending test account
+
+STEP 7 — RISK
+[RISK] basf: 34 — Steady-state residual. Only reachable unauth surface remains repfinder `/bin/basf/repfindertool`; this cycle added a new error path (200-wrapped NPE naming RetailFinderDatabaseService methods/line numbers) confirming dual service routing but still zero data returned. Full 9-host *.api + SAP KM + 7-host CMS estates closed. Top potential: repfinder DB read once populated (MED-HIGH) and no-PKCE refresh ATO on my.basf.com (HIGH, credential-blocked). No escalation.

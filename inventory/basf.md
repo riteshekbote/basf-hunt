@@ -447,3 +447,15 @@ www.basf.com
 - CHANGED `*.api.basf.com` estate (9 hosts) full unauth surface reconfirmed end-to-end — zero reachable endpoints beyond auth gates/404
 - CHANGED `my.basf.com/.auth` HTTP 200/205KB SPA fallback re-confirmed — `/.auth` remains client-side callback, no server-side token surface
 - CHANGED `federation.basf.com` NAM OIDC discovery reconfirmed unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes); SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434
+
+## 2026-09-12 09:31:04 UTC
+- CHANGED north-america.intranet.basf.com Concrete APIs: raw response is HTTP 307→`/ccm/system/authentication/oauth2/basf/attempt_auth?then=<full-url>` on ALL 6 paths (index.php/api, tools/activated_packages, c
+- CHANGED repfinder.basf.com/bin/basf/repfindertool: `repType=BR&productServiceId=2&country=DE` now returns HTTP 200 JSON with NPE stacktrace (`RetailFinderDatabaseService.getFinalResult:143` / `searchDatabase:
+- NEW `repfinder.basf.com/bin/basf/repfindertool` → unauth AEM→AWS Lambda proxy confirmed 2026-09-12: 200 JSON at all coords/psid (hits=0/results=[]), stacktrace disclosure, dispatcher misses `/bin/basf/*` 
+- NEW `north-america.intranet.basf.com/index.php/api` + 3 sibling endpoints → HTTP 200 len=43KB (not 307 redirect) at 2026-09-11/12 — Concrete CMS internal APIs returning full HTML pages unauthenticated (pr
+- NEW `agriculture.basf.com` Magnolia endpoints `/graphql2`, `/.graphql`, `/.restful`, `/.rest`, `/adminCentral`, `/.admin`, `/.cache`, `/.imaging`, `/dam`, `/docurl/` → all 200 len=335-404KB at 2026-09-11/
+- CHANGED `repfinder.basf.com` re-probed 2026-09-12 00:44 & 05:23 — `/bin/basf/repfindertool` consistently 200 JSON with geolocation params; stacktrace disclosure confirmed; empty DB (hits=0)
+- CHANGED `secsys.basf.com/api/users/me` + siblings `bsh.secsys`, `secsys-visitor` → all HTTP 200 len=246 = WAF "Request Rejected" page (not 403) — WAF returns 200 OK for blocks across ecosystem (probe-results.
+- CHANGED `my.basf.com/.auth` + `federation.basf.com` OIDC discovery → reconfirmed unchanged 2026-09-12; zero PKCE hardening on public client 86cc4bf9; ATO blocked pending test account
+- CHANGED `*.api.basf.com` estate (9 hosts) → full unauth surface reconfirmed end-to-end 2026-09-12; zero reachable endpoints beyond auth gates/404
+- CHANGED `rep.basf.com` Spring Boot Actuator → `/actuator` HAL + `/actuator/health` UP; all 16 sensitive endpoints 404; path traversal + content-negotiation blocked; custom handler status 999 — locked down

@@ -2425,3 +2425,43 @@ testability: PASSIVE (rejected)
 [LEARN] ACCEPTED RECON @ my.basf.com + federation.basf.com: OAuth client 86cc4bf9 + NAM OIDC discovery unchanged — zero PKCE hardening, ATO blocked pending test account
 [LEARN] ACCEPTED RECON @ rep.basf.com: /actuator HAL + /actuator/health UP; 16 sensitive endpoints 404; custom handler 999 — actuator locked down
 [RISK] BASF SE: 34 — Full 9-host *.api.basf.com estate + SAP KM + 7-host CMS estate unauth classes conclusively closed end-to-end. Only reachable unauth surface = repfinder /bin/basf/repfindertool Lambda proxy (stacktrace/architecture disclosure with empty rep/retailer DB). Top potential remains repfinder DB read when populated (MEDIUM-HIGH) and no-PKCE refresh_token ATO on my.basf.com (HIGH, needs test account). Remaining leads require auth creds (out-of-scope class) — stable residual, no escalation.
+## 2026-09-12 09:30:53 UTC [target] (model bigpickle)
+[CHANGED] north-america.intranet.basf.com Concrete APIs: raw response is HTTP 307→`/ccm/system/authentication/oauth2/basf/attempt_auth?then=<full-url>` on ALL 6 paths (index.php/api, tools/activated_packages, ccm/system/block/types ×2, api/blocks, dashboard) — prior "NEW 200/43KB" rows were `curl -L` artifacts (OAuth/AAD landing); contradiction resolved, still fully auth-gated
+[CHANGED] repfinder.basf.com/bin/basf/repfindertool: `repType=BR&productServiceId=2&country=DE` now returns HTTP 200 JSON with NPE stacktrace (`RetailFinderDatabaseService.getFinalResult:143` / `searchDatabase:110`, `results` null) — new param-dependent error path, NOT graceful `hits=0/results=[]`; sibling `retailfindertool.json` confirmed 404/1B
+[PRIO] repfinder.basf.com,7.6,AS=8 BV=8 TE=8 GE=10 CS=8 FR=1
+[PRIO] north-america.intranet.basf.com,1.1,AS=1 BV=4 TE=3 GE=0 CS=1 FR=1
+[PRIO] my.basf.com,5.7,AS=4 BV=8 TE=3 GE=8 CS=5 FR=7
+[HYP] Unauth AEM→Lambda servlet proxies to TWO service classes with param-driven routing, error path leaks Java internals
+class: MISCONFIG
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 82
+reasoning: repType=BR+psid=2 → 200 JSON NPE naming `com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService` (getFinalResult:143, searchDatabase:110); earlier graceful probes (DE/US, psid 1/2, repType=SA%2CBR) returned hits=0/results=[]; sibling `/bin/basf/retailfindertool`(.json) 404 — rep vs retail routing likely decided inside the same servlet by repType/country; dispatcher gap confirmed to miss `/bin/basf/*`
+evidence_needed: a param set that yields non-empty results[] (data read) or a sibling selector that proxies RetailFinderDatabaseService
+verify_steps: PASSIVE — 1 rps GET with per-repType variants (SA/BR/DE/US, with/without repType) capturing full JSON body; ~6 requests
+impact: unauth DB query to rep/retailer PII if results ever non-empty; current stacktrace+pkg/line disclosure (info-class, low-med); MEDIUM-HIGH once data populated
+testability: PASSIVE
+[HYP] Public OAuth client 86cc4bf9 lacks PKCE → refresh_token ATO
+class: OATH
+asset: my.basf.com/.auth
+confidence: 65
+reasoning: SSR boot config discloses client_id, redirect_uri=/.auth, scope incl refresh_token, acr_values, zero PKCE refs; public client + refresh_token = long-lived bearer if code/refresh intercepted
+evidence_needed: valid test account to exercise code/refresh flow and measure refresh lifetime/reuse
+verify_steps: PASSIVE — AUTH_HELPED (blocked on test account)
+impact: ATO of myBASFWorld account; HIGH but credential-blocked
+testability: AUTH_HELPED
+[HYP] Concrete CMS unauth API surface on north-america.intranet.basf.com
+class: MISCONFIG
+asset: north-america.intranet.basf.com
+confidence: 10
+reasoning: all 6 Concrete API/auth-derivative paths return 307 to OAuth2 attempt_auth; prior 200 rows were curl -L artifacts; fully gated
+evidence_needed: none — class closed
+testability: PASSIVE (rejected)
+[PARKED] north-america.intranet.basf.com Concrete surface: 307 on all 6 paths, both spellings (index.php/+bare), -L artifact now explained; no unauth surface.
+[PARKED] secsys WAF 200-OK block-page: no data leak, response-code anomaly only; no POC.
+[FINAL] repfinder unauth Lambda proxy → param-dependent dual-service routing + NPE stacktrace disclosure; confirmed actionable, PASSIVE.
+[FINAL] my.basf.com no-PKCE refresh_token ATO — highest impact, blocked on test account.
+[NEXT] PROBE: 1 rps, GET `https://repfinder.basf.com/bin/basf/retailfindertool?country=US&productServiceId=1&lat=41.8781&lon=-87.6298&distance=250&limitResults=10&repType=SA%2CBR` — capture full JSON body (no .json selector) to test if a retail servlet exists behind the same dispatcher gap; then one repfinder re-probe with repType=BR minus play/id to isolate the NPE trigger
+[LEARN] REJECTED MISCONFIG @ north-america.intranet.basf.com: contradiction resolved — raw 307 to `/ccm/system/authentication/oauth2/basf/attempt_auth?then=<url>` on all 6 Concrete paths; earlier 200/43KB rows were curl -L auth-chain artifacts; no unauth Concrete API surface; class closed
+[LEARN] ACCEPTED MISCONFIG @ repfinder.basf.com/bin/basf/repfindertool: new param-dependent error path — `repType=BR&productServiceId=2` yields HTTP 200 wrapper around JSON NPE (`RetailFinderDatabaseService.java:143/:110`, results null), leaking Java service internals + confirming rep-vs-retail routing inside single servlet; sibling retailfindertool(.json) 404 — NPE path distinct from earlier graceful empty results, still empty-DB
+[LEARN] ACCEPTED RECON @ my.basf.com + federation.basf.com: OAuth client 86cc4bf9 + NAM discovery reconfirmed unchanged — no PKCE hardening; ATO remains blocked pending test account
+[RISK] basf: 34 — Steady-state residual. Only reachable unauth surface remains repfinder `/bin/basf/repfindertool`; this cycle added a new error path (200-wrapped NPE naming RetailFinderDatabaseService methods/line numbers) confirming dual service routing but still zero data returned. Full 9-host *.api + SAP KM + 7-host CMS estates closed. Top potential: repfinder DB read once populated (MED-HIGH) and no-PKCE refresh ATO on my.basf.com (HIGH, credential-blocked). No escalation.
