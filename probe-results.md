@@ -689,3 +689,17 @@ https://ap-eupf.api.basf.com/api/?url=http://169.254.169.254/metadata/instance?a
 https://my.basf.com/.auth` -> 200 len=204916
 https://my.basf.com/ -> 200 len=204916
 https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+
+## 2026-09-12 23:24:31 UTC
+https://repfinder.basf.com/bin/basf/repfindertool -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?lat=999&lon=999 -> 200 len=?
+https://my.basf.com/.auth` -> 200 len=204906
+https://my.basf.com/ -> 200 len=204906
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/authorize?client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&response_type=code&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth&scope=openid%20profile%20refresh_token&acr_values=3IAM%2FLogin%2FExternal -> HTTP 404
+https://my.basf.com/.auth?code=INTERCEPTED -> 200 len=204993
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://federation.basf.com/nidp/oauth/nam/clients -> HTTP 401
+https://my.basf.com/.auth -> 200 len=204993
