@@ -661,3 +661,17 @@ https://federation.basf.com/nidp/oauth/nam/authorize?client_id=86cc4bf9-cfdf-421
 https://my.basf.com/.auth?code=INTERCEPTED -> 200 len=204993
 https://secsys.basf.com/api/users/me -> 200 len=246
 https://secsys.basf.com/api/users/me%00 -> 200 len=246
+
+## 2026-09-12 18:51:28 UTC
+https://repfinder.basf.com/bin/basf/repfindertool -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?lat=999&lon=999 -> 200 len=?
+https://repfinder.basf.com/bin/basf/retailfindertool?country=US&productServiceId=1&lat=41.8781&lon=-87.6298&distance=250&limitResults=10&repType=1 -> HTTP 404
+https://ap-eupf.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+https://ap-eupf.api.basf.com/api/HttpTrigger1?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://ap-eupf.api.basf.com/api/?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+https://my.basf.com/.auth` -> 200 len=204906
+https://my.basf.com/ -> 200 len=204916
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920

@@ -483,3 +483,11 @@ www.basf.com
 - CHANGED `my.basf.com/.auth` + `federation.basf.com` OIDC discovery reconfirmed unchanged 2026-09-12; zero PKCE hardening on public client `86cc4bf9`; ATO blocked pending test account
 - CHANGED `*.api.basf.com` estate (9 hosts) → full unauth surface reconfirmed end-to-end 2026-09-12; zero reachable endpoints beyond auth gates/404
 - CHANGED `rep.basf.com` Spring Boot Actuator → `/actuator` HAL + `/actuator/health` UP; all 16 sensitive endpoints 404; path traversal + content-negotiation blocked; custom handler status 999 — locked down
+
+## 2026-09-12 18:51:10 UTC
+- NEW repfinder.basf.com/bin/basf/retailfindertool: HTTP 404 — last cycle's sibling probe executed, no second servlet behind the dispatcher gap (probe-results:642); /bin/basf/* namespace reduced to repfinde
+- CHANGED knowledge-base integrity: 2026-09-12 re-appends verbatim 09-03 entries ("ACCEPTED SSRF ap-eupf", "REJECTED AUTH ap-digitalconnect master key", "REJECTED AUTH dev-clientcert-sap") that contradict all c
+- CHANGED `repfinder.basf.com/bin/basf/retailfindertool` → HTTP 404 (sibling servlet probe executed; no second servlet behind dispatcher gap)
+- CHANGED `repfinder.basf.com/bin/basf/repfindertool` bare GET → HTTP 200 len=80 compact JSON wrapper (distinct from NPE 200-path; confirms param-driven branches)
+- CHANGED `repfinder.basf.com/bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE` → HTTP 200 JSON wrapper around NPE stacktrace (`RetailFinderDatabaseService.getFinalResult:143` / `searchDatabase:1
+- CHANGED Triager marked `repfinder` unauth Lambda proxy VALID 5.3 (Submit) at 2026-09-12 09:45 — reportable framing: broken-access-control (dispatcher misses `/bin/basf/*`), NOT stacktrace disclosure
