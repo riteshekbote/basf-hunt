@@ -2484,3 +2484,149 @@ evidence_needed: valid BASF test account to exercise code+refresh flow, observe 
 verify_steps: PASSIVE — AUTH_HELPED (credential-blocked; no unauth vector)
 impact: ATO of myBASFWorld account; HIGH but blocked on test account
 testability: AUTH_HELPED
+## 2026-09-12 16:27:10 UTC [target] (model bigpickle)
+[HYP] Azure Functions SSRF to cloud metadata via url parameter
+class: SSRF
+asset: ap-eupf.api.basf.com
+confidence: 85
+reasoning: Azure Functions HTTP triggers accept arbitrary url params; cloud metadata 169.254.169.254 reachable from App Service; host confirmed HTTP 200
+evidence_needed: metadata JSON response body (instance, identity, compute keys)
+verify_steps: GET https://ap-eupf.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01
+impact: Cloud managed identity token theft, lateral move to linked Azure resources, data exfiltration from storage/keyvault; CRITICAL
+testability: PASSIVE
+[HYP] Azure Functions SSRF to cloud metadata via url parameter
+class: SSRF
+asset: ap-digitalconnect.api.basf.com
+confidence: 60
+reasoning: Same Azure Functions platform as ap-eupf; HTTP 200 suggests active endpoints; Digital Connect likely proxies external data
+evidence_needed: metadata JSON response or error distinguishing valid SSRF from generic error
+verify_steps: GET https://ap-digitalconnect.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01
+impact: Same as above; CRITICAL
+testability: PASSIVE
+[HYP] Dev endpoint information disclosure via error messages
+class: MISCONFIG
+asset: dev-ext001.api.basf.com
+confidence: 45
+reasoning: HTTP 400 without client cert suggests structured error response; dev endpoints may leak stack traces or internal paths
+evidence_needed: Full error response body showing internal details
+verify_steps: GET https://dev-ext001.api.basf.com/ and inspect response body for stack traces, internal paths, or version info
+impact: Internal information disclosure aiding further attacks; LOW-MEDIUM
+testability: PASSIVE
+[NEXT] PROBE: GET https://ap-eupf.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01
+[LEARN] ACCEPTED SSRF @ ap-eupf.api.basf.com: Azure Functions confirmed via KB; metadata endpoint reachable from App Service; concrete url param for testing
+[LEARN] REJECTED AUTH @ ap-digitalconnect.api.basf.com: master key leak lacks verify without auth; passive GitHub search not systematic
+[LEARN] REJECTED AUTH @ dev-clientcert-sap.api.basf.com: mTLS bypass speculative; no CT evidence of public CA use
+[RISK] BASF SE program: 70 — Large cloud surface across Azure Functions + SAP dev endpoints; SSRF→metadata chain high impact if confirmed; dev endpoints may have weaker controls but lower business value
+[HYP] SSRF via header-injected URL on Azure Functions health endpoint
+class: SSRF
+asset: ap-eupf.api.basf.com
+confidence: 62
+reasoning: url param probes return 403 (WAF); Azure Functions HTTP triggers may forward X-Forwarded-For, X-Original-URL, or Referer headers to backend; metadata endpoint confirmed reachable from App Service; common pattern in Azure Functions with reverse proxy
+evidence_needed: metadata JSON response or header-specific 403/timeout distinguishing blocked vs allowed header injection
+verify_steps: GET https://ap-eupf.api.basf.com/api/health with headers: X-Forwarded-For: 169.254.169.254 / Referer: http://169.254.169.254/metadata/instance?api-version=2021-02-01
+impact: Managed identity token theft, lateral move to linked Azure resources, keyvault/storage exfiltration; CRITICAL
+testability: PASSIVE
+[HYP] Azure Function admin key via non-standard path enumeration
+class: AUTH
+asset: ap-digitalconnect.api.basf.com
+confidence: 50
+reasoning: /admin/host/keys returns 404 not 401; admin surface non-standard — suggests custom routing; alternative paths (/admin/list, /admin/keys, /admin/.env, /.azure-functions-host) may expose master key or admin dashboard; Azure Functions v4 default admin path varies by extension version
+evidence_needed: HTTP 200 with master key in response body or admin dashboard HTML
+verify_steps: GET https://ap-digitalconnect.api.basf.com/admin/list, GET /admin/keys, GET /.azure-functions-host
+reasoning: SSR boot config discloses client_id, redirect_uri=/.auth, scope incl refresh_token, acr_values, zero PKCE refs; public client + refresh_token = long-lived bearer if code/refresh intercepted
+evidence_needed: valid test account to exercise code/refresh flow and measure refresh lifetime/reuse
+verify_steps: PASSIVE — AUTH_HELPED (blocked on test account)
+impact: ATO of myBASFWorld account; HIGH but credential-blocked
+testability: AUTH_HELPED
+[HYP] Concrete CMS unauth API surface on north-america.intranet.basf.com
+class: MISCONFIG
+asset: north-america.intranet.basf.com
+confidence: 10
+reasoning: all 6 Concrete API/auth-derivative paths return 307 to OAuth2 attempt_auth; prior 200 rows were curl -L artifacts; fully gated
+evidence_needed: none — class closed
+testability: PASSIVE (rejected)
+[PARKED] north-america.intranet.basf.com Concrete surface: 307 on all 6 paths, both spellings (index.php/+bare), -L artifact now explained; no unauth surface.
+[PARKED] secsys WAF 200-OK block-page: no data leak, response-code anomaly only; no POC.
+[FINAL] repfinder unauth Lambda proxy → param-dependent dual-service routing + NPE stacktrace disclosure; confirmed actionable, PASSIVE.
+[FINAL] my.basf.com no-PKCE refresh_token ATO — highest impact, blocked on test account.
+[NEXT] PROBE: 1 rps, GET `https://repfinder.basf.com/bin/basf/retailfindertool?country=US&productServiceId=1&lat=41.8781&lon=-87.6298&distance=250&limitResults=10&repType=SA%2CBR` — capture full JSON body (no .json selector) to test if a retail servlet exists behind the same dispatcher gap; then one repfinder re-probe with repType=BR minus play/id to isolate the NPE trigger
+[LEARN] REJECTED MISCONFIG @ north-america.intranet.basf.com: contradiction resolved — raw 307 to `/ccm/system/authentication/oauth2/basf/attempt_auth?then=<url>` on all 6 Concrete paths; earlier 200/43KB rows were curl -L auth-chain artifacts; no unauth Concrete API surface; class closed
+[LEARN] ACCEPTED MISCONFIG @ repfinder.basf.com/bin/basf/repfindertool: new param-dependent error path — `repType=BR&productServiceId=2` yields HTTP 200 wrapper around JSON NPE (`RetailFinderDatabaseService.java:143/:110`, results null), leaking Java service internals + confirming rep-vs-retail routing inside single servlet; sibling retailfindertool(.json) 404 — NPE path distinct from earlier graceful empty results, still empty-DB
+[LEARN] ACCEPTED RECON @ my.basf.com + federation.basf.com: OAuth client 86cc4bf9 + NAM discovery reconfirmed unchanged — no PKCE hardening; ATO remains blocked pending test account
+[RISK] basf: 34 — Steady-state residual. Only reachable unauth surface remains repfinder `/bin/basf/repfindertool`; this cycle added a new error path (200-wrapped NPE naming RetailFinderDatabaseService methods/line numbers) confirming dual service routing but still zero data returned. Full 9-host *.api + SAP KM + 7-host CMS estates closed. Top potential: repfinder DB read once populated (MED-HIGH) and no-PKCE refresh ATO on my.basf.com (HIGH, credential-blocked). No escalation.
+[HYP] Unauth Lambda dual-service proxy: routing enum + DI regression + verbose NPE disclosure, DB read still potential
+class: MISCONFIG
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 55
+reasoning: psid=1→RepFinderDatabaseService (DI regression, googleService null blocks geocode path); psid=2→RetailFinderDatabaseService (results null at getFinalResult:143 = zero-match/empty DB, not data); 2 distinct full stacktraces leak com.basf.aws.cxm.lambda.functions.repfinder package + method/line structure; broken-quote probe no error delta (parameterized); sibling servlets 404; dispatcher misses only this path
+evidence_needed: any query yielding non-null results[] (requires googleService DI fix + populated DB) — currently impossible (config regression)
+verify_steps: PASSIVE — exhausted this cycle (param matrix psid 1/2 × SA/BR × lat/lon/zip, quote-injection, sibling enum, no-args); residual re-probe 1 rps only after observable change
+impact: unauth Read of rep/retailer DB (PII) IF services operational + populated; today info-class only (LDAP-like arch/config-state + package/code disclosure); MEDIUM if repo re-populated
+testability: PASSIVE
+[HYP] Public OAuth client 86cc4bf9 lacks PKCE → refresh_token ATO
+class: OATH
+asset: my.basf.com/.auth
+confidence: 65
+reasoning: SSR boot config discloses client_id 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect_uri=https://my.basf.com/.auth, scope refresh_token, acr_values, zero PKCE refs; NAM discovery lists plain+S256; public client + refresh_token = long-lived bearer if code/refresh intercepted
+evidence_needed: valid BASF test account to exercise code+refresh flow, observe refresh lifetime/reuse/revocation
+verify_steps: PASSIVE — AUTH_HELPED (credential-blocked; no unauth vector)
+impact: ATO of myBASFWorld account; HIGH but blocked on test account
+testability: AUTH_HELPED
+[HYP] Unauth Lambda dual-service proxy: routing enum + DI regression + verbose NPE disclosure, DB read still potential
+class: MISCONFIG
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 55
+reasoning: psid=1→RepFinderDatabaseService (DI regression, googleService null blocks geocode path); psid=2→RetailFinderDatabaseService (results null at getFinalResult:143 = zero-match/empty DB, not data); 2 distinct full stacktraces leak com.basf.aws.cxm.lambda.functions.repfinder package + method/line structure; broken-quote probe no error delta (parameterized); sibling servlets 404; dispatcher misses only this path
+evidence_needed: any query yielding non-null results[] (requires googleService DI fix + populated DB) — currently impossible (config regression)
+verify_steps: PASSIVE — exhausted this cycle (param matrix psid 1/2 × SA/BR × lat/lon/zip, quote-injection, sibling enum, no-args); residual re-probe 1 rps only after observable change
+impact: unauth Read of rep/retailer DB (PII) IF services operational + populated; today info-class only (LDAP-like arch/config-state + package/code disclosure); MEDIUM if repo re-populated
+testability: PASSIVE
+[HYP] Public OAuth client 86cc4bf9 lacks PKCE → refresh_token ATO
+class: OATH
+asset: my.basf.com/.auth
+confidence: 65
+reasoning: SSR boot config discloses client_id 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect_uri=https://my.basf.com/.auth, scope refresh_token, acr_values, zero PKCE refs; NAM discovery lists plain+S256; public client + refresh_token = long-lived bearer if code/refresh intercepted
+evidence_needed: valid BASF test account to exercise code+refresh flow, observe refresh lifetime/reuse/revocation
+verify_steps: PASSIVE — AUTH_HELPED (credential-blocked; no unauth vector)
+impact: ATO of myBASFWorld account; HIGH but blocked on test account
+testability: AUTH_HELPED
+[NEXT] PROBE: at 1 rps, GET `https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=SA%2CBR` and psid=2 variant (Chicago metro) — any non-empty `results[]` = unauth rep/retailer DB read (report HIGH); if empty, report the unauth Lambda proxy + full stack-trace disclosure as LOW-MED and re-test after any deployment fix.
+[NEXT] PROBE: at 1 rps, GET `https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=SA%2CBR` and psid=2 variant (Chicago metro) — any non-empty `results[]` = unauth rep/retailer DB read (report HIGH); if empty, report the unauth Lambda proxy + full stack-trace disclosure as LOW-MED and re-test after any deployment fix.
+[NEXT] PROBE: GET https://repfinder.basf.com/bin/basf/repfindertool?country=DE&productServiceId=1&lat=50&lon=8&distance=50&limitResults=5&repType=SA%2CBR and BR variant with productServiceId=1&2, 1 rps, capture full JSON body to confirm hits/results still empty after 09-12 probes
+[NEXT] PROBE: 1 rps GET https://repfinder.basf.com/bin/basf/repfindertool?country=DE&productServiceId=1&lat=49.45&lon=8.39&distance=50&limitResults=5&repType=SA%2CBR — capture full JSON body to confirm hits/results still empty; also GET .json selector on sibling retailfindertool
+[NEXT] PROBE: 1 rps, GET `https://repfinder.basf.com/bin/basf/retailfindertool?country=US&productServiceId=1&lat=41.8781&lon=-87.6298&distance=250&limitResults=10&repType=SA%2CBR` — capture full JSON body (no .json selector) to test if a retail servlet exists behind the same dispatcher gap; then one repfinder re-probe with repType=BR minus play/id to isolate the NPE trigger
+[NEW] repfinder.basf.com/bin/basf/retailfindertool: HTTP 404 — last cycle's NEXT sibling probe executed; no sibling servlet present behind dispatcher gap (probe-results:642)
+[NEW] repfinder.basf.com/bin/basf/repfindertool bare GET: 200 len=80 (compact JSON wrapper, was len=? prior) — no-args path returns fixed short body, distinct from 200-wrapped NPE (probe-results:638)
+[NEW] repfinder psid=2 + repType=BR: NPE wrapper reconfirmed at 13:15:40 (probe-results:640) — dual-service routing stable
+[CHANGED] triage/reports: repfinder unauth Lambda proxy + stacktrace marked VALID (5.3, Submit) 2026-09-12 09:45; ROPC/plain-PKCE identity config on HOLD
+[PRIO] repfinder.basf.com,7.4,AS=7 BV=7 TE=8 GE=10 CS=8 FR=4
+[PRIO] my.basf.com,5.7,AS=4 BV=8 TE=3 GE=8 CS=5 FR=7
+[PRIO] north-america.intranet.basf.com,1.1,AS=1 BV=4 TE=3 GE=0 CS=1 FR=1
+[HYP] Sibling /bin/basf/* servlets exist behind the dispatcher gap and one proxies a second Lambda function with a non-empty DB
+class: MISCONFIG
+asset: repfinder.basf.com/bin/basf/
+confidence: 42
+reasoning: dispatcher misses /bin/basf/repfindertool (confirmed 200 unauth); naming suggests a Rep Finder service suite — das.basf.com hosts AgSolutions Finder (S3 PWA, api.das.basf.com dead) suggesting a family of finder Lambdas; only retailfindertool enumerated so far and it 404s; dual-service routing lives inside repfindertool, so any sibling must be a distinct repository/package with its own database
+evidence_needed: a /bin/basf/<name> returning 200 JSON with non-empty results[] or a distinct stacktrace naming an unreported service class
+verify_steps: PASSIVE — 1 rps GET candidates: /bin/basf/agsolutionsfindertool, /bin/basf/agfindertool, /bin/basf/distributorfindertool, /bin/basf/productfindertool, /bin/basf/dealerfindertool (with country=DE&productServiceId=1), capture body; ~6 requests
+impact: unauth read of a separate rep/retailer/agronomist PII DB once located; today info/discovery value only
+testability: PASSIVE
+[HYP] Public OAuth client 86cc4bf9 lacks PKCE → refresh_token ATO
+class: OATH
+asset: my.basf.com/.auth
+confidence: 65
+reasoning: SSR boot config discloses client_id 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect_uri=https://my.basf.com/.auth, scope refresh_token, acr_values, zero PKCE refs; NAM discovery lists plain+S256; public client + refresh_token = long-lived bearer if code/refresh intercepted
+evidence_needed: valid BASF test account to exercise code+refresh flow, measure refresh lifetime/reuse/revocation
+verify_steps: PASSIVE — AUTH_HELPED (credential-blocked; no unauth vector)
+impact: ATO of myBASFWorld account; HIGH but blocked on test account
+testability: AUTH_HELPED
+[PARKED] repfinder dual-service NPE path: confirmed, no new param yields data (googleService DI null blocks geocode; RetailFinder results null at getFinalResult:143 = empty DB) — residual 1 rps re-probe only after observable change
+[PARKED] north-america.intranet.basf.com Concrete: 307→OAuth2 attempt_auth on all 6 paths, -L artifact resolved; closed
+[PARKED] secsys WAF 200-OK block-page: response-code anomaly only, no data leak; no POC
+[FINAL] repfinder /bin/basf/* sibling enumeration — actionable PASSIVE, fresh namespace angle, confidence modest (42) after retailfindertool 404
+[FINAL] my.basf.com no-PKCE refresh_token ATO — highest impact, credential-blocked (65)
+[NEXT] PROBE: 1 rps, GET `https://repfinder.basf.com/bin/basf/agsolutionsfindertool?country=DE&productServiceId=1&lat=49.45&lon=8.39&distance=50&limitResults=5&repType=SA%2CBR` then /bin/basf/agfindertool, /bin/basf/distributorfindertool, /bin/basf/productfindertool, /bin/basf/dealerfindertool (same params) — capture full response body; any 200 JSON with non-results-null body or a distinct stacktrace service class = sibling Lambda proxied unauth → escalate to HIGH; all 404 = sibling namespace exhausted, close
+[LEARN] REJECTED RECON @ repfinder.basf.com/bin/basf/retailfindertool: HTTP 404 — sibling servlet absent behind dispatcher gap despite dual-service routing inside repfindertool; confirms single servlet only in /bin/basf namespace tested so far
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: bare GET now 200 len=80 fixed wrapper — no-args path returns static short JSON, structurally distinct from NPE 200-path; confirms param-driven branches
+[LEARN] ACCEPTED TRIAGE @ repfinder unauth Lambda proxy: triager marked VALID 5.3 (Submit) at 2026-09-12 09:45 — reportable framing must be broken-access-control (dispatcher misses /bin/basf/* → unauth servlet invocation), NOT stacktrace disclosure (excluded class)
+[RISK] basf: 36 — Triage elevated repfinder proxy to VALID/Submit (5.3), the estate's sole reachable unauth business-function surface; fresh /bin/basf/* sibling angle remains open (42), retailfindertool closed. my.basf.com PKCE/refresh ATO unchanged at HIGH but credential-blocked. All *.api, SAP-KM, and CMS estates remain conclusively closed. Residual stable, mild upward delta from submit-readiness; no escalation beyond MED-HIGH potential.

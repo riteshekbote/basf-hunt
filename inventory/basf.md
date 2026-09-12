@@ -469,3 +469,17 @@ www.basf.com
 - CHANGED `my.basf.com/.auth` + `federation.basf.com` OIDC discovery reconfirmed unchanged 2026-09-12; zero PKCE hardening on public client `86cc4bf9`; ATO blocked pending test account
 - CHANGED `*.api.basf.com` estate (9 hosts) → full unauth surface reconfirmed end-to-end 2026-09-12; zero reachable endpoints beyond auth gates/404
 - CHANGED `rep.basf.com` Spring Boot Actuator → `/actuator` HAL + `/actuator/health` UP; all 16 sensitive endpoints 404; path traversal + content-negotiation blocked; custom handler status 999 — locked down
+
+## 2026-09-12 16:27:44 UTC
+- NEW repfinder.basf.com/bin/basf/retailfindertool: HTTP 404 — last cycle's NEXT sibling probe executed; no sibling servlet present behind dispatcher gap (probe-results:642)
+- NEW repfinder.basf.com/bin/basf/repfindertool bare GET: 200 len=80 (compact JSON wrapper, was len=? prior) — no-args path returns fixed short body, distinct from 200-wrapped NPE (probe-results:638)
+- NEW repfinder psid=2 + repType=BR: NPE wrapper reconfirmed at 13:15:40 (probe-results:640) — dual-service routing stable
+- CHANGED triage/reports: repfinder unauth Lambda proxy + stacktrace marked VALID (5.3, Submit) 2026-09-12 09:45; ROPC/plain-PKCE identity config on HOLD
+- NEW `repfinder.basf.com/bin/basf/repfindertool` param `repType=BR&productServiceId=2` returns HTTP 200 JSON wrapper around NPE stacktrace (`RetailFinderDatabaseService.getFinalResult:143` / `searchDatabas
+- CHANGED `north-america.intranet.basf.com` Concrete APIs: raw response is HTTP 307→`/ccm/system/authentication/oauth2/basf/attempt_auth?then=<full-url>` on ALL 6 paths — earlier 200/43KB were curl `-L` auth-ch
+- CHANGED `agriculture.basf.com` Magnolia endpoints (`/graphql2`, `/.graphql`, `/.restful`, `/.rest`, `/adminCentral`, `/.admin`, `/.cache`, `/.imaging`, `/dam`, `/docurl/`) now confirmed 308 redirect or 404 — 
+- CHANGED `repfinder.basf.com/bin/basf/repfindertool` re-probed 2026-09-12 00:44 & 05:23 — consistently 200 JSON with geolocation params, stacktrace disclosure confirmed, empty DB (hits=0)
+- CHANGED `secsys.basf.com/api/users/me` + siblings `bsh.secsys`, `secsys-visitor` → all HTTP 200 len=246 = WAF "Request Rejected" page (not 403) — WAF returns 200 OK for blocks across ecosystem
+- CHANGED `my.basf.com/.auth` + `federation.basf.com` OIDC discovery reconfirmed unchanged 2026-09-12; zero PKCE hardening on public client `86cc4bf9`; ATO blocked pending test account
+- CHANGED `*.api.basf.com` estate (9 hosts) → full unauth surface reconfirmed end-to-end 2026-09-12; zero reachable endpoints beyond auth gates/404
+- CHANGED `rep.basf.com` Spring Boot Actuator → `/actuator` HAL + `/actuator/health` UP; all 16 sensitive endpoints 404; path traversal + content-negotiation blocked; custom handler status 999 — locked down
