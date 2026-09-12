@@ -16507,3 +16507,124 @@ STEP 6 — LEARNING
 
 STEP 7 — RISK
 [RISK] basf: 34 — Steady-state residual. Only reachable unauth surface remains repfinder `/bin/basf/repfindertool`; this cycle added a new error path (200-wrapped NPE naming RetailFinderDatabaseService methods/line numbers) confirming dual service routing but still zero data returned. Full 9-host *.api + SAP KM + 7-host CMS estates closed. Top potential: repfinder DB read once populated (MED-HIGH) and no-PKCE refresh ATO on my.basf.com (HIGH, credential-blocked). No escalation.
+===== ANALYST bigpickle 2026-09-12 13:15:20 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mcurl -sk -m 20 -o /tmp/opencode/retail1.json -D /tmp/opencode/retail1.hdr -w "HTTP %{http_code} len=%{size_download}\n" "https://repfinder.basf.com/bin/basf/retailfindertool?country=US&productServiceId=1&lat=41.8781&lon=-87.6298&distance=250&limitResults=10&repType=SA%2CBR" && head -c 1500 /tmp/opencode/retail1.json; echo; echo "---HDR---"; head -c 600 /tmp/opencode/retail1.hdr
+HTTP 404 len=1
+
+
+---HDR---
+HTTP/2 404 
+server: CloudFront
+content-type: text/html;charset=utf-8
+content-length: 1
+date: Sat, 12 Sep 2026 13:12:30 GMT
+x-content-type-options: nosniff
+strict-transport-security: max-age=31536000
+x-aem-error-pass: true
+x-dispatcher: dispatcher1useast1-21425334
+x-vhost: repfinder
+x-cache: Error from cloudfront
+via: 1.1 4a3c4fc40ddd2a09909acf925fc84d70.cloudfront.net (CloudFront)
+x-amz-cf-pop: PHX50-P1
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: W8f06HNeV-TdR5ANrGwHsuCWkGCt4tr9SuHirwB9zNJGE8omlE71Tg==
+content-security-policy: frame-ancestors 'self'; object-src 'none'; upgrade-ins
+[0m
+retailfindertool sibling: 404/1B — confirmed not behind dispatcher gap. Now isolating the NPE trigger on repfindertool.
+[0m$ [0msleep 1.5; curl -sk -m 20 -o /tmp/opencode/rf_br.json -D /tmp/opencode/rf_br.hdr -w "HTTP %{http_code} len=%{size_download}\n" "https://repfinder.basf.com/bin/basf/repfindertool?country=DE&productServiceId=2&lat=49.45&lon=8.39&distance=50&limitResults=5&repType=BR" && echo "---BODY---" && head -c 2000 /tmp/opencode/rf_br.json
+HTTP 200 len=815
+---BODY---
+{"errorMessage":"Cannot invoke \"java.util.List.iterator()\" because \"results\" is null","errorType":"java.lang.NullPointerException","stackTrace":["com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.getFinalResult(RetailFinderDatabaseService.java:143)","com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.searchDatabase(RetailFinderDatabaseService.java:110)","com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.extractFromDatabase(RetailFinderDatabaseService.java:75)","com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.search(RetailFinderDatabaseService.java:59)","com.basf.aws.cxm.lambda.functions.repfinder.RepFinderHandler.handleRequest(RepFinderHandler.java:60)","com.basf.aws.cxm.lambda.functions.repfinder.RepFinderHandler.handleRequest(RepFinderHandler.java:21)"]}
+[0m
+[0m$ [0msleep 1.5; curl -sk -m 20 -o /tmp/opencode/rf_sa2.json -w "SA/psid2 HTTP %{http_code} len=%{size_download}\n" "https://repfinder.basf.com/bin/basf/repfindertool?country=DE&productServiceId=2&lat=49.45&lon=8.39&distance=50&limitResults=5&repType=SA"
+SA/psid2 HTTP 200 len=815
+[0m
+[0m$ [0mhead -c 900 /tmp/opencode/rf_sa2.json; echo
+{"errorMessage":"Cannot invoke \"java.util.List.iterator()\" because \"results\" is null","errorType":"java.lang.NullPointerException","stackTrace":["com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.getFinalResult(RetailFinderDatabaseService.java:143)","com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.searchDatabase(RetailFinderDatabaseService.java:110)","com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.extractFromDatabase(RetailFinderDatabaseService.java:75)","com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.search(RetailFinderDatabaseService.java:59)","com.basf.aws.cxm.lambda.functions.repfinder.RepFinderHandler.handleRequest(RepFinderHandler.java:60)","com.basf.aws.cxm.lambda.functions.repfinder.RepFinderHandler.handleRequest(RepFinderHandler.java:21)"]}
+[0m
+[0m$ [0msleep 2; curl -sk -m 20 -o /tmp/opencode/rf_sa1.json -w "SA/psid1 HTTP %{http_code} len=%{size_download}\n" "https://repfinder.basf.com/bin/basf/repfindertool?country=DE&productServiceId=1&lat=49.45&lon=8.39&distance=50&limitResults=5&repType=SA"; head -c 1500 /tmp/opencode/rf_sa1.json; echo
+SA/psid1 HTTP 200 len=857
+{"errorMessage":"Cannot invoke \"com.basf.aws.services.repfinder.GoogleService.getLatLongPositions(String)\" because \"this.googleService\" is null","errorType":"java.lang.NullPointerException","stackTrace":["com.basf.aws.cxm.service.db.impl.RepFinderDatabaseService.getResultsFromZipCode(RepFinderDatabaseService.java:188)","com.basf.aws.cxm.service.db.impl.RepFinderDatabaseService.searchDatabase(RepFinderDatabaseService.java:106)","com.basf.aws.cxm.service.db.impl.RepFinderDatabaseService.extractFromDatabase(RepFinderDatabaseService.java:78)","com.basf.aws.cxm.service.db.impl.RepFinderDatabaseService.search(RepFinderDatabaseService.java:63)","com.basf.aws.cxm.lambda.functions.repfinder.RepFinderHandler.handleRequest(RepFinderHandler.java:52)","com.basf.aws.cxm.lambda.functions.repfinder.RepFinderHandler.handleRequest(RepFinderHandler.java:21)"]}
+[0m
+Distinct dual-service routing confirmed via NPE stacktraces. Testing the earlier "graceful" combo to map the state change.
+[0m$ [0msleep 2.5; curl -sk -m 20 -o /tmp/opencode/rf_sab1.json -w "SA,BR/psid1 HTTP %{http_code} len=%{size_download}\n" "https://repfinder.basf.com/bin/basf/repfindertool?country=DE&productServiceId=1&lat=49.45&lon=8.39&distance=50&limitResults=5&repType=SA%2CBR"; head -c 1200 /tmp/opencode/rf_sab1.json; echo
+SA,BR/psid1 HTTP 200 len=857
+{"errorMessage":"Cannot invoke \"com.basf.aws.services.repfinder.GoogleService.getLatLongPositions(String)\" because \"this.googleService\" is null","errorType":"java.lang.NullPointerException","stackTrace":["com.basf.aws.cxm.service.db.impl.RepFinderDatabaseService.getResultsFromZipCode(RepFinderDatabaseService.java:188)","com.basf.aws.cxm.service.db.impl.RepFinderDatabaseService.searchDatabase(RepFinderDatabaseService.java:106)","com.basf.aws.cxm.service.db.impl.RepFinderDatabaseService.extractFromDatabase(RepFinderDatabaseService.java:78)","com.basf.aws.cxm.service.db.impl.RepFinderDatabaseService.search(RepFinderDatabaseService.java:63)","com.basf.aws.cxm.lambda.functions.repfinder.RepFinderHandler.handleRequest(RepFinderHandler.java:52)","com.basf.aws.cxm.lambda.functions.repfinder.RepFinderHandler.handleRequest(RepFinderHandler.java:21)"]}
+[0m
+Previously-graceful combo now NPEs too — consistent dual-service routing by `productServiceId`. Probing dispatcher gap for sibling servlets under `/bin/basf/`.
+[0m$ [0msleep 2; for p in repfinder repfinder.json retailerfinder storefinder distributorfinder cropfinder; do curl -sk -m 15 -o /tmp/opencode/bf.json -w "%{http_code} %{size_download} /bin/basf/$p\n" "https://repfinder.basf.com/bin/basf/$p" ; sleep 1.2; done
+404 1 /bin/basf/repfinder
+404 1 /bin/basf/repfinder.json
+404 1 /bin/basf/retailerfinder
+404 1 /bin/basf/storefinder
+404 1 /bin/basf/distributorfinder
+404 1 /bin/basf/cropfinder
+[0m
+[0m$ [0msleep 1.5; curl -sk -m 15 -o /tmp/opencode/rf_zip.json -w "zip-path HTTP %{http_code} len=%{size_download}\n" "https://repfinder.basf.com/bin/basf/repfindertool?zip=67059&country=DE&productServiceId=1&limitResults=5&repType=SA"; head -c 900 /tmp/opencode/rf_zip.json; echo; sleep 1.5; curl -sk -m 15 -o /tmp/opencode/rf_noargs.json -w "noargs HTTP %{http_code} len=%{size_download}\n" "https://repfinder.basf.com/bin/basf/repfindertool"; head -c 900 /tmp/opencode/rf_noargs.json; echo
+zip-path HTTP 200 len=857
+{"errorMessage":"Cannot invoke \"com.basf.aws.services.repfinder.GoogleService.getLatLongPositions(String)\" because \"this.googleService\" is null","errorType":"java.lang.NullPointerException","stackTrace":["com.basf.aws.cxm.service.db.impl.RepFinderDatabaseService.getResultsFromZipCode(RepFinderDatabaseService.java:188)","com.basf.aws.cxm.service.db.impl.RepFinderDatabaseService.searchDatabase(RepFinderDatabaseService.java:106)","com.basf.aws.cxm.service.db.impl.RepFinderDatabaseService.extractFromDatabase(RepFinderDatabaseService.java:78)","com.basf.aws.cxm.service.db.impl.RepFinderDatabaseService.search(RepFinderDatabaseService.java:63)","com.basf.aws.cxm.lambda.functions.repfinder.RepFinderHandler.handleRequest(RepFinderHandler.java:52)","com.basf.aws.cxm.lambda.functions.repfinder.RepFinderHandler.handleRequest(RepFinderHandler.java:21)"]}
+noargs HTTP 200 len=80
+{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}
+[0m
+[0m$ [0msleep 1.5; for ps in 3 0 -1 9; do curl -sk -m 15 -o /tmp/opencode/ps.json -w "psid=$ps HTTP %{http_code} len=%{size_download} body=" "https://repfinder.basf.com/bin/basf/repfindertool?country=DE&productServiceId=$ps&lat=49.45&lon=8.39&limitResults=5"; head -c 120 /tmp/opencode/ps.json; echo; sleep 1.2; done
+psid=3 HTTP 200 len=80 body={"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}
+psid=0 HTTP 200 len=80 body={"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}
+psid=-1 HTTP 200 len=80 body={"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}
+psid=9 HTTP 200 len=80 body={"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}
+[0m
+Enum strictly {1,2}, both NPE. One probe: broken quote in `country` to test if params feed string-built SQL (read-only, error-delta observation).
+[0m$ [0msleep 1.5; curl -sk -m 15 -o /tmp/opencode/sqli.json -w "sqli-probe HTTP %{http_code} len=%{size_download}\n" "https://repfinder.basf.com/bin/basf/repfindertool?country=DE%27&productServiceId=2&lat=49.45&lon=8.39&limitResults=5&repType=BR"; head -c 1500 /tmp/opencode/sqli.json; echo
+sqli-probe HTTP 200 len=815
+{"errorMessage":"Cannot invoke \"java.util.List.iterator()\" because \"results\" is null","errorType":"java.lang.NullPointerException","stackTrace":["com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.getFinalResult(RetailFinderDatabaseService.java:143)","com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.searchDatabase(RetailFinderDatabaseService.java:110)","com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.extractFromDatabase(RetailFinderDatabaseService.java:75)","com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.search(RetailFinderDatabaseService.java:59)","com.basf.aws.cxm.lambda.functions.repfinder.RepFinderHandler.handleRequest(RepFinderHandler.java:60)","com.basf.aws.cxm.lambda.functions.repfinder.RepFinderHandler.handleRequest(RepFinderHandler.java:21)"]}
+[0m
+No error delta on broken quote — NPE short-circuits pre-SQL; parameterized or empty-match short-circuit. Exploration complete.
+
+STEP 1 — DELTA:
+- [CHANGED] repfinder.basf.com/bin/basf/repfindertool: routing is `productServiceId`-driven ONLY — psid=1→`RepFinderDatabaseService` (NPE getResultsFromZipCode:188, `this.googleService` null = DI regression), psid=2→`RetailFinderDatabaseService` (NPE getFinalResult:143, `results` null); `repType`, `country`, `zip`, broken-quote all feed same paths — full param matrix → 200-wrapped NPE. Previously-graceful `hits=0/results=[]` no longer reproducible on ANY input shape (config/deploy regression).
+- [CHANGED] repfinder.basf.com/bin/basf/{retailfindertool,retailerfinder,storefinder,distributorfinder,cropfinder,repfinder(.json)}: all 404/1B — dispatcher gap scoped to `/bin/basf/repfindertool` alone; no-args→400 `\nUnsupported Product Service ID` graceful JSON (enum strictly {1,2}, others 400).
+- NO_DELTA: my.basf.com/federation OAuth (unchanged, AUTH_HELPED), north-america (307 gated), agriculture (308/404), est closes unchanged.
+
+STEP 2 — PRIORITIZE:
+- [PRIO] repfinder.basf.com,7.85,AS=8 BV=7 TE=8 GE=10 CS=8 FR=6
+- [PRIO] my.basf.com,5.85,AS=4 BV=8 TE=3 GE=8 CS=5 FR=7
+
+STEP 3 — HYPOTHESES:
+[HYP] Unauth Lambda dual-service proxy: routing enum + DI regression + verbose NPE disclosure, DB read still potential
+class: MISCONFIG
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 55
+reasoning: psid=1→RepFinderDatabaseService (DI regression, googleService null blocks geocode path); psid=2→RetailFinderDatabaseService (results null at getFinalResult:143 = zero-match/empty DB, not data); 2 distinct full stacktraces leak com.basf.aws.cxm.lambda.functions.repfinder package + method/line structure; broken-quote probe no error delta (parameterized); sibling servlets 404; dispatcher misses only this path
+evidence_needed: any query yielding non-null results[] (requires googleService DI fix + populated DB) — currently impossible (config regression)
+verify_steps: PASSIVE — exhausted this cycle (param matrix psid 1/2 × SA/BR × lat/lon/zip, quote-injection, sibling enum, no-args); residual re-probe 1 rps only after observable change
+impact: unauth Read of rep/retailer DB (PII) IF services operational + populated; today info-class only (LDAP-like arch/config-state + package/code disclosure); MEDIUM if repo re-populated
+testability: PASSIVE
+[HYP] Public OAuth client 86cc4bf9 lacks PKCE → refresh_token ATO
+class: OATH
+asset: my.basf.com/.auth
+confidence: 65
+reasoning: SSR boot config discloses client_id 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect_uri=https://my.basf.com/.auth, scope refresh_token, acr_values, zero PKCE refs; NAM discovery lists plain+S256; public client + refresh_token = long-lived bearer if code/refresh intercepted
+evidence_needed: valid BASF test account to exercise code+refresh flow, observe refresh lifetime/reuse/revocation
+verify_steps: PASSIVE — AUTH_HELPED (credential-blocked; no unauth vector)
+impact: ATO of myBASFWorld account; HIGH but blocked on test account
+testability: AUTH_HELPED
+
+STEP 4 — SELF-CRITIQUE:
+- [PARKED] repfinder unauth DB read once-populated: confidence 82→55 — DI regression (googleService null) now provably blocks the rep path and even the retail path returns null results on all inputs; the MED-HIGH "once populated" premise weakens to "if both DI config AND DB state align". Complaint held: still zero data access, disclosure-only today.
+- [FINAL] repfinder: dual-service routing + DI-regression + NPE stacktrace disclosure — confirmed actionable, PASSIVE, disclosure-only.
+- [FINAL] my.basf.com no-PKCE OAuth — highest impact, AUTH_HELPED.
+- Rejected this cycle: SQLi hypothesis (no error delta → parameterized/short-circuited), sibling `retailfindertool` servlet existence (404), alternate psid enum values (3/0/-1/9 → 400).
+
+STEP 5 — NEXT ACTION:
+- [NEXT] RAG: passive search for `RetailFinderDatabaseService` / `RepFinderDatabaseService` / `com.basf.aws.cxm` source on GitHub/gitlab/paste to see if the Lambda package or Terraform config (DI wiring for googleService) is public — would indicate whether the NPE is a known config regression and whether any consumer documents the psid mapping beyond {1,2}.
+
+STEP 6 — LEARNING:
+- [LEARN] ACCEPTED MISCONFIG @ repfinder.basf.com: routing is productServiceId-only ({1:RepFinder,2:RetailFinder}) confirmed via distinct NPE stacktraces; repType/country/zip/quote probes all hit same branches; enum validated gracefully (400, `Unsupported Product Service ID`) — no SQL/param injection echo, all valid paths now NPE (worse than the earlier hits=0/results=[] graceful output — googleService DI bean null + results-null short-circuit).
+- [LEARN] REJECTED MISCONFIG @ repfinder.basf.com: /bin/basf/* sibling servlets (retailfindertool, retailerfinder, storefinder, distributorfinder, cropfinder, repfinder, *.json) all 404/1B — dispatcher gap exclusive to /bin/basf/repfindertool; SQLi via country broken-quote produced no error delta (parameterized or pre-SQL null short-circuit).
+- [LEARN] REJECTED OATH @ my.basf.com: unchanged, AUTH_HELPED — no provider hardening, no new unauth vector.
+- [LEARN] REJECTED MISCONFIG @ north-america.intranet.basf.com: closed (307 OAuth2 gate confirmed).
+
+STEP 7 — RISK:
+- [RISK] basf: 33 — repfinder remains the sole reachable unauth surface; this cycle **de-escalated its data-read potential** (googleService DI regression now provably blocks the rep path on all inputs; retail path null-results across whole param matrix). Findings: unauth AEM→Lambda proxy with dual-service routing + config-state/DI regression disclosure + full stacktrace architecture leak — disclosure-class, not data. All other estates closed/reconfirmed. Top forward potential: ROPC/refresh ATO on my.basf.com (HIGH, credential-blocked) and hypothetical repfinder DB read only if DI config is restored AND DB populated. Stable residual, slight downgrade from 34.

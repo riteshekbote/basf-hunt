@@ -633,3 +633,17 @@ https://secsys.basf.com/api/users/me -> 200 len=246
 https://secsys.basf.com/api/users/me%00 -> 200 len=246
 https://bsh.secsys.basf.com/api/users/me -> 200 len=246
 https://secsys-visitor.basf.com/api/users/me -> 200 len=246
+
+## 2026-09-12 13:15:40 UTC
+https://repfinder.basf.com/bin/basf/repfindertool -> 200 len=80
+https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?lat=999&lon=999 -> 200 len=?
+https://repfinder.basf.com/bin/basf/retailfindertool?country=US&productServiceId=1&lat=41.8781&lon=-87.6298&distance=250&limitResults=10&repType=1 -> HTTP 404
+https://secsys.basf.com/api/users/me -> 200 len=246
+https://secsys.basf.com/api/users/me%00 -> 200 len=246
+https://bsh.secsys.basf.com/api/users/me -> 200 len=246
+https://secsys-visitor.basf.com/api/users/me -> 200 len=246
+https://my.basf.com/.auth` -> 200 len=204906
+https://my.basf.com/ -> 200 len=204906
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920

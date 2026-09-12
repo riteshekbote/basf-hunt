@@ -2465,3 +2465,22 @@ testability: PASSIVE (rejected)
 [LEARN] ACCEPTED MISCONFIG @ repfinder.basf.com/bin/basf/repfindertool: new param-dependent error path — `repType=BR&productServiceId=2` yields HTTP 200 wrapper around JSON NPE (`RetailFinderDatabaseService.java:143/:110`, results null), leaking Java service internals + confirming rep-vs-retail routing inside single servlet; sibling retailfindertool(.json) 404 — NPE path distinct from earlier graceful empty results, still empty-DB
 [LEARN] ACCEPTED RECON @ my.basf.com + federation.basf.com: OAuth client 86cc4bf9 + NAM discovery reconfirmed unchanged — no PKCE hardening; ATO remains blocked pending test account
 [RISK] basf: 34 — Steady-state residual. Only reachable unauth surface remains repfinder `/bin/basf/repfindertool`; this cycle added a new error path (200-wrapped NPE naming RetailFinderDatabaseService methods/line numbers) confirming dual service routing but still zero data returned. Full 9-host *.api + SAP KM + 7-host CMS estates closed. Top potential: repfinder DB read once populated (MED-HIGH) and no-PKCE refresh ATO on my.basf.com (HIGH, credential-blocked). No escalation.
+## 2026-09-12 13:15:10 UTC [target] (model bigpickle)
+[HYP] Unauth Lambda dual-service proxy: routing enum + DI regression + verbose NPE disclosure, DB read still potential
+class: MISCONFIG
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 55
+reasoning: psid=1→RepFinderDatabaseService (DI regression, googleService null blocks geocode path); psid=2→RetailFinderDatabaseService (results null at getFinalResult:143 = zero-match/empty DB, not data); 2 distinct full stacktraces leak com.basf.aws.cxm.lambda.functions.repfinder package + method/line structure; broken-quote probe no error delta (parameterized); sibling servlets 404; dispatcher misses only this path
+evidence_needed: any query yielding non-null results[] (requires googleService DI fix + populated DB) — currently impossible (config regression)
+verify_steps: PASSIVE — exhausted this cycle (param matrix psid 1/2 × SA/BR × lat/lon/zip, quote-injection, sibling enum, no-args); residual re-probe 1 rps only after observable change
+impact: unauth Read of rep/retailer DB (PII) IF services operational + populated; today info-class only (LDAP-like arch/config-state + package/code disclosure); MEDIUM if repo re-populated
+testability: PASSIVE
+[HYP] Public OAuth client 86cc4bf9 lacks PKCE → refresh_token ATO
+class: OATH
+asset: my.basf.com/.auth
+confidence: 65
+reasoning: SSR boot config discloses client_id 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect_uri=https://my.basf.com/.auth, scope refresh_token, acr_values, zero PKCE refs; NAM discovery lists plain+S256; public client + refresh_token = long-lived bearer if code/refresh intercepted
+evidence_needed: valid BASF test account to exercise code+refresh flow, observe refresh lifetime/reuse/revocation
+verify_steps: PASSIVE — AUTH_HELPED (credential-blocked; no unauth vector)
+impact: ATO of myBASFWorld account; HIGH but blocked on test account
+testability: AUTH_HELPED
