@@ -324,3 +324,13 @@
 - 2026-09-12 ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims — provider config stable, no hardening
 - 2026-09-12 ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: unauth AEM->AWS Lambda proxy, 200 JSON, stacktrace disclosure, geolocation-based search path functional (empty DB) — dispatcher misses /bin/basf/repfindertool
 - 2026-09-12 ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
+- 2026-09-12 ACCEPTED RECON @ repfinder.basf.com: unauth AEM servlet proxy `/bin/basf/repfindertool` re-probed 2026-09-12 — 200 JSON unauth, hits=0/results=[] across all coords, psid 1/2, DE/US/BR; geolocation path functional (empty DB); stacktrace disclosure confirmed on error path; dispatcher still misses this path; sibling 404 — FINDING: unauth Lambda proxy + stacktrace/architecture disclosure (low-med) with potential rep/retailer DB read once data populated (med-high)
+- 2026-09-12 REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL/REST/admin/cache all 308/404 (reconfirmed 2026-09-12) — zero unauth unauth surface; class closed
+- 2026-09-12 REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs all 307 Azure AD/OAuth2 gated (reconfirmed) — no unauth API surface
+- 2026-09-12 ACCEPTED RECON @ my.basf.com + federation.basf.com: OAuth client 86cc4bf9 / NAM OIDC discovery reconfirmed unchanged — zero provider hardening; ATO remains blocked pending test account
+- 2026-09-12 ACCEPTED RECON @ rep.basf.com: /actuator + /actuator/health (HAL/UP); all 16 sensitive endpoints 404; custom handler 999 — locked down
+- 2026-09-12 ACCEPTED RECON @ repfinder.basf.com: unauth AEM servlet→AWS Lambda proxy `/bin/basf/repfindertool` 200 JSON at all coords/psid (hits=0/results=[]), stacktrace disclosure, dispatcher misses /bin/basf/* — one reachable unauth endpoint on the whole estate, currently empty DB (MEDIA-HIGH once populated)
+- 2026-09-12 REJECTED MISCONFIG @ agriculture.basf.com: Magnolia GraphQL/REST/admin/cache/DAM all 308/404 — zero unauth surface; closed
+- 2026-09-12 REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs all 307 Azure AD OAuth2-gated — closed
+- 2026-09-12 ACCEPTED RECON @ my.basf.com + federation.basf.com: OAuth client 86cc4bf9 + NAM OIDC discovery unchanged — zero PKCE hardening, ATO blocked pending test account
+- 2026-09-12 ACCEPTED RECON @ rep.basf.com: /actuator HAL + /actuator/health UP; 16 sensitive endpoints 404; custom handler 999 — actuator locked down

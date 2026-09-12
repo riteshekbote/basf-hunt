@@ -1,1 +1,76 @@
-## 2026-09-12 00:38:57 UTC [target] (model bigpickle)
+## 2026-09-12 05:22:34 UTC [target] (model bigpickle)
+[NEXT] PROBE: at 1 rps, GET `https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=SA%2CBR` and psid=2 variant (Chicago metro) — any non-empty `results[]` = unauth rep/retailer DB read (report HIGH); if empty, report the unauth Lambda proxy + full stack-trace disclosure as LOW-MED and re-test after any deployment fix.
+[RISK] BASF SE: 34 — Unauthenticated estate stays gated, but this cycle surfaced a new class: repfinder.basf.com `/bin/basf/repfindertool` is an unauth AEM->production AWS Lambda proxy returning 200 JSON with full Java stack traces and a functional (currently empty) rep/retailer DB search interface — backend error-handling/stacktrace disclosure now, with potential contact-data read if the deployment's missing GoogleService/DB bindings are repaired. Magnolia (agriculture) and Concrete-CMS `then=` (north-america intranet) classes conclusively closed. Standing top item remains the no-PKCE refresh_token ATO on my.basf.com (75, AUTH_HELPED, needs a test account).
+[PRIO] repfinder.basf.com,7.85,attack_surface=8 business_value=8 tech_exposure=7 gate_ease=10 cloud_surface=8 freshness=8
+[PRIO] my.basf.com,5.85,attack_surface=4 business_value=8 tech_exposure=3 gate_ease=8 cloud_surface=5 freshness=7
+[PRIO] agriculture.basf.com,5.35,attack_surface=6 business_value=7 tech_exposure=5 gate_ease=9 cloud_surface=9 freshness=4
+[PRIO] rep.basf.com,3.95,attack_surface=3 business_value=7 tech_exposure=2 gate_ease=8 cloud_surface=3 freshness=3
+[PRIO] secsys.basf.com,3.05,attack_surface=4 business_value=5 tech_exposure=2 gate_ease=5 cloud_surface=3 freshness=6
+[HYP] Unauth AEM Sling Servlet Proxy to AWS Lambda with Stacktrace Disclosure + Functional Geolocation Search Path
+class: MISCONFIG
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 78
+reasoning: GET returns 200 JSON (72B) unauthenticated with `hits:0,results:[]`; AEM→Lambda proxy confirmed; full Java stacktrace disclosed on earlier degraded gcloud-service path (RepFinderDatabaseService.getResultsFromZipCode, RetailFinderDatabaseService, GoogleService); dispatcher misses `productServiceId` selectors; geolocation parameterization (lat/lng/psid/ZIP) functional but backend DB returns empty across all US/DE/BR coordinates tested
+evidence_needed: non-empty results[] array once backend DB is populated; alternate selector/servlet paths returning rep/retailer records
+impact: unauth read of rep/retailer contact DB (PII, MEDIUM-HIGH once data present); stacktrace + Lambda ARN architecture disclosure now (LOW-MED); unauthenticated AWS Lambda invocation proxy
+testability: PASSIVE (probe only)
+[HYP] Public OAuth Client Without PKCE Allowing refresh_token ATO
+class: OATH
+asset: my.basf.com/.auth
+confidence: 65
+reasoning: SSR boot config discloses public client_id 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect_uri /.auth, scope openid+profile+refresh_token, acr_values, zero PKCE refs; authorization_code flow with refresh_token on public client = long-lived bearer if code/refresh intercepted (no PKCE protection on code exchange)
+impact: account takeover if login code or refresh token intercepted (mitm/open redirect chain); HIGH, but requires a test account
+verify_steps: PASSIVE — needs auth test account for refresh lifetime checking (AUTH_HELPED)
+testability: AUTH_HELPED
+[HYP] Magnolia CMS unauth GraphQL/REST surface on agriculture.basf.com
+class: MISCONFIG
+asset: agriculture.basf.com
+confidence: 42
+reasoning: Magnolia confirmed (348KB); all standard paths /graphql2, /.graphql, /.restful, /.rest, /adminCentral, /.cache, /.imaging return 308 redirect or 404 — deleted as zero unauth surface this cycle (agriculture all Magnolia endpoints confirmed 308/404)
+evidence_needed: none — class closed
+impact: LOW
+testability: PASSIVE
+[FINAL] repfinder unauth Lambda proxy stacktrace+search path — confirmed, actionable, PASSIVE.
+[FINAL] my.basf.com no-PKCE refresh_token ATO — highest impact, blocked on account.
+[PARKED] secsys WAF 200-OK block-page class — no data leak; WAF 200 response anomaly only; no POC.
+[NEXT] PROBE: GET https://repfinder.basf.com/bin/basf/repfindertool?country=DE&productServiceId=1&lat=50&lon=8&distance=50&limitResults=5&repType=SA%2CBR and BR variant with productServiceId=1&2, 1 rps, capture full JSON body to confirm hits/results still empty after 09-12 probes
+[LEARN] ACCEPTED RECON @ repfinder.basf.com: unauth AEM servlet proxy `/bin/basf/repfindertool` re-probed 2026-09-12 — 200 JSON unauth, hits=0/results=[] across all coords, psid 1/2, DE/US/BR; geolocation path functional (empty DB); stacktrace disclosure confirmed on error path; dispatcher still misses this path; sibling 404 — FINDING: unauth Lambda proxy + stacktrace/architecture disclosure (low-med) with potential rep/retailer DB read once data populated (med-high)
+[LEARN] REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL/REST/admin/cache all 308/404 (reconfirmed 2026-09-12) — zero unauth unauth surface; class closed
+[LEARN] REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs all 307 Azure AD/OAuth2 gated (reconfirmed) — no unauth API surface
+[LEARN] ACCEPTED RECON @ my.basf.com + federation.basf.com: OAuth client 86cc4bf9 / NAM OIDC discovery reconfirmed unchanged — zero provider hardening; ATO remains blocked pending test account
+[LEARN] ACCEPTED RECON @ rep.basf.com: /actuator + /actuator/health (HAL/UP); all 16 sensitive endpoints 404; custom handler 999 — locked down
+[RISK] basf: 34 — Full 9-host *.api.basf.com + SAP KM estate + 7-host CMS estate unauth classes all conclusively closed end-to-end. Only reachable unauth surface = repfinder /bin/basf/repfindertool Lambda proxy (stacktrace/architecture disclosure, empty rep/retailer DB). Top potential remains no-PKCE refresh_token ATO (my.basf.com) and unauth repfinder DB read when data populated. Remaining leads require auth credentials (out-of-scope class) — steady-state residual, no escalation.**STEP 1 — DELTA**
+[PRIO] repfinder.basf.com,7.85,AS=8 BV=8 TE=7 GE=10 CS=8 FR=8
+[PRIO] my.basf.com,5.70,AS=4 BV=8 TE=3 GE=8 CS=5 FR=7
+[PRIO] agriculture.basf.com,5.05,AS=6 BV=7 TE=5 GE=9 CS=9 FR=4
+[PRIO] rep.basf.com,3.95,AS=3 BV=7 TE=2 GE=8 CS=3 FR=3
+[PRIO] secsys.basf.com,3.05,AS=4 BV=5 TE=2 GE=5 CS=3 FR=6
+[HYP] Unauthenticated AEM→AWS Lambda proxy with stacktrace disclosure and live geolocation search path
+class: MISCONFIG
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 80
+reasoning: 200 JSON unauth at 1 rps; hit=0/results=[] confirms functional search across US/DE/BR coords and psid 1/2; error path leaks stacktrace with Lambda class names (RepFinderDatabaseService, GoogleService, RepFinderHandler); dispatcher misses /bin/basf/*; 16 siblings 404
+evidence_needed: non-empty results[] once DB is populated; any alternate selector that returns records
+verify_steps: PASSIVE — GET with coords, capture JSON body
+impact: unauth DB read of rep/retailer contact data (PII) if data present; immediate stacktrace/architecture info disclosure; MEDIUM-HIGH
+testability: PASSIVE
+[HYP] Public OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 lacks PKCE → refresh_token ATO
+class: OATH
+asset: my.basf.com
+confidence: 65
+reasoning: SSR boot config discloses client_id, redirect_uri=/.auth, scope incl refresh_token, acr_values; zero PKCE refs; public client with refresh token = long-lived bearer if token captured
+impact: ATO of myBASFWorld account; HIGH, but requires a valid BASF test account + token interception chain
+testability: AUTH_HELPED (blocked on account)
+[HYP] Magnolia CMS unauth API surface on agriculture.basf.com
+class: MISCONFIG
+asset: agriculture.basf.com
+confidence: 20
+reasoning: All Magnolia endpoints (/graphql2, /.graphql, /.restful, /.rest, /adminCentral, /.cache, /.imaging) return 308 redirect or 404 — zero unauth API surface; class conclusively closed this cycle
+testability: PASSIVE (rejected)
+[NEXT] PROBE: 1 rps GET https://repfinder.basf.com/bin/basf/repfindertool?country=DE&productServiceId=1&lat=49.45&lon=8.39&distance=50&limitResults=5&repType=SA%2CBR — capture full JSON body to confirm hits/results still empty; also GET .json selector on sibling retailfindertool
+[LEARN] ACCEPTED RECON @ repfinder.basf.com: unauth AEM servlet→AWS Lambda proxy `/bin/basf/repfindertool` 200 JSON at all coords/psid (hits=0/results=[]), stacktrace disclosure, dispatcher misses /bin/basf/* — one reachable unauth endpoint on the whole estate, currently empty DB (MEDIA-HIGH once populated)
+[LEARN] REJECTED MISCONFIG @ agriculture.basf.com: Magnolia GraphQL/REST/admin/cache/DAM all 308/404 — zero unauth surface; closed
+[LEARN] REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs all 307 Azure AD OAuth2-gated — closed
+[LEARN] ACCEPTED RECON @ my.basf.com + federation.basf.com: OAuth client 86cc4bf9 + NAM OIDC discovery unchanged — zero PKCE hardening, ATO blocked pending test account
+[LEARN] ACCEPTED RECON @ rep.basf.com: /actuator HAL + /actuator/health UP; 16 sensitive endpoints 404; custom handler 999 — actuator locked down
+[RISK] BASF SE: 34 — Full 9-host *.api.basf.com estate + SAP KM + 7-host CMS estate unauth classes conclusively closed end-to-end. Only reachable unauth surface = repfinder /bin/basf/repfindertool Lambda proxy (stacktrace/architecture disclosure with empty rep/retailer DB). Top potential remains repfinder DB read when populated (MEDIUM-HIGH) and no-PKCE refresh_token ATO on my.basf.com (HIGH, needs test account). Remaining leads require auth creds (out-of-scope class) — stable residual, no escalation.

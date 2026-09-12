@@ -435,3 +435,15 @@ www.basf.com
 - CHANGED `*.api.basf.com` estate (9 hosts) full unauth surface reconfirmed end-to-end — zero reachable endpoints beyond auth gates/404
 - CHANGED `my.basf.com/.auth` HTTP 200/205KB SPA fallback re-confirmed — `/.auth` remains client-side callback, no server-side token surface
 - CHANGED `federation.basf.com` NAM OIDC discovery reconfirmed unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes); SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434
+
+## 2026-09-12 05:22:44 UTC
+- NEW `repfinder.basf.com/bin/basf/repfindertool` → unauth AEM→AWS Lambda proxy, 200 JSON, stacktrace disclosure, geolocation search functional (empty DB) — dispatcher misses this path
+- NEW `north-america.intranet.basf.com/index.php/api` → 200 len=43206; `/index.php/tools/activated_packages` → 200 len=43173; `/ccm/system/block/types` → 200 len=43191; `/api/blocks` → 200 len=43203 — Concr
+- CHANGED `agriculture.basf.com` ALL 10 Magnolia endpoints now confirmed 308 redirect or 404 — zero unauthenticated API surface (was "zero sub-path probes ever run")
+- CHANGED `north-america.intranet.basf.com` ALL 5 Concrete internal API endpoints now confirmed 307 redirect to Azure AD OAuth2 — fully auth-gated (contradicts NEW above — need clarification)
+- CHANGED `experience.basf.com` AEM Dispatcher cache poisoning via Host header spoofing (author-prod-aem64.basf.com) returns 403 from CloudFront on all 4 tested paths — edge blocks spoofed Host headers conclusi
+- CHANGED `secsys.basf.com` /api/* endpoints return HTTP 200 len=246 = WAF "Request Rejected" page (NOT API data) across all 3 hosts; WAF returns 200 instead of 403
+- CHANGED `rep.basf.com` Spring Boot Actuator at `/actuator` (HAL) + `/actuator/health` (UP); all 16 sensitive endpoints return 404; path traversal and content-negotiation blocked; custom error handler returns 
+- CHANGED `*.api.basf.com` estate (9 hosts) full unauth surface reconfirmed end-to-end — zero reachable endpoints beyond auth gates/404
+- CHANGED `my.basf.com/.auth` HTTP 200/205KB SPA fallback re-confirmed — `/.auth` remains client-side callback, no server-side token surface
+- CHANGED `federation.basf.com` NAM OIDC discovery reconfirmed unchanged (ROPC/hybrid grants, plain+S256 PKCE, registration scopes); SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor (21434

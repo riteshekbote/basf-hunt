@@ -1227,3 +1227,30 @@
 - LEARN: ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/bas
 - LEARN: ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: unauth AEM->AWS Lambda proxy, 200 JSON, stacktrace disclosure, geolocation-based search path functio
 - LEARN: ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
+
+## RANKED HYPOTHESES 2026-09-12 05:22:44 UTC
+- [78] repfinder.basf.com/bin/basf/repfindertool: Unauth AEM Sling Servlet Proxy to AWS Lambda with Stacktrace Disclosure + Functional Geolocation Search Path (from art/lead_bigpickle.txt)
+- [75] repfinder.basf.com/bin/basf/repfindertool: Unauthenticated AEM Sling Servlet Proxy to AWS Lambda with Stacktrace Disclosure (from art/lead_nemotron3.txt)
+- NEXT(hypotheses-bigpickle.txt): PROBE: at 1 rps, GET `https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repT
+- NEXT(hypotheses-nemotron3.txt): PROBE: GET https://repfinder.basf.com/bin/basf/repfindertool -H "Accept: application/json" (HEAD) — confirm 200 JSON response and capture full response body for
+- LEARN: ACCEPTED RECON @ repfinder.basf.com: unauth AEM servlet proxy `/bin/basf/repfindertool` re-probed 2026-09-12 — 200 JSON unauth, hits=0/results=[] across all coo
+- LEARN: REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL/REST/admin/cache all 308/404 (reconfirmed 2026-09-12) — zero unauth unauth surface; class closed
+- LEARN: REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs all 307 Azure AD/OAuth2 gated (reconfirmed) — no unauth API surface
+- LEARN: ACCEPTED RECON @ my.basf.com + federation.basf.com: OAuth client 86cc4bf9 / NAM OIDC discovery reconfirmed unchanged — zero provider hardening; ATO remains bloc
+- LEARN: ACCEPTED RECON @ rep.basf.com: /actuator + /actuator/health (HAL/UP); all 16 sensitive endpoints 404; custom handler 999 — locked down
+- LEARN: ACCEPTED RECON @ repfinder.basf.com: unauth AEM servlet→AWS Lambda proxy `/bin/basf/repfindertool` 200 JSON at all coords/psid (hits=0/results=[]), stacktrace d
+- LEARN: REJECTED MISCONFIG @ agriculture.basf.com: Magnolia GraphQL/REST/admin/cache/DAM all 308/404 — zero unauth surface; closed
+- LEARN: REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs all 307 Azure AD OAuth2-gated — closed
+- LEARN: ACCEPTED RECON @ my.basf.com + federation.basf.com: OAuth client 86cc4bf9 + NAM OIDC discovery unchanged — zero PKCE hardening, ATO blocked pending test account
+- LEARN: ACCEPTED RECON @ rep.basf.com: /actuator HAL + /actuator/health UP; 16 sensitive endpoints 404; custom handler 999 — actuator locked down
+- LEARN: REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL (/graphql2, /.graphql), REST (/.restful, /.rest), admin (/adminCentral, /admin, /.admin), cache 
+- LEARN: REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs (/index.php/ccm/system/block/types, /index.php/ccm/system/page/types, /index.ph
+- LEARN: REJECTED MISCONFIG @ experience.basf.com: AEM Dispatcher cache poisoning via Host header spoofing — CloudFront returns 403 on all 4 tested paths with Host: auth
+- LEARN: REJECTED MISCONFIG @ rep.basf.com/actuator/*: All 16 sensitive actuator endpoints return 404; path traversal (env.., actuator;/env, health/path/../../env) and c
+- LEARN: REJECTED BUSLOGIC @ procurement.basf.com/tm/passage-europe/vss3.basf.com KM servlet: All parameterized requests return HTTP 500 (SAP runtime error) across 4 por
+- LEARN: REJECTED MISCONFIG @ basf.login.apigee.com: Standard Apigee Edge SSO identity-zone login — generic Edge SSO, not custom BASF OAuth provider; ROPC/implicit confi
+- LEARN: ACCEPTED RECON @ *.api.basf.com estate: Full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/4
+- LEARN: ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect_uri, scope, refresh_token, 
+- LEARN: ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/bas
+- LEARN: ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: unauth AEM->AWS Lambda proxy, 200 JSON, stacktrace disclosure, geolocation-based search path functio
+- LEARN: ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403

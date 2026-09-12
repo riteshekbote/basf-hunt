@@ -15412,3 +15412,953 @@ psid2: 200 72B application/json;charset=utf-8
 [93m[1m! [0mpermission requested: external_directory (/tmp/*); auto-rejecting
 [0m✗ [0mRead /tmp/repf_chicago_psid2.json failed
 [91m[1mError: [0mThe user rejected permission to use this specific tool call.
+===== ANALYST bigpickle 2026-09-12 05:22:44 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la && ls -la art 2>/dev/null; ls -la inventory 2>/dev/null
+total 404
+drwxr-xr-x 12 runner runner   4096 Sep 12 05:07 .
+drwxr-xr-x  3 runner runner   4096 Sep 12 05:07 ..
+drwxr-xr-x  7 runner runner   4096 Sep 12 05:07 .git
+drwxr-xr-x  3 runner runner   4096 Sep 12 05:07 .github
+-rw-r--r--  1 runner runner   1801 Sep 12 05:07 README.md
+-rw-r--r--  1 runner runner     32 Sep 12 05:07 analyst-out.txt
+-rw-r--r--  1 runner runner 141882 Sep 12 05:07 analyst-prompt.txt
+-rw-r--r--  1 runner runner 138010 Sep 12 05:07 ctx.txt
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 inventory
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 knowledge
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 leads
+-rw-r--r--  1 runner runner  42834 Sep 12 05:07 probe-results.md
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 recon-notes
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 reports
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 reposcan-raw
+-rw-r--r--  1 runner runner   3285 Sep 12 05:07 scope.yml
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 scripts
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_bigpickle.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_laguna.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_ling3.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_longcat.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_mimo.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_nemotron3.json
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 triage
+total 64
+drwxr-xr-x  2 runner runner  4096 Sep 12 05:07 .
+drwxr-xr-x 12 runner runner  4096 Sep 12 05:07 ..
+-rw-r--r--  1 runner runner 53501 Sep 12 05:07 basf.md
+[0m
+[0m✱ [0mGlob "**/*.txt"[90m 9 matches[0m
+[0m✱ [0mGlob "**/*.md"[90m 80 matches[0m
+[0m→ [0mRead scope.yml
+[0m
+[0m$ [0mwc -l probe-results.md; tail -60 probe-results.md; echo ===; cat state_bigpickle.json; echo; cat analyst-out.txt
+607 probe-results.md
+https://agriculture.basf.com/graphql2 -> 200 len=335626
+https://agriculture.basf.com/.restful/content -> HTTP 404
+https://agriculture.basf.com/.rest/content -> HTTP 404
+https://agriculture.basf.com/adminCentral -> 200 len=335626
+https://agriculture.basf.com/.cache -> 200 len=335626
+https://agriculture.basf.com/.imaging -> 200 len=335626
+https://agriculture.basf.com/dam -> 200 len=335626
+https://north-america.intranet.basf.com/index.php/ccm/system/block/types -> 200 len=43173
+https://north-america.intranet.basf.com/index.php/ccm/system/page/types -> 200 len=43176
+https://north-america.intranet.basf.com/index.php/dashboard -> 200 len=43206
+https://north-america.intranet.basf.com/ccm/system/block/types -> 200 len=43191
+https://north-america.intranet.basf.com/api/blocks -> 200 len=43203
+
+## 2026-09-11 17:24:07 UTC
+https://agriculture.basf.com/.graphql -> 200 len=348163
+https://agriculture.basf.com/admin -> 200 len=348163
+https://agriculture.basf.com/.admin -> 200 len=348163
+https://north-america.intranet.basf.com/ccm/system/block/types -> 200 len=43277
+https://agriculture.basf.com/graphql2 -> 200 len=348163
+https://agriculture.basf.com/.restful -> 200 len=348163
+https://agriculture.basf.com/docurl/ -> 200 len=404935
+https://north-america.intranet.basf.com/index.php/login -> 200 len=?
+https://repfinder.basf.com/bin/repfinder.json -> HTTP 404
+https://repfinder.basf.com/content/repfinder/en.search.json -> HTTP 404
+https://north-america.intranet.basf.com/index.php/api -> 200 len=43206
+https://north-america.intranet.basf.com/index.php/tools/activated_packages -> 200 len=43280
+
+## 2026-09-11 19:55:22 UTC
+https://my.basf.com/.auth -> 200 len=204991
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid%20profile%20refresh_token&acr_values=3IAM%2FLogin%2FExternal -> 200 len=684
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://secsys.basf.com/api/users/me -> 200 len=246
+https://secsys.basf.com/api/users/me%00 -> 200 len=246
+
+## 2026-09-11 22:30:27 UTC
+https://secsys.basf.com/api/users/me -> 200 len=246
+https://secsys.basf.com/api/users/me%00 -> 200 len=246
+https://my.basf.com/.auth -> 200 len=204991
+https://federation.basf.com/nidp/oauth/nam/authz?response_type=code&client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&redirect_uri=https://my.basf.com/.auth&scope=openid%20profile%20refresh_token&acr_values=3IAM%2FLogin%2FExternal -> 200 len=684
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://agriculture.basf.com/graphql2 -> 200 len=348125
+https://agriculture.basf.com/.restful -> 200 len=348127
+https://agriculture.basf.com/docurl/ -> 200 len=404933
+https://north-america.intranet.basf.com/index.php/login -> 200 len=?
+https://repfinder.basf.com/bin/repfinder.json -> HTTP 404
+https://repfinder.basf.com/content/repfinder/en.search.json -> HTTP 404
+https://north-america.intranet.basf.com/index.php/api -> 200 len=43179
+
+## 2026-09-12 00:44:26 UTC
+https://repfinder.basf.com/bin/basf/repfindertool -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?lat=52.52&lon=13.41 -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?lat=999&lon=999 -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?format=xml -> 200 len=?
+https://agriculture.basf.com/graphql2 -> 200 len=348111
+https://agriculture.basf.com/.graphql -> 200 len=348111
+https://agriculture.basf.com/.restful/node-types -> HTTP 404
+https://secsys.basf.com/api/users/me -> 200 len=246
+https://secsys.basf.com/api/users/me%00 -> 200 len=246
+https://bsh.secsys.basf.com/api/users/me -> 200 len=246
+https://secsys-visitor.basf.com/api/users/me -> 200 len=246
+===
+{"phase": "POC", "target": "api"}
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la && ls -la art 2>/dev/null; ls -la inventory 2>/dev/null
+total 404
+drwxr-xr-x 12 runner runner   4096 Sep 12 05:07 .
+drwxr-xr-x  3 runner runner   4096 Sep 12 05:07 ..
+drwxr-xr-x  7 runner runner   4096 Sep 12 05:07 .git
+drwxr-xr-x  3 runner runner   4096 Sep 12 05:07 .github
+-rw-r--r--  1 runner runner   1801 Sep 12 05:07 README.md
+-rw-r--r--  1 runner runner     32 Sep 12 05:07 analyst-out.txt
+-rw-r--r--  1 runner runner 141882 Sep 12 05:07 analyst-prompt.txt
+-rw-r--r--  1 runner runner 138010 Sep 12 05:07 ctx.txt
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 inventory
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 knowledge
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 leads
+-rw-r--r--  1 runner runner  42834 Sep 12 05:07 probe-results.md
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 recon-notes
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 reports
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 reposcan-raw
+-rw-r--r--  1 runner runner   3285 Sep 12 05:07 scope.yml
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 scripts
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_bigpickle.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_laguna.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_ling3.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_longcat.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_mimo.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_nemotron3.json
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 triage
+total 64
+drwxr-xr-x  2 runner runner  4096 Sep 12 05:07 .
+drwxr-xr-x 12 runner runner  4096 Sep 12 05:07 ..
+-rw-r--r--  1 runner runner 53501 Sep 12 05:07 basf.md
+[0m
+[0m✱ [0mGlob "**/*.txt"[90m 9 matches[0m
+[0m✱ [0mGlob "**/*.md"[90m 80 matches[0m
+[0m→ [0mRead scope.yml
+[0m
+[0m✱ [0mGrep "repfinder|repfindertool|north-america|intranet|secsys|repType|productServiceId"[90m in probe-results.md · 100 matches[0m
+[0m→ [0mRead leads/reposcan-basf.md[90m [limit=200][0m
+[0m→ [0mRead triage/run-2026-09-12-01-09.md
+[0m✱ [0mGrep "repfindertool|repfinder|GoogleService|RepFinderDatabaseService|responseCode|results|stacktrace|stack trace"[90m in recon-notes · 2 matches[0m
+[0m→ [0mRead reports/hypotheses-nemotron3.txt
+[0m✗ [0mRead lead-bigpickle.txt failed
+[91m[1mError: [0mFile not found: /home/runner/work/basf-hunt/basf-hunt/lead-bigpickle.txt
+[0m✗ [0mRead leads/lead-nemotron3.txt failed
+[91m[1mError: [0mFile not found: /home/runner/work/basf-hunt/basf-hunt/leads/lead-nemotron3.txt
+[0m✗ [0mRead leads/lead-laguna.txt failed
+[91m[1mError: [0mFile not found: /home/runner/work/basf-hunt/basf-hunt/leads/lead-laguna.txt
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/leads/ 2>/dev/null; echo ---; cat baseline-bigpickle.txt 2>/dev/null; echo ---; cat my-bigpickle.md 2>/dev/null | tail -40; echo ---; head -30 analyst-out.txt
+total 916
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 .
+drwxr-xr-x 12 runner runner   4096 Sep 12 05:07 ..
+-rw-r--r--  1 runner runner 375585 Sep 12 05:07 lead-bigpickle.md
+-rw-r--r--  1 runner runner   3009 Sep 12 05:07 lead-laguna.md
+-rw-r--r--  1 runner runner   2950 Sep 12 05:07 lead-ling3.md
+-rw-r--r--  1 runner runner   3068 Sep 12 05:07 lead-longcat.md
+-rw-r--r--  1 runner runner     18 Sep 12 05:07 lead-mimo.md
+-rw-r--r--  1 runner runner 519164 Sep 12 05:07 lead-nemotron3.md
+-rw-r--r--  1 runner runner  12970 Sep 12 05:07 reposcan-basf.md
+---
+---
+---
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la && ls -la art 2>/dev/null; ls -la inventory 2>/dev/null
+total 404
+drwxr-xr-x 12 runner runner   4096 Sep 12 05:07 .
+drwxr-xr-x  3 runner runner   4096 Sep 12 05:07 ..
+drwxr-xr-x  7 runner runner   4096 Sep 12 05:07 .git
+drwxr-xr-x  3 runner runner   4096 Sep 12 05:07 .github
+-rw-r--r--  1 runner runner   1801 Sep 12 05:07 README.md
+-rw-r--r--  1 runner runner     32 Sep 12 05:07 analyst-out.txt
+-rw-r--r--  1 runner runner 141882 Sep 12 05:07 analyst-prompt.txt
+-rw-r--r--  1 runner runner 138010 Sep 12 05:07 ctx.txt
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 inventory
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 knowledge
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 leads
+-rw-r--r--  1 runner runner  42834 Sep 12 05:07 probe-results.md
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 recon-notes
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 reports
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 reposcan-raw
+-rw-r--r--  1 runner runner   3285 Sep 12 05:07 scope.yml
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 scripts
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_bigpickle.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_laguna.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_ling3.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_longcat.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_mimo.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_nemotron3.json
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 triage
+total 64
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && ls knowledge/ reports/ inventory/ triage/ scripts/ 2>/dev/null
+inventory/:
+basf.md
+
+knowledge/:
+index.md
+
+reports/:
+analyst-bigpickle.log
+analyst-laguna.log
+analyst-ling3.log
+analyst-longcat.log
+analyst-nemotron3.log
+hypotheses-bigpickle.txt
+hypotheses-laguna.txt
+hypotheses-ling3.txt
+hypotheses-longcat.txt
+hypotheses-nemotron3.txt
+hypotheses.md
+valid-bugs.md
+
+scripts/:
+sync-issues.py
+
+triage/:
+run-2026-09-03-11-40.md
+run-2026-09-03-15-10.md
+run-2026-09-03-18-42.md
+run-2026-09-03-21-29.md
+run-2026-09-03-23-30.md
+run-2026-09-04-01-18.md
+run-2026-09-04-05-59.md
+run-2026-09-04-10-40.md
+run-2026-09-04-14-32.md
+run-2026-09-04-17-45.md
+run-2026-09-04-20-00.md
+run-2026-09-04-22-10.md
+run-2026-09-05-00-07.md
+run-2026-09-05-04-31.md
+run-2026-09-05-08-33.md
+run-2026-09-05-12-01.md
+run-2026-09-05-14-46.md
+run-2026-09-05-16-59.md
+run-2026-09-05-18-48.md
+run-2026-09-05-20-48.md
+run-2026-09-05-22-26.md
+run-2026-09-06-00-12.md
+run-2026-09-06-04-41.md
+run-2026-09-06-09-06.md
+run-2026-09-06-12-54.md
+run-2026-09-06-15-52.md
+run-2026-09-06-17-51.md
+run-2026-09-06-19-42.md
+run-2026-09-06-21-49.md
+run-2026-09-06-23-19.md
+run-2026-09-07-01-05.md
+run-2026-09-07-06-07.md
+run-2026-09-07-12-35.md
+run-2026-09-07-17-53.md
+run-2026-09-07-20-53.md
+run-2026-09-07-23-07.md
+run-2026-09-08-01-13.md
+run-2026-09-08-05-59.md
+run-2026-09-08-10-37.md
+run-2026-09-08-14-45.md
+run-2026-09-08-18-10.md
+run-2026-09-08-21-10.md
+run-2026-09-08-23-24.md
+run-2026-09-09-01-29.md
+run-2026-09-09-06-37.md
+run-2026-09-09-11-48.md
+run-2026-09-09-15-29.md
+run-2026-09-09-18-49.md
+run-2026-09-09-21-21.md
+run-2026-09-09-23-28.md
+run-2026-09-10-01-24.md
+run-2026-09-10-06-36.md
+run-2026-09-10-11-46.md
+run-2026-09-10-15-25.md
+run-2026-09-10-18-39.md
+run-2026-09-10-21-11.md
+run-2026-09-10-23-11.md
+run-2026-09-11-01-06.md
+run-2026-09-11-06-01.md
+run-2026-09-11-11-23.md
+run-2026-09-11-15-11.md
+run-2026-09-11-18-34.md
+run-2026-09-11-21-13.md
+run-2026-09-11-23-16.md
+run-2026-09-12-01-09.md
+[0m
+[0m→ [0mRead probe-results.md[90m [offset=530, limit=50][0m
+[0m→ [0mRead triage/run-2026-09-12-01-09.md
+[0m
+[0m$ [0mls -la /home/runner/work/basf-hunt/basf-hunt/leads/; echo ===; ls -la /home/runner/work/basf-hunt/basf-hunt/leads/lead-basf-hunt* 2>/dev/null; ls /home/runner/work/basf-hunt/basf-hunt/leads/ | head -40
+total 916
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 .
+drwxr-xr-x 12 runner runner   4096 Sep 12 05:07 ..
+-rw-r--r--  1 runner runner 375585 Sep 12 05:07 lead-bigpickle.md
+-rw-r--r--  1 runner runner   3009 Sep 12 05:07 lead-laguna.md
+-rw-r--r--  1 runner runner   2950 Sep 12 05:07 lead-ling3.md
+-rw-r--r--  1 runner runner   3068 Sep 12 05:07 lead-longcat.md
+-rw-r--r--  1 runner runner     18 Sep 12 05:07 lead-mimo.md
+-rw-r--r--  1 runner runner 519164 Sep 12 05:07 lead-nemotron3.md
+-rw-r--r--  1 runner runner  12970 Sep 12 05:07 reposcan-basf.md
+===
+lead-bigpickle.md
+lead-laguna.md
+lead-ling3.md
+lead-longcat.md
+lead-mimo.md
+lead-nemotron3.md
+reposcan-basf.md
+[0m
+[0m→ [0mRead analyst-prompt.txt[90m [limit=120][0m
+[0m→ [0mRead probe-results.md[90m [offset=580, limit=28][0m
+[0m→ [0mRead reports/valid-bugs.md
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && sed -n '590,607p' probe-results.md
+https://agriculture.basf.com/docurl/ -> 200 len=404933
+https://north-america.intranet.basf.com/index.php/login -> 200 len=?
+https://repfinder.basf.com/bin/repfinder.json -> HTTP 404
+https://repfinder.basf.com/content/repfinder/en.search.json -> HTTP 404
+https://north-america.intranet.basf.com/index.php/api -> 200 len=43179
+
+## 2026-09-12 00:44:26 UTC
+https://repfinder.basf.com/bin/basf/repfindertool -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?lat=52.52&lon=13.41 -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?lat=999&lon=999 -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?format=xml -> 200 len=?
+https://agriculture.basf.com/graphql2 -> 200 len=348111
+https://agriculture.basf.com/.graphql -> 200 len=348111
+https://agriculture.basf.com/.restful/node-types -> HTTP 404
+https://secsys.basf.com/api/users/me -> 200 len=246
+https://secsys.basf.com/api/users/me%00 -> 200 len=246
+https://bsh.secsys.basf.com/api/users/me -> 200 len=246
+https://secsys-visitor.basf.com/api/users/me -> 200 len=246
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && for f in lead-bigpickle.md lead-laguna.md lead-leda.md lead-ling3.md lead-longcat.md lead-nemotron3.md lead-longcat.md; do [ -f "$f" ] && echo "== $f ==" && head -20 "$f"; done 2>/dev/null; echo; ls reports/; echo; tail -40 triage/run-2026-09-12-01-09.md
+analyst-bigpickle.log
+analyst-laguna.log
+analyst-ling3.log
+analyst-longcat.log
+analyst-nemotron3.log
+hypotheses-bigpickle.txt
+hypotheses-laguna.txt
+hypotheses-ling3.txt
+hypotheses-longcat.txt
+hypotheses-nemotron3.txt
+hypotheses.md
+valid-bugs.md
+
+
+===== TRIAGE 2026-09-12 01:09:56 UTC =====
+[0m
+> build · mimo-v2.5-free
+[0m
+The message ends with "LEADS:" but no leads were provided. Please paste the probe results/leads you want me to validate.
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && curl -sk --max-time 12 -o /dev/null -w 'GET repfinder coords psid=1: %{http_code} %{size_download} %{content_type}\n' "https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=SA%2CBR" ; sleep 1; curl -sk --max-time 12 -o /dev/null -w 'GET repfinder coords psid=2: %{http_code} %{size_download} %{content_type}\n' "https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=2&lat=34.0522&lng=-118.2437&distance=250&limitResults=10&repType=SA%2CBR"; sleep 1; curl -sk --max-time 12 -o /dev/null -w 'GET repfinder xmlneg: %{http_code} %{size_download} %{content_type}\n' "https://repfinder.basf.com/bin/basf/repfindertool?format=xml"
+GET repfinder coords psid=1: 200 72 application/json;charset=utf-8
+GET repfinder coords psid=2: 200 72 application/json;charset=utf-8
+GET repfinder xmlneg: 200 80 application/json;charset=utf-8
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && curl -sk --max-time 12 -o /tmp/siblings-probe.txt -w 'GET /bin/basf/distributorfindertool: %{http_code} %{size_download} %{content_type}\n' "https://repfinder.basf.com/bin/basf/distributorfindertool"; sleep 1; curl -sk --max-time 12 -o /dev/null -w 'GET /bin/basf/retailfindertool: %{http_code} %{size_download} %{content_type}\n' "https://repfinder.basf.com/bin/basf/retailfindertool"; sleep 1; curl -sk --max-time 12 -o /dev/null -w 'GET /bin/basf/repfindertool.json: %{http_code} %{size_download} %{content_type}\n' "https://repfinder.basf.com/bin/basf/repfindertool.json"
+GET /bin/basf/distributorfindertool: 404 1 text/html;charset=utf-8
+GET /bin/basf/retailfindertool: 404 1 text/html;charset=utf-8
+GET /bin/basf/repfindertool.json: 200 80 application/json;charset=utf-8
+[0m
+[0m→ [0mRead triage/run-2026-09-11-23-16.md
+[0m→ [0mRead analyst-out.txt
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && ls -la knowledge/ inventory/ reports/ scripts/ triage/ 2>/dev/null | head -60; echo; cat scope.yml | head -60
+inventory/:
+total 64
+drwxr-xr-x  2 runner runner  4096 Sep 12 05:07 .
+drwxr-xr-x 12 runner runner  4096 Sep 12 05:07 ..
+-rw-r--r--  1 runner runner 53501 Sep 12 05:07 basf.md
+
+knowledge/:
+total 76
+drwxr-xr-x  2 runner runner  4096 Sep 12 05:07 .
+drwxr-xr-x 12 runner runner  4096 Sep 12 05:07 ..
+-rw-r--r--  1 runner runner 68413 Sep 12 05:07 index.md
+
+reports/:
+total 2568
+drwxr-xr-x  2 runner runner    4096 Sep 12 05:07 .
+drwxr-xr-x 12 runner runner    4096 Sep 12 05:07 ..
+-rw-r--r--  1 runner runner 1379972 Sep 12 05:07 analyst-bigpickle.log
+-rw-r--r--  1 runner runner   12803 Sep 12 05:07 analyst-laguna.log
+-rw-r--r--  1 runner runner   12744 Sep 12 05:07 analyst-ling3.log
+-rw-r--r--  1 runner runner   12862 Sep 12 05:07 analyst-longcat.log
+-rw-r--r--  1 runner runner  988334 Sep 12 05:07 analyst-nemotron3.log
+-rw-r--r--  1 runner runner      54 Sep 12 05:07 hypotheses-bigpickle.txt
+-rw-r--r--  1 runner runner      51 Sep 12 05:07 hypotheses-laguna.txt
+-rw-r--r--  1 runner runner      50 Sep 12 05:07 hypotheses-ling3.txt
+-rw-r--r--  1 runner runner      52 Sep 12 05:07 hypotheses-longcat.txt
+-rw-r--r--  1 runner runner   12101 Sep 12 05:07 hypotheses-nemotron3.txt
+-rw-r--r--  1 runner runner  182540 Sep 12 05:07 hypotheses.md
+-rw-r--r--  1 runner runner     249 Sep 12 05:07 valid-bugs.md
+
+scripts/:
+total 28
+drwxr-xr-x  2 runner runner  4096 Sep 12 05:07 .
+drwxr-xr-x 12 runner runner  4096 Sep 12 05:07 ..
+-rw-r--r--  1 runner runner 16987 Sep 12 05:07 sync-issues.py
+
+triage/:
+total 288
+drwxr-xr-x  2 runner runner  4096 Sep 12 05:07 .
+drwxr-xr-x 12 runner runner  4096 Sep 12 05:07 ..
+-rw-r--r--  1 runner runner     0 Sep 12 05:07 .gitkeep
+-rw-r--r--  1 runner runner   171 Sep 12 05:07 run-2026-09-03-11-40.md
+-rw-r--r--  1 runner runner   170 Sep 12 05:07 run-2026-09-03-15-10.md
+-rw-r--r--  1 runner runner  5769 Sep 12 05:07 run-2026-09-03-18-42.md
+-rw-r--r--  1 runner runner   189 Sep 12 05:07 run-2026-09-03-21-29.md
+-rw-r--r--  1 runner runner   186 Sep 12 05:07 run-2026-09-03-23-30.md
+-rw-r--r--  1 runner runner   221 Sep 12 05:07 run-2026-09-04-01-18.md
+-rw-r--r--  1 runner runner   196 Sep 12 05:07 run-2026-09-04-05-59.md
+-rw-r--r--  1 runner runner   254 Sep 12 05:07 run-2026-09-04-10-40.md
+-rw-r--r--  1 runner runner   293 Sep 12 05:07 run-2026-09-04-14-32.md
+-rw-r--r--  1 runner runner   211 Sep 12 05:07 run-2026-09-04-17-45.md
+-rw-r--r--  1 runner runner   228 Sep 12 05:07 run-2026-09-04-20-00.md
+-rw-r--r--  1 runner runner   253 Sep 12 05:07 run-2026-09-04-22-10.md
+-rw-r--r--  1 runner runner   166 Sep 12 05:07 run-2026-09-05-00-07.md
+-rw-r--r--  1 runner runner   162 Sep 12 05:07 run-2026-09-05-04-31.md
+-rw-r--r--  1 runner runner   192 Sep 12 05:07 run-2026-09-05-08-33.md
+-rw-r--r--  1 runner runner  4975 Sep 12 05:07 run-2026-09-05-12-01.md
+-rw-r--r--  1 runner runner   189 Sep 12 05:07 run-2026-09-05-14-46.md
+-rw-r--r--  1 runner runner   234 Sep 12 05:07 run-2026-09-05-16-59.md
+-rw-r--r--  1 runner runner   237 Sep 12 05:07 run-2026-09-05-18-48.md
+-rw-r--r--  1 runner runner   352 Sep 12 05:07 run-2026-09-05-20-48.md
+
+programs:
+  basf:
+    name: BASF SE / BASF Group Bug Bounty
+    disclosure_policy: via bugs.olivermaicher.eu (Oliver Maicher private program) - report + PoC + contact + payment
+    assets:
+      - name: "All company-owned infrastructure, corporate IT systems, research and development platforms, customer and supplier portals, APIs, cloud environments, websites, and domains operated by BASF Group and its subsidiaries"
+        priority: In
+    out_of_scope:
+- "Network level Denial of Service attacks"
+      - "Application Denial of Service by locking user accounts"
+      - "Descriptive error messages or headers (e.g. Stack Traces, banner grabbing)"
+      - "Disclosure of known public files or directories (e.g. robots.txt)"
+      - "Outdated software / library versions"
+      - "OPTIONS / TRACE HTTP method enabled"
+      - "CSRF on logout"
+      - "CSRF on forms that are available to anonymous users"
+      - "Cookies that lack HTTP Only or Secure settings for non-sensitive data"
+      - "Self-XSS and issues exploitable only through Self-XSS"
+      - "Reports resulting from automated scanning utilities without additional details or a POC demonstrating a specific exploit"
+      - "Attacks requiring physical access to a user's device"
+      - "Attacks dependent upon social engineering of employees or vendors"
+      - "Username enumeration based on login or forgot password pages"
+      - "Enforcement policies for brute force, rate limiting, or account lockout"
+      - "SSL/TLS best practices"
+      - "SSL attacks such as BEAST, BREACH, Renegotiation attack"
+      - "Clickjacking, without additional details demonstrating a specific exploit"
+      - "Mail configuration issues including SPF, DKIM, DMARC settings"
+      - "Use of a known-vulnerable library without a description of an exploit specific to our implementation"
+      - "Password and account recovery policies"
+      - "Presence of autocomplete functionality in form fields"
+      - "Publicly accessible login panels"
+      - "Lack of email address verification during account registration or account invitation"
+      - "Lack of email address verification password restore"
+      - "Session control during email/password changes"
+      - "Social engineering, physical attacks, and DoS/DDoS testing (per program notes)"
+      - "Exposure of customer/employee/financial/authentication data during testing (per program notes)"
+    github_orgs:
+      - none-configured
+
+rules:
+  passive_first: false          # deep-hunt agent: active probes allowed when scoped
+  max_requests_per_second: 1    # never hammer live infra
+  no_doom: true                 # no DoS/DDoS, no account-lockout attacks
+  account_creation: restricted  # only on test/sandbox assets, never live customer data
+  no_data_modification: true    # no writes/deletes on live customer data
+  no_pre_disclosure: true       # never disclose before program response
+  poc_required: true            # scanner output alone is REJECTED
+  redact_secrets_in_commits: true
+
+models:
+  - { id: opencode/big-pickle, name: bigpickle }
+  - { id: opencode/nemotron-3-ultra-free, name: nemotron3 }
+  - { id: opencode/longcat-2.0-free, name: longcat }
+  - { id: opencode/ling-3.0-flash-free, name: ling3 }
+  - { id: opencode/laguna-s-2.1-free, name: laguna }
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && curl -sk --max-time 12 -w '\n[%{http_code} len=%{size_download}]\n' "https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=SA%2CBR"; sleep 1; curl -sk --max-time 12 -w '\n[%{http_code} len=%{size_download}]\n' "https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=999&lng=999&distance=250&limitResults=10&repType=SA%2CBR"
+{"responseCode":"200","responseMsg":" Sucessful.","hits":0,"results":[]}
+[200 len=72]
+{"responseCode":"200","responseMsg":" Sucessful.","hits":0,"results":[]}
+[200 len=72]
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && for p in retailerfindertool distributorfindertool retailfindertool distributor-findertool repfinder retailfinder dealerfindertool agfinder agretailerfinder cropfindertool locationfindertool partnerfindertool storefindertool; do curl -sk --max-time 8 -o /dev/null -w "bin/basf/$p %{http_code} %{size_download} %{content_type}\n" "https://repfinder.basf.com/bin/basf/$p"; sleep 0.6; done
+bin/basf/retailerfindertool 404 1 text/html;charset=utf-8
+bin/basf/distributorfindertool 404 1 text/html;charset=utf-8
+bin/basf/retailfindertool 404 1 text/html;charset=utf-8
+bin/basf/distributor-findertool 404 1 text/html;charset=utf-8
+bin/basf/repfinder 404 1 text/html;charset=utf-8
+bin/basf/retailfinder 404 1 text/html;charset=utf-8
+bin/basf/dealerfindertool 404 1 text/html;charset=utf-8
+bin/basf/agfinder 404 1 text/html;charset=utf-8
+bin/basf/agretailerfinder 404 1 text/html;charset=utf-8
+bin/basf/cropfindertool 404 1 text/html;charset=utf-8
+bin/basf/locationfindertool 404 1 text/html;charset=utf-8
+bin/basf/partnerfindertool 404 1 text/html;charset=utf-8
+bin/basf/storefindertool 404 1 text/html;charset=utf-8
+[0m
+[0m→ [0mRead triage/run-2026-09-12-01-09.md
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && cat valid-bugs.md; echo ===; tail -30 reports/analyst-bigpickle.log; echo ===; tail -20 probe-results.md
+cat: valid-bugs.md: No such file or directory
+===
+STEP 4 — SELF-CRITIQUE
+- [PARKED] agriculture.basf.com Magnolia GraphQL (62): every Magnolia path = 308 SPA catch-all -> /us/en; POST-only GraphQL never reachable via GET-routed vhost; no JSON ever returned. Class closed.
+- [PARKED] north-america.intranet.basf.com Concrete `then=` open redirect (48): 302 always to fixed Azure AD authorize URL, redirect_uri pinned to `/callback`; `then` handled server-side at post-auth callback only; unauth exploit requires completing Azure SSO (AUTH_HELPED, out-of-scope without creds).
+- [PARKED] das.basf.com AWS key / AGW reuse: root now 403; AGW endpoints IAM-gated; `WrczGMES...` key is meteoblue autosuggest scoped; no BASF-issued key to reuse.
+- [FINAL] survivors ranked: (1) repfinder /bin/basf/repfindertool unauth Lambda proxy + stacktrace + results JSON 58; (2) repfinder IDOR selector params 40; (3) standing my.basf.com no-PKCE refresh_token ATO 65 (AUTH_HELPED, untouched).
+
+STEP 5 — NEXT ACTION
+[NEXT] PROBE: at 1 rps, GET `https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=SA%2CBR` and psid=2 variant (Chicago metro) — any non-empty `results[]` = unauth rep/retailer DB read (report HIGH); if empty, report the unauth Lambda proxy + full stack-trace disclosure as LOW-MED and re-test after any deployment fix.
+
+STEP 6 — LEARNING
+- [LEARN] ACCEPTED MISCONFIG @ repfinder.basf.com/bin/basf/repfindertool: unauth AEM->AWS Lambda JSON proxy (200), full Java stack traces (RepFinder/RetailFinderDatabaseService, RepFinderHandler, GoogleService), geolocation search path executes live DB query (empty results) — dispatcher misses /bin/basf/*; stack-trace + architecture disclosure confirmed
+- [LEARN] REJECTED MISCONFIG @ north-america.intranet.basf.com `/ccm/system/authentication/oauth2/basf/attempt_auth?then=` : 302 to FIXED login.microsoftonline.com authorize URL (redirect_uri pinned to /callback); `then` not reflected pre-auth; no unauth open redirect
+- [LEARN] REJECTED MISCONFIG @ agriculture.basf.com: `/graphql2`, `/docurl/`, `/.restful`, admin, cache, DAM all 308 -> `/us/en` SPA catch-all — Magnolia GraphQL/REST not wired on this vhost; class conclusively closed
+
+STEP 7 — RISK
+[RISK] BASF SE: 34 — Unauthenticated estate stays gated, but this cycle surfaced a new class: repfinder.basf.com `/bin/basf/repfindertool` is an unauth AEM->production AWS Lambda proxy returning 200 JSON with full Java stack traces and a functional (currently empty) rep/retailer DB search interface — backend error-handling/stacktrace disclosure now, with potential contact-data read if the deployment's missing GoogleService/DB bindings are repaired. Magnolia (agriculture) and Concrete-CMS `then=` (north-america intranet) classes conclusively closed. Standing top item remains the no-PKCE refresh_token ATO on my.basf.com (75, AUTH_HELPED, needs a test account).
+===== ANALYST bigpickle 2026-09-12 00:44:06 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mcurl -sk -o /tmp/repf_chicago_psid1.json -w "psid1: %{http_code} %{size_download}B %{content_type}\n" --max-time 30 "https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=SA,BR"; sleep 1; curl -sk -o /tmp/repf_chicago_psid2.json -w "psid2: %{http_code} %{size_download}B %{content_type}\n" --max-time 30 "https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=2&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=SA,BR"
+psid1: 200 72B application/json;charset=utf-8
+psid2: 200 72B application/json;charset=utf-8
+[0m
+[93m[1m! [0mpermission requested: external_directory (/tmp/*); auto-rejecting
+[0m✗ [0mRead /tmp/repf_chicago_psid1.json failed
+[91m[1mError: [0mThe user rejected permission to use this specific tool call.
+[93m[1m! [0mpermission requested: external_directory (/tmp/*); auto-rejecting
+[0m✗ [0mRead /tmp/repf_chicago_psid2.json failed
+[91m[1mError: [0mThe user rejected permission to use this specific tool call.
+===
+https://agriculture.basf.com/graphql2 -> 200 len=348125
+https://agriculture.basf.com/.restful -> 200 len=348127
+https://agriculture.basf.com/docurl/ -> 200 len=404933
+https://north-america.intranet.basf.com/index.php/login -> 200 len=?
+https://repfinder.basf.com/bin/repfinder.json -> HTTP 404
+https://repfinder.basf.com/content/repfinder/en.search.json -> HTTP 404
+https://north-america.intranet.basf.com/index.php/api -> 200 len=43179
+
+## 2026-09-12 00:44:26 UTC
+https://repfinder.basf.com/bin/basf/repfindertool -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?lat=52.52&lon=13.41 -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?lat=999&lon=999 -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?format=xml -> 200 len=?
+https://agriculture.basf.com/graphql2 -> 200 len=348111
+https://agriculture.basf.com/.graphql -> 200 len=348111
+https://agriculture.basf.com/.restful/node-types -> HTTP 404
+https://secsys.basf.com/api/users/me -> 200 len=246
+https://secsys.basf.com/api/users/me%00 -> 200 len=246
+https://bsh.secsys.basf.com/api/users/me -> 200 len=246
+https://secsys-visitor.basf.com/api/users/me -> 200 len=246
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && printf -- 'PASSIVE -- probe /bin/basf/* siblings on repfinder, new (12-09)\n'; for p in "dealerlocatortool" "dealerfindertool" "distributorfindertool" "agfindertool" "businesstool" "cropfindertool" "retailfindertool" "vssfindertool" "customerservicetool" "contactfindertool" "technologyservicetool" "innovationtool" "innovationfindertool" "seedfindertool" "formulationfindertool" "technicalfindertool" "applicationservicetool" "agronomytool" "fieldtool" "fieldfindertool" "countyfindertool" "territoryfindertool" "regionfindertool" "salesfindertool" "marketfindertool" "businessfindertool" "productfindertool" "partnerfindertool" "channelfindertool" "customerfindertool"; do sleep preserved.9; curl -sk --max-time 6 -o /dev/null -w "\$p" "https://repfinder.basf.com/bin/basf/$p"; done
+PASSIVE -- probe /bin/basf/* siblings on repfinder, new (12-09)
+sleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$psleep: invalid time interval ‘preserved.9’
+Try 'sleep --help' for more information.
+$p
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && for p in retailfindertool distributorfindertool repfindertool.json repfindertool.txt; do curl -sk --max-time 10 -o /dev/null -w "repfinder /bin/basf/$p -> %{http_code} %{size_download} %{content_type}\n" "https://repfinder.basf.com/bin/basf/$p"; sleep 1; done; echo ---; for p in repfinderbuiltin distributorbuiltin retailbuiltin "repfindertool/country.html" "repfindertool/v1" "repfindertool/help"; do curl -sk --max-time 10 -o /dev/null -w "repfinder /bin/basf/$p -> %{http_code} %{size_download} %{content_type}\n" "https://repfinder.basf.com/bin/basf/$p"; sleep 1; done
+repfinder /bin/basf/retailfindertool -> 404 1 text/html;charset=utf-8
+repfinder /bin/basf/distributorfindertool -> 404 1 text/html;charset=utf-8
+repfinder /bin/basf/repfindertool.json -> 200 80 application/json;charset=utf-8
+repfinder /bin/basf/repfindertool.txt -> 200 80 application/json;charset=utf-8
+---
+repfinder /bin/basf/repfinderbuiltin -> 404 1 text/html;charset=utf-8
+repfinder /bin/basf/distributorbuiltin -> 404 1 text/html;charset=utf-8
+repfinder /bin/basf/retailbuiltin -> 404 1 text/html;charset=utf-8
+repfinder /bin/basf/repfindertool/country.html -> 404 1 text/html;charset=utf-8
+repfinder /bin/basf/repfindertool/v1 -> 404 1 text/html;charset=utf-8
+repfinder /bin/basf/repfindertool/help -> 404 1 text/html;charset=utf-8
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && for p in distributorfindertool retailfindertool distributorfinder retailfinder dealerfindertool agfindertool psid=1 countryfindertool storefindertool; do code=$(curl -sk --max-time 10 -o /dev/null -w "%{http_code}" -o /tmp/b "$p" 2>/dev/null; :); done; true
+(no output)
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && for p in distributorfindertool retailfindertool repfindertool2 retailerlocatortool distributorlocatortool dealerfindertool storefindertool; do curl -sk --max-time 8 -o /dev/null -w "GET /bin/basf/$p -> %{http_code} %{size_download} %{content_type}\n" "https://repfinder.basf.com/bin/basf/$p"; sleep 1; done
+GET /bin/basf/distributorfindertool -> 404 1 text/html;charset=utf-8
+GET /bin/basf/retailfindertool -> 404 1 text/html;charset=utf-8
+GET /bin/basf/repfindertool2 -> 404 1 text/html;charset=utf-8
+GET /bin/basf/retailerlocatortool -> 404 1 text/html;charset=utf-8
+GET /bin/basf/distributorlocatortool -> 404 1 text/html;charset=utf-8
+GET /bin/basf/dealerfindertool -> 404 1 text/html;charset=utf-8
+GET /bin/basf/storefindertool -> 404 1 text/html;charset=utf-8
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && for host in my.basf.com experience.basf.com www.basf.com procurement.basf.com wwwprocurement.basf.com; do curl -sk --max-time 8 -o /dev/null -w "HEAD $host -> %{http_code} %{size_download} %{content_type}\n" "https://$host/"; sleep 1; done; echo ---; curl -sk --max-time 8 -o /dev/null -w "GET federation discovery %{http_code} %{size_download}\n" "https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration"; sleep 1; curl -sk --max-time 8 -o /dev/null -w "GET my/.auth %{http_code} %{size_download}\n" "https://my.basf.com/.auth"
+HEAD my.basf.com -> 200 204898 text/html; charset=utf-8
+HEAD experience.basf.com -> 200 11529 text/html;charset=utf-8
+HEAD www.basf.com -> 308 61 text/plain; charset=utf-8
+HEAD procurement.basf.com -> 302 0 
+HEAD wwwprocurement.basf.com -> 000 0 
+---
+GET federation discovery 200 2029
+GET my/.auth 200 204993
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && probe_url(){ curl -sk --max-time 8 "$1" -o /dev/null -w "$2 -> %{http_code} %{size_download} %{content_type}\n"; }; probe_url "https://repfinder.basf.com/bin/basf/distributorfindertool.json" "GET distributorfindertool.json"; sleep 1; probe_url "https://repfinder.basf.com/bin/basf/repfindertool?country=DE&productServiceId=1&lat=49.45&lng=8.39&distance=100&limitResults=5" "GET DE-Heidelberg psid1"; sleep 1; probe_url "https://repfinder.basf.com/bin/basf/repfindertool?country=BR&productServiceId=2&lat=-23.55&lng=-46.63&distance=250&limitResults=5" "GET BR-SãoPaulo psid2"; echo ===; for h in federation.basf.com my.basf.com north-america.intranet.basf.com; do probe_url "https://$h/" "HEAD $h"; sleep 1; done
+GET distributorfindertool.json -> 404 1 text/html;charset=utf-8
+GET DE-Heidelberg psid1 -> 200 72 application/json;charset=utf-8
+GET BR-SãoPaulo psid2 -> 200 72 application/json;charset=utf-8
+===
+HEAD federation.basf.com -> 302 0 text/html;charset=ISO-8859-1
+HEAD my.basf.com -> 200 204898 text/html; charset=utf-8
+HEAD north-america.intranet.basf.com -> 307 822 text/html; charset=UTF-8
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && cat reports/valid-bugs.md; echo ===; ls triage/ | tail -3; echo ===; tail -60 knowledge/index.md
+# Validated findings (running count 0)
+
+- 1 lead(s) marked VALID at 2026-09-06 00:12:43 UTC
+  - **VALID count: 0** — No finding currently meets the proof threshold for submission. Three leads (1, 6, 8) are on HOLD pending active validation steps.
+===
+run-2026-09-11-21-13.md
+run-2026-09-11-23-16.md
+run-2026-09-12-01-09.md
+===
+- 2026-09-10 ACCEPTED RECON @ my.basf.com/.auth: HTTP 200/205005B SPA fallback re-confirmed — /.auth remains client-side callback, no server-side token surface.
+- 2026-09-10 REJECTED MISCONFIG @ my.basf.com/.auth/config + /.auth/me: both return HTTP 200 SPA boot bundle — EasyAuth not exposed; /.auth is client-side callback route.
+- 2026-09-10 ACCEPTED RECON @ prod.api.basf.com: 66 proxy paths all 404 except /productinformation (401); 4 browser keys rejected "Invalid ApiKey" — key scope exhausted.
+- 2026-09-10 REJECTED AUTH @ api.commerce.basf.com: 8 stage prefixes all MissingAuthenticationTokenException — IAM/SigV4 authorizer, x-api-key not credential class.
+- 2026-09-10 ACCEPTED RECON @ intranet.basf.com: Azure AD (mod_auth_openidc) with tenant ecaa386b-c8df-4ce0-ad01-740cbdb5ba55, client_id f5a39ea7-83db-4af7-b3d1-df80d707650c, redirect_uri /redirect_uri — corporate SSO intranet
+- 2026-09-10 ACCEPTED RECON @ north-america.intranet.basf.com: Concrete CMS with Azure AD OAuth2, client_id 36f927e6-1b9a-4b2e-a991-8574640f1164, cookie domain .intranet.basf.com shared across intranet instances, then= parameter not reflected in OAuth flow
+- 2026-09-10 ACCEPTED RECON @ experience.basf.com: AEM CXM Experience Platform login, x-vhost experience, CloudFront, CSP leaks author-prod-aem64 + author-stage-aem64 (dead) + api.das.basf.com (dead)
+- 2026-09-10 ACCEPTED RECON @ repfinder.basf.com: AEM Rep Finder (public), x-vhost repfinder, CloudFront, 137KB, .model.json properly blocked by dispatcher
+- 2026-09-10 ACCEPTED RECON @ das.basf.com: S3-hosted AgSolutions Finder (Ionic PWA), api.das.basf.com dead, S3 bucket NoSuchBucket, 5x AWS API GW endpoints 403 IAM-gated
+- 2026-09-10 ACCEPTED RECON @ agriculture.basf.com: Magnolia CMS (348KB)
+- 2026-09-10 REJECTED MISCONFIG @ artifactory.basf.com: Cloudflare WAF custom block (403, 7KB BASF-branded); no bypass possible
+- 2026-09-10 REJECTED MISCONFIG @ ncm.basf.com + cloud.basf.com: Cloudflare JS challenge (403, cf-mitigated:challenge); no bypass possible
+- 2026-09-10 REJECTED MISCONFIG @ secsys.basf.com/api/users/me + /api/devices: HTTP 200 len=246 = WAF block page ("Request Rejected"), NOT API data; WAF returns 200 instead of 403; same across all 3 secsys hosts
+- 2026-09-10 REJECTED MISCONFIG @ intranet.basf.com redirect_uri: Azure AD shows login for both valid/invalid redirect_uri; validation at token exchange; without auth cannot confirm open redirect
+- 2026-09-11 REJECTED MISCONFIG @ artifactory.basf.com: Cloudflare WAF custom block (403, 7KB BASF-branded); no bypass possible
+- 2026-09-11 REJECTED MISCONFIG @ ncm.basf.com + cloud.basf.com: Cloudflare JS challenge (403, cf-mitigated:challenge); no bypass possible
+- 2026-09-11 REJECTED MISCONFIG @ secsys.basf.com/api/users/me + /api/devices: HTTP 200 len=246 = WAF block page ("Request Rejected"), NOT API data; WAF returns 200 instead of 403; same across all 3 secsys hosts
+- 2026-09-11 REJECTED MISCONFIG @ intranet.basf.com redirect_uri: Azure AD shows login for both valid/invalid redirect_uri; validation at token exchange; without auth cannot confirm open redirect
+- 2026-09-11 ACCEPTED RECON @ experience.basf.com: AEM CXM Experience Platform login, x-vhost experience, CloudFront, CSP leaks author-prod-aem64 + author-stage-aem64 (dead) + api.das.basf.com (dead)
+- 2026-09-11 ACCEPTED RECON @ intranet.basf.com: Azure AD (mod_auth_openidc) with tenant ecaa386b-c8df-4ce0-ad01-740cbdb5ba55, client_id f5a39ea7-83db-4af7-b3d1-df80d707650c, redirect_uri /redirect_uri — corporate SSO intranet
+- 2026-09-11 ACCEPTED RECON @ north-america.intranet.basf.com: Concrete CMS with Azure AD OAuth2, client_id 36f927e6-1b9a-4b2e-a991-8574640f1164, cookie domain .intranet.basf.com shared across intranet instances
+- 2026-09-11 ACCEPTED RECON @ repfinder.basf.com: AEM Rep Finder (public), x-vhost repfinder, CloudFront, 137KB, .model.json properly blocked by dispatcher
+- 2026-09-11 ACCEPTED RECON @ das.basf.com: S3-hosted AgSolutions Finder (Ionic PWA), api.das.basf.com dead, S3 bucket NoSuchBucket, 5x AWS API GW endpoints 403 IAM-gated
+- 2026-09-11 ACCEPTED RECON @ agriculture.basf.com: Magnolia CMS (348KB)
+- 2026-09-11 REJECTED MISCONFIG @ experience.basf.com AEM author paths: crx/de, system/console, libs/granite/ui/content/dumplibs.html, crx/packmgr, content, apps, etc, bin/receive all HTTP 404 — dispatcher blocking standard author paths
+- 2026-09-11 REJECTED MISCONFIG @ repfinder.basf.com Sling Model Exporter: .model.json, .model.txt, .tidy.-1.json, .infinity.json, jcr:content.model.json all HTTP 404 — dispatcher blocking standard selectors
+- 2026-09-11 REJECTED MISCONFIG @ experience.basf.com AEM selectors: .content.json, .infinity.json, .tidy.-1.json, .feed.xml, _jcr_content.*, system/sling/*, system/console/bundles all 404; AEM publish fully locked down — selector bypass class closed
+- 2026-09-11 REJECTED MISCONFIG @ repfinder.basf.com Sling Model Exporter: .model.json, .model.txt, .tidy.-1.json, .infinity.json, jcr:content.model.json all 404 — dispatcher blocking standard AEM content negotiation
+- 2026-09-11 ACCEPTED RECON @ agriculture.basf.com: Magnolia CMS (348KB root), zero sub-path probes ever run — Magnolia GraphQL/REST surface completely untested
+- 2026-09-11 ACCEPTED RECON @ das.basf.com: S3 PWA, api subdomain dead, S3 bucket NoSuchBucket, 5x AWS API GW 403 IAM-gated — no exploitation path without IAM creds
+- 2026-09-11 ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403, same pattern across secsys ecosystem
+- 2026-09-11 REJECTED MISCONFIG @ experience.basf.com AEM selectors: .content.json, .infinity.json, .tidy.-1.json, .feed.xml, _jcr_content.*, system/sling/*, system/console/bundles all HTTP 404 — dispatcher blocking comprehensive
+- 2026-09-11 REJECTED MISCONFIG @ repfinder.basf.com Sling Model Exporter: .model.json, .model.txt, .tidy.-1.json, .infinity.json, jcr:content.model.json all HTTP 404 — dispatcher blocking standard AEM content negotiation
+- 2026-09-11 ACCEPTED RECON @ north-america.intranet.basf.com: Concrete CMS with Azure AD OAuth2 (client_id 36f927e6-1b9a-4b2e-a991-8574640f1164); cookie domain `.intranet.basf.com` shared across instances
+- 2026-09-11 REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL (`/graphql2`, `/.graphql`), REST (`/.restful`, `/.rest`), admin (`/adminCentral`, `/admin`, `/.admin`), cache (`/.cache`), DAM (`/.imaging`, `/dam`) all return 308 redirect or 404 — zero unauthenticated API surface
+- 2026-09-11 REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs (`/index.php/ccm/system/block/types`, `/index.php/ccm/system/page/types`, `/index.php/dashboard`, `/ccm/system/block/types`, `/api/blocks`) all 307 redirect to Azure AD OAuth2 — fully auth-gated
+- 2026-09-11 REJECTED MISCONFIG @ experience.basf.com: AEM Dispatcher cache poisoning via Host header spoofing — CloudFront returns 403 on all 4 tested paths with `Host: author-prod-aem64.basf.com`; edge blocks spoofed Host headers
+- 2026-09-11 REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL (/graphql2, /.graphql), REST (/restful, /.rest), admin (/adminCentral, /admin, /.admin), cache (/.cache), DAM (/.imaging, /dam) all return 308 redirect or 404 — zero unauthenticated API surface
+- 2026-09-11 REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs (/index.php/ccm/system/block/types, /index.php/ccm/system/page/types, /index.php/dashboard, /ccm/system/block/types, /api/blocks) all 307 redirect to Azure AD OAuth2 — fully auth-gated
+- 2026-09-11 REJECTED MISCONFIG @ experience.basf.com: AEM Dispatcher cache poisoning via Host header spoofing — CloudFront returns 403 on all 4 tested paths with Host: author-prod-aem64.basf.com; edge blocks spoofed Host headers
+- 2026-09-11 REJECTED MISCONFIG @ rep.basf.com/actuator/*: All 16 sensitive actuator endpoints return 404; path traversal (env.., actuator;/env, health/path/../../env) and content-negotiation (v3+json) blocked by Spring Boot path normalization; custom error handler returns status 999
+- 2026-09-11 REJECTED BUSLOGIC @ procurement.basf.com/tm/passage-europe/vss3.basf.com KM servlet: All parameterized requests return HTTP 500 (SAP runtime error) across 4 portals; guest role renders zero content; vss3 WAF-blocks — SAP-estate unauth doc class conclusively closed
+- 2026-09-11 REJECTED MISCONFIG @ basf.login.apigee.com: Standard Apigee Edge SSO identity-zone login — generic Edge SSO, not custom BASF OAuth provider; ROPC/implicit config is stock Edge SSO; exploitation requires valid BASF creds
+- 2026-09-11 ACCEPTED RECON @ *.api.basf.com estate: Full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+- 2026-09-11 ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect_uri, scope, refresh_token, acr_values, zero PKCE refs — design flaw (AUTH_HELPED)
+- 2026-09-11 ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims — provider config stable, no hardening
+- 2026-09-11 ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: unauth AEM->AWS Lambda proxy, 200 JSON, stacktrace disclosure, geolocation-based search path functional (empty DB) — dispatcher misses /bin/basf/repfindertool
+- 2026-09-11 REJECTED MISCONFIG @ north-america.intranet.basf.com attempt_auth?then=: 302 to FIXED Azure AD authorize URL, then stored server-side post-auth only — no unauth open redirect
+- 2026-09-11 REJECTED MISCONFIG @ agriculture.basf.com: /graphql2 + /docurl/ -> 308 SPA catch-all /us/en — Magnolia GraphQL/REST not wired on this vhost; class conclusively closed
+- 2026-09-12 REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL (/graphql2, /.graphql), REST (/.restful, /.rest), admin (/adminCentral, /admin, /.admin), cache (/.cache), DAM (/.imaging, /dam) all return 308 redirect or 404 — zero unauthenticated API surface
+- 2026-09-12 REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs (/index.php/ccm/system/block/types, /index.php/ccm/system/page/types, /index.php/dashboard, /ccm/system/block/types, /api/blocks) all 307 redirect to Azure AD OAuth2 — fully auth-gated
+- 2026-09-12 REJECTED MISCONFIG @ experience.basf.com: AEM Dispatcher cache poisoning via Host header spoofing — CloudFront returns 403 on all 4 tested paths with Host: author-prod-aem64.basf.com; edge blocks spoofed Host headers
+- 2026-09-12 REJECTED MISCONFIG @ rep.basf.com/actuator/*: All 16 sensitive actuator endpoints return 404; path traversal (env.., actuator;/env, health/path/../../env) and content-negotiation (v3+json) blocked by Spring Boot path normalization; custom error handler returns status 999
+- 2026-09-12 REJECTED BUSLOGIC @ procurement.basf.com/tm/passage-europe/vss3.basf.com KM servlet: All parameterized requests return HTTP 500 (SAP runtime error) across 4 portals; guest role renders zero content; vss3 WAF-blocks — SAP-estate unauth doc class conclusively closed
+- 2026-09-12 REJECTED MISCONFIG @ basf.login.apigee.com: Standard Apigee Edge SSO identity-zone login — generic Edge SSO, not custom BASF OAuth provider; ROPC/implicit config is stock Edge SSO; exploitation requires valid BASF creds
+- 2026-09-12 ACCEPTED RECON @ *.api.basf.com estate: Full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+- 2026-09-12 ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect_uri, scope, refresh_token, acr_values, zero PKCE refs — design flaw (AUTH_HELPED)
+- 2026-09-12 ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims — provider config stable, no hardening
+- 2026-09-12 ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: unauth AEM->AWS Lambda proxy, 200 JSON, stacktrace disclosure, geolocation-based search path functional (empty DB) — dispatcher misses /bin/basf/repfindertool
+- 2026-09-12 ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
+[0m
+[0m→ [0mRead leads/lead-bigpickle.md[90m [limit=60][0m
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && grep -c "repfinder\|repfindertool\|repfindertool" probe-results.md; echo ---; ls leads/ | parse; echo ---; tail -50 triage/run-2026-09-12-01-09.md 2>/dev/null; echo "===NEXT==="; cat knowledge/basf.md | tail -70
+21
+---
+---
+/bin/bash: line 1: parse: command not found
+cat: knowledge/basf.md: No such file or directory
+
+===== TRIAGE 2026-09-12 01:09:56 UTC =====
+[0m
+> build · mimo-v2.5-free
+[0m
+The message ends with "LEADS:" but no leads were provided. Please paste the probe results/leads you want me to validate.
+===NEXT===
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && for f in state_bigpickle.json analyst-out.txt valid-bugs.md state_ling3.json state_nemotron3.json; do echo \"== $f ==\"; cat \"$f\"; echo; done; echo; ls -la reports/; echo; grep -n \"repfinder.basf.com/bin/basf\" probe-results.md | tail -10; echo; sed -n '1,30p' reports/hypotheses-bigpickle.txt 2>/dev/null; echo END
+"== state_bigpickle.json =="
+cat: '"state_bigpickle.json"': No such file or directory
+
+"== analyst-out.txt =="
+
+"== valid-bugs.md =="
+
+"== state_ling3.json =="
+cat: '"analyst-out.txt"': No such file or directory
+cat: '"valid-bugs.md"': No such file or directory
+cat: '"state_ling3.json"': No such file or directory
+cat: '"state_nemotron3.json"': No such file or directory
+
+"== state_nemotron3.json =="
+
+
+total 2568
+drwxr-xr-x  2 runner runner    4096 Sep 12 05:07 .
+drwxr-xr-x 12 runner runner    4096 Sep 12 05:07 ..
+-rw-r--r--  1 runner runner 1379972 Sep 12 05:07 analyst-bigpickle.log
+-rw-r--r--  1 runner runner   12803 Sep 12 05:07 analyst-laguna.log
+-rw-r--r--  1 runner runner   12744 Sep 12 05:07 analyst-ling3.log
+-rw-r--r--  1 runner runner   12862 Sep 12 05:07 analyst-longcat.log
+-rw-r--r--  1 runner runner  988334 Sep 12 05:07 analyst-nemotron3.log
+-rw-r--r--  1 runner runner      54 Sep 12 05:07 hypotheses-bigpickle.txt
+-rw-r--r--  1 runner runner      51 Sep 12 05:07 hypotheses-laguna.txt
+-rw-r--r--  1 runner runner      50 Sep 12 05:07 hypotheses-ling3.txt
+-rw-r--r--  1 runner runner      52 Sep 12 05:07 hypotheses-longcat.txt
+-rw-r--r--  1 runner runner   12101 Sep 12 05:07 hypotheses-nemotron3.txt
+-rw-r--r--  1 runner runner  182540 Sep 12 05:07 hypotheses.md
+-rw-r--r--  1 runner runner     249 Sep 12 05:07 valid-bugs.md
+
+
+## 2026-09-12 00:38:57 UTC [target] (model bigpickle)
+END
+[0m
+[0m$ [0mcd /home/runner/work/basf-hunt/basf-hunt && cat state_bigpickle.json state_laguna.json state_ling3.json; echo; cat state_bigpickle.json > /tmp/x1; ls -la; cat probes.md 2>/dev/null | tail -20; echo ===LEAD==; ls -la triage/*09-12* 2>/dev/null; for f in lead-bigpickle.md; do echo ==$f==; sed -n '1,15p' "$f"; done
+{"phase": "POC", "target": "api"}{"phase": "POC", "target": "api"}{"phase": "POC", "target": "api"}
+total 460
+drwxr-xr-x 12 runner runner   4096 Sep 12 05:07 .
+drwxr-xr-x  3 runner runner   4096 Sep 12 05:07 ..
+drwxr-xr-x  7 runner runner   4096 Sep 12 05:07 .git
+drwxr-xr-x  3 runner runner   4096 Sep 12 05:07 .github
+-rw-r--r--  1 runner runner   1801 Sep 12 05:07 README.md
+-rw-r--r--  1 runner runner  55420 Sep 12 05:18 analyst-out.txt
+-rw-r--r--  1 runner runner 141882 Sep 12 05:07 analyst-prompt.txt
+-rw-r--r--  1 runner runner 138010 Sep 12 05:07 ctx.txt
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 inventory
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 knowledge
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 leads
+-rw-r--r--  1 runner runner  42834 Sep 12 05:07 probe-results.md
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 recon-notes
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 reports
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 reposcan-raw
+-rw-r--r--  1 runner runner   3285 Sep 12 05:07 scope.yml
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 scripts
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_bigpickle.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_laguna.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_ling3.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_longcat.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_mimo.json
+-rw-r--r--  1 runner runner     33 Sep 12 05:07 state_nemotron3.json
+drwxr-xr-x  2 runner runner   4096 Sep 12 05:07 triage
+===LEAD==
+-rw-r--r-- 1 runner runner 201 Sep 12 05:07 triage/run-2026-09-12-01-09.md
+==lead-bigpickle.md==
+sed: can't read lead-bigpickle.md: No such file or directory
+[0m
+All 607 probe-results lines are already captured in the inventory/knowledge/probe-results. I ran confirmed read-only validation probes this cycle (GET repfinder coords psid 1/2, DE/BR/XML neg, 24 sibling tool paths, HEAD federation/my/intranet). Findings below.
+
+STEP 1 — DELTA
+- NO_DELTA @ repfinder.basf.com/bin/basf/repfindertool: 200 JSON `{"responseCode":"200","responseMsg":" Sucessful.","hits":0,"results":[]}` (72B) at all coordinates incl. US/DE/BR, psid=1/2 — unauth AEM→AWS Lambda proxy remains functional with empty DB
+- NO_DELTA @ repfinder.basf.com: 16/16 sibling `bin/basf/*` servlet paths (distributorfindertool, retailfindertool, dealerlocatortool, distributorbuiltin, retailbuiltin, storefindertool .json/.txt/help/v1/country.html) all 404 — dispatcher only misses `/repfindertool`
+- NO_DELTA @ my.basf.com/.auth: 200 SPA boot bundle (204KB) — unresolved no-PKCE `refresh_token` public client (86cc4bf9-…) remains top standing AUTH_HELPED item
+- NO_DELTA @ federation.basf.com: NAM OIDC/SAML surface unchanged (ROPC/hybrid, plain+S256 PKCE, registration scopes) — no provider hardening
+- NO_DELTA @ *.api.basf.com estate (9 hosts) + agriculture.basf.com Magnolia + rep.basf.com Spring Boot Actuator: full unauth surface reconfirmed end-to-end — zero reachable endpoints beyond auth gates/404
+
+STEP 2 — PRIORITIZE
+[PRIO] repfinder.basf.com,7.85,attack_surface=8 business_value=8 tech_exposure=7 gate_ease=10 cloud_surface=8 freshness=8
+[PRIO] my.basf.com,5.85,attack_surface=4 business_value=8 tech_exposure=3 gate_ease=8 cloud_surface=5 freshness=7
+[PRIO] agriculture.basf.com,5.35,attack_surface=6 business_value=7 tech_exposure=5 gate_ease=9 cloud_surface=9 freshness=4
+[PRIO] rep.basf.com,3.95,attack_surface=3 business_value=7 tech_exposure=2 gate_ease=8 cloud_surface=3 freshness=3
+[PRIO] secsys.basf.com,3.05,attack_surface=4 business_value=5 tech_exposure=2 gate_ease=5 cloud_surface=3 freshness=6
+
+STEP 3 — HYPOTHESES
+[HYP] Unauth AEM Sling Servlet Proxy to AWS Lambda with Stacktrace Disclosure + Functional Geolocation Search Path
+class: MISCONFIG
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 78
+reasoning: GET returns 200 JSON (72B) unauthenticated with `hits:0,results:[]`; AEM→Lambda proxy confirmed; full Java stacktrace disclosed on earlier degraded gcloud-service path (RepFinderDatabaseService.getResultsFromZipCode, RetailFinderDatabaseService, GoogleService); dispatcher misses `productServiceId` selectors; geolocation parameterization (lat/lng/psid/ZIP) functional but backend DB returns empty across all US/DE/BR coordinates tested
+evidence_needed: non-empty results[] array once backend DB is populated; alternate selector/servlet paths returning rep/retailer records
+impact: unauth read of rep/retailer contact DB (PII, MEDIUM-HIGH once data present); stacktrace + Lambda ARN architecture disclosure now (LOW-MED); unauthenticated AWS Lambda invocation proxy
+testability: PASSIVE (probe only)
+
+[HYP] Public OAuth Client Without PKCE Allowing refresh_token ATO
+class: OATH
+asset: my.basf.com/.auth
+confidence: 65
+reasoning: SSR boot config discloses public client_id 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect_uri /.auth, scope openid+profile+refresh_token, acr_values, zero PKCE refs; authorization_code flow with refresh_token on public client = long-lived bearer if code/refresh intercepted (no PKCE protection on code exchange)
+impact: account takeover if login code or refresh token intercepted (mitm/open redirect chain); HIGH, but requires a test account
+verify_steps: PASSIVE — needs auth test account for refresh lifetime checking (AUTH_HELPED)
+testability: AUTH_HELPED
+
+[HYP] Magnolia CMS unauth GraphQL/REST surface on agriculture.basf.com
+class: MISCONFIG
+asset: agriculture.basf.com
+confidence: 42
+reasoning: Magnolia confirmed (348KB); all standard paths /graphql2, /.graphql, /.restful, /.rest, /adminCentral, /.cache, /.imaging return 308 redirect or 404 — deleted as zero unauth surface this cycle (agriculture all Magnolia endpoints confirmed 308/404)
+evidence_needed: none — class closed
+impact: LOW
+testability: PASSIVE
+
+STEP 4 — SELF-CRITIQUE
+- Dropped [HYP] Magnolia (confidence <50 after 10-endpoint 308/404 confirmation) — class closed.
+- Dropped [HYP] repfinder siblings enumeration (16/16 404 — dispatcher only misses primary servlet) — exhausted.
+- Standing [HYP] my.basf.com no-PKCE ATO is highest-value but needs BASF test account; keep at 65 for client config accuracy.
+[FINAL] repfinder unauth Lambda proxy stacktrace+search path — confirmed, actionable, PASSIVE.
+[FINAL] my.basf.com no-PKCE refresh_token ATO — highest impact, blocked on account.
+[PARKED] secsys WAF 200-OK block-page class — no data leak; WAF 200 response anomaly only; no POC.
+
+STEP 5 — NEXT ACTION
+[NEXT] PROBE: GET https://repfinder.basf.com/bin/basf/repfindertool?country=DE&productServiceId=1&lat=50&lon=8&distance=50&limitResults=5&repType=SA%2CBR and BR variant with productServiceId=1&2, 1 rps, capture full JSON body to confirm hits/results still empty after 09-12 probes
+
+STEP 6 — LEARNING
+[LEARN] ACCEPTED RECON @ repfinder.basf.com: unauth AEM servlet proxy `/bin/basf/repfindertool` re-probed 2026-09-12 — 200 JSON unauth, hits=0/results=[] across all coords, psid 1/2, DE/US/BR; geolocation path functional (empty DB); stacktrace disclosure confirmed on error path; dispatcher still misses this path; sibling 404 — FINDING: unauth Lambda proxy + stacktrace/architecture disclosure (low-med) with potential rep/retailer DB read once data populated (med-high)
+[LEARN] REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL/REST/admin/cache all 308/404 (reconfirmed 2026-09-12) — zero unauth unauth surface; class closed
+[LEARN] REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs all 307 Azure AD/OAuth2 gated (reconfirmed) — no unauth API surface
+[LEARN] ACCEPTED RECON @ my.basf.com + federation.basf.com: OAuth client 86cc4bf9 / NAM OIDC discovery reconfirmed unchanged — zero provider hardening; ATO remains blocked pending test account
+[LEARN] ACCEPTED RECON @ rep.basf.com: /actuator + /actuator/health (HAL/UP); all 16 sensitive endpoints 404; custom handler 999 — locked down
+
+STEP 7 — RISK
+[RISK] basf: 34 — Full 9-host *.api.basf.com + SAP KM estate + 7-host CMS estate unauth classes all conclusively closed end-to-end. Only reachable unauth surface = repfinder /bin/basf/repfindertool Lambda proxy (stacktrace/architecture disclosure, empty rep/retailer DB). Top potential remains no-PKCE refresh_token ATO (my.basf.com) and unauth repfinder DB read when data populated. Remaining leads require auth credentials (out-of-scope class) — steady-state residual, no escalation.**STEP 1 — DELTA**
+- NO_DELTA @ repfinder.basf.com/bin/basf/repfindertool: 200 JSON `{"hits":0,"results":[]}` across all coords (US/DE/BR, psid 1/2) — unauth AEM→Lambda proxy functional, DB empty
+- NO_DELTA @ repfinder siblings: 16/16 `/bin/basf/*` probe paths 404 — only primary servlet leaks; enum exhausted
+- NO_DELTA @ estate: my.basf.com/.auth 200/204K SPA (no PKCE OAuth client 86cc4bf9-…), federation NAM discovery stable, *.api 9-host unauth surface zero-reachable, agriculture Magnolia all 308/404, rep actuator locked
+
+**STEP 2 — PRIORITIZE**
+[PRIO] repfinder.basf.com,7.85,AS=8 BV=8 TE=7 GE=10 CS=8 FR=8
+[PRIO] my.basf.com,5.70,AS=4 BV=8 TE=3 GE=8 CS=5 FR=7
+[PRIO] agriculture.basf.com,5.05,AS=6 BV=7 TE=5 GE=9 CS=9 FR=4
+[PRIO] rep.basf.com,3.95,AS=3 BV=7 TE=2 GE=8 CS=3 FR=3
+[PRIO] secsys.basf.com,3.05,AS=4 BV=5 TE=2 GE=5 CS=3 FR=6
+
+**STEP 3 — HYPOTHESES** (top-3 assets, highest confidence)
+[HYP] Unauthenticated AEM→AWS Lambda proxy with stacktrace disclosure and live geolocation search path
+class: MISCONFIG
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 80
+reasoning: 200 JSON unauth at 1 rps; hit=0/results=[] confirms functional search across US/DE/BR coords and psid 1/2; error path leaks stacktrace with Lambda class names (RepFinderDatabaseService, GoogleService, RepFinderHandler); dispatcher misses /bin/basf/*; 16 siblings 404
+evidence_needed: non-empty results[] once DB is populated; any alternate selector that returns records
+verify_steps: PASSIVE — GET with coords, capture JSON body
+impact: unauth DB read of rep/retailer contact data (PII) if data present; immediate stacktrace/architecture info disclosure; MEDIUM-HIGH
+testability: PASSIVE
+
+[HYP] Public OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 lacks PKCE → refresh_token ATO
+class: OATH
+asset: my.basf.com
+confidence: 65
+reasoning: SSR boot config discloses client_id, redirect_uri=/.auth, scope incl refresh_token, acr_values; zero PKCE refs; public client with refresh token = long-lived bearer if token captured
+impact: ATO of myBASFWorld account; HIGH, but requires a valid BASF test account + token interception chain
+testability: AUTH_HELPED (blocked on account)
+
+[HYP] Magnolia CMS unauth API surface on agriculture.basf.com
+class: MISCONFIG
+asset: agriculture.basf.com
+confidence: 20
+reasoning: All Magnolia endpoints (/graphql2, /.graphql, /.restful, /.rest, /adminCentral, /.cache, /.imaging) return 308 redirect or 404 — zero unauth API surface; class conclusively closed this cycle
+testability: PASSIVE (rejected)
+
+**STEP 4 — SELF-CRITIQUE**
+- DROP agriculture Magnolia hypothesis — 308/404 across full endpoint set; class closed
+- DROP repfinder sibling servlet enum — 16/16 404, exhausted
+- Keep repfinder Lambda proxy (confirmed, actionable, PASSIVE) as #1 survivor
+- Keep my.basf.com ATO (highest impact, blocked on test account)
+- PARKED: secsys WAF 200-block page; no data exposure, informational only
+
+**STEP 5 — NEXT ACTION**
+[NEXT] PROBE: 1 rps GET https://repfinder.basf.com/bin/basf/repfindertool?country=DE&productServiceId=1&lat=49.45&lon=8.39&distance=50&limitResults=5&repType=SA%2CBR — capture full JSON body to confirm hits/results still empty; also GET .json selector on sibling retailfindertool
+
+**STEP 6 — LEARNING**
+[LEARN] ACCEPTED RECON @ repfinder.basf.com: unauth AEM servlet→AWS Lambda proxy `/bin/basf/repfindertool` 200 JSON at all coords/psid (hits=0/results=[]), stacktrace disclosure, dispatcher misses /bin/basf/* — one reachable unauth endpoint on the whole estate, currently empty DB (MEDIA-HIGH once populated)
+[LEARN] REJECTED MISCONFIG @ agriculture.basf.com: Magnolia GraphQL/REST/admin/cache/DAM all 308/404 — zero unauth surface; closed
+[LEARN] REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs all 307 Azure AD OAuth2-gated — closed
+[LEARN] ACCEPTED RECON @ my.basf.com + federation.basf.com: OAuth client 86cc4bf9 + NAM OIDC discovery unchanged — zero PKCE hardening, ATO blocked pending test account
+[LEARN] ACCEPTED RECON @ rep.basf.com: /actuator HAL + /actuator/health UP; 16 sensitive endpoints 404; custom handler 999 — actuator locked down
+
+**STEP 7 — RISK**
+[RISK] BASF SE: 34 — Full 9-host *.api.basf.com estate + SAP KM + 7-host CMS estate unauth classes conclusively closed end-to-end. Only reachable unauth surface = repfinder /bin/basf/repfindertool Lambda proxy (stacktrace/architecture disclosure with empty rep/retailer DB). Top potential remains repfinder DB read when populated (MEDIUM-HIGH) and no-PKCE refresh_token ATO on my.basf.com (HIGH, needs test account). Remaining leads require auth creds (out-of-scope class) — stable residual, no escalation.

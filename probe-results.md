@@ -605,3 +605,17 @@ https://secsys.basf.com/api/users/me -> 200 len=246
 https://secsys.basf.com/api/users/me%00 -> 200 len=246
 https://bsh.secsys.basf.com/api/users/me -> 200 len=246
 https://secsys-visitor.basf.com/api/users/me -> 200 len=246
+
+## 2026-09-12 05:23:03 UTC
+https://repfinder.basf.com/bin/basf/repfindertool -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?lat=52.52&lon=13.41 -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?lat=999&lon=999 -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?format=xml -> 200 len=?
+https://north-america.intranet.basf.com/index.php/api -> 200 len=43206
+https://north-america.intranet.basf.com/index.php/tools/activated_packages -> 200 len=43203
+https://north-america.intranet.basf.com/ccm/system/block/types -> 200 len=43173
+https://north-america.intranet.basf.com/api/blocks -> 200 len=43182
+https://secsys.basf.com/api/users/me -> 200 len=246
+https://secsys.basf.com/api/users/me%00 -> 200 len=246
+https://bsh.secsys.basf.com/api/users/me -> 200 len=246
+https://secsys-visitor.basf.com/api/users/me -> 200 len=246
