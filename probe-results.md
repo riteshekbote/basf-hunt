@@ -592,3 +592,16 @@ https://north-america.intranet.basf.com/index.php/login -> 200 len=?
 https://repfinder.basf.com/bin/repfinder.json -> HTTP 404
 https://repfinder.basf.com/content/repfinder/en.search.json -> HTTP 404
 https://north-america.intranet.basf.com/index.php/api -> 200 len=43179
+
+## 2026-09-12 00:44:26 UTC
+https://repfinder.basf.com/bin/basf/repfindertool -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?lat=52.52&lon=13.41 -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?lat=999&lon=999 -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?format=xml -> 200 len=?
+https://agriculture.basf.com/graphql2 -> 200 len=348111
+https://agriculture.basf.com/.graphql -> 200 len=348111
+https://agriculture.basf.com/.restful/node-types -> HTTP 404
+https://secsys.basf.com/api/users/me -> 200 len=246
+https://secsys.basf.com/api/users/me%00 -> 200 len=246
+https://bsh.secsys.basf.com/api/users/me -> 200 len=246
+https://secsys-visitor.basf.com/api/users/me -> 200 len=246
