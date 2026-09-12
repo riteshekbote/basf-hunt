@@ -1,41 +1,21 @@
-## 2026-09-12 18:51:00 UTC [target] (model bigpickle)
-[NEW] repfinder.basf.com/bin/basf/retailfindertool: HTTP 404 — last cycle's sibling probe executed, no second servlet behind the dispatcher gap (probe-results:642); /bin/basf/* namespace reduced to repfindertool + 5 unprobed candidates.
-[CHANGED] knowledge-base integrity: 2026-09-12 re-appends verbatim 09-03 entries ("ACCEPTED SSRF ap-eupf", "REJECTED AUTH ap-digitalconnect master key", "REJECTED AUTH dev-clientcert-sap") that contradict all contract-specific evidence; RANKED [85] ap-eupf SSRF is recycled text, not new data.
-[PRIO] repfinder.basf.com/bin/basf/,7.9,AS=8 BV=7 TE=8 GE=10 CS=8 FR=6
-[PRIO] my.basf.com/.auth,5.5,AS=3 BV=8 TE=7 GE=3 CS=5 FR=7
-[PRIO] ap-eupf.api.basf.com,5.7,AS=4 BV=9 TE=6 GE=2 CS=9 FR=3 (GE=2 because edge returns 403 on url=; rank inflated by stale KB)
-[HYP] Sibling /bin/basf/* AEM servlet proxies a second unauth Lambda with a populated DB
+## 2026-09-12 21:23:19 UTC [target] (model bigpickle)
+[HYP] AEM QueryBuilder servlet also slips the repfinder dispatcher gap → unauth JCR/content enumeration
 class: MISCONFIG
-asset: repfinder.basf.com/bin/basf/
-confidence: 42
-reasoning: dispatcher misses /bin/basf/repfindertool (200 unauth JSON, triaged VALID 5.3 on 09-12 09:45); single servlet dual-routes RepFinderDatabaseService (psid=1) and RetailFinderDatabaseService (psid=2, NPE at RetailFinderDatabaseService.java:143, empty DB); retailfindertool 404; das.basf.com hosts AgSolutionsFinder PWA (api.das.basf.com dead) implying a finder-suite naming family; only 2 /bin/basf/* names ever tested
-evidence_needed: /bin/basf/<name> returning 200 JSON with non-null results[] or a stacktrace naming an unreported Lambda service class
-verify_steps: PASSIVE — 1 rps GET /bin/basf/{agsolutionsfindertool,agfindertool,distributorfindertool,productfindertool,dealerfindertool}?country=DE&productServiceId=1&lat=49.45&lon=8.39&distance=50&limitResults=5&repType=SA%2CBR, capture full body each
-impact: unauth read of a second rep/retailer/agronomist PII DB once found; today discovery/info value only (MED)
-testability: PASSIVE
-[HYP] ap-eupf Azure Functions SSRF to 169.254.169.254 via function url param
-class: SSRF
-asset: ap-eupf.api.basf.com
-confidence: 20
-reasoning: 09-12 KB "ACCEPTED SSRF" entry is verbatim 09-03 text; contradicts every contract-specific probe — /api/health 404, /api/<enum>?url= 403 at edge (reconfirmed 09-04/09-05), zero function names resolve at /api/, X-Forwarded-Url/X-Callback-Url return 200 with headers ignored; no new probe since 09-05 supports reachability
-evidence_needed: any reachable unauth function name at /api/ (none enumerated), or a param/header that passes the WAF to backend fetch — none identified
-verify_steps: PASSIVE — single 1 rps GET /api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 to re-baseline 404; no function-name brute (exhausted 09-03/04)
-impact: cloud metadata read → Azure keys if ever reachable (HIGH); not reachable today
+asset: repfinder.basf.com/bin/querybuilder.json
+confidence: 45
+reasoning: dispatcher demonstrably misses /bin/basf/* (repfindertool 200 unauth, triaged VALID 5.3); if the allow-list is path-prefix based (/bin/<app>/*), sibling AEM servlets in /bin/ like querybuilder.json, wcm/search/gql.servlet.json, security/currentuser.json also escape it; these return Sling JSON of /content subtree or current-user identity when open; never tested on repfinder
+evidence_needed: querybuilder.json returning JSON with jcr:path/hits on /content; gql.servlet.json returning node list; currentuser.json returning user id
+verify_steps: PASSIVE — 1 rps GET https://repfinder.basf.com/bin/querybuilder.json?path=/content&type=nt:base&p.limit=5 ; then /bin/wcm/search/gql.servlet.json?path=/content ; then /bin/security/currentuser.json — compare bodies against /bin/basf/zzznotthere 404-len-1 baseline
+impact: unauth read of AEM content graph / author identity (MED); if /content includes customer/retailer pages, data exposure (MED-HIGH)
 testability: PASSIVE
 [HYP] Public OAuth client 86cc4bf9 without PKCE → refresh_token ATO of myBASFWorld
 class: OATH
 asset: my.basf.com/.auth
 confidence: 65
-reasoning: SSR boot config discloses client_id 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect_uri=https://my.basf.com/.auth, scope=openid profile refresh_token, acr_values, zero PKCE refs; NAM discovery lists code_challenge plain+S256 and ROPC/hybrid — reconfirmed unchanged 09-12; public client + refresh_token = long-lived bearer if code/refresh intercepted
-evidence_needed: program-owned BASF test account to exercise code+refresh flow and observe refresh lifetime/reuse/revocation
-verify_steps: PASSIVE — AUTH_HELPED; the only vector is credential-dependent, no unauth path
-impact: ATO of myBASFWorld account (HIGH), blocked on test account
+reasoning: SSR boot config discloses client_id 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect_uri=https://my.basf.com/.auth, scope incl. refresh_token, zero PKCE refs; NAM discovery lists code_challenge plain+S256 and ROPC/hybrid; reconfirmed unchanged 09-12; public client + refresh_token = long-lived bearer on code/refresh intercept
+evidence_needed: program-owned test account to exercise code+refresh flow and observe reuse/revocation
+verify_steps: PASSIVE — AUTH_HELPED; credential-dependent only, no unauth path
+impact: ATO of myBASFWorld (HIGH), blocked on test account; reportable as design-level finding
 testability: AUTH_HELPED
-[PARKED] ap-eupf SSRF url= : 09-12 "ACCEPTED" is recycled 09-03 text contradicting WAF-403 and /api/health-404 evidence; confidence 20 < 40 threshold; reopen only after a function-name or edge-bypass discovery
-[PARKED] ap-digitalconnect master-key leak + dev-clientcert-sap mTLS bypass : stale KB re-appends, both rejected on day-1 for lacking verify steps; no new basis
-[PARKED] north-america.intranet.basf.com Concrete + secsys WAF-200 : closed classes (307 OAuth2 gate; WAF block page only)
-[FINAL] repfinder /bin/basf/* sibling enumeration — only candidate set with executable PASSIVE probes this cycle (42)
-[FINAL] my.basf.com no-PKCE refresh_token ATO — highest impact (65), credential-blocked, reportable as design-level finding
-[NEXT] PROBE: at 1 rps, GET `https://repfinder.basf.com/bin/basf/agsolutionsfindertool?country=DE&productServiceId=1&lat=49.45&lon=8.39&distance=50&limitResults=5&repType=SA%2CBR`, then `/bin/basf/agfindertool`, `/bin/basf/distributorfindertool`, `/bin/basf/productfindertool`, `/bin/basf/dealerfindertool` (same params) — capture full response body each; any 200 JSON with non-null `results[]` or a stacktrace naming an unreported service class = sibling unauth Lambda proxy → escalate HIGH; all 404 → close the /bin/basf/* namespace and move to submit-writeup only.
-[LEARN] REJECTED SSRF @ ap-eupf.api.basf.com: 09-12 "ACCEPTED SSRF ... metadata endpoint reachable" is verbatim-recycled 09-03 text conflicting with all contracted evidence (WAF 403 on url=, /api/health 404, no function names, header probes ignored) — [85] rank inflated, unauth SSRF vector remains closed.
-[RISK] basf: 38 — repfinder finding validated to Submit (sole reachable unauth business surface, broken-access-control framing) sustains MED-HIGH; sibling /bin/basf/* namespace open but bounds to 5 probes; every other estate (API, SAP-KM, CMS, OAuth config, actuator) reconfirmed closed; ATO remains credential-blocked and reportable only as a design note; no new exploitable surface since last cycle.
+[NEXT] PROBE: 1 rps, GET `https://repfinder.basf.com/bin/querybuilder.json?path=/content&type=nt:base&p.limit=5`, then `https://repfinder.basf.com/bin/wcm/search/gql.servlet.json?path=/content`, then `https://repfinder.basf.com/bin/security/currentuser.json` — capture full body each; any 200 JSON returning jcr:path hits or a principal id = second unauth servlet behind the gap → extend report; all 404/403 len~1 → close /bin/ namespace and freeze the VALID 5.3 report.
+[RISK] basf: 38 — sole live unauth surface remains the repfinder Lambda proxy (VALID/Submit, MED-HIGH once retail data lands); sibling namespace now provably single-servlet, /bin/ sibling class one probe-set away from closure; every other estate (API, SAP-KM, CMS, OAuth config, actuator) reconfirmed closed; ATO stays credential-blocked design-note. Residual unchanged, no escalation.

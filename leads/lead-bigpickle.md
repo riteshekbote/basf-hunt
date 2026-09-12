@@ -2671,3 +2671,24 @@ testability: AUTH_HELPED
 [NEXT] PROBE: at 1 rps, GET `https://repfinder.basf.com/bin/basf/agsolutionsfindertool?country=DE&productServiceId=1&lat=49.45&lon=8.39&distance=50&limitResults=5&repType=SA%2CBR`, then `/bin/basf/agfindertool`, `/bin/basf/distributorfindertool`, `/bin/basf/productfindertool`, `/bin/basf/dealerfindertool` (same params) — capture full response body each; any 200 JSON with non-null `results[]` or a stacktrace naming an unreported service class = sibling unauth Lambda proxy → escalate HIGH; all 404 → close the /bin/basf/* namespace and move to submit-writeup only.
 [LEARN] REJECTED SSRF @ ap-eupf.api.basf.com: 09-12 "ACCEPTED SSRF ... metadata endpoint reachable" is verbatim-recycled 09-03 text conflicting with all contracted evidence (WAF 403 on url=, /api/health 404, no function names, header probes ignored) — [85] rank inflated, unauth SSRF vector remains closed.
 [RISK] basf: 38 — repfinder finding validated to Submit (sole reachable unauth business surface, broken-access-control framing) sustains MED-HIGH; sibling /bin/basf/* namespace open but bounds to 5 probes; every other estate (API, SAP-KM, CMS, OAuth config, actuator) reconfirmed closed; ATO remains credential-blocked and reportable only as a design note; no new exploitable surface since last cycle.
+## 2026-09-12 21:23:19 UTC [target] (model bigpickle)
+[HYP] AEM QueryBuilder servlet also slips the repfinder dispatcher gap → unauth JCR/content enumeration
+class: MISCONFIG
+asset: repfinder.basf.com/bin/querybuilder.json
+confidence: 45
+reasoning: dispatcher demonstrably misses /bin/basf/* (repfindertool 200 unauth, triaged VALID 5.3); if the allow-list is path-prefix based (/bin/<app>/*), sibling AEM servlets in /bin/ like querybuilder.json, wcm/search/gql.servlet.json, security/currentuser.json also escape it; these return Sling JSON of /content subtree or current-user identity when open; never tested on repfinder
+evidence_needed: querybuilder.json returning JSON with jcr:path/hits on /content; gql.servlet.json returning node list; currentuser.json returning user id
+verify_steps: PASSIVE — 1 rps GET https://repfinder.basf.com/bin/querybuilder.json?path=/content&type=nt:base&p.limit=5 ; then /bin/wcm/search/gql.servlet.json?path=/content ; then /bin/security/currentuser.json — compare bodies against /bin/basf/zzznotthere 404-len-1 baseline
+impact: unauth read of AEM content graph / author identity (MED); if /content includes customer/retailer pages, data exposure (MED-HIGH)
+testability: PASSIVE
+[HYP] Public OAuth client 86cc4bf9 without PKCE → refresh_token ATO of myBASFWorld
+class: OATH
+asset: my.basf.com/.auth
+confidence: 65
+reasoning: SSR boot config discloses client_id 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect_uri=https://my.basf.com/.auth, scope incl. refresh_token, zero PKCE refs; NAM discovery lists code_challenge plain+S256 and ROPC/hybrid; reconfirmed unchanged 09-12; public client + refresh_token = long-lived bearer on code/refresh intercept
+evidence_needed: program-owned test account to exercise code+refresh flow and observe reuse/revocation
+verify_steps: PASSIVE — AUTH_HELPED; credential-dependent only, no unauth path
+impact: ATO of myBASFWorld (HIGH), blocked on test account; reportable as design-level finding
+testability: AUTH_HELPED
+[NEXT] PROBE: 1 rps, GET `https://repfinder.basf.com/bin/querybuilder.json?path=/content&type=nt:base&p.limit=5`, then `https://repfinder.basf.com/bin/wcm/search/gql.servlet.json?path=/content`, then `https://repfinder.basf.com/bin/security/currentuser.json` — capture full body each; any 200 JSON returning jcr:path hits or a principal id = second unauth servlet behind the gap → extend report; all 404/403 len~1 → close /bin/ namespace and freeze the VALID 5.3 report.
+[RISK] basf: 38 — sole live unauth surface remains the repfinder Lambda proxy (VALID/Submit, MED-HIGH once retail data lands); sibling namespace now provably single-servlet, /bin/ sibling class one probe-set away from closure; every other estate (API, SAP-KM, CMS, OAuth config, actuator) reconfirmed closed; ATO stays credential-blocked design-note. Residual unchanged, no escalation.

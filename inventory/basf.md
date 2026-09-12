@@ -491,3 +491,12 @@ www.basf.com
 - CHANGED `repfinder.basf.com/bin/basf/repfindertool` bare GET → HTTP 200 len=80 compact JSON wrapper (distinct from NPE 200-path; confirms param-driven branches)
 - CHANGED `repfinder.basf.com/bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE` → HTTP 200 JSON wrapper around NPE stacktrace (`RetailFinderDatabaseService.getFinalResult:143` / `searchDatabase:1
 - CHANGED Triager marked `repfinder` unauth Lambda proxy VALID 5.3 (Submit) at 2026-09-12 09:45 — reportable framing: broken-access-control (dispatcher misses `/bin/basf/*`), NOT stacktrace disclosure
+
+## 2026-09-12 21:28:20 UTC
+- CHANGED `repfinder.basf.com/bin/basf/repfindertool` bare GET → HTTP 200 len=80 compact JSON wrapper `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}` (distinct from NPE 200-pa
+- CHANGED `repfinder.basf.com/bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE` → HTTP 200 JSON wrapper around NPE stacktrace (`RetailFinderDatabaseService.getFinalResult:143` / `searchDatabase:1
+- CHANGED `repfinder.basf.com/bin/basf/retailfindertool` → HTTP 404 (sibling servlet probe executed; no second servlet behind dispatcher gap despite dual-service routing inside repfindertool)
+- CHANGED Triager marked `repfinder` unauth Lambda proxy VALID 5.3 (Submit) at 2026-09-12 09:45 — reportable framing: broken-access-control (dispatcher misses `/bin/basf/*`), NOT stacktrace disclosure (excluded
+- CHANGED `north-america.intranet.basf.com` Concrete APIs: raw response is HTTP 307→`/ccm/system/authentication/oauth2/basf/attempt_auth?then=<full-url>` on ALL 6 paths — earlier 200/43KB were curl `-L` auth-ch
+- CHANGED `agriculture.basf.com` Magnolia endpoints (`/graphql2`, `/.graphql`, `/.restful`, `/.rest`, `/adminCentral`, `/.admin`, `/.cache`, `/.imaging`, `/dam`, `/docurl/`) now confirmed 308 redirect or 404 — 
+- CHANGED Knowledge-base integrity: 2026-09-12 re-appends verbatim 09-03 entries ("ACCEPTED SSRF ap-eupf", "REJECTED AUTH ap-digitalconnect master key", "REJECTED AUTH dev-clientcert-sap") that contradict all c
