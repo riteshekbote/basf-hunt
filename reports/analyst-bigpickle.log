@@ -18151,3 +18151,29 @@ STEP 6 — LEARNING
 
 STEP 7 — RISK
 [RISK] basf: 25 — stable. Sole live unauth finding (repfinder VALID 5.3) submit-ready with today-confirmed reproducibility; empty DB caps current impact at MED, MED-HIGH only once retail/rep data populates. OAuth no-PKCE remains an AUTH_HELPED design note. All other classes reconfirmed closed; no escalation, no further investment above submission.
+===== ANALYST bigpickle 2026-09-13 19:21:47 UTC =====
+[0m
+> build · big-pickle
+[0m
+STEP 1 — DELTA: NO_DELTA — 09-13 17:07 inventory entry re-verifies the already-documented repfinder geolocation path (200 `Successful` wrapper at country/psid coords); no new asset, path, or status regime — same VALID finding, same empty DB.
+
+STEP 2 — PRIORITIZE: [PRIO] repfinder.basf.com,6.2,attack_surface=5/business=6/tech=7/gate=10/cloud=8/fresh=1 — sole reachable unauth endpoint on estate; submit-ready, no new probes justified.
+
+STEP 3 — HYPOTHESES:
+[HYP] Unauthenticated AEM Sling servlet → AWS Lambda proxy under /bin/basf/* (dispatcher ACL miss) — broken-access-control
+class: OTHER
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 92
+reasoning: dispatcher blocks standard AEM selectors/author paths but miss /bin/basf/repfindertool (200 JSON unauth at all coords; psid=1 RepFinder / psid=2 RetailFinder NPE path RetailFinderDatabaseService:143); sibling retailfindertool 404; bare GET len-80 `Unsupported Product Service ID` wrapper vs functional 200 — param-driven branches live; triager marked VALID 5.3 (Submit) 09-12 09:45; current DB empty (hits=0)
+evidence_needed: none — reproducibility already byte-reconfirmed 09-13; report evidence complete
+verify_steps: PASSIVE — none further; evidence frozen and current
+impact: unauth query of rep/retailer DB once populated (MED-HIGH; empty today) + Java service-class disclosure on error branch; report framing = broken-access-control only
+testability: PASSIVE
+
+STEP 4 — SELF-CRITIQUE: [PARKED] OAuth no-PKCE public client 86cc4bf9 (conf 65): credential/account-dependent, no unauth probe changes anything, config stable since 09-05, ATO blocked pending test account — design-level AUTH_HELPED note, not a probe target. [FINAL] repfinder broken-access-control @ 92 = only survivor; evidence live and byte-stable across 09-12/09-13.
+
+STEP 5 — NEXT ACTION: [NEXT] HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu — broken-access-control: dispatcher misses /bin/basf/* → unauth AEM servlet proxies to AWS Lambda; include 200-JSON evidence at country/US+psid=1 coords (empty DB, hits=0), bare-GET 400 wrapper, psid=2 NPE branch, retailfindertool-404 sibling negative; frame as broken-access-control only (NOT stacktrace, excluded class); attach OAuth no-PKCE as separate AUTH_HELPED design note. No further probes on any asset.
+
+STEP 6 — LEARNING: [LEARN] REJECTED OTHER @ *.basf.com: 09-13 full cycle re-emitted byte-identical hypotheses (repfinder + OAuth) with zero new evidence — estate statistically closed by direct probes; inventing hypotheses on probed-closed assets yields no delta, per prior convergence.
+
+STEP 7 — RISK: [RISK] basf: 25 — stable-to-declining. Sole live finding (repfinder VALID 5.3) is submit-ready with today-confirmed reproducibility; empty DB caps current impact MED, MED-HIGH only once retail/rep data populates. OAuth no-PKCE remains a credential-blocked design note. All discovery classes reconfirmed closed; no escalation, no further investment above submission.

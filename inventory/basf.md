@@ -530,3 +530,8 @@ www.basf.com
 ## 2026-09-13 17:07:31 UTC
 - CHANGED `repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` → HTTP 200 JSON `{"responseCode":"200","responseMsg":" Sucessf
 - CHANGED `repfinder.basf.com/bin/basf/repfindertool` bare GET → HTTP 200 len=80 `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}` (confirmed param-driven branches)
+
+## 2026-09-13 19:21:47 UTC
+- CHANGED repfinder.basf.com/bin/basf/repfindertool bare GET → HTTP 200 len=80 fixed wrapper `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}` (09-13 re-probe confirms param-dri
+- CHANGED repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 → HTTP 200 JSON `{"responseCode":"200","responseMsg":" Sucessful
+- CHANGED Triager confirmation: repfinder unauth Lambda proxy marked VALID 5.3 (Submit) at 2026-09-12 09:45 — framing: broken-access-control (dispatcher misses `/bin/basf/*`), NOT stacktrace disclosure

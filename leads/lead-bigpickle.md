@@ -2837,3 +2837,13 @@ testability: AUTH_HELPED
 [LEARN] ACCEPTED TRIAGE @ repfinder.basf.com/bin/basf/repfindertool: 09-13 re-probe returns byte-identical len-80 no-args wrapper → finding live, evidence reproduces at submit time.
 [LEARN] REJECTED OTHER @ *.basf.com estate remainder: no new unauth surface anywhere 09-13; every discovery class statistically closed by direct probes — inventing new hypotheses on probed-closed assets is non-productive.
 [RISK] basf: 25 — stable. Sole live unauth finding (repfinder VALID 5.3) submit-ready with today-confirmed reproducibility; empty DB caps current impact at MED, MED-HIGH only once retail/rep data populates. OAuth no-PKCE remains an AUTH_HELPED design note. All other classes reconfirmed closed; no escalation, no further investment above submission.
+## 2026-09-13 19:19:09 UTC [target] (model bigpickle)
+[HYP] Unauthenticated AEM Sling servlet → AWS Lambda proxy under /bin/basf/* (dispatcher ACL miss) — broken-access-control
+class: OTHER
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 92
+reasoning: dispatcher blocks standard AEM selectors/author paths but miss /bin/basf/repfindertool (200 JSON unauth at all coords; psid=1 RepFinder / psid=2 RetailFinder NPE path RetailFinderDatabaseService:143); sibling retailfindertool 404; bare GET len-80 `Unsupported Product Service ID` wrapper vs functional 200 — param-driven branches live; triager marked VALID 5.3 (Submit) 09-12 09:45; current DB empty (hits=0)
+evidence_needed: none — reproducibility already byte-reconfirmed 09-13; report evidence complete
+verify_steps: PASSIVE — none further; evidence frozen and current
+impact: unauth query of rep/retailer DB once populated (MED-HIGH; empty today) + Java service-class disclosure on error branch; report framing = broken-access-control only
+testability: PASSIVE
