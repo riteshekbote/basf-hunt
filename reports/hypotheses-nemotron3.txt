@@ -1,16 +1,16 @@
-## 2026-09-13 06:50:37 UTC [target] (model nemotron3)
+## 2026-09-13 12:59:55 UTC [target] (model nemotron3)
 [NEW] `repfinder.basf.com/bin/basf/repfindertool` bare GET → HTTP 200 len=80 compact JSON wrapper `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}` (structurally distinct from NPE 200-path; confirms param-driven branches)
 [NEW] `repfinder.basf.com/bin/basf/retailfindertool` → HTTP 404 (sibling servlet probe executed; no second servlet behind dispatcher gap despite dual-service routing inside repfindertool)
-[NEW] Triager marked `repfinder` unauth Lambda proxy VALID 5.3 (Submit) at 2026-09-12 09:45 — reportable framing: broken-access-control (dispatcher misses `/bin/basf/*`), NOT stacktrace disclosure (excluded class)
 [CHANGED] `north-america.intranet.basf.com` Concrete APIs: raw response is HTTP 307→`/ccm/system/authentication/oauth2/basf/attempt_auth?then=<full-url>` on ALL 6 paths — earlier 200/43KB were curl `-L` auth-chain artifacts; no unauth Concrete API surface
 [CHANGED] `agriculture.basf.com` Magnolia endpoints (`/graphql2`, `/.graphql`, `/.restful`, `/.rest`, `/adminCentral`, `/.admin`, `/.cache`, `/.imaging`, `/dam`, `/docurl/`) now confirmed 308 redirect or 404 — zero unauthenticated API surface (contradicted earlier 200 probes; resolved)
 [CHANGED] Knowledge-base integrity: 2026-09-12 re-appends verbatim 09-03 entries ("ACCEPTED SSRF ap-eupf", "REJECTED AUTH ap-digitalconnect master key", "REJECTED AUTH dev-clientcert-sap") that contradict all contracted evidence — SSRF vector remains closed, auth gates confirmed
 [PRIO] repfinder.basf.com/bin/basf/repfindertool,8.90,attack_surface=9 business_value=8 tech_exposure=9 gate_ease=10 cloud_surface=8 freshness=10
-[PRIO] secsys.basf.com,6.45,attack_surface=5 business_value=6 tech_exposure=6 gate_ease=10 cloud_surface=5 freshness=8
 [PRIO] my.basf.com,6.15,attack_surface=3 business_value=8 tech_exposure=4 gate_ease=10 cloud_surface=6 freshness=7
 [PRIO] federation.basf.com,6.10,attack_surface=4 business_value=7 tech_exposure=5 gate_ease=10 cloud_surface=5 freshness=6
+[PRIO] secsys.basf.com,5.80,attack_surface=5 business_value=6 tech_exposure=5 gate_ease=10 cloud_surface=5 freshness=8
 [PRIO] rep.basf.com,5.50,attack_surface=3 business_value=7 tech_exposure=2 gate_ease=10 cloud_surface=7 freshness=5
-[PRIO] ap-eupf.api.basf.com,3.20,attack_surface=7 business_value=6 tech_exposure=3 gate_ease=10 cloud_surface=9 freshness=2
+[PRIO] prod.api.basf.com,3.80,attack_surface=7 business_value=6 tech_exposure=3 gate_ease=10 cloud_surface=9 freshness=2
+[PRIO] *.api.basf.com estate,3.20,attack_surface=7 business_value=6 tech_exposure=3 gate_ease=10 cloud_surface=9 freshness=2
 [HYP] Unauthenticated AEM Sling Servlet Proxy to AWS Lambda with Param-Driven Dual Service Routing + Java Internals Disclosure
 class: MISCONFIG
 asset: repfinder.basf.com/bin/basf/repfindertool
@@ -24,9 +24,9 @@ testability: PASSIVE
 class: AUTH
 asset: my.basf.com
 confidence: 70
-reasoning: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with `redirect_uri=https://my.basf.com/.auth`, `scope=openid profile refresh_token`, `acr_values=3IAM/Login/External`, authorization_code flow, zero PKCE references; federation.basf.com NAM OIDC discovery confirms `code_challenge_methods_supported: plain, S256` but client doesn't enforce; refresh_token grant = long-lived bearer; code interception → token exchange → refresh_token replay = ATO; config stable across all 09-09/09-12 re-probes, no provider hardening
+reasoning: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with `redirect_uri=https://my.basf.com/.auth`, `scope=openid profile refresh_token`, `acr_values=3IAM/Login/External`, authorization_code flow, zero PKCE references; federation.basf.com NAM OIDC discovery at `/nidp/oauth/nam/.well-known/openid-configuration` confirms `code_challenge_methods_supported: ["plain","S256"]` but client doesn't enforce; refresh_token grant = long-lived bearer; code interception → token exchange → refresh_token replay = ATO; config stable across all 09-09/09-12 re-probes, no provider hardening
 evidence_needed: Valid authorization_code interception (requires MITM or open redirect on redirect_uri); token exchange with intercepted code yields refresh_token; refresh_token replay yields new access_token without user interaction
-verify_steps: GET https://my.basf.com/ (HEAD, capture SSR boot config JSON for client_id/redirect_uri/scope/acr_values); GET https://federation.basf.com/nidp/.well-known/openid-configuration (HEAD, confirm PKCE methods supported); GET https://federation.basf.com/nidp/oauth/nam/authorize?client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&response_type=code&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth&scope=openid%20profile%20refresh_token&acr_values=3IAM%2FLogin%2FExternal (HEAD, observe login flow); GET https://my.basf.com/.auth?code=INTERCEPTED (HEAD, observe SPA callback handling)
+verify_steps: GET https://my.basf.com/ (HEAD, capture SSR boot config JSON for client_id/redirect_uri/scope/acr_values); GET https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration (HEAD, confirm PKCE methods supported); GET https://federation.basf.com/nidp/oauth/nam/authorize?client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&response_type=code&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth&scope=openid%20profile%20refresh_token&acr_values=3IAM%2FLogin%2FExternal (HEAD, observe login flow); GET https://my.basf.com/.auth?code=INTERCEPTED (HEAD, observe SPA callback handling)
 impact: Full account takeover via OAuth code interception → refresh_token replay; long-lived access bypassing MFA/acr; design-level flaw (AUTH_HELPED); HIGH
 testability: AUTH_HELPED
 [HYP] WAF 200-OK Block Page Enables Cache Poisoning / Response Confusion
@@ -38,11 +38,11 @@ evidence_needed: Cache-Control/ETag headers on WAF block response; demonstration
 verify_steps: GET https://secsys.basf.com/api/users/me -H "Accept: application/json" -v (capture full headers including Cache-Control); GET https://secsys.basf.com/api/users/me -H "Accept: text/html" (test content-negotiation on block page); repeat across bsh.secsys, secsys-visitor to confirm ecosystem-wide pattern
 impact: Theoretical cache poisoning if block responses cached; response confusion for clients expecting JSON; LOW-MEDIUM without demonstrated exploit
 testability: PASSIVE
-[PARKED] NetIQ NAM ROPC + Hybrid Grants Enabled Without Client Enforcement Allows Credential Stuffing: confidence 55 but exploitation requires valid BASF credentials (out-of-scope to obtain/test); ROPC is provider-level config, not a misconfiguration per se; no verify path without creds
 [PARKED] WAF 200-OK Block Page Enables Cache Poisoning / Response Confusion (secsys.basf.com): confidence 45 borderline; no evidence of actual cache poisoning or client confusion; WAF returns 200 for blocks across ecosystem but no caching headers observed on block page; no verify steps demonstrating exploit
+[PARKED] NetIQ NAM ROPC + Hybrid Grants Enabled Without Client Enforcement Allows Credential Stuffing: confidence 55 but exploitation requires valid BASF credentials (out-of-scope to obtain/test); ROPC is provider-level config, not a misconfiguration per se; no verify path without creds
 [FINAL] Unauthenticated AEM Sling Servlet Proxy to AWS Lambda with Param-Driven Dual Service Routing + Java Internals Disclosure (repfinder.basf.com, confidence 92, PASSIVE) — HIGHEST CONFIDENCE, clear verify steps, exploitable surface, triager VALID 5.3
 [FINAL] Public OAuth Client Emitting Refresh Tokens Without PKCE Enables ATO Chain (my.basf.com, confidence 70, AUTH_HELPED) — DESIGN FLAW, config confirmed stable, requires test account for POC but ATO chain well-defined
-[NEXT] PROBE: GET https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 -H "Accept: application/json" (HEAD, capture full response body + headers) — observe RepFinder (repType=1) search behavior with valid coordinates, confirm empty DB vs populated results, validate geolocation param handling
+[NEXT] PROBE: GET https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 -H "Accept: application/json" (capture full response body + headers) — observe RepFinder (repType=1) search behavior with valid coordinates, confirm empty DB vs populated results, validate geolocation param handling
 [LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: unauth AEM→AWS Lambda proxy, 200 JSON, stacktrace disclosure, geolocation-based search path functional (empty DB) — dispatcher misses /bin/basf/repfindertool
 [LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/retailfindertool: HTTP 404 — sibling servlet absent behind dispatcher gap despite dual-service routing inside repfindertool
 [LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: bare GET now 200 len=80 fixed wrapper — no-args path returns static short JSON, structurally distinct from NPE 200-path; confirms param-driven branches

@@ -1,4 +1,4 @@
-## 2026-09-13 06:48:11 UTC [target] (model bigpickle)
+## 2026-09-13 12:42:13 UTC [target] (model bigpickle)
 class: OATH
 asset: my.basf.com/.auth + federation.basf.com/nidp/oauth/nam
 confidence: 65
@@ -7,3 +7,15 @@ evidence_needed: program-owned test account to exercise code+refresh reuse/revoc
 verify_steps: PASSIVE — AUTH_HELPED only; no unauth vector exists
 impact: ATO of myBASFWorld (HIGH), credential-blocked
 testability: AUTH_HELPED
+[NEXT] HUMAN: freeze and submit the VALID 5.3 repfinder broken-access-control report (dispatcher misses `/bin/basf/*` 
+[HYP] /nidp/oauth/nam/authz exposes misconfigured per-client grant on public client 86cc4bf9 (refresh_token on public client w/o PKCE)
+class: OATH
+asset: federation.basf.com/nidp/oauth/nam/authz
+confidence: 40
+reasoning: dev docs advertise authz at /authz (not /authorize, which 404s); NAM discovery still lists plain+S256 PKCE + password/hybrid grants (reconfirmed 14920B); public client w/ refresh_token scope is long-lived-bearer-if-intercepted; but every angle remains credential/account-dependent and provider config has been stable since 09-05
+evidence_needed: program-owned test account; prove refresh-token reuse/revocation on the public client flow
+verify_steps: PASSIVE — AUTH_HELPED only; no unauth probe changes the credential-dependency
+impact: ATO of myBASFWorld (HIGH) — only reachable with a program test account, no unauth path
+testability: AUTH_HELPED
+[NEXT] HUMAN: submit the frozen VALID 5.3 report via bugs.olivermaicher.eu — broken-access-control: dispatcher misses `/bin/basf/*` → unauth AEM servlet proxies to AWS Lambda, JSON at all coords/psid (empty DB), param-driven DualService routing (RepFinder/Retail) with Java NPE internals on psid=2 error path; frame as broken-access-control only, NOT stacktrace (excluded class). Reports/evidence already complete; no further probes warranted on any asset.
+[RISK] basf: 25 — estate fully converged to submit-only: sole live unauth finding is repfindertool (VALID 5.3, MED-HIGH only once retail/rep data populates; empty-DB today); all twelve discovery classes statistically closed by direct probes; ATO design note (no-PKCE public client) remains a credential-blocked reportable; residual stable-to-declining, no escalation, no further investment justified above report submission.

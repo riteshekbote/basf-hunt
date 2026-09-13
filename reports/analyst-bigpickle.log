@@ -17853,3 +17853,249 @@ STEP 6 — LEARNING
 
 STEP 7 — RISK
 - [RISK] basf: 28 — residual stable-to-declining; zero open research classes above closure threshold; all remaining advisory surface (repfinder MED-HIGH once DB populated, ATO design note) transmits only via report submission, which is the sole remaining action.
+===== ANALYST bigpickle 2026-09-13 13:00:06 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la && ls -la art/ 2>/dev/null | tail -20
+total 452
+drwxr-xr-x 12 runner runner   4096 Sep 13 12:40 .
+drwxr-xr-x  3 runner runner   4096 Sep 13 12:40 ..
+drwxr-xr-x  7 runner runner   4096 Sep 13 12:40 .git
+drwxr-xr-x  3 runner runner   4096 Sep 13 12:40 .github
+-rw-r--r--  1 runner runner   1801 Sep 13 12:40 README.md
+-rw-r--r--  1 runner runner     32 Sep 13 12:40 analyst-out.txt
+-rw-r--r--  1 runner runner 162631 Sep 13 12:40 analyst-prompt.txt
+-rw-r--r--  1 runner runner 158759 Sep 13 12:40 ctx.txt
+drwxr-xr-x  2 runner runner   4096 Sep 13 12:40 inventory
+drwxr-xr-x  2 runner runner   4096 Sep 13 12:40 knowledge
+drwxr-xr-x  2 runner runner   4096 Sep 13 12:40 leads
+-rw-r--r--  1 runner runner  51280 Sep 13 12:40 probe-results.md
+drwxr-xr-x  2 runner runner   4096 Sep 13 12:40 recon-notes
+drwxr-xr-x  2 runner runner   4096 Sep 13 12:40 reports
+drwxr-xr-x  2 runner runner   4096 Sep 13 12:40 reposcan-raw
+-rw-r--r--  1 runner runner   3285 Sep 13 12:40 scope.yml
+drwxr-xr-x  2 runner runner   4096 Sep 13 12:40 scripts
+-rw-r--r--  1 runner runner     33 Sep 13 12:40 state_bigpickle.json
+-rw-r--r--  1 runner runner     33 Sep 13 12:40 state_laguna.json
+-rw-r--r--  1 runner runner     33 Sep 13 12:40 state_ling3.json
+-rw-r--r--  1 runner runner     33 Sep 13 12:40 state_longcat.json
+-rw-r--r--  1 runner runner     33 Sep 13 12:40 state_mimo.json
+-rw-r--r--  1 runner runner     33 Sep 13 12:40 state_nemotron3.json
+drwxr-xr-x  2 runner runner   4096 Sep 13 12:40 triage
+[0m
+[0m$ [0mtail -60 probe-results.md
+https://secsys.basf.com/api/users/me -> 200 len=246
+https://secsys.basf.com/api/users/me%00 -> 200 len=246
+
+## 2026-09-12 18:51:28 UTC
+https://repfinder.basf.com/bin/basf/repfindertool -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?lat=999&lon=999 -> 200 len=?
+https://repfinder.basf.com/bin/basf/retailfindertool?country=US&productServiceId=1&lat=41.8781&lon=-87.6298&distance=250&limitResults=10&repType=1 -> HTTP 404
+https://ap-eupf.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+https://ap-eupf.api.basf.com/api/HttpTrigger1?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://ap-eupf.api.basf.com/api/?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+https://my.basf.com/.auth` -> 200 len=204906
+https://my.basf.com/ -> 200 len=204916
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+
+## 2026-09-12 21:28:37 UTC
+https://repfinder.basf.com/bin/basf/repfindertool -> 200 len=80
+https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 -> 200 len=72
+https://repfinder.basf.com/bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE -> 200 len=815
+https://repfinder.basf.com/bin/basf/repfindertool?lat=999&lon=999 -> 200 len=?
+https://repfinder.basf.com/bin/basf/retailfindertool?country=US&productServiceId=1&lat=41.8781&lon=-87.6298&distance=250&limitResults=10&repType=1 -> HTTP 404
+https://ap-eupf.api.basf.com/api/health?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+https://ap-eupf.api.basf.com/api/HttpTrigger1?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+https://ap-eupf.api.basf.com/ -> 200 len=150093
+https://ap-eupf.api.basf.com/api/?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01 -> HTTP 403
+https://my.basf.com/.auth` -> 200 len=204916
+https://my.basf.com/ -> 200 len=204916
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+
+## 2026-09-12 23:24:31 UTC
+https://repfinder.basf.com/bin/basf/repfindertool -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?lat=999&lon=999 -> 200 len=?
+https://my.basf.com/.auth` -> 200 len=204906
+https://my.basf.com/ -> 200 len=204906
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/authorize?client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&response_type=code&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth&scope=openid%20profile%20refresh_token&acr_values=3IAM%2FLogin%2FExternal -> HTTP 404
+https://my.basf.com/.auth?code=INTERCEPTED -> 200 len=204993
+https://federation.basf.com/nidp/oauth/nam/token -> HTTP 405
+https://federation.basf.com/nidp/oauth/nam/clients -> HTTP 401
+https://my.basf.com/.auth -> 200 len=204993
+
+## 2026-09-13 01:27:45 UTC
+https://my.basf.com/.auth -> 200 len=205003
+
+## 2026-09-13 06:51:06 UTC
+https://repfinder.basf.com/bin/basf/repfindertool -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE -> 200 len=?
+https://repfinder.basf.com/bin/basf/repfindertool?lat=999&lon=999 -> 200 len=?
+https://my.basf.com/.auth` -> 200 len=204898
+https://my.basf.com/ -> 200 len=204906
+https://federation.basf.com/nidp/.well-known/openid-configuration -> 200 len=14920
+https://federation.basf.com/nidp/oauth/nam/authorize?client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&response_type=code&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth&scope=openid%20profile%20refresh_token&acr_values=3IAM%2FLogin%2FExternal -> HTTP 404
+https://my.basf.com/.auth?code=INTERCEPTED -> 200 len=204985
+https://secsys.basf.com/api/users/me -> 200 len=246
+https://my.basf.com/.auth -> 200 len=204985
+[0m
+[0m$ [0mcat state_bigpickle.json && echo "---" && cat triage/*.md 2>/dev/null | tail -40 && echo "---reports---" && ls -la reports/ 2>/dev/null
+{"phase": "POC", "target": "api"}---
+[0m
+> build · mimo-v2.5-free
+[0m
+[0m• [0mLoad BASF scope files[90m Explore Agent[0m
+I'll start by loading the program scope and any relevant files to prepare for validation.
+[0m✓ [0mLoad BASF scope files[90m Explore Agent[0m
+[0m✱ [0mGlob "leads/**/*.md"[90m 7 matches[0m
+[0m✱ [0mGlob "leads/**/*.yml"[90m 0 matches[0m
+Let me check for any existing lead files in the workspace.
+[0m→ [0mRead leads/lead-mimo.md
+[0m→ [0mRead leads/lead-bigpickle.md
+[0m→ [0mRead leads/lead-longcat.md
+[0m→ [0mRead leads/lead-ling3.md
+[0m→ [0mRead leads/lead-laguna.md
+[0m→ [0mRead leads/lead-nemotron3.md
+Your message ends with `LEADS:` but no leads were provided. Please paste the leads you want validated against the 7-Question Gate, and I'll triage each one.
+
+===== TRIAGE 2026-09-12 22:42:01 UTC =====
+[0m
+> build · mimo-v2.5-free
+[0m
+No leads provided — the message ends with an empty `LEADS:` block. Please paste the probe results (URLs + passive findings) so I can run each through the 7-Question Gate.
+
+===== TRIAGE 2026-09-13 00:29:28 UTC =====
+[0m
+> build · mimo-v2.5-free
+[0m
+No leads were provided after "LEADS:" - the list appears empty. Please paste the probe results/leads you want me to validate against the 7-Question Gate.
+
+===== TRIAGE 2026-09-13 05:18:58 UTC =====
+[0m
+> build · mimo-v2.5-free
+[0m
+No leads were provided. The LEADS section is empty. Please share the specific leads you'd like me to triage.
+
+===== TRIAGE 2026-09-13 10:21:38 UTC =====
+[0m
+> build · mimo-v2.5-free
+[0m
+No leads provided. The LEADS section is empty — please paste the probe results to triage.
+---reports---
+total 2896
+drwxr-xr-x  2 runner runner    4096 Sep 13 12:40 .
+drwxr-xr-x 12 runner runner    4096 Sep 13 12:40 ..
+-rw-r--r--  1 runner runner 1575158 Sep 13 12:40 analyst-bigpickle.log
+-rw-r--r--  1 runner runner   14756 Sep 13 12:40 analyst-laguna.log
+-rw-r--r--  1 runner runner   14688 Sep 13 12:40 analyst-ling3.log
+-rw-r--r--  1 runner runner   14824 Sep 13 12:40 analyst-longcat.log
+-rw-r--r--  1 runner runner 1097251 Sep 13 12:40 analyst-nemotron3.log
+-rw-r--r--  1 runner runner     573 Sep 13 12:40 hypotheses-bigpickle.txt
+-rw-r--r--  1 runner runner      51 Sep 13 12:40 hypotheses-laguna.txt
+-rw-r--r--  1 runner runner      50 Sep 13 12:40 hypotheses-ling3.txt
+-rw-r--r--  1 runner runner      52 Sep 13 12:40 hypotheses-longcat.txt
+-rw-r--r--  1 runner runner   12936 Sep 13 12:40 hypotheses-nemotron3.txt
+-rw-r--r--  1 runner runner  209609 Sep 13 12:40 hypotheses.md
+-rw-r--r--  1 runner runner     586 Sep 13 12:40 valid-bugs.md
+[0m
+[0m$ [0mcat valid-bugs.md && echo "===HYP-bigpickle===" && cat reports/hypotheses-bigpickle.txt && echo "===HYP-nemotron3===" && cat reports/hypotheses-nemotron3.txt | head -50
+cat: valid-bugs.md: No such file or directory
+[0m
+[0m$ [0mcat reports/valid-bugs.md && echo "===HYP-bigpickle===" && cat reports/hypotheses-bigpickle.txt
+# Validated findings (running count 0)
+
+- 1 lead(s) marked VALID at 2026-09-06 00:12:43 UTC
+  - **VALID count: 0** — No finding currently meets the proof threshold for submission. Three leads (1, 6, 8) are on HOLD pending active validation steps.
+
+- 3 lead(s) marked VALID at 2026-09-12 09:45:34 UTC
+  - **Verdict: VALID**
+  - | Q7 | Reasonable triager accept? | **HOLD** — ROPC+plain PKCE are configuration weaknesses but exploitation requires valid credentials; depends on whether program accepts identity config findings |
+  - | repfinder stacktrace | **VALID** | 5.3 | Submit |
+===HYP-bigpickle===
+## 2026-09-13 06:48:11 UTC [target] (model bigpickle)
+class: OATH
+asset: my.basf.com/.auth + federation.basf.com/nidp/oauth/nam
+confidence: 65
+reasoning: SSR boot config discloses client_id, redirect_uri https://my.basf.com/.auth, refresh_token scope, zero PKCE; NAM discovery offers plain+S256 and ROPC/hybrid, reconfirmed unchanged 09-12
+evidence_needed: program-owned test account to exercise code+refresh reuse/revocation
+verify_steps: PASSIVE — AUTH_HELPED only; no unauth vector exists
+impact: ATO of myBASFWorld (HIGH), credential-blocked
+testability: AUTH_HELPED
+[0m
+[0m$ [0mgrep -nE "querybuilder|gql.servlet|currentuser|productServiceId=[3-9]|agsolutions" probe-results.md | head -30; echo "===tail log==="; tail -5 reports/analyst-bigpickle.log | cut -c1-200
+===tail log===
+STEP 6 — LEARNING
+- [LEARN] ACCEPTED MISCONFIG @ repfinder.basf.com/bin/basf/repfindertool: exhausted — single reachable unauth endpoint on estate, VALID 5.3 Submit; sibling and /bin/ classes closed by 404; no probe 
+
+STEP 7 — RISK
+- [RISK] basf: 28 — residual stable-to-declining; zero open research classes above closure threshold; all remaining advisory surface (repfinder MED-HIGH once DB populated, ATO design note) transmits
+[0m
+[0m$ [0mgrep -nE "querybuilder|gql|currentuser|psid 3|productServiceId=3|psid=|bin/ trio" reports/analyst-bigpickle.log | tail -30 | cut -c1-220
+grep: reports/analyst-bigpickle.log: binary file matches
+[0m
+[0m$ [0mstrings reports/analyst-bigpickle.log | grep -E "querybuilder|gql|currentuser|psid 3|productServiceId=[3-8]|bin/ trio|/bin/" | tail -20
+gap is path-prefix-specific to `/bin/basf/*` only
+- [NEW] `repfinder.basf.com/bin/basf/repfindertool?productServiceId=3..8&repType=SA%2CBR&country=DE` 
+- [NEW] `repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` 
+- [PRIO] repfinder.basf.com/bin/basf/repfindertool 
+- [PARKED] repfinder /bin/ QueryBuilder (was 45): all 3 probes 404 
+- [PARKED] repfinder psid>2 (was 45): psid 3
+[NEXT] HUMAN: freeze and submit the VALID 5.3 repfinder broken-access-control report (dispatcher misses `/bin/basf/*` 
+ repfinder surface exhaustively probed (9 reqs this cycle: /bin/ trio 404, psid 3
+- [LEARN] REJECTED MISCONFIG @ repfinder.basf.com/bin/querybuilder.json: dispatcher blocks `/bin/` except `/bin/basf/*` 
+ querybuilder.json, gql.servlet.json, currentuser.json all HTTP 404 (196B); gap is path-prefix-specific, no AEM JCR/identity servlet escapes
+- [LEARN] REJECTED MISCONFIG @ repfinder.basf.com/bin/basf/repfindertool: psid=3..8 all 200 len=80 "Unsupported Product Service ID" 
+- [LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: country=US/repType=1/`lng` variant 
+ both open research classes (sibling `/bin/basf/*` servlets, `/bin/` AEM QueryBuilder) closed this cycle with zero new surface; psid router proven binary {1,2}; sole reachable unauth endpoint remains repfindertool (VALID 5.3 Submit, empty DB limits current impact, MED-HIGH only once retail/rep data populates) 
+ KB tail is my own 09-13 01:27 cycle; repfinder surface exhausted (bare GET len-80, psid {1,2} routing, Retail NPE path, retailfindertool 404, /bin querybuilder/gql/currentuser 404), triager VALID 5.3 Submit; no new probe data; all other estates (API 9-host, SAP-KM, CMS, OAuth config, actuator, secsys) reconfirmed closed.
+- [PRIO] repfinder.basf.com/bin/basf/repfindertool, 6.0, gate_ease=10/unauth + business=7/rep-retailDB
+- [PARKED] repfinder sibling servlets + /bin/ QueryBuilder class: probed 09-12/09-13, all 404 
+- [FINAL] repfinder /bin/basf/repfindertool broken-access-control 
+- [NEXT] HUMAN: submit VALID 5.3 repfinder report (broken-access-control: dispatcher misses `/bin/basf/*` 
+- [LEARN] ACCEPTED MISCONFIG @ repfinder.basf.com/bin/basf/repfindertool: exhausted 
+ single reachable unauth endpoint on estate, VALID 5.3 Submit; sibling and /bin/ classes closed by 404; no probe justified beyond current evidence set.
+[0m
+STEP 1 — DELTA
+- [CHANGED] `federation.basf.com/nidp/oauth/nam/authorize?client_id=86cc4bf9...&response_type=code&redirect_uri=https://my.basf.com/.auth&scope=openid+profile+refresh_token&acr_values=3IAM/Login/External` → HTTP 404 (probe-results 09-13 06:51) — NAM does not expose the RFC-standard `/authorize`; dev docs point to `/nidp/oauth/nam/authz`, so this is endpoint-naming, not an absent-protection signal. No ATO path gained
+- [CHANGED] repfinder/basf probes + my.basf.com/.auth + federation discovery reconfirmed identical to 06:48 (len-80 bare, len-72 US, len-815 NPE, 205KB .auth, 14920B discovery) — zero new surface
+- NO_DELTA on all other estates: API 9-host, SAP-KM, proc portals, Magnolia, Concrete, AEM, actuator, secsys, Apigee SSO — all prior closures stand
+
+STEP 2 — PRIORITIZE
+- [PRIO] repfinder.basf.com/bin/basf/repfindertool, 6.0, gate_ease=10 + business=7 (rep/retail DB once populated) + freshness=2 — unchanged
+- [PRIO] my.basf.com/.auth (OAuth 86cc4bf9, no PKCE), 4.8, business=9 (myBASFWorld ATO) but gate_ease=1/AUTH_HELPED + freshness=1 — design-note only, credential-blocked
+- No other asset scores above 4.0; all discovery classes re-closed.
+
+STEP 3 — HYPOTHESES
+[HYP] /nidp/oauth/nam/authz exposes misconfigured per-client grant on public client 86cc4bf9 (refresh_token on public client w/o PKCE)
+class: OATH
+asset: federation.basf.com/nidp/oauth/nam/authz
+confidence: 40
+reasoning: dev docs advertise authz at /authz (not /authorize, which 404s); NAM discovery still lists plain+S256 PKCE + password/hybrid grants (reconfirmed 14920B); public client w/ refresh_token scope is long-lived-bearer-if-intercepted; but every angle remains credential/account-dependent and provider config has been stable since 09-05
+evidence_needed: program-owned test account; prove refresh-token reuse/revocation on the public client flow
+verify_steps: PASSIVE — AUTH_HELPED only; no unauth probe changes the credential-dependency
+impact: ATO of myBASFWorld (HIGH) — only reachable with a program test account, no unauth path
+testability: AUTH_HELPED
+
+STEP 4 — SELF-CRITIQUE
+- [PARKED] psid enum >2 wider router (was 45): psid 3–8 all len-80 "Unsupported Product Service ID" — router proven binary {1,2}; closed by direct probe
+- [PARKED] /bin/ QueryBuilder/currentuser sibling servlets (was 45): querybuilder.json + gql.servlet.json + currentuser.json all 404/196B — dispatcher gap is path-prefix-specific to /bin/basf/* only; closed by direct probe
+- [PARKED] OAuth /authorize 404: 404 on /authorize is the expected NAM naming quirk; adds nothing above the existing 65-conf ATO design note
+- [FINAL] repfinder /bin/basf/repfindertool broken-access-control — already VALID 5.3 (Submit), triaged 09-12 09:45; sole surviving finding on estate
+
+STEP 5 — NEXT ACTION
+[NEXT] HUMAN: submit the frozen VALID 5.3 report via bugs.olivermaicher.eu — broken-access-control: dispatcher misses `/bin/basf/*` → unauth AEM servlet proxies to AWS Lambda, JSON at all coords/psid (empty DB), param-driven DualService routing (RepFinder/Retail) with Java NPE internals on psid=2 error path; frame as broken-access-control only, NOT stacktrace (excluded class). Reports/evidence already complete; no further probes warranted on any asset.
+
+STEP 6 — LEARNING
+- [LEARN] REJECTED MISCONFIG @ federation.basf.com/nidp/oauth/nam/authorize: HTTP 404 (was "authorize live 302") — NAM exposes `/authz` not `/authorize`; endpoint naming quirk, no authz surface gained
+- [LEARN] REJECTED MISCONFIG @ repfinder.basf.com/bin/querybuilder.json + gql.servlet.json + currentuser.json: all HTTP 404/196B — dispatcher allow-list is `/bin/basf/*`-prefix-specific; no standard AEM Sling /bin servlets escape it
+- [LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: re-probed 09-13 06:51, stable (bare len-80, US len-72, BR/psid=2 len-815 NPE) — VALID 5.3 evidence set frozen, submit-only
+
+STEP 7 — RISK
+[RISK] basf: 25 — estate fully converged to submit-only: sole live unauth finding is repfindertool (VALID 5.3, MED-HIGH only once retail/rep data populates; empty-DB today); all twelve discovery classes statistically closed by direct probes; ATO design note (no-PKCE public client) remains a credential-blocked reportable; residual stable-to-declining, no escalation, no further investment justified above report submission.

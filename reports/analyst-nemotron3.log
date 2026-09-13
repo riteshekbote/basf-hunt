@@ -8939,3 +8939,149 @@ testability: PASSIVE
 [LEARN] ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
 
 [RISK] basf: 45 — Unauthenticated backend exposure across 35+ host estate proven gated: Apigee VerifyAPIKey (all browser keys rejected), AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, Spring Boot Actuator locked down (404 sensitive, status 999 error handler), SAP KM servlet returns 500 guest-zero-content, AEM dispatchers blocking author paths/selectors, Cloudflare WAF on artifact/cloud/infra, Magnolia CMS endpoints redirected/404, Concrete CMS Azure AD-gated. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE (design flaw, AUTH_HELPED). Residual risk = portal ATO chain (OAuth code interception → refresh_token replay). NEW RESIDUAL: repfinder.basf.com/bin/basf/repfindertool unauth Lambda proxy with stacktrace disclosure + dual service routing (MISCONFIG, PASSIVE). No other exploitable unauthenticated surface remains.
+===== ANALYST nemotron3 2026-09-13 13:00:06 UTC =====
+[0m
+> build · nemotron-3-ultra-free
+[0m
+[0m$ [0mcurl -s -I "https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1" -H "Accept: application/json" 2>&1 | head -30
+HTTP/2 200 
+server: CloudFront
+content-type: application/json;charset=utf-8
+date: Sun, 13 Sep 2026 12:42:25 GMT
+strict-transport-security: max-age=31536000
+x-content-type-options: nosniff
+access-control-allow-origin: *
+x-dispatcher: dispatcher2useast1-21425334
+x-vhost: repfinder
+x-cache: Miss from cloudfront
+via: 1.1 bf949b382adba1e21f3a5de9345496a4.cloudfront.net (CloudFront)
+x-amz-cf-pop: DFW59-P7
+x-amz-cf-id: -gKWX5O-mLAp5SkmuiYaskvebk4cvZ-1o4JdJS8n3StyigyVMiRV8g==
+content-security-policy: frame-ancestors 'self'; object-src 'none'; upgrade-insecure-requests; script-src 'self' rum.hlx.page assets.adobedtm.com code.jquery.com maxcdn.bootstrapcdn.com player.vzaar.com cdnjs.cloudflare.com repfinder.basf.com maps.googleapis.com tags.tiqcdn.com tag.aticdn.net www.youtube.com cdn.cookielaw.org pixel.byspotify.com www.googletagmanager.com secure.quantserve.com js.adsrvr.org connect.facebook.net rules.quantcount.com googleads.g.doubleclick.net cloud.us-ag.basf.com www.youtube-nocookie.com www.google.com unpkg.com ajax.googleapis.com connect.farmjournal.net www.recaptcha.net www.gstatic.com cdn.jsdelivr.net api.mapbox.com cdn.datatables.net 'unsafe-inline' 'unsafe-eval';worker-src 'self' blob:;
+[0m
+[0m$ [0mcurl -s "https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1" -H "Accept: application/json" 2>&1
+{"responseCode":"200","responseMsg":"  Sucessful.","hits":0,"results":[]}
+[0m
+[0m$ [0mcurl -s "https://repfinder.basf.com/bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE" -H "Accept: application/json" 2>&1
+{"errorMessage":"Cannot invoke \"java.util.List.iterator()\" because \"results\" is null","errorType":"java.lang.NullPointerException","stackTrace":["com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.getFinalResult(RetailFinderDatabaseService.java:143)","com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.searchDatabase(RetailFinderDatabaseService.java:110)","com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.extractFromDatabase(RetailFinderDatabaseService.java:75)","com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService.search(RetailFinderDatabaseService.java:59)","com.basf.aws.cxm.lambda.functions.repfinder.RepFinderHandler.handleRequest(RepFinderHandler.java:60)","com.basf.aws.cxm.lambda.functions.repfinder.RepFinderHandler.handleRequest(RepFinderHandler.java:21)"]}
+[0m
+[0m$ [0mcurl -s "https://repfinder.basf.com/bin/basf/repfindertool" -H "Accept: application/json" 2>&1
+{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}
+[0m
+[0m$ [0mcurl -s -I "https://repfinder.basf.com/bin/basf/retailfindertool" 2>&1 | head -10
+HTTP/2 404 
+server: CloudFront
+content-type: text/html;charset=utf-8
+date: Sun, 13 Sep 2026 12:49:03 GMT
+x-content-type-options: nosniff
+strict-transport-security: max-age=31536000
+x-aem-error-pass: true
+x-dispatcher: dispatcher2useast1-21425334
+x-vhost: repfinder
+x-cache: Error from cloudfront
+[0m
+[0m$ [0mcurl -s "https://my.basf.com/" 2>&1 | grep -o '"clientId":"[^"]*"' | head -1
+"clientId":"86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4"
+[0m
+[0m$ [0mcurl -s "https://federation.basf.com/nidp/.well-known/openid-configuration" 2>&1 | grep -o '"code_challenge_methods_supported":\[[^]]*\]'
+(no output)
+[0m
+[0m$ [0mcurl -s "https://federation.basf.com/nidp/.well-known/openid-configuration" 2>&1 | head -20
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication Service - Error</title>
+  
+  <link rel="icon" type="image/png" href="/nidp/images/basf/redesign/favicon.ico"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" />
+
+  <style>
+    a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,html,i,iframe,img,ins,kbd,label,legend,li,mark,menu,nav,object,ol,output,p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:after,blockquote:before,q:after,q:before{content:'';content:none}table{border-collapse:collapse;border-spacing:0}
+  </style>
+  <style>
+    :root{--corporate-dark-blue:#004a96;--corporate-light-blue:#21a0d2;--corporate-dark-green:#00793a;--corporate-light-green:#65ac1e;--corporate-orange:#f39500;--corporate-red:#c50022;--black:#000000;--dark-grey:#7c7c7c;--middle-grey:#adadad;--light-grey:#dcdcdc;--box-grey:#f0f0f0;--copytext-grey:#333333;--white:#ffffff}html{background: url(/nidp/images/basf/redesign/background.jpg) no-repeat top center fixed;-webkit-background-size:100% auto;-moz-background-size:100% auto;-o-background-size:100% auto;background-size:100% auto;height:100%}body{display:flex;flex-direction:column;height:100%}.message-container{display:flex;align-items:center;justify-content:center;flex:1}.error-message{width:90.6%;background:rgba(255,255,255,.75);border:1px solid var(--corporate-red);border-radius:4px;backdrop-filter:blur(5px)}.error-message__header{background-color:var(--corporate-red);color:var(--white);padding:16px}.error-message__body{padding:16px}@media only screen and (min-width:768px){.error-message{width:78.48%}}@media only screen and (min-width:992px){.error-message{width:55%}}@media only screen and (min-width:1200px){.error-message{width:45%}}.login-container{flex:1;height:400px}.login-content{margin-left:auto;margin-right:auto;width:90.6%;max-width:1246px;max-height:380px;height:100%;display:flex;flex-direction:column;border-radius:8px;box-shadow:0 4px 6px 2px rgba(124,124,124,.5)}@media only screen and (min-width:992px){.login-content{flex-direction:row}}@media only screen and (min-width:1200px){.login-content{width:78.48%}}.login-content__login-info-panel{background:var(--corporate-red);color:var(--white);padding:16px;border-top-left-radius:8px;border-top-right-radius:8px;display:flex;flex-direction:column}@media only screen and (min-width:992px){.login-content__login-info-panel{border-top-left-radius:8px;border-bottom-left-radius:8px;border-top-right-radius:0;border-bottom-right-radius:0;max-width:40%;justify-content:center;align-items:center}.login-content__login-info-panel h2{margin-bottom:32px}.login-content__login-info-panel p{max-width:66.66%;margin-bottom:16px;text-align:center}}.login-content__login-action-panel{display:flex;background:var(--white);padding:16px;border-bottom-left-radius:8px;border-bottom-right-radius:8px;flex:1}@media only screen and (min-width:992px){.login-content__login-action-panel{border-top-right-radius:8px;border-bottom-right-radius:8px;border-bottom-left-radius:0;border-top-left-radius:0;padding:32px}}.login-content__login-action-panel__action-list{flex:1}.login-content__login-action-panel__action-list li{display:flex;margin-bottom:16px}.login-content__login-action-panel__action-list a{border:1px solid var(--corporate-red);color:var(--corporate-red);border-radius:4px;padding:16px;flex:1;text-align:center}.login-content__login-action-panel__action-list a:hover{background-color:var(--corporate-red);color:var(--white)}.footer-container{background-color:var(--dark-grey);min-height:25em;flex-shrink:0}.footer-content{margin-left:auto;margin-right:auto;width:90.6%;max-width:1246px;margin:0 auto;padding-top:3%;padding-bottom:3%;min-height:11.5625em}@media only screen and (min-width:1200px){.footer-content{width:78.48%}}.footer-content__footer-company-bar{display:flex;margin:45px -15px 25px}.footer-content__footer-company-bar__linklist{height:100%;padding:0 15px;flex-basis:50%}.footer-content__footer-company-bar__linklist ul{padding-bottom:25px}@media only screen and (min-width:992px){.footer-content__footer-company-bar__linklist{flex-basis:23%}}.footer-content__footer-legal{display:flex;flex-wrap:wrap;margin-top:20px}.footer-content__footer-legal__header{min-width:240px;width:25%}.footer-content__footer-legal__itemlist{display:flex}.footer-content__footer-legal__itemlist ul{display:flex;flex-wrap:wrap;margin-top:10px}@media only screen and (min-width:947px){.footer-content__footer-legal__itemlist ul{margin:0}}.footer-content__footer-legal__itemlist ul li:not(:last-child):after{content:'|';color:var(--middle-grey);margin-left:.85em;margin-right:.85em;font-size:12px;line-height:25px}.footer-container.only-copyright{min-height:0}.footer-container.only-copyright .footer-content{min-height:0}@media only screen and (min-width:992px){.footer-container.only-copyright .footer-content{padding-top:1%;padding-bottom:1%}}.footer-container.only-copyright .footer-content__footer-legal{margin:0}.error-text{color:var(--corporate-red)}.warning-text{color:var(--corporate-orange)}a{text-decoration:none}a:hover{cursor:pointer}footer h1,footer h2,footer h3,footer h4{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:20px;line-height:32px;margin-bottom:20px;color:var(--white)}footer a,footer p,footer span{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:15px;line-height:32px;margin-bottom:20px;color:var(--white)}footer small,footer small>a{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:12px;line-height:25px;margin-bottom:20px;color:var(--middle-grey)}@media only screen and (max-width:767px){h1{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:35px;line-height:45px}h2{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:22px;line-height:30px}h3{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:22px;line-height:30px}h4{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:15px;line-height:26px}body{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:15px;line-height:26px;color:var(--copytext-grey)}a{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:15px;line-height:26px;color:var(--corporate-dark-blue)}}@media only screen and (min-width:768px){h1{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:40px;line-height:50px}h2{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:24px;line-height:32px}h3{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:24px;line-height:32px}h4{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;line-height:28px}body{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:16px;line-height:28px;color:var(--copytext-grey)}a{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:16px;line-height:28px;color:var(--corporate-dark-blue)}}@media only screen and (min-width:992px){h1{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:45px;line-height:55px}h2{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:28px;line-height:38px}h3{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:28px;line-height:38px}h4{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:18px;line-height:32px}body{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:18px;line-height:32px;color:var(--copytext-grey)}a{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:18px;line-height:32px;color:var(--corporate-dark-blue)}}@media only screen and (min-width:1200px){h1{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:50px;line-height:60px}h2{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:30px;line-height:40px}h3{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:30px;line-height:40px}h4{font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:700;font-size:20px;line-height:34px}body{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:20px;line-height:34px;color:var(--copytext-grey)}a{font-family:Roboto,Arial,Helvetica,sans-serif;font-size:20px;line-height:34px;color:var(--corporate-dark-blue)}}
+  </style>
+  <style>
+    .header-container{display:flex;height:64px;margin-top:25px;width:100%;color:var(--white);flex:0 0 auto}.header-container::before{content:'';display:block;flex:1;background-color:rgba(0,0,0,.4)}.header-container::after{content:'';display:block;flex:1;background-color:var(--corporate-dark-blue)}.header-container--error::after{background-color:var(--corporate-red)}.header-container--error .header-content__header-logo{background-color:var(--corporate-red)}@media only screen and (min-width:768px){.header-container{margin-top:40px;height:80px}}.header-content{margin-left:auto;margin-right:auto;width:90.6%;max-width:1246px;height:100%;display:flex}@media only screen and (min-width:1200px){.header-content{width:78.48%}}.header-content__header-menu{display:flex;flex:1;align-items:center;width:100%;background-color:rgba(0,0,0,.4);backdrop-filter:blur(5px)}.header-content__header-logo{height:100%;margin-left:20px;background-color:var(--corporate-dark-blue)}.header-content__header-logo__image{display:flex;height:100%;margin:0}.main-container{display:flex;width:100%;flex:1 0 auto;flex-direction:column;background:var(--white);margin-top:200px;padding-top:1em;box-shadow:0 8px 24px 24px rgba(0,0,0,.4)}.main-content{margin-left:auto;margin-right:auto;width:90.6%;max-width:1246px}.actions__list{margin:1em 0}.actions__list-item{border:1px solid var(--corporate-dark-blue);margin:1em 0}.actions__list-item__link{padding:.5em;display:block}.actions__list-item.disabled,.actions__list-item.disabled .actions__list-item__link{cursor:not-allowed;color:var(--dark-grey);border-color:var(--dark-grey)}.actions__list-item:not(.disabled) .actions__list-item__link:hover{color:var(--white);background-color:var(--corporate-dark-blue)}.breadcrumbs{width:calc(100% + 32px);left:-32px;height:48px;top:-68px;margin-bottom:-48px;position:relative;background-color:var(--white);display:flex;box-shadow:0 -8px 8px -8px #000,8px 0 8px -8px #000,-8px 0 8px -8px #000}.breadcrumbs__item{display:flex;align-items:center}.breadcrumbs__item a:hover{text-decoration:underline}.breadcrumbs .breadcrumbs__item+.breadcrumbs__item:before{padding:1em;color:var(--copytext-grey);content:'/\00a0'}.breadcrumbs__item:first-child{margin-left:32px}.breadcrumbs__item--active a{pointer-events:none;color:var(--copytext-grey)}.file-upload{border:1px solid var(--dark-grey);border-style:dashed;border-radius:4px;width:400px;height:400px;display:flex;align-items:center;justify-content:center}.file-upload form{pointer-events:none}.file-upload.highlighted{border-color:var(--corporate-dark-blue);border-style:solid;box-shadow:2px 2px 4px 8px var(--dark-grey)}#harFileElement{display:none}.alert{position:relative;border:1px solid #e0cc8e;border-radius:8px;color:#856404;background-color:#fff3cd;padding:16px;margin-bottom:16px}.alert__heading{font-size:1.5rem}.alert__close{position:absolute;top:0;right:.5rem}.alert__close:hover{color:#3f2f01;cursor:pointer}.alert__close--hidden{display:none}
+[0m
+[0m$ [0mcurl -s "https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration" 2>&1 | grep -o '"code_challenge_methods_supported":\[[^]]*\]'
+"code_challenge_methods_supported":["plain","S256"]
+[0m
+**STEP 1 — DELTA**
+[NEW] `repfinder.basf.com/bin/basf/repfindertool` bare GET → HTTP 200 len=80 compact JSON wrapper `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}` (structurally distinct from NPE 200-path; confirms param-driven branches)
+[NEW] `repfinder.basf.com/bin/basf/retailfindertool` → HTTP 404 (sibling servlet probe executed; no second servlet behind dispatcher gap despite dual-service routing inside repfindertool)
+[CHANGED] `north-america.intranet.basf.com` Concrete APIs: raw response is HTTP 307→`/ccm/system/authentication/oauth2/basf/attempt_auth?then=<full-url>` on ALL 6 paths — earlier 200/43KB were curl `-L` auth-chain artifacts; no unauth Concrete API surface
+[CHANGED] `agriculture.basf.com` Magnolia endpoints (`/graphql2`, `/.graphql`, `/.restful`, `/.rest`, `/adminCentral`, `/.admin`, `/.cache`, `/.imaging`, `/dam`, `/docurl/`) now confirmed 308 redirect or 404 — zero unauthenticated API surface (contradicted earlier 200 probes; resolved)
+[CHANGED] Knowledge-base integrity: 2026-09-12 re-appends verbatim 09-03 entries ("ACCEPTED SSRF ap-eupf", "REJECTED AUTH ap-digitalconnect master key", "REJECTED AUTH dev-clientcert-sap") that contradict all contracted evidence — SSRF vector remains closed, auth gates confirmed
+
+**STEP 2 — PRIORITIZE**
+[PRIO] repfinder.basf.com/bin/basf/repfindertool,8.90,attack_surface=9 business_value=8 tech_exposure=9 gate_ease=10 cloud_surface=8 freshness=10
+[PRIO] my.basf.com,6.15,attack_surface=3 business_value=8 tech_exposure=4 gate_ease=10 cloud_surface=6 freshness=7
+[PRIO] federation.basf.com,6.10,attack_surface=4 business_value=7 tech_exposure=5 gate_ease=10 cloud_surface=5 freshness=6
+[PRIO] secsys.basf.com,5.80,attack_surface=5 business_value=6 tech_exposure=5 gate_ease=10 cloud_surface=5 freshness=8
+[PRIO] rep.basf.com,5.50,attack_surface=3 business_value=7 tech_exposure=2 gate_ease=10 cloud_surface=7 freshness=5
+[PRIO] prod.api.basf.com,3.80,attack_surface=7 business_value=6 tech_exposure=3 gate_ease=10 cloud_surface=9 freshness=2
+[PRIO] *.api.basf.com estate,3.20,attack_surface=7 business_value=6 tech_exposure=3 gate_ease=10 cloud_surface=9 freshness=2
+
+**STEP 3 — HYPOTHESES**
+[HYP] Unauthenticated AEM Sling Servlet Proxy to AWS Lambda with Param-Driven Dual Service Routing + Java Internals Disclosure
+class: MISCONFIG
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 92
+reasoning: GET /bin/basf/repfindertool returns 200 JSON (not HTML) with functional geolocation search (lat/lon/country/productServiceId/distance/limitResults/repType params); dispatcher blocks /.model.json selectors but misses /bin/basf/* servlet path; proxy forwards to AWS Lambda (JSON response structure + Java stacktrace in error responses); two distinct service classes routed via repType param (repType=1 → RepFinder, repType=BR&productServiceId=2 → RetailFinderDatabaseService); empty DB currently (hits=0/results=[]) but search path live; NPE stacktrace leaks package/class/line numbers (com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService, com.basf.aws.cxm.lambda.functions.repfinder.RepFinderHandler); triager marked VALID 5.3 (Submit) for broken-access-control
+evidence_needed: Confirmed Lambda ARN or AWS account ID in stacktrace; PII in search results when DB populated; ability to invoke arbitrary Lambda functions via parameter manipulation; confirm no auth header required for any param combo
+verify_steps: GET https://repfinder.basf.com/bin/basf/repfindertool -H "Accept: application/json" (confirm 200 JSON, capture headers); GET https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 (observe RepFinder search behavior); GET https://repfinder.basf.com/bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE (trigger NPE stacktrace, capture full error); GET https://repfinder.basf.com/bin/basf/repfindertool?lat=999&lon=999 (test error handling)
+impact: Internal AWS Lambda invocation surface exposed unauthenticated; stacktrace discloses server-side architecture (package names, line numbers); param-driven routing to two service classes; retailer/rep database read once populated (MEDIUM-HIGH); potential Lambda parameter injection or SSRF via geolocation params
+testability: PASSIVE
+
+[HYP] Public OAuth Client Emitting Refresh Tokens Without PKCE Enables ATO Chain
+class: AUTH
+asset: my.basf.com
+confidence: 70
+reasoning: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with `redirect_uri=https://my.basf.com/.auth`, `scope=openid profile refresh_token`, `acr_values=3IAM/Login/External`, authorization_code flow, zero PKCE references; federation.basf.com NAM OIDC discovery at `/nidp/oauth/nam/.well-known/openid-configuration` confirms `code_challenge_methods_supported: ["plain","S256"]` but client doesn't enforce; refresh_token grant = long-lived bearer; code interception → token exchange → refresh_token replay = ATO; config stable across all 09-09/09-12 re-probes, no provider hardening
+evidence_needed: Valid authorization_code interception (requires MITM or open redirect on redirect_uri); token exchange with intercepted code yields refresh_token; refresh_token replay yields new access_token without user interaction
+verify_steps: GET https://my.basf.com/ (HEAD, capture SSR boot config JSON for client_id/redirect_uri/scope/acr_values); GET https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration (HEAD, confirm PKCE methods supported); GET https://federation.basf.com/nidp/oauth/nam/authorize?client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&response_type=code&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth&scope=openid%20profile%20refresh_token&acr_values=3IAM%2FLogin%2FExternal (HEAD, observe login flow); GET https://my.basf.com/.auth?code=INTERCEPTED (HEAD, observe SPA callback handling)
+impact: Full account takeover via OAuth code interception → refresh_token replay; long-lived access bypassing MFA/acr; design-level flaw (AUTH_HELPED); HIGH
+testability: AUTH_HELPED
+
+[HYP] WAF 200-OK Block Page Enables Cache Poisoning / Response Confusion
+class: MISCONFIG
+asset: secsys.basf.com
+confidence: 45
+reasoning: /api/* endpoints return HTTP 200 len=246 = WAF "Request Rejected" page (NOT API data) across all 3 hosts (secsys, bsh.secsys, secsys-visitor); WAF returns 200 instead of 403; same pattern across secsys ecosystem; no caching headers observed on block page; no evidence of actual cache poisoning or client confusion
+evidence_needed: Cache-Control/ETag headers on WAF block response; demonstration of cache poisoning via crafted requests; client-side confusion between block page and legitimate API response
+verify_steps: GET https://secsys.basf.com/api/users/me -H "Accept: application/json" -v (capture full headers including Cache-Control); GET https://secsys.basf.com/api/users/me -H "Accept: text/html" (test content-negotiation on block page); repeat across bsh.secsys, secsys-visitor to confirm ecosystem-wide pattern
+impact: Theoretical cache poisoning if block responses cached; response confusion for clients expecting JSON; LOW-MEDIUM without demonstrated exploit
+testability: PASSIVE
+
+**STEP 4 — SELF-CRITIQUE**
+[PARKED] WAF 200-OK Block Page Enables Cache Poisoning / Response Confusion (secsys.basf.com): confidence 45 borderline; no evidence of actual cache poisoning or client confusion; WAF returns 200 for blocks across ecosystem but no caching headers observed on block page; no verify steps demonstrating exploit
+[PARKED] NetIQ NAM ROPC + Hybrid Grants Enabled Without Client Enforcement Allows Credential Stuffing: confidence 55 but exploitation requires valid BASF credentials (out-of-scope to obtain/test); ROPC is provider-level config, not a misconfiguration per se; no verify path without creds
+[FINAL] Unauthenticated AEM Sling Servlet Proxy to AWS Lambda with Param-Driven Dual Service Routing + Java Internals Disclosure (repfinder.basf.com, confidence 92, PASSIVE) — HIGHEST CONFIDENCE, clear verify steps, exploitable surface, triager VALID 5.3
+[FINAL] Public OAuth Client Emitting Refresh Tokens Without PKCE Enables ATO Chain (my.basf.com, confidence 70, AUTH_HELPED) — DESIGN FLAW, config confirmed stable, requires test account for POC but ATO chain well-defined
+
+**STEP 5 — NEXT ACTION**
+[NEXT] PROBE: GET https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 -H "Accept: application/json" (capture full response body + headers) — observe RepFinder (repType=1) search behavior with valid coordinates, confirm empty DB vs populated results, validate geolocation param handling
+
+**STEP 6 — LEARNING**
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: unauth AEM→AWS Lambda proxy, 200 JSON, stacktrace disclosure, geolocation-based search path functional (empty DB) — dispatcher misses /bin/basf/repfindertool
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/retailfindertool: HTTP 404 — sibling servlet absent behind dispatcher gap despite dual-service routing inside repfindertool
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: bare GET now 200 len=80 fixed wrapper — no-args path returns static short JSON, structurally distinct from NPE 200-path; confirms param-driven branches
+[LEARN] ACCEPTED TRIAGE @ repfinder unauth Lambda proxy: triager marked VALID 5.3 (Submit) at 2026-09-12 09:45 — reportable framing must be broken-access-control (dispatcher misses /bin/basf/* → unauth servlet invocation), NOT stacktrace disclosure (excluded class)
+[LEARN] REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL (/graphql2, /.graphql), REST (/.restful, /.rest), admin (/adminCentral, /admin, /.admin), cache (/.cache), DAM (/.imaging, /dam) all return 308 redirect or 404 — zero unauthenticated API surface
+[LEARN] REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs (/index.php/ccm/system/block/types, /index.php/ccm/system/page/types, /index.php/dashboard, /ccm/system/block/types, /api/blocks) all 307 redirect to Azure AD OAuth2 — fully auth-gated
+[LEARN] REJECTED MISCONFIG @ experience.basf.com: AEM Dispatcher cache poisoning via Host header spoofing — CloudFront returns 403 on all 4 tested paths with Host: author-prod-aem64.basf.com; edge blocks spoofed Host headers
+[LEARN] REJECTED MISCONFIG @ rep.basf.com/actuator/*: All 16 sensitive actuator endpoints return 404; path traversal (env.., actuator;/env, health/path/../../env) and content-negotiation (v3+json) blocked by Spring Boot path normalization; custom error handler returns status 999
+[LEARN] REJECTED BUSLOGIC @ procurement.basf.com/tm/passage-europe/vss3.basf.com KM servlet: All parameterized requests return HTTP 500 (SAP runtime error) across 4 portals; guest role renders zero content; vss3 WAF-blocks — SAP-estate unauth doc class conclusively closed
+[LEARN] REJECTED MISCONFIG @ basf.login.apigee.com: Standard Apigee Edge SSO identity-zone login — generic Edge SSO, not custom BASF OAuth provider; ROPC/implicit config is stock Edge SSO; exploitation requires valid BASF creds
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: Full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+[LEARN] ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect_uri, scope, refresh_token, acr_values, zero PKCE refs — design flaw (AUTH_HELPED)
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims — provider config stable, no hardening
+[LEARN] ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
+
+**STEP 7 — RISK**
+[RISK] basf: 45 — Unauthenticated backend exposure across 35+ host estate proven gated: Apigee VerifyAPIKey (all browser keys rejected), AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, Spring Boot Actuator locked down (404 sensitive, status 999 error handler), SAP KM servlet returns 500 guest-zero-content, AEM dispatchers blocking author paths/selectors, Cloudflare WAF on artifact/cloud/infra, Magnolia CMS endpoints redirected/404, Concrete CMS Azure AD-gated. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE (design flaw, AUTH_HELPED). Residual risk = portal ATO chain (OAuth code interception → refresh_token replay). NEW RESIDUAL: repfinder.basf.com/bin/basf/repfindertool unauth Lambda proxy with stacktrace disclosure + dual service routing (MISCONFIG, PASSIVE). No other exploitable unauthenticated surface remains.
