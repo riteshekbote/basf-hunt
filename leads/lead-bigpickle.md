@@ -2784,3 +2784,12 @@ impact: ATO of myBASFWorld (HIGH); blocked on test account; reportable as design
 testability: AUTH_HELPED
 [NEXT] HUMAN: freeze and submit the VALID 5.3 repfinder broken-access-control report (dispatcher misses `/bin/basf/*` → unauth servlet→Lambda proxy, psid 1/2 routing, empty DB, no stacktrace framing) — repfinder surface exhaustively probed (9 reqs this cycle: /bin/ trio 404, psid 3–8, US success path); no further probes warranted
 [RISK] basf: 30 — both open research classes (sibling `/bin/basf/*` servlets, `/bin/` AEM QueryBuilder) closed this cycle with zero new surface; psid router proven binary {1,2}; sole reachable unauth endpoint remains repfindertool (VALID 5.3 Submit, empty DB limits current impact, MED-HIGH only once retail/rep data populates) — every other estate (API 9-host, SAP-KM, CMS, OAuth config, actuator) reconfirmed closed; ATO stays credential-blocked design note. Residual stable-to-declining toward submit-only.
+## 2026-09-13 06:48:11 UTC [target] (model bigpickle)
+class: OATH
+asset: my.basf.com/.auth + federation.basf.com/nidp/oauth/nam
+confidence: 65
+reasoning: SSR boot config discloses client_id, redirect_uri https://my.basf.com/.auth, refresh_token scope, zero PKCE; NAM discovery offers plain+S256 and ROPC/hybrid, reconfirmed unchanged 09-12
+evidence_needed: program-owned test account to exercise code+refresh reuse/revocation
+verify_steps: PASSIVE — AUTH_HELPED only; no unauth vector exists
+impact: ATO of myBASFWorld (HIGH), credential-blocked
+testability: AUTH_HELPED

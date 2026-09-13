@@ -17817,3 +17817,39 @@ STEP 6 — LEARNING
 
 STEP 7 — RISK
 [RISK] basf: 30 — both open research classes (sibling `/bin/basf/*` servlets, `/bin/` AEM QueryBuilder) closed this cycle with zero new surface; psid router proven binary {1,2}; sole reachable unauth endpoint remains repfindertool (VALID 5.3 Submit, empty DB limits current impact, MED-HIGH only once retail/rep data populates) — every other estate (API 9-host, SAP-KM, CMS, OAuth config, actuator) reconfirmed closed; ATO stays credential-blocked design note. Residual stable-to-declining toward submit-only.
+===== ANALYST bigpickle 2026-09-13 06:50:47 UTC =====
+[0m
+> build · big-pickle
+[0m
+STEP 1 — DELTA
+- NO_DELTA — KB tail is my own 09-13 01:27 cycle; repfinder surface exhausted (bare GET len-80, psid {1,2} routing, Retail NPE path, retailfindertool 404, /bin querybuilder/gql/currentuser 404), triager VALID 5.3 Submit; no new probe data; all other estates (API 9-host, SAP-KM, CMS, OAuth config, actuator, secsys) reconfirmed closed.
+
+STEP 2 — PRIORITIZE
+- [PRIO] repfinder.basf.com/bin/basf/repfindertool, 6.0, gate_ease=10/unauth + business=7/rep-retailDB
+- [PRIO] my.basf.com/.auth + federation.basf.com, 5.0, tech_exposure=9/OAuth but gate_ease=1 (AUTH_HELPED)
+
+STEP 3 — HYPOTHESES
+- [HYP] Public OAuth client 86cc4bf9 no-PKCE refresh_token → ATO of myBASFWorld (standing, unchanged 6+ cycles; only reportable frame is design-note)
+class: OATH
+asset: my.basf.com/.auth + federation.basf.com/nidp/oauth/nam
+confidence: 65
+reasoning: SSR boot config discloses client_id, redirect_uri https://my.basf.com/.auth, refresh_token scope, zero PKCE; NAM discovery offers plain+S256 and ROPC/hybrid, reconfirmed unchanged 09-12
+evidence_needed: program-owned test account to exercise code+refresh reuse/revocation
+verify_steps: PASSIVE — AUTH_HELPED only; no unauth vector exists
+impact: ATO of myBASFWorld (HIGH), credential-blocked
+testability: AUTH_HELPED
+
+STEP 4 — SELF-CRITIQUE
+- [PARKED] my.basf.com no-PKCE refresh_token ATO: credential-blocked AUTH_HELPED, reportable only as design note, no new vector in 6 cycles.
+- [PARKED] ap-eupf SSRF / ap-digitalconnect keys / dev-clientcert-sap mTLS: day-1 rejections, recycled-KB texts contradict evidence — permanently closed.
+- [PARKED] repfinder sibling servlets + /bin/ QueryBuilder class: probed 09-12/09-13, all 404 — namespace closed.
+- [FINAL] repfinder /bin/basf/repfindertool broken-access-control — VALID 5.3 Submit, evidence complete, sole reachable unauth surface.
+
+STEP 5 — NEXT ACTION
+- [NEXT] HUMAN: submit VALID 5.3 repfinder report (broken-access-control: dispatcher misses `/bin/basf/*` → unauth servlet→Lambda proxy, psid 1/2 dual routing incl. RetailFinderDatabaseService NPE, empty DB → MED-HIGH once retail data populates); attach bare-GET len-80, psid=1 empty-results, psid=2+repType=BR NPE, retailfindertool-404 evidence; annex identity design notes (86cc4bf9 no-PKCE refresh_token; NAM ROPC/plain-PKCE).
+
+STEP 6 — LEARNING
+- [LEARN] ACCEPTED MISCONFIG @ repfinder.basf.com/bin/basf/repfindertool: exhausted — single reachable unauth endpoint on estate, VALID 5.3 Submit; sibling and /bin/ classes closed by 404; no probe justified beyond current evidence set.
+
+STEP 7 — RISK
+- [RISK] basf: 28 — residual stable-to-declining; zero open research classes above closure threshold; all remaining advisory surface (repfinder MED-HIGH once DB populated, ATO design note) transmits only via report submission, which is the sole remaining action.
