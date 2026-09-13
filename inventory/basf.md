@@ -526,3 +526,7 @@ www.basf.com
 - CHANGED `north-america.intranet.basf.com` Concrete APIs: raw response is HTTP 307→`/ccm/system/authentication/oauth2/basf/attempt_auth?then=<full-url>` on ALL 6 paths — earlier 200/43KB were curl `-L` auth-ch
 - CHANGED `agriculture.basf.com` Magnolia endpoints (`/graphql2`, `/.graphql`, `/.restful`, `/.rest`, `/adminCentral`, `/.admin`, `/.cache`, `/.imaging`, `/dam`, `/docurl/`) now confirmed 308 redirect or 404 — 
 - CHANGED Knowledge-base integrity: 2026-09-12 re-appends verbatim 09-03 entries ("ACCEPTED SSRF ap-eupf", "REJECTED AUTH ap-digitalconnect master key", "REJECTED AUTH dev-clientcert-sap") that contradict all c
+
+## 2026-09-13 17:07:31 UTC
+- CHANGED `repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` → HTTP 200 JSON `{"responseCode":"200","responseMsg":" Sucessf
+- CHANGED `repfinder.basf.com/bin/basf/repfindertool` bare GET → HTTP 200 len=80 `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}` (confirmed param-driven branches)
