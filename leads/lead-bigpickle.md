@@ -2863,3 +2863,12 @@ testability: PASSIVE
 [NEXT] HUMAN: Submit the frozen VALID 5.3 report at bugs.olivermaicher.eu — broken-access-control: dispatcher misses `/bin/basf/*` → unauth AEM Sling servlet proxies to AWS Lambda; attach 09-13 evidence (bare GET HTTP 200/80B `Unsupported Product Service ID` wrapper; US coords + productServiceId=1 200 successful JSON, hits=0; psid=2 NPE path); frame as broken-access-control only, NOT stacktrace (excluded class); include OAuth no-PKCE public client (86cc4bf9) as separate AUTH_HELPED design note. No further probes on any asset.
 [LEARN] REJECTED OTHER @ *.basf.com estate remainder: no new unauth surface anywhere 09-13; all twelve discovery classes statistically closed by direct probes; re-probing or new hypotheses on closed assets is non-productive — converged to submission-only.
 [RISK] basf: 25 — stable. Sole live unauth finding (repfinder, VALID 5.3) submit-ready with today-reproduced evidence; empty DB caps current impact at MED, MED-HIGH only once retail/rep data populates. OAuth no-PKCE remains AUTH_HELPED design note. No escalation, no further investment above report submission.
+## 2026-09-13 23:33:51 UTC [target] (model bigpickle)
+class: OTHER
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 92
+reasoning: dispatcher blocks standard AEM selectors/author paths but misses /bin/basf/repfindertool; 200 JSON unauth at country=US&productServiceId=1 (hits=0, empty DB); repType=BR&productServiceId=2 fires RetailFinderDatabaseService NPE (getFinalResult:143/searchDatabase:110) proving dual-service routing; sibling retailfindertool 404; today's bare GET still 200 len=80 fixed wrapper {"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0} — byte-identical, live at submit time
+evidence_needed: none — triager VALID 5.3 (Submit) 09-12 09:45; reproducibility re-confirmed 09-13 17:07/19:21
+verify_steps: PASSIVE — done; evidence frozen and current (HTTP 200/80B no-args; 200 successful JSON w/ coords+psid=1; NPE wrapper psid=2)
+impact: unauth query of rep/retailer DB once populated (MED-HIGH; empty today) + Java service-class disclosure on error branch; frame as broken-access-control only, NOT stacktrace (excluded class)
+testability: PASSIVE
