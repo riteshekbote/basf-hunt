@@ -365,3 +365,4 @@
 - 2026-09-13 ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
 - 2026-09-13 ACCEPTED TRIAGE @ repfinder.basf.com/bin/basf/repfindertool: 09-13 re-probe returns byte-identical len-80 no-args wrapper → finding live, evidence reproduces at submit time.
 - 2026-09-13 REJECTED OTHER @ *.basf.com estate remainder: no new unauth surface anywhere 09-13; every discovery class statistically closed by direct probes — inventing new hypotheses on probed-closed assets is non-productive.
+- 2026-09-13 REJECTED OTHER @ *.basf.com estate remainder: no new unauth surface anywhere 09-13; all twelve discovery classes statistically closed by direct probes; re-probing or new hypotheses on closed assets is non-productive — converged to submission-only.

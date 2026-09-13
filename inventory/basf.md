@@ -535,3 +535,10 @@ www.basf.com
 - CHANGED repfinder.basf.com/bin/basf/repfindertool bare GET → HTTP 200 len=80 fixed wrapper `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}` (09-13 re-probe confirms param-dri
 - CHANGED repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 → HTTP 200 JSON `{"responseCode":"200","responseMsg":" Sucessful
 - CHANGED Triager confirmation: repfinder unauth Lambda proxy marked VALID 5.3 (Submit) at 2026-09-12 09:45 — framing: broken-access-control (dispatcher misses `/bin/basf/*`), NOT stacktrace disclosure
+
+## 2026-09-13 21:35:44 UTC
+- CHANGED repfinder.basf.com/bin/basf/repfindertool bare GET → HTTP 200 len=80 fixed wrapper `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}` (09-13 re-probe confirms param-dri
+- CHANGED repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 → HTTP 200 JSON `{"responseCode":"200","responseMsg":" Sucessful
+- CHANGED repfinder.basf.com/bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE → HTTP 200 JSON with NPE stacktrace leaking `RetailFinderDatabaseService.java:143` / `RepFinderHandler.java:60` (dual
+- CHANGED my.basf.com SSR boot config → still discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with `redirect_uri=https://my.basf.com/.auth`, `scope=openid profile refresh_token`, `acr_value
+- CHANGED federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration → `code_challenge_methods_supported:["plain","S256"]` unchanged (provider config stable, no hardening)
