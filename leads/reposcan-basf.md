@@ -174,3 +174,33 @@ TARGET_ORG not configured for basf; skipping public-org deep scan.
 TARGET_ORG not configured for basf; skipping public-org deep scan.
 ## REPOSCAN 2026-09-12 23:23:59 UTC
 TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-13 01:29:53 UTC
+[HYP] Hardcoded default API_KEY and WEBHOOKS_KEY shared across Docker compose + sample configs
+class: SECRET
+asset: basf/metis-backend/.docker/common.yml:47-48, basf/metis-backend/conf/env.ini.sample:9,12, basf/metis-bff/conf/env.ini.sample:14
+confidence: 55
+reasoning: The value `a-very-very-very-long-and-very-very-very-secret-string` is committed as the default API_KEY in Docker compose (line 47), env.ini.sample for both backend (line 9) and BFF (line 14). The same value is used for the webhook auth key (`another-very-very-long-and-very-very-very-secret-string`). These are YAML-anchor defaults that become the runtime secrets if env.ini is not overridden. The BFF config.js (line 17) reads `process.env.API_KEY || _api.key`, meaning the hardcoded sample value is the fallback. If any deployment copies env.ini.sample without changing the key, the API_KEY is the publicly-known default. These are clearly dev/test secrets but the identical value across 3 files means any leaked copy compromises all services sharing this key.
+impact: MEDIUM — The values are obviously placeholder strings (not real production secrets), but they demonstrate a pattern where the same static secret is shared across multiple services (backend API auth + BFF proxy auth + webhook auth). If a developer copies env.ini.sample to env.ini without rotating, all auth gates use the known default. The webhook key is also embedded in plaintext in yascheduler.conf:10.
+verify_steps: Passively confirm that `metis-backend/conf/env.ini.sample` and `metis-bff/conf/env.ini.sample` are committed to the public repo (confirmed). Check if `metis.basf.net` or `bff.metis.basf.net` are live (already confirmed in inventory). No active testing needed.
+[HYP] Internal BASF infrastructure URLs leaked in public repo source code
+class: MISCONFIG
+asset: basf/metis-gui/src/config.ts:11,18, basf/xeredar/.gitlab-ci.yml:9, basf/xeredar/docs/index.html:103-104, basf/metis-backend/conf/env.ini.sample:19, basf/doe/docs/install.md:3
+confidence: 75
+reasoning: Production and internal URLs are hardcoded in public source code: `https://metis.basf.net` (production Metis GUI), `https://bff.metis.basf.net` (production BFF), `https://metis.basf.com/pi/` (production PhaseID), `registry.roqs.basf.net` (internal Docker registry), `gitlab.roqs.basf.net` (internal GitLab), `nexus.roqs.basf.net` (internal Nexus). The `roqs.basf.net` domain hosts multiple internal services (registry, gitlab, nexus). These are not public-facing but are leaked via public GitHub repos.
+impact: LOW-MEDIUM — Internal hostnames and service architecture are revealed. An attacker with network access (or who compromises a VPN/employee endpoint) now knows the internal service mesh layout. The `registry.roqs.basf.net` is a Docker registry that could be targeted for image poisoning. `gitlab.roqs.basf.net` is an internal GitLab instance. These URLs are not secrets per se, but they are infrastructure intelligence that should not be public.
+verify_steps: Passively confirm the URLs exist in the committed files (confirmed). Check if `registry.roqs.basf.net` resolves (passive DNS). Do NOT attempt to access internal services.
+[HYP] Default admin credentials in database seed data
+class: SECRET
+asset: basf/metis-bff/db/seeds/030-users.js:12,41,46
+confidence: 40
+reasoning: The database seed file creates a test admin user with password `'123123'` (line 12: `const password = await hashString('123123')`) and email `admin@test.com` (line 46). The admin role is assigned to this user (line 21). This is clearly test/seed data, but if the seed runs against a production database (e.g., during migration), it would create a known-credential admin account. The password is also weak (numeric-only, 6 chars).
+impact: LOW — This is a seed/migration file that likely only runs during development setup. However, if the same seed is applied to production databases during deployment, it creates a backdoor admin account with a known weak password. The risk depends on deployment practices.
+verify_steps: Passively confirm the seed file is committed (confirmed). Check if `metis.basf.net` uses this seed in production (cannot confirm without active testing).
+[HYP] API key auth uses plain string equality — timing attack vector
+class: OTHER
+asset: basf/metis-backend/metis_backend/helpers.py:53-64
+confidence: 35
+reasoning: The `key_auth` decorator (line 59) compares the API key using `if key == API_KEY:` — plain string equality comparison. This is vulnerable to timing attacks where an attacker can deduce the key character-by-character by measuring response time differences. The `webhook_auth` (line 68) has the same issue with `WEBHOOK_KEY`. Both should use `hmac.compare_digest()` for constant-time comparison.
+impact: LOW — Timing attacks on network comparisons are generally low practical risk due to network jitter, but it's a known weakness class. The real issue is that the default key values are already publicly known.
+verify_steps: Passively read the source file (confirmed). No active testing needed.
+TARGET_ORG not configured for basf; skipping public-org deep scan.
