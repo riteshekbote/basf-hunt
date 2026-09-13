@@ -509,3 +509,5 @@ www.basf.com
 - CHANGED `north-america.intranet.basf.com` Concrete APIs: raw response is HTTP 307→`/ccm/system/authentication/oauth2/basf/attempt_auth?then=<full-url>` on ALL 6 paths — earlier 200/43KB were curl `-L` auth-ch
 - CHANGED `agriculture.basf.com` Magnolia endpoints (`/graphql2`, `/.graphql`, `/.restful`, `/.rest`, `/adminCentral`, `/.admin`, `/.cache`, `/.imaging`, `/dam`, `/docurl/`) now confirmed 308 redirect or 404 — 
 - CHANGED Knowledge-base integrity: 2026-09-12 re-appends verbatim 09-03 entries ("ACCEPTED SSRF ap-eupf", "REJECTED AUTH ap-digitalconnect master key", "REJECTED AUTH dev-clientcert-sap") that contradict all c
+
+## 2026-09-13 01:27:43 UTC

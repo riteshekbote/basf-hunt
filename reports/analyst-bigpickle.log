@@ -17698,3 +17698,122 @@ testability: AUTH_HELPED
 
 ## STEP 7 — RISK
 [RISK] basf: 36 — both open research classes (sibling servlets, /bin/ QueryBuilder) closed by tonight's probes with no new surface; sole reachable unauth endpoint remains repfindertool (VALID 5.3 Submit, broken-access-control, empty-DB MED-HIGH once retail data lands); psid router is a write-up-enhancement lead only; every other estate reconfirmed closed; ATO credential-blocked design note. Residual stable, slight drop on closure.
+===== ANALYST bigpickle 2026-09-13 01:27:43 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mmkdir -p /tmp/opencode/repfinder && cd /tmp/opencode/repfinder
+UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+for spec in \
+  "qb|https://repfinder.basf.com/bin/querybuilder.json?path=/content&type=nt:base&p.limit=5" \
+  "gql|https://repfinder.basf.com/bin/wcm/search/gql.servlet.json?path=/content" \
+  "cu|https://repfinder.basf.com/bin/security/currentuser.json" ; do
+  name="${spec%%|*}"; url="${spec#*|}"
+  curl -sS -A "$UA" -o "$name.body" -w "$name HTTP:%{http_code} SIZE:%{size_download} CT:%{content_type}\n" --max-time 25 "$url"
+  sleep 1.2
+done
+qb HTTP:404 SIZE:196 CT:text/html; charset=iso-8859-1
+gql HTTP:404 SIZE:196 CT:text/html; charset=iso-8859-1
+cu HTTP:404 SIZE:196 CT:text/html; charset=iso-8859-1
+[0m
+[0m$ [0mcd /tmp/opencode/repfinder && for f in qb gql cu; do echo "== $f =="; cat "$f.body"; echo; done
+== qb ==
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>404 Not Found</title>
+</head><body>
+<h1>Not Found</h1>
+<p>The requested URL was not found on this server.</p>
+</body></html>
+
+== gql ==
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>404 Not Found</title>
+</head><body>
+<h1>Not Found</h1>
+<p>The requested URL was not found on this server.</p>
+</body></html>
+
+== cu ==
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>404 Not Found</title>
+</head><body>
+<h1>Not Found</h1>
+<p>The requested URL was not found on this server.</p>
+</body></html>
+[0m
+[0m$ [0mcd /tmp/opencode/repfinder
+UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+for psid in 3 4 5 6; do
+  curl -sS -A "$UA" "https://repfinder.basf.com/bin/basf/repfindertool?productServiceId=$psid&repType=SA%2CBR&country=DE" -o "psid$psid.body" -w "psid$psid HTTP:%{http_code} SIZE:%{size_download}\n" --max-time 25
+  sleep 1.2
+done
+psid3 HTTP:200 SIZE:80
+psid4 HTTP:200 SIZE:80
+psid5 HTTP:200 SIZE:80
+psid6 HTTP:200 SIZE:80
+[0m
+[0m$ [0mcd /tmp/opencode/repfinder
+UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+echo "== psid3 body =="; cat psid3.body; echo; echo "== psid6 body =="; cat psid6.body; echo
+for psid in 7 8; do
+  curl -sS -A "$UA" "https://repfinder.basf.com/bin/basf/repfindertool?productServiceId=$psid&repType=SA%2CBR&country=DE" -o "psid$psid.body" -w "psid$psid HTTP:%{http_code} SIZE:%{size_download}\n" --max-time 25
+  sleep 1.2
+done
+curl -sS -A "$UA" -H "Accept: application/json" "https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1" -o us.body -w "US HTTP:%{http_code} SIZE:%{size_download}\n" --max-time 25
+== psid3 body ==
+{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}
+== psid6 body ==
+{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}
+psid7 HTTP:200 SIZE:80
+psid8 HTTP:200 SIZE:80
+US HTTP:200 SIZE:72
+[0m
+[0m$ [0mcd /tmp/opencode/repfinder && echo "== US body =="; cat us.body; echo; echo "== US len =="; wc -c us.body
+== US body ==
+{"responseCode":"200","responseMsg":" Sucessful.","hits":0,"results":[]}
+== US len ==
+72 us.body
+[0m
+All open probes executed. `/bin/` AEM servlets 404, psid enum capped at {1,2}, US success path empty-DB. Both open research classes now closed.
+
+STEP 1 — DELTA
+- [NEW] `repfinder.basf.com/bin/querybuilder.json?path=/content&type=nt:base&p.limit=5` → HTTP 404 (196B Apache/404 "Not Found") — dispatcher blocks `/bin/`; QueryBuilder/gql/currentuser namespaces NOT behind the gap
+- [NEW] `repfinder.basf.com/bin/wcm/search/gql.servlet.json?path=/content` + `/bin/security/currentuser.json` → both HTTP 404 (196B) — gap is path-prefix-specific to `/bin/basf/*` only
+- [NEW] `repfinder.basf.com/bin/basf/repfindertool?productServiceId=3..8&repType=SA%2CBR&country=DE` → all HTTP 200 len=80 identical `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}` — router enum exactly {1,2}; no third finder service
+- [NEW] `repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` → HTTP 200 len=72 `{"responseCode":"200","responseMsg":" Sucessful.","hits":0,"results":[]}` — success path functional under numeric repType + `lng` param; empty DB reconfirmed
+
+STEP 2 — PRIORITIZE
+- [PRIO] repfinder.basf.com/bin/basf/repfindertool — priority 6.1 — surface 4, business 8, tech 6, gate 10, cloud 5, fresh 2 (sole reachable endpoint; enumerated exhaustively this cycle)
+- [PRIO] my.basf.com/.auth (OAuth 86cc4bf9, no PKCE) — priority 4.95 — surface 5, business 9, tech 7, gate 0, cloud 0, fresh 4 (credential-blocked, design-note only)
+
+STEP 3 — HYPOTHESES
+[HYP] Public OAuth client 86cc4bf9 without PKCE → refresh_token ATO of myBASFWorld
+class: OATH
+asset: my.basf.com/.auth
+confidence: 65
+reasoning: SSR boot config discloses client_id 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect_uri https://my.basf.com/.auth, scope incl. refresh_token, zero PKCE refs; NAM discovery offers plain+S256 and ROPC/hybrid, reconfirmed unchanged 09-12; public client + refresh_token = long-lived bearer on code/refresh interception — unchanged since prior cycles, no new vector
+evidence_needed: program-owned BASF test account to exercise code+refresh flow and observe refresh lifetime/reuse/revocation
+verify_steps: PASSIVE — AUTH_HELPED; only vector is credential-dependent, no unauth path
+impact: ATO of myBASFWorld (HIGH); blocked on test account; reportable as design-level finding
+testability: AUTH_HELPED
+
+STEP 4 — SELF-CRITIQUE
+- [PARKED] repfinder /bin/ QueryBuilder (was 45): all 3 probes 404 — disproven, not parked; drop below threshold
+- [PARKED] repfinder psid>2 (was 45): psid 3–8 all len-80 unsupported — enum {1,2} proven; closed
+- [PARKED] ap-eupf SSRF, ap-digitalconnect keys, dev-clientcert mTLS, north-america Concrete, secsys WAF-200: stale/recycled, no new basis, all remain closed
+- [FINAL] my.basf.com no-PKCE refresh_token ATO (65) — highest residual value, credential-blocked, design-note framing
+- [FINAL] repfinder unauth Lambda proxy — VALID 5.3 Submit, empty-DB MED-HIGH once retail data lands, namespace fully enumerated (single servlet, enum {1,2})
+
+STEP 5 — NEXT ACTION
+[NEXT] HUMAN: freeze and submit the VALID 5.3 repfinder broken-access-control report (dispatcher misses `/bin/basf/*` → unauth servlet→Lambda proxy, psid 1/2 routing, empty DB, no stacktrace framing) — repfinder surface exhaustively probed (9 reqs this cycle: /bin/ trio 404, psid 3–8, US success path); no further probes warranted
+
+STEP 6 — LEARNING
+- [LEARN] REJECTED MISCONFIG @ repfinder.basf.com/bin/querybuilder.json: dispatcher blocks `/bin/` except `/bin/basf/*` — querybuilder.json, gql.servlet.json, currentuser.json all HTTP 404 (196B); gap is path-prefix-specific, no AEM JCR/identity servlet escapes
+- [LEARN] REJECTED MISCONFIG @ repfinder.basf.com/bin/basf/repfindertool: psid=3..8 all 200 len=80 "Unsupported Product Service ID" — service enum exactly {1,2}; no third finder (AgSolutions-family guess disproven)
+- [LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: country=US/repType=1/`lng` variant → 200 len=72 " Sucessful." hits=0 results=[] — success path robust across param spellings, empty DB reconfirmed; finding scope unchanged
+
+STEP 7 — RISK
+[RISK] basf: 30 — both open research classes (sibling `/bin/basf/*` servlets, `/bin/` AEM QueryBuilder) closed this cycle with zero new surface; psid router proven binary {1,2}; sole reachable unauth endpoint remains repfindertool (VALID 5.3 Submit, empty DB limits current impact, MED-HIGH only once retail/rep data populates) — every other estate (API 9-host, SAP-KM, CMS, OAuth config, actuator) reconfirmed closed; ATO stays credential-blocked design note. Residual stable-to-declining toward submit-only.

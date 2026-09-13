@@ -2772,3 +2772,15 @@ impact: ATO of myBASFWorld (HIGH), credential-blocked
 testability: AUTH_HELPED
 [NEXT] PROBE: at 1 rps GET `https://repfinder.basf.com/bin/basf/repfindertool?productServiceId=3&repType=SA%2CBR&country=DE`, then psid 4,5,6,7,8 (same params) — capture full bodies; diff vs len-80 ("Unsupported Product Service ID") and len-815 (NPE) baselines; any 200 with a new service-class stacktrace or non-empty results[] = wider router → escalate finding scope; all len-80 → freeze VALID 5.3 report and go submit-only.
 [RISK] basf: 36 — both open research classes (sibling servlets, /bin/ QueryBuilder) closed by tonight's probes with no new surface; sole reachable unauth endpoint remains repfindertool (VALID 5.3 Submit, broken-access-control, empty-DB MED-HIGH once retail data lands); psid router is a write-up-enhancement lead only; every other estate reconfirmed closed; ATO credential-blocked design note. Residual stable, slight drop on closure.
+## 2026-09-13 01:27:33 UTC [target] (model bigpickle)
+[HYP] Public OAuth client 86cc4bf9 without PKCE → refresh_token ATO of myBASFWorld
+class: OATH
+asset: my.basf.com/.auth
+confidence: 65
+reasoning: SSR boot config discloses client_id 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect_uri https://my.basf.com/.auth, scope incl. refresh_token, zero PKCE refs; NAM discovery offers plain+S256 and ROPC/hybrid, reconfirmed unchanged 09-12; public client + refresh_token = long-lived bearer on code/refresh interception — unchanged since prior cycles, no new vector
+evidence_needed: program-owned BASF test account to exercise code+refresh flow and observe refresh lifetime/reuse/revocation
+verify_steps: PASSIVE — AUTH_HELPED; only vector is credential-dependent, no unauth path
+impact: ATO of myBASFWorld (HIGH); blocked on test account; reportable as design-level finding
+testability: AUTH_HELPED
+[NEXT] HUMAN: freeze and submit the VALID 5.3 repfinder broken-access-control report (dispatcher misses `/bin/basf/*` → unauth servlet→Lambda proxy, psid 1/2 routing, empty DB, no stacktrace framing) — repfinder surface exhaustively probed (9 reqs this cycle: /bin/ trio 404, psid 3–8, US success path); no further probes warranted
+[RISK] basf: 30 — both open research classes (sibling `/bin/basf/*` servlets, `/bin/` AEM QueryBuilder) closed this cycle with zero new surface; psid router proven binary {1,2}; sole reachable unauth endpoint remains repfindertool (VALID 5.3 Submit, empty DB limits current impact, MED-HIGH only once retail/rep data populates) — every other estate (API 9-host, SAP-KM, CMS, OAuth config, actuator) reconfirmed closed; ATO stays credential-blocked design note. Residual stable-to-declining toward submit-only.

@@ -8861,3 +8861,10 @@ testability: AUTH_HELPED
 
 ## STEP 7 — RISK
 [RISK] basf: 45 — Unauthenticated backend exposure across 35+ host estate proven gated: Apigee VerifyAPIKey (all browser keys rejected), AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, Spring Boot Actuator locked down (404 sensitive, status 999 error handler), SAP KM servlet returns 500 guest-zero-content, AEM dispatchers blocking author paths/selectors, Cloudflare WAF on artifact/cloud/infra, Magnolia CMS endpoints redirected/404, Concrete CMS Azure AD-gated. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE (design flaw, AUTH_HELPED). Residual risk = portal ATO chain (OAuth code interception → refresh_token replay). NEW RESIDUAL: repfinder.basf.com/bin/basf/repfindertool unauth Lambda proxy with stacktrace disclosure + dual service routing (MISCONFIG, PASSIVE). No other exploitable unauthenticated surface remains.
+===== ANALYST nemotron3 2026-09-13 01:27:43 UTC =====
+[0m
+> build · nemotron-3-ultra-free
+[0m
+[93m[1m! [0mpermission requested: external_directory (/tmp/*); auto-rejecting
+[0m✗ [0mcurl -s -H "Accept: application/json" "https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1" -o /tmp/repfinder_reptype1.json -w "HTTP %{http_code} %{size_download}\n" && cat /tmp/repfinder_reptype1.json failed
+[91m[1mError: [0mThe user rejected permission to use this specific tool call.
