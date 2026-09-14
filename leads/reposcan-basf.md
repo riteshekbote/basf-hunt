@@ -220,3 +220,12 @@ TARGET_ORG not configured for basf; skipping public-org deep scan.
 TARGET_ORG not configured for basf; skipping public-org deep scan.
 ## REPOSCAN 2026-09-14 07:11:23 UTC
 TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-14 14:15:18 UTC
+[HYP] <none — zero candidate repositories>
+class: OTHER
+asset: N/A
+confidence: 0
+reasoning: |
+impact: N/A — cannot generate findings without source code to audit
+verify_steps: |
+TARGET_ORG not configured for basf; skipping public-org deep scan.
