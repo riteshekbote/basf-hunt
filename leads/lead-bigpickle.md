@@ -2939,3 +2939,22 @@ evidence_needed: live deployment of metis reachable with default keys — dispro
 verify_steps: PASSIVE — done (tree scan for secreta-pattern filenames: NONE; DNS: all NXDOMAIN; raw-file confirmation)
 impact: none externally reachable; informational internal-name/architecture disclosure only, dev-placeholder creds
 testability: PASSIVE
+## 2026-09-14 07:50:39 UTC [target] (model bigpickle)
+[HYP] Unauthenticated AEM Sling servlet→AWS Lambda proxy under /bin/basf/* (dispatcher ACL miss)
+class: OTHER
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 92
+reasoning: dispatcher blocks standard AEM selectors/author paths but misses /bin/basf/repfindertool; 200 JSON unauth at country=US&productServiceId=1 (hits=0, empty DB); repType=BR&productServiceId=2 fires RetailFinderDatabaseService NPE (getFinalResult:143/searchDatabase:110) proving dual-service routing; sibling retailfindertool 404; bare GET still 200 len=80 byte-identical
+evidence_needed: none — triager VALID 5.3 (Submit) 09-12 09:45; reproducibility re-probed through 09-14 01:46
+verify_steps: PASSIVE — done; evidence frozen and current
+impact: unauth query of rep/retailer DB once populated (MED-HIGH; empty today) + Java service-class disclosure on error branch; frame as broken-access-control only
+testability: PASSIVE
+[PARKED] WAF 200-OK Block Page Cache Poisoning (secsys.basf.com, confidence 45): no evidence of actual cache poisoning or client confusion; WAF returns 200 for blocks but no caching headers observed; no verify steps demonstrating exploit. Drops below 40 threshold.
+[FINAL] Unauthenticated AEM Sling Servlet Proxy to AWS Lambda (repfinder.basf.com, confidence 92) — HIGHEST CONFIDENCE, triager VALID 5.3, frozen evidence, clear verify steps, exploitable surface.
+[PARKED] Public OAuth Client 86cc4bf9 Without PKCE (my.basf.com, confidence 65) — design flaw confirmed but AUTH_HELPED only; needs test account for POC; triager HOLD.
+[NEXT] HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu — broken-access-control: dispatcher misses `/bin/basf/*` → unauth AEM Sling servlet proxies to AWS Lambda with dual service routing (RepFinder/RetailFinder) + Java stacktrace disclosure; evidence: bare GET 200 len=80 wrapper, geolocation search 200 hits=0, repType=BR NPE stacktrace (RetailFinderDatabaseService.java:143), dispatcher blocks /.model.json but not /bin/basf/*
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: unauth AEM→AWS Lambda proxy, 200 JSON, stacktrace disclosure, geolocation-based search path functional (empty DB) — dispatcher misses /bin/basf/repfindertool
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/retailfindertool: HTTP 404 — sibling servlet absent behind dispatcher gap despite dual-service routing inside repfindertool
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: bare GET now 200 len=80 fixed wrapper — no-args path returns static short JSON, structurally distinct from NPE 200-path; confirms param-driven branches
+[LEARN] ACCEPTED TRIAGE @ repfinder unauth Lambda proxy: triager marked VALID 5.3 (Submit) at 2026-09-12 09:45 — reportable framing must be broken-access-control (dispatcher misses /bin/basf/* → unauth servlet invocation), NOT stacktrace disclosure (excluded class)
+[RISK] basf: 45 — Unauthenticated backend exposure across 35+ host estate proven gated: Apigee VerifyAPIKey (all browser keys rejected), AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, Spring Boot Actuator locked down (404 sensitive, status 999 error handler), SAP KM servlet returns 500 guest-zero-content, AEM dispatchers blocking author paths/selectors, Cloudflare WAF on artifact/cloud/infra, Magnolia CMS endpoints redirected/404, Concrete CMS Azure AD-gated. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE (design flaw, AUTH_HELPED). Residual risk = portal ATO chain (OAuth code interception → refresh_token replay). NEW RESIDUAL: repfinder.basf.com/bin/basf/repfindertool unauth Lambda proxy with stacktrace disclosure + dual service routing (MISCONFIG, PASSIVE). No other exploitable unauthenticated surface remains.

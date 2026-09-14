@@ -556,3 +556,5 @@ www.basf.com
 - CHANGED repfinder.basf.com/bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE → HTTP 200 JSON with NPE stacktrace leaking `RetailFinderDatabaseService.java:143` / `RepFinderHandler.java:60` (dual
 - CHANGED my.basf.com SSR boot config → still discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with `redirect_uri=https://my.basf.com/.auth`, `scope=openid profile refresh_token`, `acr_value
 - CHANGED federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration → `code_challenge_methods_supported:["plain","S256"]` unchanged (provider config stable, no hardening)
+
+## 2026-09-14 07:53:29 UTC
