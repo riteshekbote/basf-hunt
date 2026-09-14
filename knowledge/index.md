@@ -394,3 +394,5 @@
 - 2026-09-14 ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect_uri, scope, refresh_token, acr_values, zero PKCE refs — design flaw (AUTH_HELPED)
 - 2026-09-14 ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims — provider config stable, no hardening
 - 2026-09-14 ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
+- 2026-09-14 ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-14 01:46/07:53 re-probes byte-stable (len-80 wrapper, 200 SUCCESS geolocation, NPE branch) — finding reproduces at submit time; no further probe cycles needed.
+- 2026-09-14 REJECTED OTHER @ *.basf.com estate remainder: 09-14 estate re-check against ranked hypotheses confirms zero new unauth surface; all prior closed classes stable; converged to submission-only.
