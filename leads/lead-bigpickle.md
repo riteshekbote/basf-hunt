@@ -3015,3 +3015,13 @@ testability: PASSIVE
 [LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-14 01:46/07:53 re-probes byte-stable (len-80 wrapper, 200 SUCCESS geolocation, NPE branch) — finding reproduces at submit time; no further probe cycles needed.
 [LEARN] REJECTED OTHER @ *.basf.com estate remainder: 09-14 estate re-check against ranked hypotheses confirms zero new unauth surface; all prior closed classes stable; converged to submission-only.
 [RISK] basf: 45 — Unauthenticated backend exposure across 35+ host estate proven gated (Apigee VerifyAPIKey, AWS IAM/authorizer, NAM exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev, Spring Boot Actuator locked down, SAP KM 500 guest-zero-content, AEM dispatchers, Cloudflare WAF, Magnolia/Concrete closed). CRITICAL RESIDUAL unchanged: repfinder.basf.com/bin/basf/repfindertool unauth Lambda proxy (broken-access-control, MED-HIGH once DB populated) + my.basf.com public OAuth client (86cc4bf9) emitting refresh_token without PKCE (design, AUTH_HELPED, residual ATO chain). No new exploitable unauth surface; submission pending.
+## 2026-09-14 23:04:16 UTC [target] (model bigpickle)
+[HYP] Unauthenticated AEM Sling servlet→AWS Lambda proxy under /bin/basf/* (dispatcher ACL miss)
+class: OTHER
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 92
+reasoning: dispatcher blocks /.model.json and standard AEM selectors but misses /bin/basf/repfindertool; re-probed 09-14 19:53 UTC — bare GET 200 len=80 (`responseCode:"400" Unsupported Product Service ID`), geolocation search 200 hits=0 (empty DB), repType=BR&productServiceId=2 fires RetailFinderDatabaseService NPE (getFinalResult:143/searchDatabase:110, RepFinderHandler:60); sibling retailfindertool 404; byte-stable since 09-12
+evidence_needed: none — triager VALID 5.3 (Submit) 09-12 09:45; reconfirmed live this cycle 19:53 UTC at submit moment
+verify_steps: PASSIVE — done; evidence frozen and current
+impact: unauth query of rep/retailer DB once populated (MED-HIGH; empty today) + Java service-class/line disclosure; frame broken-access-control only
+testability: PASSIVE
