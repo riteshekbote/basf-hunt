@@ -558,3 +558,5 @@ www.basf.com
 - CHANGED federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration → `code_challenge_methods_supported:["plain","S256"]` unchanged (provider config stable, no hardening)
 
 ## 2026-09-14 07:53:29 UTC
+
+## 2026-09-14 15:14:01 UTC

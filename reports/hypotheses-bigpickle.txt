@@ -1,10 +1,10 @@
-## 2026-09-14 07:50:39 UTC [target] (model bigpickle)
+## 2026-09-14 15:02:55 UTC [target] (model bigpickle)
 [HYP] Unauthenticated AEM Sling servlet→AWS Lambda proxy under /bin/basf/* (dispatcher ACL miss)
 class: OTHER
 asset: repfinder.basf.com/bin/basf/repfindertool
 confidence: 92
-reasoning: dispatcher blocks standard AEM selectors/author paths but misses /bin/basf/repfindertool; 200 JSON unauth at country=US&productServiceId=1 (hits=0, empty DB); repType=BR&productServiceId=2 fires RetailFinderDatabaseService NPE (getFinalResult:143/searchDatabase:110) proving dual-service routing; sibling retailfindertool 404; bare GET still 200 len=80 byte-identical
-evidence_needed: none — triager VALID 5.3 (Submit) 09-12 09:45; reproducibility re-probed through 09-14 01:46
+reasoning: dispatcher blocks standard AEM selectors/author paths but misses /bin/basf/repfindertool; 200 JSON unauth at country=US&productServiceId=1 (hits=0, empty DB); repType=BR&productServiceId=2 fires RetailFinderDatabaseService NPE (getFinalResult:143/searchDatabase:110) proving dual-service routing; sibling retailfindertool 404; bare GET still 200 len=80 byte-identical through 09-14 07:53
+evidence_needed: none — triager VALID 5.3 (Submit) 09-12 09:45; reproducibility re-probed through 09-14 07:53
 verify_steps: PASSIVE — done; evidence frozen and current
 impact: unauth query of rep/retailer DB once populated (MED-HIGH; empty today) + Java service-class disclosure on error branch; frame as broken-access-control only
 testability: PASSIVE
