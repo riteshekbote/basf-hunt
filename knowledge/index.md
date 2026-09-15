@@ -412,3 +412,4 @@
 - 2026-09-15 ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect_uri, scope, refresh_token, acr_values, zero PKCE refs — design flaw (AUTH_HELPED)
 - 2026-09-15 ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims — provider config stable, no hardening
 - 2026-09-15 ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
+- 2026-09-15 ACCEPTED TRIAGE @ repfinder unauth Lambda proxy: triager marked VALID 5.3 (Submit) at 2026-09-12 09:45 — reportable framing must be broken-access-control (dispatcher misses `/bin/basf/*` → unauth AEM Sling servlet proxies to AWS Lambda), NOT stacktrace disclosure (excluded class)

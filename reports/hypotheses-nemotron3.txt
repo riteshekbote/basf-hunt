@@ -1,4 +1,4 @@
-## 2026-09-15 01:35:39 UTC [target] (model nemotron3)
+## 2026-09-15 06:48:56 UTC [target] (model nemotron3)
 [PRIO] repfinder.basf.com/bin/basf/repfindertool,8.90,attack_surface=9 business_value=8 tech_exposure=9 gate_ease=10 cloud_surface=8 freshness=10
 [PRIO] my.basf.com,7.05,attack_surface=3 business_value=8 tech_exposure=5 gate_ease=10 cloud_surface=6 freshness=7
 [PRIO] federation.basf.com,6.10,attack_surface=4 business_value=7 tech_exposure=5 gate_ease=10 cloud_surface=5 freshness=6
@@ -33,6 +33,10 @@ testability: AUTH_HELPED
 [FINAL] Unauthenticated AEM Sling Servlet Proxy to AWS Lambda with Param-Driven Dual Service Routing + Java Internals Disclosure (repfinder.basf.com, confidence 92, PASSIVE) — HIGHEST CONFIDENCE, triager VALID 5.3, clear verify steps, exploitable surface
 [FINAL] Public OAuth Client Emitting Refresh Tokens Without PKCE Enables ATO Chain (my.basf.com, confidence 70, AUTH_HELPED) — DESIGN FLAW, config confirmed stable, ATO chain well-defined, requires test account for POC
 [NEXT] HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu — broken-access-control: dispatcher misses `/bin/basf/*` → unauth AEM Sling servlet proxies to AWS Lambda with dual service routing (RepFinder/RetailFinder) + Java stacktrace disclosure; evidence: bare GET 200 len=80 wrapper, geolocation search 200 hits=0, repType=BR NPE stacktrace (RetailFinderDatabaseService.java:143), dispatcher blocks /.model.json but not /bin/basf/*
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: unauth AEM→AWS Lambda proxy, 200 JSON, stacktrace disclosure, geolocation-based search path functional (empty DB) — dispatcher misses /bin/basf/repfindertool
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/retailfindertool: HTTP 404 — sibling servlet absent behind dispatcher gap despite dual-service routing inside repfindertool
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: bare GET now 200 len=80 fixed wrapper — no-args path returns static short JSON, structurally distinct from NPE 200-path; confirms param-driven branches
+[LEARN] ACCEPTED TRIAGE @ repfinder unauth Lambda proxy: triager marked VALID 5.3 (Submit) at 2026-09-12 09:45 — reportable framing must be broken-access-control (dispatcher misses `/bin/basf/*` → unauth AEM Sling servlet proxies to AWS Lambda), NOT stacktrace disclosure (excluded class)
 [LEARN] REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL (/graphql2, /.graphql), REST (/.restful, /.rest), admin (/adminCentral, /admin, /.admin), cache (/.cache), DAM (/.imaging, /dam) all return 308 redirect or 404 — zero unauthenticated API surface
 [LEARN] REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs (/index.php/ccm/system/block/types, /index.php/ccm/system/page/types, /index.php/dashboard, /ccm/system/block/types, /api/blocks) all 307 redirect to Azure AD OAuth2 — fully auth-gated
 [LEARN] REJECTED MISCONFIG @ experience.basf.com: AEM Dispatcher cache poisoning via Host header spoofing — CloudFront returns 403 on all 4 tested paths with Host: author-prod-aem64.basf.com; edge blocks spoofed Host headers
