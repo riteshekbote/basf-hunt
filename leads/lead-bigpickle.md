@@ -3150,3 +3150,42 @@ impact: none
 testability: PASSIVE
 [NEXT] HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu — broken-access-control: AEM dispatcher misses `/bin/basf/*` → unauth Sling servlet proxies to AWS Lambda (dual-service routing RepFinder/RetailFinder via productServiceId/repType) with Java stacktrace disclosure. Evidence set: bare GET 200/80 `Unsupported Product Service ID`; geolocation query 200/72 `hits:0` SUCCESS; `repType=BR&productServiceId=2&country=DE` → 200/815 NPE `RetailFinderDatabaseService.getFinalResult:143` / `searchDatabase:110` / `RepFinderHandler:60`; sibling `retailfindertool` 404; dispatcher blocks `/.model.json` but not `/bin/basf/*`. Impact: unauth DB read MED-HIGH once populated + internals leak; empty today. 09-15 probes confirm live at submit moment.
 [RISK] basf: 45 — 35+ host estate proven gated across twelve classes (Apigee VerifyAPIKey + Invalid ApiKey, AWS IAM/authorizer, NAM exact-match redirect_uri oracle, Azure Functions admin 401/404 + WAF-403 SSRF, mTLS dev 400, Spring Boot Actuator locked, SAP KM 500 guest-zero, AEM dispatchers, Cloudflare WAF/JS-challenge, Magnolia 308/404, Concrete 307-OAuth, Edge SSO cred-blocked). CRITICAL RESIDUAL unchanged: repfinder.basf.com/bin/basf/repfindertool unauth Lambda proxy (broken-access-control, MED-HIGH once DB populated, empty today, submit-ready) + my.basf.com public OAuth client 86cc4bf9 refresh_token w/o PKCE (design, AUTH_HELPED, residual ATO chain). No new exploitable unauth surface; converged to submission-only.
+## 2026-09-15 12:37:24 UTC [target] (model bigpickle)
+reasoning: The `key_auth` decorator (line 59) compares the API key using `if key == API_KEY:` — plain string equality comparison. This is vulnerable to timing attacks where an attacker can deduce the key character-by-character by measuring response time differences. The `webhook_auth` (line 68) has the same issue with `WEBHOOK_KEY`. Both should use `hmac.compare_digest()` for constant-time comparison.
+impact: LOW — Timing attacks on network comparisons are generally low practical risk due to network jitter, but it's a known weakness class. The real issue is that the default key values are already publicly known.
+verify_steps: Passively read the source file (confirmed). No active testing needed.
+[HYP] <none — zero candidate repositories>
+class: OTHER
+asset: N/A
+confidence: 0
+reasoning: |
+impact: N/A — cannot generate findings without source code to audit
+verify_steps: |
+[HYP] (none)
+[HYP] Unauthenticated AEM Sling servlet→AWS Lambda proxy under /bin/basf/* (dispatcher ACL miss) — SUBMIT-READY
+class: OTHER
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 92
+reasoning: dispatcher blocks /.model.json + all standard AEM selectors but misses /bin/basf/repfindertool; 09-15 06:49 re-probe stable — bare GET 200/80 (`Unsupported Product Service ID`), geolocation 200/72 hits=0 SUCCESS, `repType=BR&productServiceId=2&country=DE` 200/815 NPE (`RetailFinderDatabaseService.getFinalResult:143`/`searchDatabase:110`/`RepFinderHandler:60`); sibling retailfindertool 404; triager VALID 5.3 (Submit) 09-12 09:45
+evidence_needed: none — frozen, reproducible at submit moment
+verify_steps: PASSIVE — reproduce three branches in report body
+impact: unauth rep/retailer DB read once populated (MED-HIGH; empty today) + Java internals; frame broken-access-control only
+testability: PASSIVE
+[HYP] Public OAuth client 86cc4bf9 no-PKCE refresh_token ATO of myBASFWorld
+class: OATH
+asset: my.basf.com/.auth + federation.basf.com/nidp/oauth/nam
+confidence: 65
+reasoning: SSR boot discloses client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4, redirect https://my.basf.com/.auth, refresh_token scope, zero PKCE refs; NAM discovery unchanged (plain/S256, authorization_code/password/hybrid, exact-match redirect_uri)
+evidence_needed: program-owned test account for code+refresh replay/revocation
+verify_steps: PASSIVE — AUTH_HELPED only, no unauth vector
+impact: ATO of myBASFWorld (HIGH), credential-blocked; triager HOLD
+testability: AUTH_HELPED
+[HYP] none — third slot vacuous
+class: OTHER
+asset: *.basf.com estate remainder
+confidence: 10
+reasoning: twelve discovery classes statistically closed by direct probes across 35+ hosts through 09-15; 09-13→09-14→09-15 convergence stable; reposcan/org scan non-contributing
+evidence_needed: config drift establishing new reachable unauth surface
+verify_steps: none warranted
+impact: none
+testability: PASSIVE

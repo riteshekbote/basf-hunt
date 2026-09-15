@@ -10210,3 +10210,72 @@ testability: AUTH_HELPED
 **STEP 7 — RISK**
 
 [RISK] basf: 45 — Unauthenticated backend exposure across 35+ host estate proven gated: Apigee VerifyAPIKey (all browser keys rejected), AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, Spring Boot Actuator locked down (404 sensitive, status 999 error handler), SAP KM servlet returns 500 guest-zero-content, AEM dispatchers blocking author paths/selectors, Cloudflare WAF on artifact/cloud/infra, Magnolia CMS endpoints redirected/404, Concrete CMS Azure AD-gated. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE (design flaw, AUTH_HELPED). Residual risk = portal ATO chain (OAuth code interception → refresh_token replay). NEW RESIDUAL: repfinder.basf.com/bin/basf/repfindertool unauth Lambda proxy with stacktrace disclosure + dual service routing (MISCONFIG, PASSIVE). No other exploitable unauthenticated surface remains.
+===== ANALYST nemotron3 2026-09-15 12:39:15 UTC =====
+[0m
+> build · nemotron-3-ultra-free
+[0m
+STEP 1 — DELTA:
+NO_DELTA — all 2026-09-15 probes confirm prior mapping stable: repfinder `/bin/basf/repfindertool` byte-stable (len-80 wrapper, geolocation 200, NPE branch), my.basf.com SSR boot config unchanged (client 86cc4bf9, zero PKCE), federation.basf.com NAM discovery unchanged (ROPC/hybrid/plain+S256), *.api.basf.com 9-host estate fully gated, agriculture/north-america/experience/rep/secsys/procurement/basf.login.apigee all closed classes reconfirmed.
+
+STEP 2 — PRIORITIZE:
+[PRIO] repfinder.basf.com/bin/basf/repfindertool,8.90,attack_surface=9 business_value=8 tech_exposure=9 gate_ease=10 cloud_surface=8 freshness=10
+[PRIO] my.basf.com,7.05,attack_surface=3 business_value=8 tech_exposure=5 gate_ease=10 cloud_surface=6 freshness=7
+[PRIO] federation.basf.com,6.10,attack_surface=4 business_value=7 tech_exposure=5 gate_ease=10 cloud_surface=5 freshness=6
+
+STEP 3 — HYPOTHESES:
+[HYP] Unauthenticated AEM Sling Servlet Proxy to AWS Lambda with Param-Driven Dual Service Routing + Java Internals Disclosure
+class: MISCONFIG
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 92
+reasoning: GET /bin/basf/repfindertool returns 200 JSON (not HTML) with functional geolocation search (lat/lon/country/productServiceId/distance/limitResults/repType params); dispatcher blocks /.model.json selectors but misses /bin/basf/* servlet path; proxy forwards to AWS Lambda (JSON response structure + Java stacktrace in error responses); two distinct service classes routed via repType param (repType=1 → RepFinder, repType=BR&productServiceId=2 → RetailFinderDatabaseService); empty DB currently (hits=0/results=[]) but search path live; NPE stacktrace leaks package/class/line numbers (com.basf.aws.cxm.service.db.impl.RetailFinderDatabaseService, com.basf.aws.cxm.lambda.functions.repfinder.RepFinderHandler); triager marked VALID 5.3 (Submit) for broken-access-control
+evidence_needed: Confirmed Lambda ARN or AWS account ID in stacktrace; PII in search results when DB populated; ability to invoke arbitrary Lambda functions via parameter manipulation; confirm no auth header required for any param combo
+verify_steps: GET https://repfinder.basf.com/bin/basf/repfindertool -H "Accept: application/json"; GET https://repfinder.basf.com/bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1; GET https://repfinder.basf.com/bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE; GET https://repfinder.basf.com/bin/basf/repfindertool?lat=999&lon=999
+impact: Internal AWS Lambda invocation surface exposed unauthenticated; stacktrace discloses server-side architecture (package names, line numbers); param-driven routing to two service classes; retailer/rep database read once populated (MEDIUM-HIGH); potential Lambda parameter injection or SSRF via geolocation params
+testability: PASSIVE
+
+[HYP] Public OAuth Client Emitting Refresh Tokens Without PKCE Enables ATO Chain
+class: AUTH
+asset: my.basf.com
+confidence: 70
+reasoning: SSR boot config fully discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with `redirect_uri=https://my.basf.com/.auth`, `scope=openid profile refresh_token`, `acr_values=3IAM/Login/External`, authorization_code flow, zero PKCE references; federation.basf.com NAM OIDC discovery confirms `code_challenge_methods_supported: ["plain","S256"]` but client doesn't enforce; refresh_token grant = long-lived bearer; code interception → token exchange → refresh_token replay = ATO; config stable across all re-probes, no provider hardening
+evidence_needed: Valid authorization_code interception (requires MITM or open redirect on redirect_uri); token exchange with intercepted code yields refresh_token; refresh_token replay yields new access_token without user interaction
+verify_steps: GET https://my.basf.com/ (capture SSR boot config JSON for client_id/redirect_uri/scope/acr_values); GET https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration (confirm PKCE methods supported); GET https://federation.basf.com/nidp/oauth/nam/authorize?client_id=86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4&response_type=code&redirect_uri=https%3A%2F%2Fmy.basf.com%2F.auth&scope=openid%20profile%20refresh_token&acr_values=3IAM%2FLogin%2FExternal (observe login flow); GET https://my.basf.com/.auth?code=INTERCEPTED (observe SPA callback handling)
+impact: Full account takeover via OAuth code interception → refresh_token replay; long-lived access bypassing MFA/acr; design-level flaw (AUTH_HELPED); HIGH
+testability: AUTH_HELPED
+
+[HYP] NAM OIDC Provider ROPC/Hybrid Grants Enable Credential Stuffing Against Registered Clients
+class: AUTH
+asset: federation.basf.com
+confidence: 55
+reasoning: OIDC discovery exposes `grant_types_supported: ["authorization_code","implicit","password","client_credentials","hybrid","refresh_token"]` including ROPC (password grant); `code_challenge_methods_supported: ["plain","S256"]` but plain allowed; `registration_endpoint: /nidp/oauth/nam/clients` (401); SAML2 metadata at `/nidp/saml2/metadata` returns 200 signed descriptor; provider config stable across all re-probes; ROPC exploitation requires valid BASF credentials (out-of-scope to test) but enables credential stuffing against any registered confidential client
+evidence_needed: Valid BASF username/password to test ROPC token endpoint; registered client_id/client_secret to test password grant; confirm token endpoint accepts password grant without PKCE
+verify_steps: GET https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration (confirm grant_types); POST https://federation.basf.com/nidp/oauth/nam/token -d "grant_type=password&username=test&password=test&client_id=VALID_CLIENT" (observe 400/401 vs 200); GET https://federation.basf.com/nidp/saml2/metadata (confirm SAML endpoints)
+impact: Credential stuffing against BASF employees/partners via ROPC; hybrid grant enables implicit flow abuse; requires valid creds/client — MEDIUM without creds, HIGH with leaked creds
+testability: AUTH_HELPED
+
+STEP 4 — SELF-CRITIQUE:
+[PARKED] NAM OIDC Provider ROPC/Hybrid Grants Enable Credential Stuffing Against Registered Clients: confidence 55 but exploitation requires valid BASF credentials (out-of-scope); no verify steps possible without test account; provider config is informational only
+[FINAL] Unauthenticated AEM Sling Servlet Proxy to AWS Lambda with Param-Driven Dual Service Routing + Java Internals Disclosure (repfinder.basf.com, confidence 92, PASSIVE) — HIGHEST CONFIDENCE, triager VALID 5.3, clear verify steps, exploitable surface
+[FINAL] Public OAuth Client Emitting Refresh Tokens Without PKCE Enables ATO Chain (my.basf.com, confidence 70, AUTH_HELPED) — DESIGN FLAW, config confirmed stable, ATO chain well-defined, requires test account for POC
+
+STEP 5 — NEXT ACTION:
+[NEXT] HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu — broken-access-control: dispatcher misses `/bin/basf/*` → unauth AEM Sling servlet proxies to AWS Lambda with dual service routing (RepFinder/RetailFinder) + Java stacktrace disclosure; evidence: bare GET 200 len=80 wrapper, geolocation search 200 hits=0, repType=BR NPE stacktrace (RetailFinderDatabaseService.java:143), dispatcher blocks /.model.json but not /bin/basf/*
+
+STEP 6 — LEARNING:
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: unauth AEM→AWS Lambda proxy, 200 JSON, stacktrace disclosure, geolocation-based search path functional (empty DB) — dispatcher misses /bin/basf/repfindertool
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/retailfindertool: HTTP 404 — sibling servlet absent behind dispatcher gap despite dual-service routing inside repfindertool
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: bare GET now 200 len=80 fixed wrapper — no-args path returns static short JSON, structurally distinct from NPE 200-path; confirms param-driven branches
+[LEARN] ACCEPTED TRIAGE @ repfinder unauth Lambda proxy: triager marked VALID 5.3 (Submit) at 2026-09-12 09:45 — reportable framing must be broken-access-control (dispatcher misses `/bin/basf/*` → unauth AEM Sling servlet proxies to AWS Lambda), NOT stacktrace disclosure (excluded class)
+[LEARN] REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL (/graphql2, /.graphql), REST (/.restful, /.rest), admin (/adminCentral, /admin, /.admin), cache (/.cache), DAM (/.imaging, /dam) all return 308 redirect or 404 — zero unauthenticated API surface
+[LEARN] REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs (/index.php/ccm/system/block/types, /index.php/ccm/system/page/types, /index.php/dashboard, /ccm/system/block/types, /api/blocks) all 307 redirect to Azure AD OAuth2 — fully auth-gated
+[LEARN] REJECTED MISCONFIG @ experience.basf.com: AEM Dispatcher cache poisoning via Host header spoofing — CloudFront returns 403 on all 4 tested paths with Host: author-prod-aem64.basf.com; edge blocks spoofed Host headers
+[LEARN] REJECTED MISCONFIG @ rep.basf.com/actuator/*: All 16 sensitive actuator endpoints return 404; path traversal (env.., actuator;/env, health/path/../../env) and content-negotiation (v3+json) blocked by Spring Boot path normalization; custom error handler returns status 999
+[LEARN] REJECTED BUSLOGIC @ procurement.basf.com/tm/passage-europe/vss3.basf.com KM servlet: All parameterized requests return HTTP 500 (SAP runtime error) across 4 portals; guest role renders zero content; vss3 WAF-blocks — SAP-estate unauth doc class conclusively closed
+[LEARN] REJECTED MISCONFIG @ basf.login.apigee.com: Standard Apigee Edge SSO identity-zone login — generic Edge SSO, not custom BASF OAuth provider; ROPC/implicit config is stock Edge SSO; exploitation requires valid BASF creds
+[LEARN] ACCEPTED RECON @ *.api.basf.com estate: Full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/404
+[LEARN] ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect_uri, scope, refresh_token, acr_values, zero PKCE refs — design flaw (AUTH_HELPED)
+[LEARN] ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/basfOTPUsed claims — provider config stable, no hardening
+[LEARN] ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
+
+STEP 7 — RISK:
+[RISK] basf: 45 — Unauthenticated backend exposure across 35+ host estate proven gated: Apigee VerifyAPIKey (all browser keys rejected), AWS IAM/authorizer MissingAuthenticationToken/Forbidden, NAM OIDC exact-match redirect_uri, Azure Functions admin 401/404, mTLS dev endpoints, Spring Boot Actuator locked down (404 sensitive, status 999 error handler), SAP KM servlet returns 500 guest-zero-content, AEM dispatchers blocking author paths/selectors, Cloudflare WAF on artifact/cloud/infra, Magnolia CMS endpoints redirected/404, Concrete CMS Azure AD-gated. CRITICAL RESIDUAL: my.basf.com public OAuth client (86cc4bf9-…) emitting refresh_token without PKCE (design flaw, AUTH_HELPED). Residual risk = portal ATO chain (OAuth code interception → refresh_token replay). NEW RESIDUAL: repfinder.basf.com/bin/basf/repfindertool unauth Lambda proxy with stacktrace disclosure + dual service routing (MISCONFIG, PASSIVE). No other exploitable unauthenticated surface remains.

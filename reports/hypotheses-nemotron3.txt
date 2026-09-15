@@ -1,4 +1,4 @@
-## 2026-09-15 06:48:56 UTC [target] (model nemotron3)
+## 2026-09-15 12:39:05 UTC [target] (model nemotron3)
 [PRIO] repfinder.basf.com/bin/basf/repfindertool,8.90,attack_surface=9 business_value=8 tech_exposure=9 gate_ease=10 cloud_surface=8 freshness=10
 [PRIO] my.basf.com,7.05,attack_surface=3 business_value=8 tech_exposure=5 gate_ease=10 cloud_surface=6 freshness=7
 [PRIO] federation.basf.com,6.10,attack_surface=4 business_value=7 tech_exposure=5 gate_ease=10 cloud_surface=5 freshness=6
