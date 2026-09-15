@@ -572,3 +572,10 @@ www.basf.com
 ## 2026-09-15 12:39:15 UTC
 
 ## 2026-09-15 17:34:00 UTC
+
+## 2026-09-15 20:28:07 UTC
+- NEW repfinder.basf.com/bin/basf/repfindertool: bare GET stable 200 len=80 wrapper `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`; geolocation search 200 `{"responseCode
+- NEW my.basf.com/.auth: consistent 200 len=204-205KB SPA fallback (client-side callback, no server-side token surface); SSR boot config discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` 
+- NEW federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration: stable 200 len=2029, `grant_types` incl `password` (ROPC) + `hybrid`, `code_challenge_methods_supported:["plain","S256"]`, `registr
+- NEW *.api.basf.com estate (9 hosts): full unauth surface reconfirmed end-to-end — zero reachable endpoints beyond auth gates/404 (Apigee 401, AWS IAM 403/400, Azure Functions 401/404, mTLS 400)
+- CHANGED probe-results.md: 09-15 17:34 cycle re-confirms all above; no new surface, no status changes

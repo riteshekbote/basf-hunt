@@ -20735,3 +20735,291 @@ STEP 6 — LEARNING
 
 STEP 7 — RISK
 [RISK] basf: 45 — 35+ host estate proven gated across twelve closed classes (Apigee VerifyAPIKey + Invalid ApiKey, AWS IAM/authorizer, NAM exact-match redirect_uri oracle, Azure Functions admin 401/404 + WAF-403 SSRF, mTLS dev 400, Spring Boot Actuator locked, SAP KM 500 guest-zero, AEM dispatchers except one miss, Cloudflare WAF/JS-challenge, Magnolia 308/404, Concrete 307-OAuth, Edge SSO cred-blocked). CRITICAL RESIDUAL unchanged: repfinder.basf.com/bin/basf/repfindertool unauth Lambda proxy (broken-access-control, MED-HIGH once DB populated, empty today, submit-ready, triager VALID 5.3) + my.basf.com public OAuth client 86cc4bf9 refresh_token without PKCE (design, AUTH_HELPED, residual ATO chain). No new exploitable unauth surface; converged to submission-only — human execution of the submission step is the sole outstanding task.
+===== ANALYST bigpickle 2026-09-15 20:28:07 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la && git log --oneline -5 2>/dev/null
+total 500
+drwxr-xr-x 12 runner runner   4096 Sep 15 20:18 .
+drwxr-xr-x  3 runner runner   4096 Sep 15 20:18 ..
+drwxr-xr-x  7 runner runner   4096 Sep 15 20:18 .git
+drwxr-xr-x  3 runner runner   4096 Sep 15 20:18 .github
+-rw-r--r--  1 runner runner   1801 Sep 15 20:18 README.md
+-rw-r--r--  1 runner runner     32 Sep 15 20:18 analyst-out.txt
+-rw-r--r--  1 runner runner 178972 Sep 15 20:18 analyst-prompt.txt
+-rw-r--r--  1 runner runner 175100 Sep 15 20:18 ctx.txt
+drwxr-xr-x  2 runner runner   4096 Sep 15 20:18 inventory
+drwxr-xr-x  2 runner runner   4096 Sep 15 20:18 knowledge
+drwxr-xr-x  2 runner runner   4096 Sep 15 20:18 leads
+-rw-r--r--  1 runner runner  65807 Sep 15 20:18 probe-results.md
+drwxr-xr-x  2 runner runner   4096 Sep 15 20:18 recon-notes
+drwxr-xr-x  2 runner runner   4096 Sep 15 20:18 reports
+drwxr-xr-x  2 runner runner   4096 Sep 15 20:18 reposcan-raw
+-rw-r--r--  1 runner runner   3285 Sep 15 20:18 scope.yml
+drwxr-xr-x  2 runner runner   4096 Sep 15 20:18 scripts
+-rw-r--r--  1 runner runner     33 Sep 15 20:18 state_bigpickle.json
+-rw-r--r--  1 runner runner     33 Sep 15 20:18 state_laguna.json
+-rw-r--r--  1 runner runner     33 Sep 15 20:18 state_ling3.json
+-rw-r--r--  1 runner runner     33 Sep 15 20:18 state_longcat.json
+-rw-r--r--  1 runner runner     33 Sep 15 20:18 state_mimo.json
+-rw-r--r--  1 runner runner     33 Sep 15 20:18 state_nemotron3.json
+drwxr-xr-x  2 runner runner   4096 Sep 15 20:18 triage
+d39cd44 reposcan 2026-09-15-19-50
+[0m
+[0m✱ [0mGlob "**/*.md"[90m 100 matches[0m
+[0m
+[0m$ [0mcat analyst-out.txt; echo "---"; cat state_bigpickle.json; echo "---"; ls -la triage | tail -3; echo "---"; cat reports/valid-bugs.md | head -60
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la && git log --oneline -5 2>/dev/null
+total 500
+drwxr-xr-x 12 runner runner   4096 Sep 15 20:18 .
+drwxr-xr-x  3 runner runner   4096 Sep 15 20:18 ..
+drwxr-xr-x  7 runner runner   4096 Sep 15 20:18 .git
+drwxr-xr-x  3 runner runner   4096 Sep 15 20:18 .github
+-rw-r--r--  1 runner runner   1801 Sep 15 20:18 README.md
+-rw-r--r--  1 runner runner     32 Sep 15 20:18 analyst-out.txt
+-rw-r--r--  1 runner runner 178972 Sep 15 20:18 analyst-prompt.txt
+-rw-r--r--  1 runner runner 175100 Sep 15 20:18 ctx.txt
+drwxr-xr-x  2 runner runner   4096 Sep 15 20:18 inventory
+drwxr-xr-x  2 runner runner   4096 Sep 15 20:18 knowledge
+drwxr-xr-x  2 runner runner   4096 Sep 15 20:18 leads
+-rw-r--r--  1 runner runner  65807 Sep 15 20:18 probe-results.md
+drwxr-xr-x  2 runner runner   4096 Sep 15 20:18 recon-notes
+drwxr-xr-x  2 runner runner   4096 Sep 15 20:18 reports
+drwxr-xr-x  2 runner runner   4096 Sep 15 20:18 reposcan-raw
+-rw-r--r--  1 runner runner   3285 Sep 15 20:18 scope.yml
+drwxr-xr-x  2 runner runner   4096 Sep 15 20:18 scripts
+-rw-r--r--  1 runner runner     33 Sep 15 20:18 state_bigpickle.json
+-rw-r--r--  1 runner runner     33 Sep 15 20:18 state_laguna.json
+-rw-r--r--  1 runner runner     33 Sep 15 20:18 state_ling3.json
+-rw-r--r--  1 runner runner     33 Sep 15 20:18 state_longcat.json
+-rw-r--r--  1 runner runner     33 Sep 15 20:18 state_mimo.json
+-rw-r--r--  1 runner runner     33 Sep 15 20:18 state_nemotron3.json
+drwxr-xr-x  2 runner runner   4096 Sep 15 20:18 triage
+d39cd44 reposcan 2026-09-15-19-50
+[0m
+[0m✱ [0mGlob "**/*.md"[90m 100 matches[0m
+---
+{"phase": "POC", "target": "api"}---
+-rw-r--r--  1 runner runner   197 Sep 15 20:18 run-2026-09-15-11-45.md
+-rw-r--r--  1 runner runner   230 Sep 15 20:18 run-2026-09-15-15-51.md
+-rw-r--r--  1 runner runner   149 Sep 15 20:18 run-2026-09-15-19-21.md
+---
+# Validated findings (running count 0)
+
+- 1 lead(s) marked VALID at 2026-09-06 00:12:43 UTC
+  - **VALID count: 0** — No finding currently meets the proof threshold for submission. Three leads (1, 6, 8) are on HOLD pending active validation steps.
+
+- 3 lead(s) marked VALID at 2026-09-12 09:45:34 UTC
+  - **Verdict: VALID**
+  - | Q7 | Reasonable triager accept? | **HOLD** — ROPC+plain PKCE are configuration weaknesses but exploitation requires valid credentials; depends on whether program accepts identity config findings |
+  - | repfinder stacktrace | **VALID** | 5.3 | Submit |
+[0m
+[0m→ [0mRead triage/run-2026-09-15-19-21.md
+[0m
+[0m$ [0mcat triage/run-2026-09-15-15-51.md triage/run-2026-09-15-11-45.md; echo "==="; ls reposcan-raw | head; echo "==="; cat reports/hypotheses.md | tail -40; echo "==="; cat leads/reposcan-basf.md | head -50
+===== TRIAGE 2026-09-15 15:51:14 UTC =====
+[0m
+> build · mimo-v2.5-free
+[0m
+The LEADS section is empty. Please provide the actual leads (URLs/findings) you'd like me to evaluate, and I'll run them through the 7-Question Gate.
+
+===== TRIAGE 2026-09-15 11:45:47 UTC =====
+[0m
+> build · mimo-v2.5-free
+[0m
+You haven't provided the actual leads. Please share the probe results/leads to validate against the 7-Question Gate.
+===
+summary.txt
+===
+- LEARN: ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
+
+## RANKED HYPOTHESES 2026-09-15 12:39:15 UTC
+- [92] repfinder.basf.com/bin/basf/repfindertool: Unauthenticated AEM Sling Servlet Proxy to AWS Lambda with Param-Driven Dual Service Routing + Java Internals Disclosure (from art/lead_nemotron3.txt)
+- [0] N/A: <none — zero candidate repositories> (from art/lead_bigpickle.txt)
+- NEXT(hypotheses-nemotron3.txt): HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu — broken-access-control: dispatcher misses `/bin/basf/*` → unauth AEM Sling servlet proxies t
+- LEARN: ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: unauth AEM→AWS Lambda proxy, 200 JSON, stacktrace disclosure, geolocation-based search path function
+- LEARN: ACCEPTED RECON @ repfinder.basf.com/bin/basf/retailfindertool: HTTP 404 — sibling servlet absent behind dispatcher gap despite dual-service routing inside repfi
+- LEARN: ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: bare GET now 200 len=80 fixed wrapper — no-args path returns static short JSON, structurally distinc
+- LEARN: ACCEPTED TRIAGE @ repfinder unauth Lambda proxy: triager marked VALID 5.3 (Submit) at 2026-09-12 09:45 — reportable framing must be broken-access-control (dispa
+- LEARN: REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL (/graphql2, /.graphql), REST (/.restful, /.rest), admin (/adminCentral, /admin, /.admin), cache 
+- LEARN: REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs (/index.php/ccm/system/block/types, /index.php/ccm/system/page/types, /index.ph
+- LEARN: REJECTED MISCONFIG @ experience.basf.com: AEM Dispatcher cache poisoning via Host header spoofing — CloudFront returns 403 on all 4 tested paths with Host: auth
+- LEARN: REJECTED MISCONFIG @ rep.basf.com/actuator/*: All 16 sensitive actuator endpoints return 404; path traversal (env.., actuator;/env, health/path/../../env) and c
+- LEARN: REJECTED BUSLOGIC @ procurement.basf.com/tm/passage-europe/vss3.basf.com KM servlet: All parameterized requests return HTTP 500 (SAP runtime error) across 4 por
+- LEARN: REJECTED MISCONFIG @ basf.login.apigee.com: Standard Apigee Edge SSO identity-zone login — generic Edge SSO, not custom BASF OAuth provider; ROPC/implicit confi
+- LEARN: ACCEPTED RECON @ *.api.basf.com estate: Full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/4
+- LEARN: ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect_uri, scope, refresh_token, 
+- LEARN: ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/bas
+- LEARN: ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
+
+## RANKED HYPOTHESES 2026-09-15 17:34:00 UTC
+- [92] repfinder.basf.com/bin/basf/repfindertool: Unauthenticated AEM Sling Servlet Proxy to AWS Lambda with Param-Driven Dual Service Routing + Java Internals Disclosure (from art/lead_nemotron3.txt)
+- [65] my.basf.com/.auth: Public OAuth client 86cc4bf9 without PKCE permits refresh-token ATO of myBASFWorld (from art/lead_bigpickle.txt)
+- NEXT(hypotheses-bigpickle.txt): HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu — broken-access-control: AEM dispatcher misses `/bin/basf/*` → unauth Sling servlet proxies t
+- NEXT(hypotheses-nemotron3.txt): HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu — broken-access-control: dispatcher misses `/bin/basf/*` → unauth AEM Sling servlet proxies t
+- LEARN: ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: unauth AEM→AWS Lambda proxy, 200 JSON, stacktrace disclosure, geolocation-based search path function
+- LEARN: ACCEPTED RECON @ repfinder.basf.com/bin/basf/retailfindertool: HTTP 404 — sibling servlet absent behind dispatcher gap despite dual-service routing inside repfi
+- LEARN: ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: bare GET now 200 len=80 fixed wrapper — no-args path returns static short JSON, structurally distinc
+- LEARN: ACCEPTED TRIAGE @ repfinder unauth Lambda proxy: triager marked VALID 5.3 (Submit) at 2026-09-12 09:45 — reportable framing must be broken-access-control (dispa
+- LEARN: REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL (/graphql2, /.graphql), REST (/.restful, /.rest), admin (/adminCentral, /admin, /.admin), cache 
+- LEARN: REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs (/index.php/ccm/system/block/types, /index.php/ccm/system/page/types, /index.ph
+- LEARN: REJECTED MISCONFIG @ experience.basf.com: AEM Dispatcher cache poisoning via Host header spoofing — CloudFront returns 403 on all 4 tested paths with Host: auth
+- LEARN: REJECTED MISCONFIG @ rep.basf.com/actuator/*: All 16 sensitive actuator endpoints return 404; path traversal (env.., actuator;/env, health/path/../../env) and c
+- LEARN: REJECTED BUSLOGIC @ procurement.basf.com/tm/passage-europe/vss3.basf.com KM servlet: All parameterized requests return HTTP 500 (SAP runtime error) across 4 por
+- LEARN: REJECTED MISCONFIG @ basf.login.apigee.com: Standard Apigee Edge SSO identity-zone login — generic Edge SSO, not custom BASF OAuth provider; ROPC/implicit confi
+- LEARN: ACCEPTED RECON @ *.api.basf.com estate: Full 9-host unauth surface mapped end-to-end — zero reachable endpoints, functions, keys, or configs beyond auth gates/4
+- LEARN: ACCEPTED RECON @ my.basf.com: SSR boot config fully discloses public OAuth client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect_uri, scope, refresh_token, 
+- LEARN: ACCEPTED RECON @ federation.basf.com: NAM OIDC discovery exposes ROPC (password) + hybrid grants, plain+S256 PKCE, registration scopes, LDAP groupMembership/bas
+- LEARN: ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
+===
+## REPOSCAN 2026-09-03 17:13:31 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-03 19:57:40 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-03 22:34:44 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-04 00:28:55 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-04 05:06:36 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-04 09:45:09 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-04 14:06:43 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-04 17:41:19 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-04 19:56:05 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-04 22:16:10 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-05 00:13:07 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-05 04:40:18 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-05 08:41:40 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-05 12:05:23 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-05 15:23:19 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-05 17:37:59 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-05 19:31:17 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-05 21:44:11 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-05 23:40:38 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-06 03:55:24 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-06 08:33:09 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-06 12:19:40 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-06 15:36:10 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-06 17:41:33 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-06 20:15:24 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+[0m
+[0m$ [0mcat reposcan-raw/summary.txt 2>/dev/null | tail -20; echo "==="; cat leads/lead-bigpickle.md | tail -40
+TARGET_ORG not configured for basf; skipping public-org deep scan.
+===
+impact: ATO of myBASFWorld (HIGH), credential-blocked; triager HOLD
+testability: AUTH_HELPED
+[HYP] none — third slot vacuous
+class: OTHER
+asset: *.basf.com estate remainder
+confidence: 10
+reasoning: twelve discovery classes statistically closed by direct probes across 35+ hosts through 09-15; 09-13→09-14→09-15 convergence stable; reposcan/org scan non-contributing
+evidence_needed: config drift establishing new reachable unauth surface
+verify_steps: none warranted
+impact: none
+testability: PASSIVE
+[HYP] Unauthenticated AEM Sling servlet→AWS Lambda proxy under /bin/basf/* (dispatcher ACL miss) — SUBMIT-READY
+class: OTHER
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 92
+reasoning: dispatcher blocks `/.model.json` + all standard AEM selectors but misses `/bin/basf/repfindertool`; 09-15 06:49 re-probe stable — bare GET 200/80 (`{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`), geolocation `?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` → 200 `SUCCESS` hits=0, `?repType=BR&productServiceId=2&country=DE` → 200/815 NPE wrapper (`RetailFinderDatabaseService.getFinalResult:143` / `searchDatabase:110` / `RepFinderHandler:60`); sibling `retailfindertool` 404; triager VALID 5.3 (Submit) 09-12 09:45; 09-14 01:46/07:53 + 09-15 06:49 byte-stable
+evidence_needed: none — frozen; reproduce three branches in report body at submit moment
+verify_steps: PASSIVE — GET `/bin/basf/repfindertool` (80B wrapper), GET geolocation query (72B hits=0), GET BR/psid=2 query (815B NPE) — all read-only, 1 rps
+impact: unauth rep/retailer DB read MED-HIGH once populated (empty today) + Java internals/architecture; frame broken-access-control only, NOT stacktrace
+testability: PASSIVE
+[HYP] Public OAuth client 86cc4bf9 no-PKCE refresh_token replay permits ATO of myBASFWorld
+class: OATH
+asset: my.basf.com/.auth + federation.basf.com/nidp/oauth/nam
+confidence: 65
+reasoning: SSR boot config discloses client_id `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4`, redirect_uri `https://my.basf.com/.auth`, scope `openid profile refresh_token`, zero PKCE refs; NAM discovery unchanged (`plain`+`S256`, authorization_code/password/hybrid, exact-match redirect_uri oracle closed all bypass variants); refresh_token issued to public client = long-lived bearer if stolen
+evidence_needed: program-owned test account for code+refresh replay/revocation testing
+verify_steps: PASSIVE — AUTH_HELPED only; no unauth vector exists (`.auth`/`.auth/me`/`.auth/config` all return SPA boot bundle)
+impact: ATO of myBASFWorld (HIGH) via stolen refresh token; credential-blocked, triager HOLD
+testability: AUTH_HELPED
+[HYP] none — no third viable hypothesis (estate closed)
+class: OTHER
+asset: *.basf.com estate remainder
+confidence: 10
+reasoning: twelve discovery classes statistically closed by direct probes across 35+ hosts through 09-15; 09-13→09-14→09-15→09-15-15:51 convergence stable; reposcan not configured contributes nothing; re-probing closed assets non-productive
+evidence_needed: actual config drift introducing a reachable unauth surface
+verify_steps: none warranted
+impact: none
+testability: PASSIVE
+[NEXT] HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu now (method: broken-access-control). Title: "AEM dispatcher ACL miss on /bin/basf/repfindertool exposes unauthenticated AEM Sling servlet proxying to AWS Lambda (dual-service RepFinder/RetailFinder routing)". Body evidence (reproduce at submit, 1 rps, all GET): (1) `GET /bin/basf/repfindertool` → 200, 80B `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`; (2) `GET /bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` → 200, 72B `responseCode:200 SUCCESS`, hits=0 (functional geolocation path, empty DB); (3) `GET /bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE` → 200, 815B NPE wrapper leaking `RetailFinderDatabaseService.getFinalResult:143` / `searchDatabase:110` / `RepFinderHandler:60` (dual-service routing). Control: `/.model.json` blocked (404), sibling `retailfindertool` 404. Impact: unauth DB read of rep/retailer data MED-HIGH once populated (empty today) + internals disclosure; no EXPLOIT-impact claim. Do NOT lead with stacktrace (excluded class).
+[RISK] basf: 45 — 35+ host estate proven gated across twelve closed classes (Apigee VerifyAPIKey + Invalid ApiKey, AWS IAM/authorizer, NAM exact-match redirect_uri oracle, Azure Functions admin 401/404 + WAF-403 SSRF, mTLS dev 400, Spring Boot Actuator locked, SAP KM 500 guest-zero, AEM dispatchers except one miss, Cloudflare WAF/JS-challenge, Magnolia 308/404, Concrete 307-OAuth, Edge SSO cred-blocked). CRITICAL RESIDUAL unchanged: repfinder.basf.com/bin/basf/repfindertool unauth Lambda proxy (broken-access-control, MED-HIGH once DB populated, empty today, submit-ready, triager VALID 5.3) + my.basf.com public OAuth client 86cc4bf9 refresh_token without PKCE (design, AUTH_HELPED, residual ATO chain). No new exploitable unauth surface; converged to submission-only — human execution of the submission step is the sole outstanding task.
+[0m
+STEP 1 — DELTA
+- NEW `reposcan 2026-09-15-19-50`: re-run appended `TARGET_ORG not configured for basf` (reposcan-raw/summary.txt) — zero candidate repositories, org scan contributes nothing (mirrors lead-bigpickle [0]). No new surface.
+- NO_DELTA — all other assets/classes byte-stable through 09-15 17:34 (repfinder 3-branch reproduce, my.basf.com/.auth SPA fallback, federation NAM discovery, *.api estate) — converged, submission-only.
+
+STEP 2 — PRIORITIZE
+- [PRIO] repfinder.basf.com/bin/basf/repfindertool: 7.6 (a=2 one host, b=6 rep/retailer DB, t=9 AEM→Lambda proxy + param-driven branches, g=10 unauth, c=3 AEM/CloudFront, f=9 re-probed 09-15 06:49)
+- [PRIO] my.basf.com/.auth + federation.basf.com: 6.4 (a=4, b=8 myBASFWorld ATO, t=8 OAuth no-PKCE, g=2 auth-gated, c=5 Azure Static Web Apps+NetIQ, f=8 stable recon)
+- [PRIO] *.basf.com estate remainder: 1.0 (all twelve discovery classes probe-closed through 09-15)
+
+STEP 3 — HYPOTHESES
+[HYP] Unauthenticated AEM Sling servlet→AWS Lambda proxy under /bin/basf/* (dispatcher ACL miss) — SUBMIT-READY
+class: OTHER
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 92
+reasoning: dispatcher blocks `/.model.json` + all standard AEM selectors but misses `/bin/basf/repfindertool`; 09-15 06:49 re-probe byte-stable — bare GET 200/80 (`{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`), geolocation `?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` → 200 SUCCESS hits=0, `?repType=BR&productServiceId=2&country=DE` → 200/815 NPE wrapper (`RetailFinderDatabaseService.getFinalResult:143`/`searchDatabase:110`/`RepFinderHandler:60`); sibling `retailfindertool` 404; triager VALID 5.3 (Submit) 09-12 09:45; stable 09-14 01:46/07:53 + 09-15 06:49
+evidence_needed: none — frozen; reproduce three branches in report body at submit moment
+verify_steps: PASSIVE — GET `/bin/basf/repfindertool` (80B), GET geolocation query (72B hits=0), GET BR/psid=2 (815B NPE), control `/.model.json` 404 + `retailfindertool` 404 — read-only, 1 rps
+impact: unauth rep/retailer DB read MED-HIGH once populated (empty today) + Java internals; frame broken-access-control only, NOT stacktrace
+testability: PASSIVE
+[HYP] Public OAuth client 86cc4bf9 no-PKCE refresh_token replay permits ATO of myBASFWorld
+class: OATH
+asset: my.basf.com/.auth + federation.basf.com/nidp/oauth/nam
+confidence: 65
+reasoning: SSR boot config discloses client_id `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4`, redirect_uri `https://my.basf.com/.auth`, scope `openid profile refresh_token`, zero PKCE refs; NAM discovery unchanged (`plain`+`S256`, authorization_code/password/hybrid, exact-match redirect_uri oracle closed all variants); refresh_token on public client = long-lived bearer if stolen
+evidence_needed: program-owned test account for code+refresh replay/revocation
+verify_steps: PASSIVE — AUTH_HELPED only; no unauth vector (`.auth`/`.auth/me`/`.auth/config` all return SPA boot bundle)
+impact: ATO of myBASFWorld (HIGH) via stolen refresh token; credential-blocked, triager HOLD
+testability: AUTH_HELPED
+[HYP] none — no third viable hypothesis (estate closed)
+class: OTHER
+asset: *.basf.com estate remainder
+confidence: 10
+reasoning: twelve discovery classes probe-closed across 35+ hosts through 09-15; reposcan not configured (zero repos); 09-13→09-14→09-15 convergence stable; re-probing closed assets non-productive
+evidence_needed: actual config drift introducing a reachable unauth surface
+verify_steps: none warranted
+impact: none
+testability: PASSIVE
+
+STEP 4 — SELF-CRITIQUE
+- [FINAL] repfinder `/bin/basf/repfindertool` unauth Lambda proxy (92) — survivors, submit-ready, triager VALID 5.3.
+- [FINAL] my.basf.com OAuth no-PKCE refresh-token ATO (65) — HOLD, credential-blocked, auth-helped reporting only.
+- [PARKED] estate-remainder drift monitoring (10): below threshold, no verify path, closed classes — record-only.
+- Not invented: no new hypotheses on probe-closed assets per convergence; no unauth mutation/live-probe warranted at 1-rps ceiling to avoid noise vs. frozen finding.
+
+STEP 5 — NEXT ACTION
+[NEXT] HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu now. Method: broken-access-control. Title: "AEM dispatcher ACL miss on /bin/basf/repfindertool exposes unauthenticated AEM Sling servlet proxying to AWS Lambda (dual-service RepFinder/RetailFinder routing)". Re-produce at submit, 1 rps, all GET: (1) `GET /bin/basf/repfindertool` → 200, 80B `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`; (2) `GET /bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` → 200, 72B SUCCESS hits=0 (functional geolocation, empty DB); (3) `GET /bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE` → 200, 815B NPE wrapper leaking `RetailFinderDatabaseService.getFinalResult:143` / `searchDatabase:110` / `RepFinderHandler:60`. Controls: `/.model.json` 404, sibling `retailfindertool` 404. Impact: unauth rep/retailer DB read MED-HIGH once populated (empty today) + internals disclosure; no EXPLOIT claim. Do NOT lead with stacktrace (excluded class).
+
+STEP 6 — LEARNING
+- [LEARN] ACCEPTED RECON @ *.basf.com reposcan: re-run (2026-09-15-19-50) returns `TARGET_ORG not configured` — org repo scan is a non-contributor; baseline `[0]` hypothesis confirmed, drop from future cycles.
+
+STEP 7 — RISK
+[RISK] basf: 45 — 35+ host estate gated across twelve closed classes (Apigee VerifyAPIKey/Invalid ApiKey, AWS IAM/authorizer, NAM exact-match redirect_uri oracle, Azure Functions admin 401/404 + WAF-403 SSRF, mTLS dev 400, Spring Boot Actuator locked, SAP KM 500 guest-zero, AEM dispatchers except one /bin/basf miss, Cloudflare WAF/JS-challenge, Magnolia 308/404, Concrete 307-OAuth, Edge SSO cred-blocked). Residual unchanged: repfinder `/bin/basf/repfindertool` unauth Lambda proxy (broken-access-control, MED-HIGH once populated, empty today, submit-ready, VALID 5.3) + my.basf.com public OAuth client 86cc4bf9 refresh_token no PKCE (design, AUTH_HELPED, residual ATO chain). No new exploitable unauth surface; converged — human execution of the submission step is the sole outstanding task.

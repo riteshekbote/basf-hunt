@@ -1,4 +1,9 @@
-## 2026-09-15 17:33:50 UTC [target] (model nemotron3)
+## 2026-09-15 20:27:57 UTC [target] (model nemotron3)
+[NEW] repfinder.basf.com/bin/basf/repfindertool: bare GET stable 200 len=80 wrapper `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`; geolocation search 200 `{"responseCode":"200","responseMsg":" Successful","hits":0,"results":[]}`; repType=BR NPE 200 stacktrace `RetailFinderDatabaseService.java:143` / `RepFinderHandler.java:60` — byte-stable across 09-13/14/15 re-probes
+[NEW] my.basf.com/.auth: consistent 200 len=204-205KB SPA fallback (client-side callback, no server-side token surface); SSR boot config discloses public OAuth client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with `redirect_uri=https://my.basf.com/.auth`, `scope=openid profile refresh_token`, `acr_values=3IAM/Login/External`, zero PKCE
+[NEW] federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration: stable 200 len=2029, `grant_types` incl `password` (ROPC) + `hybrid`, `code_challenge_methods_supported:["plain","S256"]`, `registration_endpoint:/nidp/oauth/nam/clients` (401) — no provider hardening
+[NEW] *.api.basf.com estate (9 hosts): full unauth surface reconfirmed end-to-end — zero reachable endpoints beyond auth gates/404 (Apigee 401, AWS IAM 403/400, Azure Functions 401/404, mTLS 400)
+[CHANGED] probe-results.md: 09-15 17:34 cycle re-confirms all above; no new surface, no status changes
 [PRIO] repfinder.basf.com/bin/basf/repfindertool,8.90,attack_surface=9,business_value=8,tech_exposure=9,gate_ease=10,cloud_surface=8,freshness=10
 [PRIO] my.basf.com,7.05,attack_surface=3,business_value=8,tech_exposure=5,gate_ease=10,cloud_surface=6,freshness=7
 [PRIO] federation.basf.com,6.10,attack_surface=4,business_value=7,tech_exposure=5,gate_ease=10,cloud_surface=5,freshness=6
