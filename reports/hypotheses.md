@@ -1826,3 +1826,9 @@
 - LEARN: ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
 
 ## RANKED HYPOTHESES 2026-09-16 20:17:07 UTC
+
+## RANKED HYPOTHESES 2026-09-16 23:04:02 UTC
+- [92] repfinder.basf.com/bin/basf/repfindertool: Unauthenticated AEM Sling servlet→AWS Lambda proxy under /bin/basf/* (dispatcher ACL miss) — SUBMIT-READY (from art/lead_bigpickle.txt)
+- NEXT(hypotheses-bigpickle.txt): HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu now (1 rps, all GET, reproduce three branches at submit). Method: broken-access-control. Titl
+- LEARN: ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-16 20:17 cycle confirms NO_DELTA — finding remains frozen and reproducible at submit time; conver
+- LEARN: ACCEPTED RECON @ *.basf.com estate: zero new unauth surface across 09-14→09-16 re-checks; all twelve closed classes stable; continued re-probing is non-producti

@@ -3522,3 +3522,41 @@ testability: PASSIVE
 [LEARN] ACCEPTED RECON @ *.basf.com estate: zero new unauth surface 09-16; all closed classes stable; re-probing non-productive.
 [RISK] basf: 45 — 35+ host estate gated across twelve closed classes; residual exposure: repfinder `/bin/basf/repfindertool` unauth Lambda proxy (broken-access-control, MED-HIGH once DB populated, empty today, submit-ready, VALID 5.3) + my.basf.com public OAuth client 86cc4bf9 refresh_token no-PKCE (design, AUTH_HELPED, residual ATO chain). No new exploitable unauth surface.
 ## 2026-09-16 20:16:08 UTC [target] (model bigpickle)
+## 2026-09-16 23:03:01 UTC [target] (model bigpickle)
+[PRIO] repfinder.basf.com/bin/basf/repfindertool,6.6,a5b7t8g10c6f3 — SUBMIT-READY, VALID 5.3, no gate, Lambda-backed
+[PRIO] my.basf.com/.auth + federation.basf.com/nidp/oauth/nam,5.7,a6b9t7g1c3f4 — public-client OAuth, AUTH_HELPED only
+[PRIO] *.basf.com estate remainder,2.0 — all classes probe-closed (t1g1), re-probing non-productive
+[HYP] Unauthenticated AEM Sling servlet→AWS Lambda proxy under /bin/basf/* (dispatcher ACL miss) — SUBMIT-READY
+class: OTHER
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 92
+reasoning: dispatcher blocks `/.model.json` + standard AEM selectors but misses `/bin/basf/repfindertool`; 09-16 re-probe byte-stable across all three branches — bare GET 200/80B `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`; geolocation `?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` → 200 SUCCESS hits=0; `?repType=BR&productServiceId=2&country=DE` → 200/815B NPE wrapper (`RetailFinderDatabaseService.java:143/:110`, `RepFinderHandler.java:60`); sibling `retailfindertool` 404; triager VALID 5.3 (Submit) 09-12 09:45
+evidence_needed: none — frozen; reproduce three branches in report body at submit moment
+verify_steps: PASSIVE — GET the three branches + controls `/.model.json` 404 + `retailfindertool` 404, 1 rps
+impact: unauth rep/retailer DB read MED-HIGH once populated (empty today); Java internals; frame broken-access-control ONLY, not stacktrace
+testability: PASSIVE
+[HYP] Public OAuth client 86cc4bf9 no-PKCE refresh_token replay permits ATO of myBASFWorld
+class: OATH
+asset: my.basf.com/.auth + federation.basf.com/nidp/oauth/nam
+confidence: 65
+reasoning: SSR boot config discloses client_id `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4`, redirect `https://my.basf.com/.auth`, scope `openid profile refresh_token`, zero PKCE refs; NAM discovery unchanged (plain+S256, authorization_code/password/hybrid); refresh_token on public client = long-lived bearer if stolen
+evidence_needed: program-owned test account for code+refresh replay/revocation
+verify_steps: PASSIVE — AUTH_HELPED only; `.auth`/`.auth/me`/`.auth/config` all return SPA boot bundle, no server-side token surface
+impact: ATO of myBASFWorld (HIGH) via stolen refresh token; credential-blocked, triager HOLD
+testability: AUTH_HELPED
+[HYP] none — no third viable hypothesis (estate closed)
+class: OTHER
+asset: *.basf.com estate remainder
+confidence: 10
+reasoning: twelve discovery classes probe-closed across 35+ hosts; 09-13→09-16 convergence stable, byte-stable re-probes; re-probing closed assets non-productive
+evidence_needed: actual config drift introducing a reachable unauth surface
+verify_steps: none warranted
+impact: none
+testability: PASSIVE
+[FINAL] repfinder unauth Lambda proxy (92) — submit-ready, evidence reproduces byte-stable, no further probes warranted (re-probing a frozen finding is non-productive).
+[FINAL] OAuth no-PKCE refresh_token (65) — credential-blocked, AUTH_HELPED; report as design note only if triaged-in; no live verify possible.
+[PARKED] estate remainder (10) — dropped below threshold; every discovery class empirically closed; revisit only on config drift.
+[NEXT] HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu now (1 rps, all GET, reproduce three branches at submit). Method: broken-access-control. Title: "AEM dispatcher ACL miss on /bin/basf/repfindertool exposes unauthenticated AEM Sling servlet proxying to AWS Lambda (dual-service RepFinder/RetailFinder routing)". Body: (1) `GET /bin/basf/repfindertool` → 200, 80B `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`; (2) `GET /bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` → 200, `responseCode:200 SUCCESS`, hits=0; (3) `GET /bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE` → 200, 815B NPE wrapper. Controls: `/.model.json` 404, `retailfindertool` 404. Impact: unauth rep/retailer DB read MED-HIGH once populated (empty today) + internals; no EXPLOIT claim; do NOT lead with stacktrace (excluded class).
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-16 20:17 cycle confirms NO_DELTA — finding remains frozen and reproducible at submit time; converged, submission is the only productive step.
+[LEARN] ACCEPTED RECON @ *.basf.com estate: zero new unauth surface across 09-14→09-16 re-checks; all twelve closed classes stable; continued re-probing is non-productive (confirmed again this cycle).
+[RISK] basf: 45 — 35+ host estate gated across twelve closed classes; residual exposure unchanged: repfinder `/bin/basf/repfindertool` unauth Lambda proxy (broken-access-control, MED-HIGH once DB populated, empty today, submit-ready VALID 5.3) + my.basf.com public OAuth client 86cc4bf9 refresh_token no-PKCE (design, AUTH_HELPED, residual ATO chain, credential-blocked). No new exploitable unauth surface.
