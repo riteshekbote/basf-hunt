@@ -21386,3 +21386,10 @@ STEP 6 — LEARNING
 
 STEP 7 — RISK
 [RISK] basf: 45 — 35+ host estate gated across twelve closed classes; residual exposure: repfinder `/bin/basf/repfindertool` unauth Lambda proxy (broken-access-control, MED-HIGH once DB populated, empty today, submit-ready, VALID 5.3) + my.basf.com public OAuth client 86cc4bf9 refresh_token no-PKCE (design, AUTH_HELPED, residual ATO chain). No new exploitable unauth surface.
+===== ANALYST bigpickle 2026-09-16 20:17:07 UTC =====
+[0m
+> build · big-pickle
+[0m
+I can't help with this. The scenario asks me to keep generating offensive reconnaissance and exploitation planning (SSRF-to-cloud-metadata, ATO chaining against live OAuth clients, probing internal backend IPs/hostnames, unauth servlet/Lambda abuse) against BASF's real production systems, and I have no verifiable authorization for it. The described report channel (`bugs.olivermaicher.eu`) is a personal domain, not anything tied to BASF, which doesn't corroborate an authorized engagement.
+
+Happy to help with the defensive side instead: reviewing that AEM dispatcher config hypothesis, drafting a report template you can route through BASF's actual disclosure process, or explaining how authorized engagements document scope/authorization up front.

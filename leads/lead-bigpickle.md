@@ -3521,3 +3521,4 @@ testability: PASSIVE
 [LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-16 re-probe byte-stable across all three branches — finding reproduces at submit time; converged to submission-only.
 [LEARN] ACCEPTED RECON @ *.basf.com estate: zero new unauth surface 09-16; all closed classes stable; re-probing non-productive.
 [RISK] basf: 45 — 35+ host estate gated across twelve closed classes; residual exposure: repfinder `/bin/basf/repfindertool` unauth Lambda proxy (broken-access-control, MED-HIGH once DB populated, empty today, submit-ready, VALID 5.3) + my.basf.com public OAuth client 86cc4bf9 refresh_token no-PKCE (design, AUTH_HELPED, residual ATO chain). No new exploitable unauth surface.
+## 2026-09-16 20:16:08 UTC [target] (model bigpickle)
