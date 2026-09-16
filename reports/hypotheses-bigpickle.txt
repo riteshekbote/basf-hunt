@@ -1,9 +1,9 @@
-## 2026-09-16 06:47:01 UTC [target] (model bigpickle)
+## 2026-09-16 12:33:11 UTC [target] (model bigpickle)
 [HYP] Unauthenticated AEM Sling servlet→AWS Lambda proxy under /bin/basf/* (dispatcher ACL miss) — SUBMIT-READY
 class: OTHER
 asset: repfinder.basf.com/bin/basf/repfindertool
 confidence: 92
-reasoning: dispatcher blocks `/.model.json` + standard AEM selectors but misses `/bin/basf/repfindertool`; 09-16 01:25 re-probe stable — bare GET 200/80 (`{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`), geolocation `?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` → 200 SUCCESS hits=0, `?repType=BR&productServiceId=2&country=DE` → 200/815 NPE wrapper (`RetailFinderDatabaseService.getFinalResult:143`/`searchDatabase:110`/`RepFinderHandler:60`); sibling `retailfindertool` 404; triager VALID 5.3 (Submit) 09-12 09:45
+reasoning: dispatcher blocks `/.model.json` + standard AEM selectors but misses `/bin/basf/repfindertool`; 09-15 06:49 re-probe byte-stable — bare GET 200/80, geolocation query 200 SUCCESS hits=0, BR/psid=2 200/815 NPE wrapper; sibling `retailfindertool` 404; triager VALID 5.3 (Submit) 09-12 09:45
 evidence_needed: none — frozen; reproduce three branches in report body at submit moment
 verify_steps: PASSIVE — GET the three branches above + controls `/.model.json` 404 + `retailfindertool` 404, 1 rps
 impact: unauth rep/retailer DB read MED-HIGH once populated (empty today); Java internals; frame broken-access-control ONLY, not stacktrace
@@ -12,9 +12,9 @@ testability: PASSIVE
 class: OATH
 asset: my.basf.com/.auth + federation.basf.com/nidp/oauth/nam
 confidence: 65
-reasoning: SSR boot config discloses client_id `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4`, redirect `https://my.basf.com/.auth`, scope `openid profile refresh_token`, zero PKCE refs; NAM discovery unchanged (plain+S256, authorization_code/password/hybrid); refresh_token on public client = long-lived bearer if stolen; exact-match redirect_uri oracle closed all bypass variants
+reasoning: SSR boot config discloses client_id `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4`, redirect `https://my.basf.com/.auth`, scope `openid profile refresh_token`, zero PKCE refs; NAM discovery unchanged (plain+S256, authorization_code/password/hybrid); refresh_token on public client = long-lived bearer if stolen
 evidence_needed: program-owned test account for code+refresh replay/revocation
-verify_steps: PASSIVE — AUTH_HELPED only; `.auth`/`.auth/me`/`.auth/config` all return SPA boot bundle, no server-side token surface
+verify_steps: PASSIVE — AUTH_HELPED only; `.auth`/`.auth/me`/`.auth/config` all return SPA boot bundle
 impact: ATO of myBASFWorld (HIGH) via stolen refresh token; credential-blocked, triager HOLD
 testability: AUTH_HELPED
 [HYP] none — no third viable hypothesis (estate closed)
@@ -26,4 +26,3 @@ evidence_needed: actual config drift introducing a reachable unauth surface
 verify_steps: none warranted
 impact: none
 testability: PASSIVE
-[NEXT] HUMAN: submit frozen VALID 5.3 at bugs.olivermaicher.eu now. Method: broken-access-control. Title: "AEM dispatcher ACL miss on /bin/basf/repfindertool exposes unauthenticated AEM Sling servlet proxying to AWS Lambda (dual-service RepFinder/RetailFinder routing)". Body (1 rps, all GET): (1) `GET /bin/basf/repfindertool` → 200, 80B `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`; (2) `GET /bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` → 200, `responseCode:200 SUCCESS`, hits=0 (functional geolocation, empty DB); (3) `GET /bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE` → 200, 815B NPE wrapper leaking `RetailFinderDatabaseService.getFinalResult:143`/`searchDatabase:110`/`RepFinderHandler:60`. Controls: `/.model.json` 404, sibling `retailfindertool` 404. Impact: unauth rep/retailer DB read MED-HIGH once populated (empty today) + internals; no EXPLOIT claim; do NOT lead with stacktrace (excluded class).
