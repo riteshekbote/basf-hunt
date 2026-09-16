@@ -3414,3 +3414,15 @@ evidence_needed: actual config drift introducing a reachable unauth surface
 verify_steps: none warranted
 impact: none
 testability: PASSIVE
+## 2026-09-16 01:21:45 UTC [target] (model bigpickle)
+[HYP] Unauthenticated AEM Sling servlet→AWS Lambda proxy under /bin/basf/* (dispatcher ACL miss) — SUBMIT-READY
+class: OTHER
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 92
+reasoning: dispatcher blocks `/.model.json` + all standard AEM selector classes but misses `/bin/basf/repfindertool`; 09-15 06:49 re-probe byte-stable — bare GET 200/80 (`{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`), geolocation `?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` → 200/72 SUCCESS hits=0, `?repType=BR&productServiceId=2&country=DE` → 200/815 NPE wrapper (`RetailFinderDatabaseService.getFinalResult:143`/`searchDatabase:110`/`RepFinderHandler:60`); sibling `retailfindertool` 404; triager VALID 5.3 (Submit) 09-12 09:45
+evidence_needed: none — frozen; reproduce three branches in report body at submit moment
+verify_steps: PASSIVE — GET `/bin/basf/repfindertool` (80B), GET geolocation query (72B hits=0), GET BR/psid=2 (815B NPE), controls `/.model.json` 404 + `retailfindertool` 404 — read-only, 1 rps
+impact: unauth rep/retailer DB read MED-HIGH once populated (empty today) + Java internals; frame broken-access-control only, NOT stacktrace
+testability: PASSIVE
+[NEXT] HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu now (1 rps, all GET, reproduce at submit). Method: broken-access-control. Title: "AEM dispatcher ACL miss on /bin/basf/repfindertool exposes unauthenticated AEM Sling servlet proxying to AWS Lambda (dual-service RepFinder/RetailFinder routing)". Body: (1) `GET /bin/basf/repfindertool` → 200, 80B `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`; (2) `GET /bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` → 200, 72B `responseCode:200 SUCCESS`, hits=0; (3) `GET /bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE` → 200, 815B NPE wrapper (`RetailFinderDatabaseService.getFinalResult:143`/`searchDatabase:110`/`RepFinderHandler:60`). Controls: `/.model.json` 404, `retailfindertool` 404. Impact: unauth rep/retailer DB read MED-HIGH once populated (empty today) + internals; no EXPLOIT impact claim; do NOT lead with stacktrace.
+[RISK] basf: 45 — 35+ host estate gated across twelve closed classes; residual exposure: repfinder `/bin/basf/repfindertool` unauth Lambda proxy (broken-access-control, MED-HIGH once DB populated, empty today, submit-ready, VALID 5.3) + my.basf.com public OAuth client 86cc4bf9 refresh_token no-PKCE (design, AUTH_HELPED, residual ATO chain). No new exploitable unauth surface.
