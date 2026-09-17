@@ -431,3 +431,5 @@
 - 2026-09-16 ACCEPTED RECON @ *.basf.com estate: zero new unauth surface 09-16; all closed classes stable; re-probing non-productive.
 - 2026-09-16 ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-16 20:17 cycle confirms NO_DELTA — finding remains frozen and reproducible at submit time; converged, submission is the only productive step.
 - 2026-09-16 ACCEPTED RECON @ *.basf.com estate: zero new unauth surface across 09-14→09-16 re-checks; all twelve closed classes stable; continued re-probing is non-productive (confirmed again this cycle).
+- 2026-09-17 ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: NO_DELTA this cycle — all three branches byte-stable, finding frozen; re-probing a frozen finding is non-productive.
+- 2026-09-17 ACCEPTED RECON @ *.basf.com estate: zero new unauth surface; all twelve closed classes stable; continued re-probing non-productive.

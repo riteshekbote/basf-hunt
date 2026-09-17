@@ -1832,3 +1832,9 @@
 - NEXT(hypotheses-bigpickle.txt): HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu now (1 rps, all GET, reproduce three branches at submit). Method: broken-access-control. Titl
 - LEARN: ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-16 20:17 cycle confirms NO_DELTA — finding remains frozen and reproducible at submit time; conver
 - LEARN: ACCEPTED RECON @ *.basf.com estate: zero new unauth surface across 09-14→09-16 re-checks; all twelve closed classes stable; continued re-probing is non-producti
+
+## RANKED HYPOTHESES 2026-09-17 01:33:13 UTC
+- [92] repfinder.basf.com/bin/basf/repfindertool: Unauthenticated AEM Sling servlet→AWS Lambda proxy under /bin/basf/* (dispatcher ACL miss) (from art/lead_bigpickle.txt)
+- NEXT(hypotheses-bigpickle.txt): HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu now (1 rps, all GET, reproduce three branches at submit). Method: broken-access-control. Titl
+- LEARN: ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: NO_DELTA this cycle — all three branches byte-stable, finding frozen; re-probing a frozen finding is
+- LEARN: ACCEPTED RECON @ *.basf.com estate: zero new unauth surface; all twelve closed classes stable; continued re-probing non-productive.
