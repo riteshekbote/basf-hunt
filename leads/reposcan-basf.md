@@ -294,3 +294,12 @@ verify_steps: DNS-resolve app-dev.roqs.basf.net externally
 TARGET_ORG not configured for basf; skipping public-org deep scan.
 ## REPOSCAN 2026-09-17 16:38:08 UTC
 TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-17 19:54:19 UTC
+[HYP] No in-scope secrets or insecure patterns found
+class: OTHER
+asset: basf-hunt (this repo)
+confidence: 95
+reasoning: The repository is a bug bounty tool, not BASF source code. All grep
+impact: N/A
+verify_steps: Run: rg -n 'AKIA[A-Z0-9]{16}|AIza[0-9A-Za-z_-]{35}|ghp_[A-Za-z0-9]{36}|sk_live_|-----BEGIN.*(PRIVATE|RSA|EC)' across the repo — zero real hits.
+TARGET_ORG not configured for basf; skipping public-org deep scan.
