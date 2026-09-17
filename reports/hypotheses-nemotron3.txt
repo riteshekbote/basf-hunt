@@ -1,7 +1,7 @@
-## 2026-09-17 17:11:00 UTC [target] (model nemotron3)
+## 2026-09-17 20:24:27 UTC [target] (model nemotron3)
 [PRIO] repfinder.basf.com/bin/basf/repfindertool,9.2,attack_surface=10,business_value=8,tech_exposure=10,gate_ease=10,cloud_surface=9,freshness=10
 [PRIO] my.basf.com,6.5,attack_surface=4,business_value=9,tech_exposure=6,gate_ease=10,cloud_surface=6,freshness=8
-[PRIO] federation.basf.com,5.8,attack_surface=5,business_value=7,tech_exposure=5,gate_ease=10,cloud_surface=5,freshness=7
+[PRIO] federation.basf.com/nidp/oauth/nam,5.8,attack_surface=5,business_value=7,tech_exposure=5,gate_ease=10,cloud_surface=5,freshness=7
 [HYP] Unauthenticated AEM Sling Servlet Proxy to AWS Lambda with Param-Driven Dual Service Routing + Java Internals Disclosure
 class: MISCONFIG
 asset: repfinder.basf.com/bin/basf/repfindertool
