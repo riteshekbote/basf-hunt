@@ -3664,3 +3664,51 @@ evidence_needed: actual config drift introducing a reachable unauth surface
 verify_steps: none warranted
 impact: none
 testability: PASSIVE
+## 2026-09-17 17:09:31 UTC [target] (model bigpickle)
+impact: unauth rep/retailer DB read MED-HIGH once populated (empty today) + Java internals; frame broken-access-control ONLY
+testability: PASSIVE
+[HYP] Public OAuth client 86cc4bf9 no-PKCE refresh_token replay permits ATO of myBASFWorld
+class: OATH
+asset: my.basf.com/.auth + federation.basf.com/nidp/oauth/nam
+confidence: 65
+reasoning: SSR boot config discloses client_id `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4`, redirect `https://my.basf.com/.auth`, scope `openid profile refresh_token`, zero PKCE refs; NAM discovery unchanged (plain+S256, authorization_code/password/hybrid); refresh_token on public client = long-lived bearer if stolen
+evidence_needed: program-owned test account for code+refresh replay/revocation
+verify_steps: PASSIVE — AUTH_HELPED only; `.auth`/`.auth/me`/`.auth/config` all return SPA boot bundle, no server-side token surface
+impact: ATO of myBASFWorld (HIGH) via stolen refresh token; credential-blocked, triager HOLD
+testability: AUTH_HELPED
+[HYP] none — no third viable hypothesis (estate closed)
+class: OTHER
+asset: *.basf.com estate remainder
+confidence: 10
+reasoning: twelve discovery classes probe-closed across 35+ hosts; 09-13→09-17 convergence stable; re-probing closed assets non-productive
+evidence_needed: actual config drift introducing a reachable unauth surface
+verify_steps: none warranted
+impact: none
+testability: PASSIVE
+[HYP] Unauthenticated AEM Sling servlet→AWS Lambda proxy under /bin/basf/* (dispatcher ACL miss)
+class: OTHER
+asset: repfinder.basf.com/bin/basf/repfindertool
+confidence: 92
+reasoning: dispatcher blocks `/.model.json` + standard selectors but misses `/bin/basf/repfindertool`; three branches byte-stable 09-12→09-16: bare GET→200/80B `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`; geolocation params→200 `responseCode:200 SUCCESS` hits=0; `repType=BR&productServiceId=2&country=DE`→200/815B NPE wrapper (`RetailFinderDatabaseService.java:143/:110`, `RepFinderHandler.java:60`); sibling `retailfindertool` 404; triager VALID 5.3 (Submit) 09-12 09:45
+evidence_needed: none — frozen; reproduce three branches in report body at submit
+verify_steps: PASSIVE — GET three branches + controls (`/.model.json` 404, `retailfindertool` 404), 1 rps
+impact: unauth rep/retailer DB read MED-HIGH once populated (empty today) + Java internals; frame broken-access-control ONLY
+testability: PASSIVE
+[HYP] Public OAuth client 86cc4bf9 no-PKCE refresh_token replay permits ATO of myBASFWorld
+class: OATH
+asset: my.basf.com/.auth + federation.basf.com/nidp/oauth/nam
+confidence: 65
+reasoning: SSR boot config discloses client_id `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4`, redirect `https://my.basf.com/.auth`, scope `openid profile refresh_token`, zero PKCE refs; NAM discovery unchanged (plain+S256, authorization_code/password/hybrid); refresh_token on public client = long-lived bearer if stolen
+evidence_needed: program-owned test account for code+refresh replay/revocation
+verify_steps: PASSIVE — AUTH_HELPED only; `.auth`/`.auth/me`/`.auth/config` all return SPA boot bundle, no server-side token surface
+impact: ATO of myBASFWorld (HIGH) via stolen refresh token; credential-blocked, triager HOLD
+testability: AUTH_HELPED
+[HYP] none — no third viable hypothesis (estate closed)
+class: OTHER
+asset: *.basf.com estate remainder
+confidence: 10
+reasoning: twelve discovery classes probe-closed across 35+ hosts; 09-13→09-17 convergence stable; re-probing closed assets non-productive
+evidence_needed: actual config drift introducing a reachable unauth surface
+verify_steps: none warranted
+impact: none
+testability: PASSIVE

@@ -1,38 +1,38 @@
-## 2026-09-17 12:11:05 UTC [target] (model nemotron3)
-[PRIO] repfinder.basf.com/bin/basf/repfindertool,8.9,attack_surface=9,business_value=8,tech_exposure=9,gate_ease=10,cloud_surface=8,freshness=10
-[PRIO] my.basf.com,6.3,attack_surface=3,business_value=8,tech_exposure=5,gate_ease=10,cloud_surface=6,freshness=7
-[PRIO] federation.basf.com,5.8,attack_surface=4,business_value=7,tech_exposure=5,gate_ease=10,cloud_surface=5,freshness=6
+## 2026-09-17 17:11:00 UTC [target] (model nemotron3)
+[PRIO] repfinder.basf.com/bin/basf/repfindertool,9.2,attack_surface=10,business_value=8,tech_exposure=10,gate_ease=10,cloud_surface=9,freshness=10
+[PRIO] my.basf.com,6.5,attack_surface=4,business_value=9,tech_exposure=6,gate_ease=10,cloud_surface=6,freshness=8
+[PRIO] federation.basf.com,5.8,attack_surface=5,business_value=7,tech_exposure=5,gate_ease=10,cloud_surface=5,freshness=7
 [HYP] Unauthenticated AEM Sling Servlet Proxy to AWS Lambda with Param-Driven Dual Service Routing + Java Internals Disclosure
 class: MISCONFIG
 asset: repfinder.basf.com/bin/basf/repfindertool
 confidence: 92
-reasoning: Dispatcher blocks `/.model.json`/standard selectors but misses `/bin/basf/*`; three branches byte-stable across 09-12→09-17: bare GET → 200 len=80 `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`; geolocation `?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` → 200 SUCCESS hits=0; `?repType=BR&productServiceId=2&country=DE` → 200 len=815 NPE wrapper leaking `RetailFinderDatabaseService.java:143`, `RepFinderHandler.java:60`; sibling `retailfindertool` 404; triager VALID 5.3 (Submit) 09-12 09:45
+reasoning: Dispatcher blocks /.model.json/standard selectors but misses /bin/basf/*; three branches byte-stable 09-12→09-17: bare GET → 200 len=80 {"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}; geolocation ?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 → 200 SUCCESS hits=0; ?repType=BR&productServiceId=2&country=DE → 200 len=815 NPE wrapper leaking RetailFinderDatabaseService.java:143, RepFinderHandler.java:60; sibling retailfindertool 404; triager VALID 5.3 (Submit) 09-12 09:45
 evidence_needed: none — frozen; reproduce three branches in report body
-verify_steps: PASSIVE — GET three branches + controls (`/.model.json` 404, `retailfindertool` 404), 1 rps
+verify_steps: PASSIVE — GET three branches + controls (/.model.json 404, retailfindertool 404), 1 rps
 impact: Unauthenticated rep/retailer DB read (MEDIUM-HIGH once populated, empty today) + Java internals; frame as broken-access-control ONLY
 testability: PASSIVE
 [HYP] Public OAuth Client Emitting Refresh Tokens Without PKCE Enables ATO Chain
 class: OATH
 asset: my.basf.com/.auth + federation.basf.com/nidp/oauth/nam
 confidence: 65
-reasoning: SSR boot config discloses public client `86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4` with `redirect_uri=https://my.basf.com/.auth`, `scope=openid profile refresh_token`, `acr_values=3IAM/Login/External`, zero PKCE refs; NAM discovery unchanged (`code_challenge_methods_supported:["plain","S256"]`, grants: `authorization_code`/`password`/`hybrid`); refresh_token on public client = long-lived bearer if intercepted
+reasoning: SSR boot config discloses public client 86cc4bf9-cfdf-4215-bd7c-e9fbbbe626d4 with redirect_uri=https://my.basf.com/.auth, scope=openid profile refresh_token, acr_values=3IAM/Login/External, zero PKCE refs; NAM discovery unchanged (code_challenge_methods_supported:["plain","S256"], grants: authorization_code/password/hybrid); refresh_token on public client = long-lived bearer if intercepted
 evidence_needed: Program-owned test account for authorization_code interception → token exchange → refresh_token replay/revocation
-verify_steps: PASSIVE — `GET https://my.basf.com/` (capture SSR config); `GET https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration` (confirm PKCE methods); AUTH_HELPED only for code flow
+verify_steps: PASSIVE — GET https://my.basf.com/ (capture SSR config); GET https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration (confirm PKCE methods); AUTH_HELPED only for code flow
 impact: Full ATO of myBASFWorld (HIGH) via stolen refresh_token; credential-blocked, triager HOLD
 testability: AUTH_HELPED
 [HYP] NAM OIDC Provider ROPC/Hybrid Grants Enable Credential Stuffing Against Registered Clients
 class: OATH
 asset: federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration
 confidence: 55
-reasoning: OIDC discovery exposes `grant_types_supported` including `password` (ROPC) and `hybrid`; `code_challenge_methods_supported:["plain","S256"]`; registration endpoint `/nidp/oauth/nam/clients` returns 401; scopes include `registration:full/read`; claims include LDAP `groupMembership` + `basfOTPUsed`; provider config stable across all re-probes
+reasoning: OIDC discovery exposes grant_types_supported including password (ROPC) and hybrid; code_challenge_methods_supported:["plain","S256"]; registration endpoint /nidp/oauth/nam/clients returns 401; scopes include registration:full/read; claims include LDAP groupMembership + basfOTPUsed; provider config stable across all re-probes
 evidence_needed: Valid BASF credentials + registered client_id/client_secret to test ROPC flow (out-of-scope without test account)
-verify_steps: PASSIVE — `GET https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration` confirms ROPC in grant_types; HUMAN_ONLY for exploitation
+verify_steps: PASSIVE — GET https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration confirms ROPC in grant_types; HUMAN_ONLY for exploitation
 impact: Credential stuffing/password spray against registered clients if valid BASF creds obtained; ROPC bypasses MFA/acr_values
 testability: HUMAN_ONLY
 [PARKED] NAM OIDC Provider ROPC/Hybrid Grants Enable Credential Stuffing Against Registered Clients: confidence 55 but exploitation requires valid BASF credentials + registered client (out-of-scope class); no verify steps possible without test account; provider config is informational only
 [FINAL] Unauthenticated AEM Sling Servlet Proxy to AWS Lambda with Param-Driven Dual Service Routing + Java Internals Disclosure (repfinder.basf.com, confidence 92, PASSIVE) — HIGHEST CONFIDENCE, triager VALID 5.3, clear verify steps, exploitable surface, submit-ready
 [FINAL] Public OAuth Client Emitting Refresh Tokens Without PKCE Enables ATO Chain (my.basf.com, confidence 65, AUTH_HELPED) — DESIGN FLAW, config confirmed stable, ATO chain well-defined, requires test account for POC
-[NEXT] HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu now (1 rps, all GET, reproduce three branches at submit). Method: broken-access-control. Title: "AEM dispatcher ACL miss on /bin/basf/repfindertool exposes unauthenticated AEM Sling servlet proxying to AWS Lambda (dual-service RepFinder/RetailFinder routing)". Body: (1) `GET /bin/basf/repfindertool` → 200, 80B `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`; (2) `GET /bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` → 200, `responseCode:200 SUCCESS`, hits=0; (3) `GET /bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE` → 200, 815B NPE wrapper. Controls: `/.model.json` 404, `retailfindertool` 404. Impact: unauth rep/retailer DB read MED-HIGH once populated (empty today) + internals; no EXPLOIT claim; do NOT lead with stacktrace (excluded class).
+[NEXT] HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu now (1 rps, all GET, reproduce three branches at submit). Method: broken-access-control. Title: "AEM dispatcher ACL miss on /bin/basf/repfindertool exposes unauthenticated AEM Sling servlet proxying to AWS Lambda (dual-service RepFinder/RetailFinder routing)". Body: (1) GET /bin/basf/repfindertool → 200, 80B {"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}; (2) GET /bin/basf/repfindertool?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 → 200, responseCode:200 SUCCESS, hits=0; (3) GET /bin/basf/repfindertool?repType=BR&productServiceId=2&country=DE → 200, 815B NPE wrapper. Controls: /.model.json 404, retailfindertool 404. Impact: unauth rep/retailer DB read MED-HIGH once populated (empty today) + internals; no EXPLOIT claim; do NOT lead with stacktrace (excluded class).
 [LEARN] REJECTED MISCONFIG @ agriculture.basf.com: Magnolia CMS GraphQL (/graphql2, /.graphql), REST (/.restful, /.rest), admin (/adminCentral, /admin, /.admin), cache (/.cache), DAM (/.imaging, /dam) all return 308 redirect or 404 — zero unauthenticated API surface
 [LEARN] REJECTED MISCONFIG @ north-america.intranet.basf.com: Concrete CMS internal APIs (/index.php/ccm/system/block/types, /index.php/ccm/system/page/types, /index.php/dashboard, /ccm/system/block/types, /api/blocks) all 307 redirect to Azure AD OAuth2 — fully auth-gated
 [LEARN] REJECTED MISCONFIG @ experience.basf.com: AEM Dispatcher cache poisoning via Host header spoofing — CloudFront returns 403 on all 4 tested paths with Host: author-prod-aem64.basf.com; edge blocks spoofed Host headers
