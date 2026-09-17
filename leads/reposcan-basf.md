@@ -292,3 +292,5 @@ reasoning: Hardcoded URL https://app-dev.roqs.basf.net/zndraw_app in source code
 impact: LOW — dev app not accessible from public internet
 verify_steps: DNS-resolve app-dev.roqs.basf.net externally
 TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-17 16:38:08 UTC
+TARGET_ORG not configured for basf; skipping public-org deep scan.
