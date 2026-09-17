@@ -262,3 +262,33 @@ TARGET_ORG not configured for basf; skipping public-org deep scan.
 TARGET_ORG not configured for basf; skipping public-org deep scan.
 ## REPOSCAN 2026-09-17 06:14:17 UTC
 TARGET_ORG not configured for basf; skipping public-org deep scan.
+## REPOSCAN 2026-09-17 12:01:36 UTC
+[HYP] Hardcoded internal BASF production hostnames in metis-gui frontend config
+class: MISCONFIG
+asset: metis-gui/src/config.ts:11,18
+confidence: 65
+reasoning: Frontend config hardcodes production URLs metis.basf.net and bff.metis.basf.net (Backend-for-Frontend). These are internal BASF hostnames not accessible from public internet but reveal internal service topology. RUNTIME_CONFIG override exists but defaults to hardcoded values.
+impact: LOW — hostnames are not routable from public internet; only useful to attacker with existing internal network access
+verify_steps: DNS-resolve metis.basf.net and bff.metis.basf.net from external network; confirm they resolve to private/internal IPs or NXDOMAIN
+[HYP] Hardcoded internal container registry URL in CI/CD pipeline
+class: MISCONFIG
+asset: xeredar/.gitlab-ci.yml:9
+confidence: 70
+reasoning: CI/CD config uses image registry.roqs.basf.net/base-images/r:latest — reveals internal GitLab registry hostname and base image naming convention. roqs.basf.net is the internal BASF GitLab/DevOps platform.
+impact: LOW — registry not accessible from public internet; reveals internal infrastructure naming
+verify_steps: DNS-resolve registry.roqs.basf.net from external network; confirm not publicly routable
+[HYP] Internal GitLab and Nexus hostnames disclosed in documentation and READMEs
+class: MISCONFIG
+asset: xeredar/docs/index.html:103-104, pyTEM/README.md:485, doe/docs/install.md:3
+confidence: 60
+reasoning: Multiple repos reference internal GitLab (gitlab.roqs.basf.net) and Nexus (nexus.roqs.basf.net) in documentation/READMEs. Reveals internal DevOps platform hostnames and project paths (WillmsIM/xeredar, raa-os-apps/xem/microed-tem-python-script).
+impact: LOW — internal hostnames not accessible from public; only useful with existing internal access
+verify_steps: DNS-resolve gitlab.roqs.basf.net and nexus.roqs.basf.net externally
+[HYP] Internal dev application URL hardcoded in Python source
+class: MISCONFIG
+asset: mlipx/mlipx/nodes/evaluate_calculator.py:105
+confidence: 55
+reasoning: Hardcoded URL https://app-dev.roqs.basf.net/zndraw_app in source code. Reveals internal dev application hostname and path.
+impact: LOW — dev app not accessible from public internet
+verify_steps: DNS-resolve app-dev.roqs.basf.net externally
+TARGET_ORG not configured for basf; skipping public-org deep scan.
