@@ -1,7 +1,7 @@
-## 2026-09-17 06:40:40 UTC [target] (model nemotron3)
-[PRIO] repfinder.basf.com/bin/basf/repfindertool,8.9,attack_surface=9,business_value=8,tech_exposure=9,gate_ease=10,cloud_surface=8,freshness=10 — SUBMIT-READY VALID 5.3 (broken-access-control, frozen evidence)
-[PRIO] my.basf.com,6.3,attack_surface=3,business_value=8,tech_exposure=5,gate_ease=10,cloud_surface=6,freshness=7 — public OAuth client 86cc4bf9 emits refresh_token without PKCE (AUTH_HELPED)
-[PRIO] federation.basf.com,5.8,attack_surface=4,business_value=7,tech_exposure=5,gate_ease=10,cloud_surface=5,freshness=6 — NAM OIDC ROPC/hybrid grants, plain+S256 PKCE (HOLD, credential-blocked)
+## 2026-09-17 12:11:05 UTC [target] (model nemotron3)
+[PRIO] repfinder.basf.com/bin/basf/repfindertool,8.9,attack_surface=9,business_value=8,tech_exposure=9,gate_ease=10,cloud_surface=8,freshness=10
+[PRIO] my.basf.com,6.3,attack_surface=3,business_value=8,tech_exposure=5,gate_ease=10,cloud_surface=6,freshness=7
+[PRIO] federation.basf.com,5.8,attack_surface=4,business_value=7,tech_exposure=5,gate_ease=10,cloud_surface=5,freshness=6
 [HYP] Unauthenticated AEM Sling Servlet Proxy to AWS Lambda with Param-Driven Dual Service Routing + Java Internals Disclosure
 class: MISCONFIG
 asset: repfinder.basf.com/bin/basf/repfindertool
