@@ -459,3 +459,5 @@
 - 2026-09-18 ACCEPTED RECON @ secsys.basf.com /api/*: HTTP 200/246B = WAF "Request Rejected" page across all 3 hosts; not API data — WAF returns 200 instead of 403
 - 2026-09-18 ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: NO_DELTA this cycle — all three branches byte-stable, finding frozen; re-probing a frozen finding is non-productive
 - 2026-09-18 ACCEPTED RECON @ *.basf.com estate: zero new unauth surface; all twelve closed classes stable; continued re-probing non-productive
+- 2026-09-18 ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-18 NO_DELTA — all three branches byte-stable, finding frozen; re-probing a frozen finding is non-productive.
+- 2026-09-18 ACCEPTED RECON @ *.basf.com estate: zero new unauth surface; all twelve closed classes stable; continued re-probing non-productive.
