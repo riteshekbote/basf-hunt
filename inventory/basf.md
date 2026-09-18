@@ -613,3 +613,6 @@ www.basf.com
 ## 2026-09-18 06:12:23 UTC
 
 ## 2026-09-18 11:35:47 UTC
+
+## 2026-09-18 15:15:20 UTC
+- CHANGED my.basf.com/.auth → 200 len=205890 (was ~204900-205005); my.basf.com/ → 200 len=205803 (was ~204900) — SPA bundle size delta only, SSR boot config unchanged (public client 86cc4bf9-cfdf-4215-bd7c-e9fb
