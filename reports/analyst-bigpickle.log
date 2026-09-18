@@ -22127,3 +22127,38 @@ STEP 6 — LEARNING
 
 STEP 7 — RISK
 [RISK] basf: 20 — one frozen MED-HIGH unauth finding (empty DB today, broken-access-control) awaiting HUMAN submission; identity class credential-blocked; all active-probe activity should pause until the engagement's scope/authorization is independently confirmed.
+===== ANALYST bigpickle 2026-09-18 11:35:47 UTC =====
+[0m
+> build · big-pickle
+[0m
+STEP 1 — DELTA
+NO_DELTA — inventory, KB, and leads unchanged since 09-18 06:12; repfinder three-branch finding frozen, identity class HOLD, all twelve discovery classes closed; no new surface observed. Re-probing remains non-productive per established convergence.
+
+STEP 2 — PRIORITIZE
+[PRIO] repfinder.basf.com/bin/basf/repfindertool, 7.2 — attack_surface=3 business_value=8 tech_exposure=5 gate_ease=10 cloud_surface=4 freshness=7 (frozen; VALID 5.3 submit-pending)
+[PRIO] my.basf.com/.auth + federation.basf.com, 5.6 — attack_surface=3 business_value=9 tech_exposure=7 gate_ease=1 cloud_surface=2 freshness=4 (credential-blocked; HOLD)
+
+STEP 3 — HYPOTHESES
+[HYP] none — no new hypothesis survives critique this cycle
+class: OTHER
+asset: *.basf.com estate remainder
+confidence: 10
+reasoning: twelve discovery classes probe-closed 09-02→09-18 across 35+ hosts; repfinder frozen byte-stable 09-12→09-18; no config drift observed; all prior [HYP] candidates rejected or parked
+evidence_needed: detectable config drift introducing reachable unauth surface
+verify_steps: none warranted under scope-pause + non-productive-reprobe convergence
+impact: none
+testability: PASSIVE
+
+STEP 4 — SELF-CRITIQUE
+[PARKED] my.basf no-PKCE ATO (conf 65): unreachable without program test account; AUTH_HELPED only; reverify if account provided.
+[FINAL] (1) repfinder unauth Lambda proxy [92] — frozen, submit-pending. (2) my.basf no-PKCE ATO [65] — HOLD. No new hypotheses survive critique; any new claim on this estate is REJECTED without concrete read-only evidence.
+
+STEP 5 — NEXT ACTION
+[NEXT] HUMAN: submit frozen VALID 5.3 report at bugs.olivermaicher.eu — method=broken-access-control (NOT stacktrace); body = three byte-stable branches (bare GET `→200/80B "Unsupported Product Service ID"`; geolocation `?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` `→200 SUCCESS hits=0`; `?repType=BR&productServiceId=2&country=DE` `→200 NPE wrapper RetailFinderDatabaseService.java:143`) + controls (`/.model.json` 404, `retailfindertool` 404), reproduced at 1 rps GET only. Do not act on this estate pending independent scope/authorization confirmation.
+
+STEP 6 — LEARNING
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-18 NO_DELTA — all three branches byte-stable, finding frozen; re-probing a frozen finding is non-productive.
+[LEARN] ACCEPTED RECON @ *.basf.com estate: zero new unauth surface; all twelve closed classes stable; continued re-probing non-productive.
+
+STEP 7 — RISK
+[RISK] basf: 20 — one frozen MED-HIGH unauth finding (empty DB today, broken-access-control) awaiting HUMAN submission; identity class credential-blocked; all active-probe activity on this third-party estate should pause until the engagement's scope/authorization is independently confirmed (report channel itself unverifiable from here).
