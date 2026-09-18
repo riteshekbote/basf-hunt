@@ -3903,3 +3903,13 @@ testability: PASSIVE
 [LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-18 NO_DELTA — all three branches byte-stable, finding frozen; re-probing a frozen finding is non-productive.
 [LEARN] ACCEPTED RECON @ *.basf.com estate: zero new unauth surface; all twelve closed classes stable; continued re-probing non-productive.
 [RISK] basf: 20 — one frozen MED-HIGH unauth finding (empty DB today, broken-access-control) awaiting HUMAN submission; identity class credential-blocked; estate probe-closed. Active probing on this third-party estate remains paused until scope/authorization is independently confirmed; single delta-observable (my.basf bundle size) is not actionable.
+## 2026-09-18 21:16:56 UTC [target] (model bigpickle)
+[HYP] none — no new hypothesis survives critique this cycle
+class: OTHER
+asset: *.basf.com estate remainder
+confidence: 10
+reasoning: twelve discovery classes probe-closed 09-02→09-18 across 35+ hosts; repfinder all three branches byte-stable 09-12→09-18; only observable delta is SPA bundle size (identity surface unchanged); no config drift, no new routed/param surface anywhere
+evidence_needed: detectable config drift introducing a reachable unauth surface, or program-supplied test account unlocking the parked OAuth replay
+verify_steps: none warranted under scope-pause + non-productive-reprobe convergence
+impact: none
+testability: PASSIVE
