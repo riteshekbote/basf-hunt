@@ -22404,3 +22404,343 @@ STEP 6 — LEARNING:
 
 STEP 7 — RISK:
 [RISK] basf: 20 — one frozen MED-HIGH unauth finding (empty DB today, broken-access-control) awaiting HUMAN submission; identity class credential-blocked; all active-probe activity remains paused until scope/authorization is independently confirmed (report channel at bugs.olivermaicher.eu not verifiable from here).
+===== ANALYST bigpickle 2026-09-19 11:38:06 UTC =====
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la art/ 2>/dev/null | tail -20; echo "---"; ls -la | head -30
+---
+total 548
+drwxr-xr-x 12 runner runner   4096 Sep 19 11:35 .
+drwxr-xr-x  3 runner runner   4096 Sep 19 11:35 ..
+drwxr-xr-x  7 runner runner   4096 Sep 19 11:35 .git
+drwxr-xr-x  3 runner runner   4096 Sep 19 11:35 .github
+-rw-r--r--  1 runner runner   1801 Sep 19 11:35 README.md
+-rw-r--r--  1 runner runner     32 Sep 19 11:35 analyst-out.txt
+-rw-r--r--  1 runner runner 197646 Sep 19 11:35 analyst-prompt.txt
+-rw-r--r--  1 runner runner 193774 Sep 19 11:35 ctx.txt
+drwxr-xr-x  2 runner runner   4096 Sep 19 11:35 inventory
+drwxr-xr-x  2 runner runner   4096 Sep 19 11:35 knowledge
+drwxr-xr-x  2 runner runner   4096 Sep 19 11:35 leads
+-rw-r--r--  1 runner runner  75114 Sep 19 11:35 probe-results.md
+drwxr-xr-x  2 runner runner   4096 Sep 19 11:35 recon-notes
+drwxr-xr-x  2 runner runner   4096 Sep 19 11:35 reports
+drwxr-xr-x  2 runner runner   4096 Sep 19 11:35 reposcan-raw
+-rw-r--r--  1 runner runner   3285 Sep 19 11:35 scope.yml
+drwxr-xr-x  2 runner runner   4096 Sep 19 11:35 scripts
+-rw-r--r--  1 runner runner     33 Sep 19 11:35 state_bigpickle.json
+-rw-r--r--  1 runner runner     33 Sep 19 11:35 state_laguna.json
+-rw-r--r--  1 runner runner     33 Sep 19 11:35 state_ling3.json
+-rw-r--r--  1 runner runner     33 Sep 19 11:35 state_longcat.json
+-rw-r--r--  1 runner runner     33 Sep 19 11:35 state_mimo.json
+-rw-r--r--  1 runner runner     33 Sep 19 11:35 state_nemotron3.json
+drwxr-xr-x  2 runner runner   4096 Sep 19 11:35 triage
+[0m
+[0m$ [0mcat analyst-out.txt; echo "---STATE---"; cat state_bigpickle.json; echo; ls leads/ knowledge/ triage/ reports/ inventory/ 2>/dev/null
+[0m
+> build · big-pickle
+[0m
+[0m$ [0mls -la art/ 2>/dev/null | tail -20; echo "---"; ls -la | head -30
+---
+total 548
+drwxr-xr-x 12 runner runner   4096 Sep 19 11:35 .
+drwxr-xr-x  3 runner runner   4096 Sep 19 11:35 ..
+drwxr-xr-x  7 runner runner   4096 Sep 19 11:35 .git
+drwxr-xr-x  3 runner runner   4096 Sep 19 11:35 .github
+-rw-r--r--  1 runner runner   1801 Sep 19 11:35 README.md
+-rw-r--r--  1 runner runner     32 Sep 19 11:35 analyst-out.txt
+-rw-r--r--  1 runner runner 197646 Sep 19 11:35 analyst-prompt.txt
+-rw-r--r--  1 runner runner 193774 Sep 19 11:35 ctx.txt
+drwxr-xr-x  2 runner runner   4096 Sep 19 11:35 inventory
+drwxr-xr-x  2 runner runner   4096 Sep 19 11:35 knowledge
+drwxr-xr-x  2 runner runner   4096 Sep 19 11:35 leads
+-rw-r--r--  1 runner runner  75114 Sep 19 11:35 probe-results.md
+drwxr-xr-x  2 runner runner   4096 Sep 19 11:35 recon-notes
+drwxr-xr-x  2 runner runner   4096 Sep 19 11:35 reports
+drwxr-xr-x  2 runner runner   4096 Sep 19 11:35 reposcan-raw
+-rw-r--r--  1 runner runner   3285 Sep 19 11:35 scope.yml
+drwxr-xr-x  2 runner runner   4096 Sep 19 11:35 scripts
+-rw-r--r--  1 runner runner     33 Sep 19 11:35 state_bigpickle.json
+-rw-r--r--  1 runner runner     33 Sep 19 11:35 state_laguna.json
+-rw-r--r--  1 runner runner     33 Sep 19 11:35 state_ling3.json
+-rw-r--r--  1 runner runner     33 Sep 19 11:35 state_longcat.json
+-rw-r--r--  1 runner runner     33 Sep 19 11:35 state_mimo.json
+-rw-r--r--  1 runner runner     33 Sep 19 11:35 state_nemotron3.json
+drwxr-xr-x  2 runner runner   4096 Sep 19 11:35 triage
+[0m
+---STATE---
+{"phase": "POC", "target": "api"}
+inventory/:
+basf.md
+
+knowledge/:
+index.md
+
+leads/:
+lead-bigpickle.md
+lead-laguna.md
+lead-ling3.md
+lead-longcat.md
+lead-mimo.md
+lead-nemotron3.md
+reposcan-basf.md
+
+reports/:
+analyst-bigpickle.log
+analyst-laguna.log
+analyst-ling3.log
+analyst-longcat.log
+analyst-nemotron3.log
+hypotheses-bigpickle.txt
+hypotheses-laguna.txt
+hypotheses-ling3.txt
+hypotheses-longcat.txt
+hypotheses-nemotron3.txt
+hypotheses.md
+valid-bugs.md
+
+triage/:
+run-2026-09-03-11-40.md
+run-2026-09-03-15-10.md
+run-2026-09-03-18-42.md
+run-2026-09-03-21-29.md
+run-2026-09-03-23-30.md
+run-2026-09-04-01-18.md
+run-2026-09-04-05-59.md
+run-2026-09-04-10-40.md
+run-2026-09-04-14-32.md
+run-2026-09-04-17-45.md
+run-2026-09-04-20-00.md
+run-2026-09-04-22-10.md
+run-2026-09-05-00-07.md
+run-2026-09-05-04-31.md
+run-2026-09-05-08-33.md
+run-2026-09-05-12-01.md
+run-2026-09-05-14-46.md
+run-2026-09-05-16-59.md
+run-2026-09-05-18-48.md
+run-2026-09-05-20-48.md
+run-2026-09-05-22-26.md
+run-2026-09-06-00-12.md
+run-2026-09-06-04-41.md
+run-2026-09-06-09-06.md
+run-2026-09-06-12-54.md
+run-2026-09-06-15-52.md
+run-2026-09-06-17-51.md
+run-2026-09-06-19-42.md
+run-2026-09-06-21-49.md
+run-2026-09-06-23-19.md
+run-2026-09-07-01-05.md
+run-2026-09-07-06-07.md
+run-2026-09-07-12-35.md
+run-2026-09-07-17-53.md
+run-2026-09-07-20-53.md
+run-2026-09-07-23-07.md
+run-2026-09-08-01-13.md
+run-2026-09-08-05-59.md
+run-2026-09-08-10-37.md
+run-2026-09-08-14-45.md
+run-2026-09-08-18-10.md
+run-2026-09-08-21-10.md
+run-2026-09-08-23-24.md
+run-2026-09-09-01-29.md
+run-2026-09-09-06-37.md
+run-2026-09-09-11-48.md
+run-2026-09-09-15-29.md
+run-2026-09-09-18-49.md
+run-2026-09-09-21-21.md
+run-2026-09-09-23-28.md
+run-2026-09-10-01-24.md
+run-2026-09-10-06-36.md
+run-2026-09-10-11-46.md
+run-2026-09-10-15-25.md
+run-2026-09-10-18-39.md
+run-2026-09-10-21-11.md
+run-2026-09-10-23-11.md
+run-2026-09-11-01-06.md
+run-2026-09-11-06-01.md
+run-2026-09-11-11-23.md
+run-2026-09-11-15-11.md
+run-2026-09-11-18-34.md
+run-2026-09-11-21-13.md
+run-2026-09-11-23-16.md
+run-2026-09-12-01-09.md
+run-2026-09-12-05-48.md
+run-2026-09-12-09-45.md
+run-2026-09-12-13-13.md
+run-2026-09-12-16-19.md
+run-2026-09-12-18-28.md
+run-2026-09-12-20-55.md
+run-2026-09-12-22-42.md
+run-2026-09-13-00-29.md
+run-2026-09-13-05-18.md
+run-2026-09-13-10-21.md
+run-2026-09-13-14-38.md
+run-2026-09-13-17-37.md
+run-2026-09-13-19-44.md
+run-2026-09-13-21-53.md
+run-2026-09-13-23-44.md
+run-2026-09-14-02-09.md
+run-2026-09-14-07-55.md
+run-2026-09-14-14-32.md
+run-2026-09-14-19-34.md
+run-2026-09-14-22-45.md
+run-2026-09-15-01-03.md
+run-2026-09-15-06-10.md
+run-2026-09-15-11-45.md
+run-2026-09-15-15-51.md
+run-2026-09-15-19-21.md
+run-2026-09-15-22-25.md
+run-2026-09-16-00-45.md
+run-2026-09-16-05-26.md
+run-2026-09-16-10-15.md
+run-2026-09-16-14-59.md
+run-2026-09-16-18-43.md
+run-2026-09-16-21-47.md
+run-2026-09-16-23-57.md
+run-2026-09-17-03-01.md
+run-2026-09-17-08-41.md
+run-2026-09-17-13-54.md
+run-2026-09-17-17-49.md
+run-2026-09-17-20-41.md
+run-2026-09-17-23-13.md
+run-2026-09-18-01-17.md
+run-2026-09-18-05-58.md
+run-2026-09-18-10-34.md
+run-2026-09-18-14-37.md
+run-2026-09-18-17-51.md
+run-2026-09-18-20-06.md
+run-2026-09-18-22-35.md
+run-2026-09-19-00-35.md
+run-2026-09-19-04-58.md
+run-2026-09-19-09-10.md
+[0m
+[0m$ [0mtail -60 triage/run-2026-09-19-09-10.md 2>/dev/null; echo "===LEADS big==="; tail -40 leads/lead-bigpickle.md 2>/dev/null
+===== TRIAGE 2026-09-19 09:10:16 UTC =====
+[0m
+> build · mimo-v2.5-free
+[0m
+I see that the "LEADS:" section is empty — no probe results or leads were provided for triage.
+
+To perform the 7-Question Gate validation, I need:
+
+1. **The leads** — URLs, domains, or assets discovered by the hunt bot
+2. **Probe results** — any passive observations (status codes, headers, technologies, etc.)
+
+Could you provide the leads you'd like me to evaluate? For example:
+
+```
+LEADS:
+1. https://subdomain.basf.example.com — probe: 200 OK, login page, Apache/2.4
+2. https://api.basf.example.com/v1/users — probe: 401, JWT required
+3. ...
+```
+
+I'll then run each through the 7-Question Gate with verdicts, impact, CVSS, and reporting channels.
+===LEADS big===
+impact: none
+testability: PASSIVE
+[PARKED] my.basf no-PKCE ATO (conf 65): credible but unreachable without program-supplied test account; AUTH_HELPED only; reverify only if one is provided — no active probing without it.
+[FINAL] (1) repfinder unauth Lambda proxy [92] — frozen, submit-pending. (2) my.basf no-PKCE ATO [65] — HOLD. No new hypotheses survive critique; any new claim on this estate is REJECTED without concrete read-only evidence.
+[NEXT] HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu — method=broken-access-control (NOT stacktrace); body = three byte-stable branches (bare GET →200/80B `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`; geolocation `?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` →200 SUCCESS hits=0; `?repType=BR&productServiceId=2&country=DE` →200 NPE wrapper `RetailFinderDatabaseService.java:143`/`RepFinderHandler.java:60`) + controls (`/.model.json` 404, `retailfindertool` 404), reproduced at 1 rps GET only. No further probes on any closed asset; do not act on this estate pending independent scope/authorization confirmation.
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-18 NO_DELTA — all three branches byte-stable, finding frozen; re-probing a frozen finding is non-productive.
+[LEARN] ACCEPTED RECON @ *.basf.com estate: zero new unauth surface; all twelve closed classes stable; continued re-probing non-productive.
+[RISK] basf: 20 — one frozen MED-HIGH unauth finding (empty DB today, broken-access-control) awaiting HUMAN submission; identity class credential-blocked; all active-probe activity on this third-party estate should pause until the engagement's scope/authorization is independently confirmed (report channel itself unverifiable from here).
+## 2026-09-19 01:36:56 UTC [target] (model bigpickle)
+[HYP] none — no new hypothesis survives critique this cycle
+class: OTHER
+asset: *.basf.com estate remainder
+confidence: 10
+reasoning: twelve discovery classes probe-closed 09-02→09-18 across 35+ hosts; repfinder all three branches byte-stable across six daily re-probes; only live delta is SPA bundle size (surface unchanged); no unrouted param/REST surface or config drift observed on any host
+evidence_needed: detectable config drift introducing a reachable unauth surface, or program-supplied test account unlocking the parked OAuth replay
+verify_steps: none warranted under scope-pause + non-productive-reprobe convergence; any new claim requires concrete read-only evidence before re-engagement
+impact: none
+testability: PASSIVE
+[NEXT] HUMAN: submit the frozen VALID 5.3 report at bugs.olivermaicher.eu — method=broken-access-control (dispatcher misses `/bin/basf/*` → unauth AEM Sling servlet → AWS Lambda proxy; NOT stacktrace); body = three byte-stable branches (bare GET →200/80B `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`; geolocation `?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` →200 SUCCESS hits=0; `?repType=BR&productServiceId=2&country=DE` →200 NPE wrapper `RetailFinderDatabaseService.java:143`/`RepFinderHandler.java:60`) + controls (`/.model.json` 404, `retailfindertool` 404), reproduced at 1 rps GET only; verify report-channel reachability and engagement scope independently before filing, then no further probes on any closed asset.
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-18 NO_DELTA — all three branches byte-stable, finding frozen; re-probing a frozen finding is non-productive.
+[LEARN] ACCEPTED RECON @ *.basf.com estate: zero new unauth surface; all twelve closed classes stable; continued re-probing non-productive.
+[RISK] basf: 20 — one frozen MED-HIGH unauth finding (empty DB today, broken-access-control) awaiting HUMAN submission; identity class credential-blocked; all active-probe activity on this third-party estate paused until scope/authorization is independently confirmed (report channel not verifiable from here).
+## 2026-09-19 06:40:15 UTC [target] (model bigpickle)
+[PRIO] repfinder.basf.com/bin/basf/repfindertool, 7.2 — attack_surface=3 business_value=8 tech_exposure=5 gate_ease=10 cloud_surface=4 freshness=7 (frozen 7 days; VALID 5.3 submit-pending; unchanged)
+[PRIO] my.basf.com/.auth + federation.basf.com no-PKCE ATO, 5.6 — attack_surface=3 business_value=9 tech_exposure=7 gate_ease=1 cloud_surface=2 freshness=4 (credential-blocked; HOLD; unchanged)
+[HYP] none — no new hypothesis survives critique this cycle
+class: OTHER
+asset: *.basf.com estate remainder
+confidence: 10
+reasoning: twelve discovery classes probe-closed 09-02→09-18 across 35+ hosts; repfinder byte-stable across seven consecutive daily re-probes; only live delta is my.basf bundle size (no param/routed/config-drift change); every prior NEW in the last week reverted to 307/308/404 auth-gates on raw inspection — no unrouted surface exists
+evidence_needed: detectable config drift introducing a reachable unauth surface, or program-supplied test account unlocking the parked OAuth replay
+verify_steps: none warranted under scope-pause + non-productive-reprobe convergence; any new claim requires concrete read-only evidence before re-engagement
+impact: none
+testability: PASSIVE
+[PARKED] my.basf no-PKCE ATO (conf 65): provider config (ROPC/hybrid, plain PKCE) is a known-poor posture but concretely unreachable without program-supplied test account; AUTH_HELPED only; no active probing without one.
+[FINAL] (1) repfinder unauth Lambda proxy [92] — frozen, submit-pending. (2) my.basf no-PKCE ATO [65] — HOLD. No new hypothesis survives critique; any new claim on this estate is REJECTED without concrete read-only evidence.
+[NEXT] HUMAN: submit the frozen VALID 5.3 report for repfinder.basf.com/bin/basf/repfindertool — method=broken-access-control (dispatcher misses `/bin/basf/*` → unauth AEM Sling servlet → AWS Lambda proxy; NOT stacktrace); body = three byte-stable branches (bare GET →200/80B `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`; geolocation `?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` →200 SUCCESS hits=0; `?repType=BR&productServiceId=2&country=DE` →200 NPE wrapper `RetailFinderDatabaseService.java:143`/`RepFinderHandler.java:60`) + controls (`/.model.json` 404, `retailfindertool` 404); reproduced at 1 rps GET only. Verify report-channel reachability and engagement scope/authorization independently before filing; no further probes on any closed asset.
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-18 NO_DELTA — all three branches byte-stable, finding frozen; re-probing a frozen finding is non-productive.
+[LEARN] ACCEPTED RECON @ *.basf.com estate: zero new unauth surface; all twelve closed classes stable; continued re-probing non-productive.
+[RISK] basf: 20 — one frozen MED-HIGH unauth finding (empty DB today, broken-access-control) awaiting HUMAN submission; identity class credential-blocked; all active-probe activity remains paused until scope/authorization is independently confirmed (report channel at bugs.olivermaicher.eu not verifiable from here).
+[0m
+[0m$ [0mtail -20 probe-results.md; echo "===VALID==="; cat reports/valid-bugs.md 2>/dev/null | tail -40
+https://my.basf.com/ -> 200 len=205797
+https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration -> 200 len=2029
+
+## 2026-09-18 21:19:40 UTC
+https://my.basf.com/.auth -> 200 len=205890
+https://my.basf.com/ -> 200 len=205795
+https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration -> 200 len=2029
+
+## 2026-09-18 23:25:45 UTC
+
+
+## 2026-09-19 01:38:33 UTC
+https://my.basf.com/.auth -> 200 len=205890
+https://my.basf.com/ -> 200 len=205803
+https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration -> 200 len=2029
+
+## 2026-09-19 06:41:20 UTC
+https://my.basf.com/.auth -> 200 len=205890
+https://my.basf.com/ -> 200 len=205803
+https://federation.basf.com/nidp/oauth/nam/.well-known/openid-configuration -> 200 len=2029
+===VALID===
+# Validated findings (running count 0)
+
+- 1 lead(s) marked VALID at 2026-09-06 00:12:43 UTC
+  - **VALID count: 0** — No finding currently meets the proof threshold for submission. Three leads (1, 6, 8) are on HOLD pending active validation steps.
+
+- 3 lead(s) marked VALID at 2026-09-12 09:45:34 UTC
+  - **Verdict: VALID**
+  - | Q7 | Reasonable triager accept? | **HOLD** — ROPC+plain PKCE are configuration weaknesses but exploitation requires valid credentials; depends on whether program accepts identity config findings |
+  - | repfinder stacktrace | **VALID** | 5.3 | Submit |
+[0m
+NO_DELTA. 09-19 06:41/earlier probes byte-identical (my.basf 205803/205890, federation 2029); triage 09-19 09:10 empty template — repfinder VALID 5.3 remains submit-pending, no new surface anywhere.
+
+STEP 1 — DELTA
+NO_DELTA: my.basf.com /.auth→200 len=205890, /→200 len=205803; federation discovery→200 len=2029 (identical 01:38→06:41); repfinder three branches byte-stable (frozen 7d); twelve discovery classes closed 09-02→09-19, zero new unauth surface.
+
+STEP 2 — PRIORITIZE
+[PRIO] repfinder.basf.com/bin/basf/repfindertool, 7.2 (attack_surface=3 business_value=8 tech_exposure=5 gate_ease=10 cloud_surface=4 freshness=7) — frozen, VALID 5.3 submit-pending; unchanged.
+[PRIO] my.basf.com/.auth + federation.basf.com no-PKCE ATO, 5.6 (3/9/7/1/2/4) — credential-blocked; HOLD; unchanged.
+
+STEP 3 — HYPOTHESES
+[HYP] none — no new hypothesis survives critique this cycle
+class: OTHER
+asset: *.basf.com estate remainder
+confidence: 10
+reasoning: twelve probe-closed classes across 35+ hosts since 09-02; repfinder byte-stable across eight consecutive daily re-probes; only live delta is my.basf SPA bundle size (no param/routed/config-drift change); every recent NEW reverted to 307/308/404 auth-gates on raw inspection; no unrouted surface exists
+evidence_needed: detectable config drift introducing a reachable unauth surface, or program-supplied test account unlocking the parked OAuth replay
+verify_steps: none warranted under scope-pause + non-productive-reprobe convergence; any new claim requires concrete read-only evidence before re-engagement
+impact: none
+testability: PASSIVE
+
+STEP 4 — SELF-CRITIQUE
+[PARKED] my.basf no-PKCE ATO (conf 65): provider config (ROPC/hybrid, plain PKCE) is poor posture but concretely unreachable without program-supplied test account; AUTH_HELPED only; no active probing without one.
+[FINAL] (1) repfinder unauth Lambda proxy [92] — frozen, submit-pending. (2) my.basf no-PKCE ATO [65] — HOLD. No new hypothesis survives critique; any new claim on this estate is REJECTED without concrete read-only evidence.
+
+STEP 5 — NEXT ACTION
+[NEXT] HUMAN: submit the frozen VALID 5.3 report for repfinder.basf.com/bin/basf/repfindertool — method=broken-access-control (dispatcher misses `/bin/basf/*` → unauth AEM Sling servlet → AWS Lambda proxy; NOT stacktrace); body = three byte-stable branches (bare GET →200/80B `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`; geolocation `?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` →200 SUCCESS hits=0; `?repType=BR&productServiceId=2&country=DE` →200 NPE wrapper `RetailFinderDatabaseService.java:143`/`RepFinderHandler.java:60`) + controls (`/.model.json` 404, `retailfindertool` 404); reproduced at 1 rps GET only. Verify report-channel reachability (bugs.olivermaicher.eu) and engagement scope/authorization independently before filing; no further probes on any closed asset.
+
+STEP 6 — LEARNING
+[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-19 NO_DELTA — all three branches byte-stable, finding frozen; re-probing a frozen finding is non-productive.
+[LEARN] ACCEPTED RECON @ *.basf.com estate: zero new unauth surface; all twelve closed classes stable; continued re-probing non-productive.
+
+STEP 7 — RISK
+[RISK] basf: 20 — one frozen MED-HIGH unauth finding (empty DB today, broken-access-control) awaiting HUMAN submission; identity class credential-blocked; all active-probe activity remains paused until scope/authorization is independently confirmed (report channel at bugs.olivermaicher.eu not verifiable from here).

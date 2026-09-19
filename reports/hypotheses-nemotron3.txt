@@ -1,5 +1,4 @@
-## 2026-09-19 06:41:05 UTC [target] (model nemotron3)
-[NEW] NO_DELTA — 09-19 estate re-check confirms all twelve discovery classes stable; repfinder three branches byte-stable (bare 80B, geolocation 72B, NPE 815B); my.basf.com SSR config unchanged; federation OIDC discovery unchanged; *.api.basf.com 9-host surface fully gated; zero new unauth surface
+## 2026-09-19 11:37:57 UTC [target] (model nemotron3)
 [PRIO] repfinder.basf.com/bin/basf/repfindertool,9.2,attack_surface=10,business_value=8,tech_exposure=10,gate_ease=10,cloud_surface=9,freshness=10
 [PRIO] my.basf.com,6.5,attack_surface=4,business_value=9,tech_exposure=6,gate_ease=10,cloud_surface=6,freshness=8
 [PRIO] federation.basf.com/nidp/oauth/nam,5.8,attack_surface=5,business_value=7,tech_exposure=5,gate_ease=10,cloud_surface=5,freshness=7
