@@ -4019,3 +4019,4 @@ testability: PASSIVE
 [LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-19 NO_DELTA — all three branches byte-stable, finding frozen; re-probing a frozen finding is non-productive.
 [LEARN] ACCEPTED RECON @ *.basf.com estate: zero new unauth surface; all twelve closed classes stable; continued re-probing non-productive.
 [RISK] basf: 20 — one frozen MED-HIGH unauth finding (empty DB today, broken-access-control) awaiting HUMAN submission; identity class credential-blocked; all active-probe activity remains paused until scope/authorization is independently confirmed (report channel at bugs.olivermaicher.eu not verifiable from here).
+## 2026-09-19 14:50:32 UTC [target] (model bigpickle)

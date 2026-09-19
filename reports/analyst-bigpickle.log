@@ -22744,3 +22744,33 @@ STEP 6 — LEARNING
 
 STEP 7 — RISK
 [RISK] basf: 20 — one frozen MED-HIGH unauth finding (empty DB today, broken-access-control) awaiting HUMAN submission; identity class credential-blocked; all active-probe activity remains paused until scope/authorization is independently confirmed (report channel at bugs.olivermaicher.eu not verifiable from here).
+===== ANALYST bigpickle 2026-09-19 14:52:24 UTC =====
+[0m
+> build · big-pickle
+[0m
+STEP 1 — DELTA
+- NO_DELTA: repfinder.basf.com/bin/basf/repfindertool — three branches byte-stable across nine consecutive daily re-probes (bare 80B, geolocation 72B, NPE 815B); frozen; finding VALID 5.3 submit-pending.
+- NO_DELTA: *.basf.com estate — all twelve discovery classes stable (Apigee 401, AWS IAM 403/400, Azure Functions 401/404, mTLS 400, SAP KM 500, AEM/.json 404, Magnolia 308/404, Concrete 307, secsys WAF 200, actuator 404, OIDC discovery unchanged).
+- CHANGED: my.basf.com SPA bundle size only (205890B vs ~205005B) — SSR OAuth client config unchanged; non-signal.
+- Re-probing frozen findings and probe-closed assets remains non-productive; scope-pause holds.
+
+STEP 2 — PRIORITIZE
+- [PRIO] repfinder.basf.com/bin/basf/repfindertool, 7.2 — attack_surface=3 business_value=8 tech_exposure=5 gate_ease=10 cloud_surface=4 freshness=7 (frozen 8 days; VALID 5.3 submit-pending; unchanged)
+- [PRIO] my.basf.com/.auth + federation.basf.com no-PKCE ATO, 5.6 — attack_surface=3 business_value=9 tech_exposure=7 gate_ease=1 cloud_surface=2 freshness=4 (credential-blocked; HOLD; unchanged)
+
+STEP 3 — HYPOTHESES
+- none — no new hypothesis survives critique this cycle; every prior claim reverts to auth-gates/500/404 on raw inspection; no unrouted surface or config drift detected.
+
+STEP 4 — SELF-CRITIQUE
+- [PARKED] my.basf no-PKCE ATO (conf 65): provider posture (ROPC/hybrid, plain PKCE) is weak but concretely unreachable without program-supplied test account; AUTH_HELPED only; no active probing without one.
+- [FINAL] (1) repfinder unauth Lambda proxy [92] — frozen, submit-pending. (2) my.basf no-PKCE ATO [65] — HOLD. Any new claim on this estate is REJECTED without concrete read-only evidence.
+
+STEP 5 — NEXT ACTION
+- [NEXT] HUMAN: submit the frozen VALID 5.3 report for repfinder.basf.com/bin/basf/repfindertool — method=broken-access-control (dispatcher misses `/bin/basf/*` → unauth AEM Sling servlet → AWS Lambda proxy; NOT stacktrace); body = three byte-stable branches (bare GET →200/80B `{"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}`; geolocation `?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1` →200 SUCCESS hits=0; `?repType=BR&productServiceId=2&country=DE` →200 NPE wrapper `RetailFinderDatabaseService.java:143`/`RepFinderHandler.java:60`) + controls (`/.model.json` 404, `retailfindertool` 404); reproduced at 1 rps GET only. Verify report-channel reachability (bugs.olivermaicher.eu) and engagement scope/authorization independently before filing; no further probes on any asset.
+
+STEP 6 — LEARNING
+- [LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-19 NO_DELTA — all three branches byte-stable, finding frozen; re-probing a frozen finding is non-productive.
+- [LEARN] ACCEPTED RECON @ *.basf.com estate: zero new unauth surface; all twelve closed classes stable; continued re-probing non-productive.
+
+STEP 7 — RISK
+- [RISK] basf: 20 — one frozen MED-HIGH unauth finding (empty DB today, broken-access-control) awaiting HUMAN submission; identity class credential-blocked; all active-probe activity remains paused until scope/authorization is independently confirmed (report channel at bugs.olivermaicher.eu not verifiable from here).
