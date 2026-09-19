@@ -1,6 +1,5 @@
-## 2026-09-19 01:38:17 UTC [target] (model nemotron3)
-[LEARN] ACCEPTED RECON @ repfinder.basf.com/bin/basf/repfindertool: 09-18 NO_DELTA — all three branches byte-stable (bare 80B, geolocation 72B, NPE 815B), finding frozen; re-probing non-productive
-[LEARN] ACCEPTED RECON @ *.basf.com estate: zero new unauth surface; all twelve closed classes stable; continued re-probing non-productive
+## 2026-09-19 06:41:05 UTC [target] (model nemotron3)
+[NEW] NO_DELTA — 09-19 estate re-check confirms all twelve discovery classes stable; repfinder three branches byte-stable (bare 80B, geolocation 72B, NPE 815B); my.basf.com SSR config unchanged; federation OIDC discovery unchanged; *.api.basf.com 9-host surface fully gated; zero new unauth surface
 [PRIO] repfinder.basf.com/bin/basf/repfindertool,9.2,attack_surface=10,business_value=8,tech_exposure=10,gate_ease=10,cloud_surface=9,freshness=10
 [PRIO] my.basf.com,6.5,attack_surface=4,business_value=9,tech_exposure=6,gate_ease=10,cloud_surface=6,freshness=8
 [PRIO] federation.basf.com/nidp/oauth/nam,5.8,attack_surface=5,business_value=7,tech_exposure=5,gate_ease=10,cloud_surface=5,freshness=7
@@ -8,7 +7,7 @@
 class: MISCONFIG
 asset: repfinder.basf.com/bin/basf/repfindertool
 confidence: 92
-reasoning: Dispatcher blocks /.model.json and standard AEM selectors but misses /bin/basf/*; three branches byte-stable 09-12→09-18: (1) bare GET → 200 len=80 {"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}; (2) geolocation ?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 → 200 SUCCESS hits=0; (3) ?repType=BR&productServiceId=2&country=DE → 200 len=815 NPE wrapper leaking RetailFinderDatabaseService.java:143, RepFinderHandler.java:60; sibling retailfindertool 404; dual-service routing confirmed inside single servlet; triager VALID 5.3 (Submit) 09-12 09:45
+reasoning: Dispatcher blocks /.model.json and standard AEM selectors but misses /bin/basf/*; three branches byte-stable 09-12→09-19: (1) bare GET → 200 len=80 {"responseCode":"400","responseMsg":"\nUnsupported Product Service ID","hits":0}; (2) geolocation ?country=US&productServiceId=1&lat=41.8781&lng=-87.6298&distance=250&limitResults=10&repType=1 → 200 SUCCESS hits=0; (3) ?repType=BR&productServiceId=2&country=DE → 200 len=815 NPE wrapper leaking RetailFinderDatabaseService.java:143, RepFinderHandler.java:60; sibling retailfindertool 404; dual-service routing confirmed inside single servlet; triager VALID 5.3 (Submit) 09-12 09:45
 evidence_needed: none — frozen; reproduce three branches + controls in report body
 verify_steps: PASSIVE — GET three branches + controls (/.model.json 404, /bin/basf/retailfindertool 404), 1 rps
 impact: Unauthenticated rep/retailer DB read (MEDIUM-HIGH once populated, empty today) + Java internals disclosure; frame as broken-access-control ONLY
